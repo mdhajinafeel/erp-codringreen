@@ -1,0 +1,479 @@
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+?>
+<?php $site_lang = $this->load->helper('language'); ?>
+<?php $wz_lang = $site_lang->session->userdata('site_lang'); ?>
+<div class="modal-header">
+    <h4 class="modal-title" id="add-modal-data"><?php echo $pageheading; ?></h4>
+    <?php echo form_button(array('aria-label' => 'Close', 'data-bs-dismiss' => 'modal', 'type' => 'button', 'class' => 'close', 'content' => '<span aria-hidden="true">×</span>')); ?>
+
+</div>
+<?php $attributes = array('name' => 'add_export', 'id' => 'add_export', 'autocomplete' => 'off', 'class' => '"m-b-1'); ?>
+<?php $hidden = array('_method' => $pagetype); ?>
+<?php echo form_open($formsubmit, $attributes, $hidden); ?>
+<div class="modal-body">
+    <input type="hidden" id="pagetype" name="pagetype" value="<?php echo $pagetype; ?>">
+    <input type="hidden" id="hdnCsrf" name="hdnCsrf" value="<?php echo $csrfhash; ?>">
+    <input type="hidden" id="hdnOriginId" name="hdnOriginId" value="<?php echo $originid; ?>">
+    <input type="hidden" id="hdnDispatchIds" name="hdnDispatchIds" value="<?php echo $dispatchids; ?>">
+    <input type="hidden" id="hdnProductTypeId" name="hdnProductTypeId" value="<?php echo $product_type_id ?>">
+    <input type="hidden" id="hdnShippingLineId" name="hdnShippingLineId" value="<?php echo $shipping_line_id ?>">
+    <input type="hidden" id="hdnWarehousePolId" name="hdnWarehousePolId" value="<?php echo $warehouse_pol_id ?>">
+    <input type="hidden" id="hdnWarehouseId" name="hdnWarehouseId" value="<?php echo $warehouse_id ?>">
+
+    <div class="row mb-2">
+        <div class="col-md-6 mb-2">
+            <label for="sa_number"><?php echo $this->lang->line("sa_number"); ?></label>
+            <input type="text" id="sa_number" name="sa_number" class="form-control text-uppercase" placeholder="<?php echo $this->lang->line("sa_number"); ?>" />
+            <label id="error-sanumber" class="error-text"><?php echo $this->lang->line("error_sanumber"); ?></label>
+        </div>
+
+        <div class="col-md-6">
+            <label for="port_of_loading"><?php echo $this->lang->line("port_of_loading"); ?></label>
+            <div class="input-group">
+                <label class="control-label"><?php echo $warehouse_pol_name; ?></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-md-6 mb-2">
+            <label for="port_of_discharge"><?php echo $this->lang->line("port_of_discharge"); ?></label>
+            <select class="form-control" name="port_of_discharge" id="port_of_discharge" data-plugin="select_erp">
+                <option value="0"><?php echo $this->lang->line("select"); ?></option>
+                <?php foreach ($exportpod as $pod) { ?>
+                    <option value="<?php echo $pod->id; ?>"><?php echo $pod->pod_name; ?></option>
+                <?php } ?>
+            </select>
+            <label id="error-portofdischarge" class="error-text"><?php echo $this->lang->line("error_pod"); ?></label>
+        </div>
+        <div class="col-md-6">
+            <label for="shipping_line"><?php echo $this->lang->line("shipping_line"); ?></label>
+            <div class="input-group">
+                <label class="control-label"><?php echo $shipping_line_name; ?></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-md-6 mb-2">
+            <label for="bl_number"><?php echo $this->lang->line("bl_number"); ?></label>
+            <input type="text" id="bl_number" name="bl_number" class="form-control text-uppercase" placeholder="<?php echo $this->lang->line("bl_number"); ?>" />
+        </div>
+        <div class="col-md-6">
+            <label for="bl_date"><?php echo $this->lang->line("bl_date"); ?></label>
+            <input type="text" id="bl_date" name="bl_date" class="form-control text-uppercase" placeholder="<?php echo $this->lang->line("bl_date"); ?>" readonly />
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-md-6 mb-2">
+            <label for="shipped_date"><?php echo $this->lang->line("shipped_date"); ?></label>
+            <input type="text" id="shipped_date" name="shipped_date" class="form-control" placeholder="<?php echo $this->lang->line("shipped_date"); ?>" readonly />
+        </div>
+        <div class="col-md-6">
+            <label for="vessel_name"><?php echo $this->lang->line("vessel_name"); ?></label>
+            <input type="text" id="vessel_name" name="vessel_name" class="form-control text-uppercase" placeholder="<?php echo $this->lang->line("vessel_name"); ?>" />
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-md-6 mb-2">
+            <label for="client_pno"><?php echo $this->lang->line("client_pno"); ?></label>
+            <input type="text" id="client_pno" name="client_pno" class="form-control text-uppercase" placeholder="<?php echo $this->lang->line("client_pno"); ?>" />
+        </div>
+        <div class="col-md-6">
+            <label for="product_type"><?php echo $this->lang->line("product_type"); ?></label>
+            <div class="input-group">
+                <label class="control-label"><?php echo $this->lang->line($product_type_name); ?></label>
+            </div>
+        </div>
+    </div>
+    
+    <?php if ($originid == 4) { ?>
+
+        <div class="row mb-2">
+            <div class="col-md-6 mb-2">
+                <label for="circumference_allowance"><?php echo $this->lang->line("circumference_allowance"); ?></label>
+                <input type="number" id="circumference_allowance" name="circumference_allowance" class="form-control text-uppercase" placeholder="<?php echo $this->lang->line("circumference_allowance"); ?>" />
+            </div>
+            <div class="col-md-6 mb-2">
+                <label for="length_allowance"><?php echo $this->lang->line("length_allowance"); ?></label>
+                <input type="number" id="length_allowance" name="length_allowance" class="form-control text-uppercase" placeholder="<?php echo $this->lang->line("length_allowance"); ?>" />
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-md-6 mb-2">
+                <label for="circumference_adjustment"><?php echo $this->lang->line("circumference_adjustment"); ?></label>
+                <input type="number" id="circumference_adjustment" name="circumference_adjustment" class="form-control text-uppercase" placeholder="<?php echo $this->lang->line("circumference_adjustment"); ?>" />
+            </div>
+        </div>
+    <?php } ?>
+
+    <div class="row mb-2">
+        <div class="col-md-6 mb-2">
+            <label for="measurement_system"><?php echo $this->lang->line("measuremet_system"); ?></label>
+            <select class="form-control" name="measurement_system" id="measurement_system" data-plugin="select_erp">
+                <option value="0"><?php echo $this->lang->line("select"); ?></option>
+                <?php foreach ($measurementsystems as $measurementsystem) { ?>
+                    <option value="<?php echo $measurementsystem->measurement_id; ?>"><?php echo $measurementsystem->measurement_name; ?></option>
+                <?php } ?>
+            </select>
+            <label id="error-measurementsystem" class="error-text"><?php echo $this->lang->line("error_measuremet_system"); ?></label>
+        </div>
+
+        <div class="col-md-6" id="divUploadedDetails">
+            <div class="next-line">
+                <label class="label-showdetails" for="lblTotalPieces" id="lblTotalPieces"><?php echo $this->lang->line("total_no_of_pieces") . ": ---"; ?></label>
+                <label class="label-showdetails" for="lblGrossVolume" id="lblGrossVolume"><?php echo $this->lang->line("total_gross_volume") . ": ---"; ?></label>
+                <label class="label-showdetails" for="lblNetVolume" id="lblNetVolume"><?php echo $this->lang->line("total_net_volume") . ": ---"; ?></label>
+                <label class="label-showdetails" for="lblNetWeight" id="lblNetWeight"><?php echo $this->lang->line("net_weight") . ": ---"; ?></label>
+            </div>
+        </div>
+    </div>
+
+    <?php if ($originid == 3) { ?>
+        <div class="row" style="margin-bottom: 30px;">
+
+            <h6 style="text-decoration: underline; font-weight: 600; color: #000;"><?php echo $this->lang->line('notify_details'); ?></h6>
+
+            <div class="col-md-6 mb-2">
+                <label for="notify_name"><?php echo $this->lang->line("name"); ?></label>
+                <input type="text" id="notify_name" name="notify_name" class="form-control text-uppercase" />
+            </div>
+            <div class="col-md-6 mb-2">
+                <label for="notify_details"><?php echo $this->lang->line("details"); ?></label>
+                <textarea name="notify_details" id="notify_details" maxlength="400" rows="6" class="form-control"></textarea>
+            </div>
+        </div>
+
+        <div class="row" style="margin-bottom: 30px;">
+
+            <h6 style="text-decoration: underline; font-weight: 600; color: #000;"><?php echo $this->lang->line('consignee_details'); ?></h6>
+
+            <div class="col-md-12">
+				<input class="form-check-input" id="enablesamenotify" name="enablesamenotify" type="checkbox" value="1" onChange="handleSameNotify(this);">
+				<label for="enablesamenotify"><?php echo $this->lang->line('same_as_notify'); ?></label>
+			</div>
+
+            <div class="col-md-6 mb-2">
+                <label for="consignee_name"><?php echo $this->lang->line("name"); ?></label>
+                <input type="text" id="consignee_name" name="consignee_name" class="form-control text-uppercase" />
+            </div>
+            <div class="col-md-6 mb-2">
+                <label for="consignee_details"><?php echo $this->lang->line("details"); ?></label>
+                <textarea name="consignee_details" id="consignee_details" maxlength="400" rows="6" class="form-control"></textarea>
+            </div>
+        </div>
+    <?php } ?>
+</div>
+<div class="modal-footer">
+    <?php echo form_button(array('data-bs-dismiss' => 'modal', 'type' => 'button', 'class' => 'btn btn-secondary', 'content' => $this->lang->line("close"))); ?>
+    <?php echo form_button(array("name" => "cgrerp_form_origin", "type" => "submit", "class" => "btn btn-success add_export", "content" => $pagetype == "edit" ? $this->lang->line("update") : $this->lang->line("add"))); ?>
+</div>
+<?php echo form_close(); ?>
+
+<script type="text/javascript">
+    var error_sanumber = "<?php echo $this->lang->line("error_sanumber"); ?>";
+    var error_sanumber_exists = "<?php echo $this->lang->line("error_sanumber_exists"); ?>";
+    var error_measuremet_system = "<?php echo $this->lang->line("error_measuremet_system"); ?>";
+    var error_total_pieces = "<?php echo $this->lang->line("error_total_pieces"); ?>";
+    var total_pieces = "<?php echo $this->lang->line("total_no_of_pieces"); ?>";
+    var total_gross_volume = "<?php echo $this->lang->line("total_gross_volume"); ?>";
+    var total_net_volume = "<?php echo $this->lang->line("total_net_volume"); ?>";
+    var total_net_weight = "<?php echo $this->lang->line("total_net_weight"); ?>";
+    var error_total_pieces_volume = "<?php echo $this->lang->line("error_total_pieces_volume"); ?>";
+    var totalPieces = 0;
+    var totalGrossVolume = 0;
+    var totalNetVolume = 0;
+    var totalNetWeight = 0;
+    var totalContainers = 0;
+    var containerDataArray = [];
+
+    $(document).ready(function() {
+
+        $("#error-sanumber").hide();
+        $("#error-portofloading").hide();
+        $("#error-portofdischarge").hide();
+        $("#error-shippingline").hide();
+        $("#error-measurementsystem").hide();
+        $("#divUploadedDetails").hide();
+        $("#lblNetWeight").hide();
+
+        $("#measurement_system").change(function() {
+            if ($("#measurement_system").val() == 0) {
+                $("#divUploadedDetails").hide();
+            } else {
+                fetchExportSummaryDetails($("#measurement_system").val());
+            }
+        });
+
+        $("#add_export").submit(function(e) {
+
+            e.preventDefault();
+            var pagetype = $("#pagetype").val().trim();
+            var origin = $("#hdnOriginId").val();
+            var sanumber = $("#sa_number").val().trim();
+            var portofdischarge = $("#port_of_discharge").val();
+            var blnumber = $("#bl_number").val().trim();
+            var bldate = $("#bl_date").val().trim();
+            var shippeddate = $("#shipped_date").val().trim();
+            var clientpno = $("#client_pno").val();
+            var vessel_name = $("#vessel_name").val().trim();
+            var measurementsystem = $("#measurement_system").val();
+
+            var isValid1 = true,
+                isValid2 = true,
+                isValid3 = true,
+                isValid4 = true;
+
+            if (sanumber.length == 0) {
+                $("#error-sanumber").show();
+                $("#error-sanumber").text(error_sanumber);
+                isValid1 = false;
+            } else {
+                $("#error-sanumber").hide();
+                isValid1 = true;
+            }
+
+            if (portofdischarge == 0) {
+                $("#error-portofdischarge").show();
+                isValid2 = false;
+            } else {
+                $("#error-portofdischarge").hide();
+                isValid2 = true;
+            }
+
+            if (measurementsystem == 0) {
+                $("#error-measurementsystem").show();
+                $("#error-measurementsystem").text(error_measuremet_system);
+                isValid3 = false;
+            } else {
+                $("#error-measurementsystem").hide();
+                isValid3 = true;
+            }
+
+            if (isValid1 && isValid2 && isValid3) {
+
+                if (totalPieces == 0 || totalNetVolume == 0 || containerDataArray.length == 0 || totalContainers == 0) {
+                    $("#error-measurementsystem").show();
+                    $("#error-measurementsystem").text(error_total_pieces_volume);
+                    isValid4 = false;
+                } else {
+                    isValid4 = true;
+                    $("#error-measurementsystem").hide();
+                }
+
+                if (isValid4) {
+                    var fd = new FormData(this);
+                    fd.append("is_ajax", 2);
+                    fd.append("form", action);
+                    fd.append("add_type", "export");
+                    fd.append("action_type", pagetype);
+
+                    fd.append("originid", origin);
+                    fd.append("sanumber", sanumber);
+                    fd.append("producttypeid", $("#hdnProductTypeId").val());
+                    fd.append("measurementsystemid", measurementsystem);
+                    fd.append("shippingline", $("#hdnShippingLineId").val());
+                    fd.append("warehouseid", $("#hdnWarehouseId").val());
+                    fd.append("warehousepolid", $("#hdnWarehousePolId").val());
+                    fd.append("dispatchids", $("#hdnDispatchIds").val());
+                    fd.append("portofdischarge", portofdischarge);
+                    fd.append("blnumber", blnumber);
+                    fd.append("bldate", bldate);
+                    fd.append("shippeddate", shippeddate);
+                    fd.append("clientpno", clientpno);
+                    fd.append("vesselname", vessel_name);
+                    fd.append("totalcontainers", totalContainers);
+                    fd.append("totalpiecesuploaded", totalPieces);
+                    fd.append("totalgrossvolume", totalGrossVolume);
+                    fd.append("totalnetvolume", totalNetVolume);
+                    fd.append("totalnetweight", totalNetWeight);
+                    fd.append("containerdata", JSON.stringify(containerDataArray));
+                    
+                    if(origin == 3) {
+                        fd.append("notifyname", $("#notify_name").val().trim());
+                        fd.append("notifydetails", $("#notify_details").val().trim());
+                        fd.append("consigneename", $("#consignee_name").val().trim());
+                        fd.append("consigneedetails", $("#consignee_details").val().trim());
+                    } else {
+                        fd.append("notifyname", "");
+                        fd.append("notifydetails", "");
+                        fd.append("consigneename", "");
+                        fd.append("consigneedetails", "");
+                    }
+                    
+                    
+
+                    $(".add_export").prop('disabled', false);
+                    toastr.info(processing_request);
+
+                    var obj = $(this),
+                        action = obj.attr('name'),
+                        form_table = obj.data('form-table');
+
+                    $("#loading").show();
+                    $.ajax({
+                        type: "POST",
+                        url: e.target.action,
+                        data: fd,
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        success: function(JSON) {
+                            $("#loading").hide();
+                            if (JSON.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (JSON.error != '') {
+                                toastr.clear();
+                                toastr.error(JSON.error);
+                                $('.add_export').prop('disabled', false);
+                                $('input[name="csrf_cgrerp"]').val(JSON.csrf_hash);
+                            } else if(JSON.duplicateerror != '') {
+                                $("#error-sanumber").show();
+                                $("#error-sanumber").text(JSON.duplicateerror);
+                                toastr.clear();
+                                toastr.error(JSON.duplicateerror);
+                            } else {
+                                toastr.clear();
+                                toastr.success(JSON.result);
+                                $('.add_export').prop('disabled', false);
+                                $('input[name="csrf_cgrerp"]').val(JSON.csrf_hash);
+                                $("#add-modal-data-bd").modal('hide');
+
+                                $('#xin_table_exportcreation').DataTable().ajax.reload(null, false);
+                                check_box_click("");
+                            }
+                        },
+                        error: function(jqXHR, exception) {
+                            toastr.clear();
+                            $('.add_export').prop('disabled', false);
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    function fetchExportSummaryDetails(measurementId) {
+
+        totalPieces = 0;
+        totalGrossVolume = 0;
+        totalNetVolume = 0;
+        totalNetWeight = 0;
+        totalContainers = 0;
+        containerDataArray = [];
+
+        var fd = new FormData();
+        fd.append("dispatchIds", $("#hdnDispatchIds").val());
+        fd.append("originId", $("#hdnOriginId").val());
+        fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+        fd.append("productTypeId", $("#hdnProductTypeId").val());
+        fd.append("measurementId", measurementId);
+        
+        if($("#hdnOriginId").val() == 4) {
+            if($("#circumference_allowance").val().length == 0) {
+                fd.append("circumferenceAllowance", 0);
+            } else {
+                fd.append("circumferenceAllowance", $("#circumference_allowance").val());
+            }
+    
+            if($("#length_allowance").val().length == 0) {
+                fd.append("lengthAllowance", 0);
+            } else {
+                fd.append("lengthAllowance", $("#length_allowance").val());
+            }
+    
+            if($("#circumference_adjustment").val().length == 0) {
+                fd.append("circumferenceAdjustment", 0);
+            } else {
+                fd.append("circumferenceAdjustment", $("#circumference_adjustment").val());
+            }
+        } else {
+             fd.append("circumferenceAllowance", 0);
+             fd.append("lengthAllowance", 0);
+             fd.append("circumferenceAdjustment", 0);
+        }
+        
+
+        $("#loading").show();
+        $.ajax({
+            url: base_url + "/fetch_export_summary_details",
+            cache: false,
+            method: "POST",
+            data: fd,
+            contentType: false,
+            processData: false,
+            success: function(JSON) {
+
+                $("#loading").hide();
+
+                if (JSON.redirect == true) {
+                    window.location.replace(login_url);
+                } else if (JSON.result != '') {
+                    toastr.clear();
+                    $("#lblTotalPieces").text(total_pieces + ": " + JSON.result["totalPieces"]);
+                    $("#lblGrossVolume").text(total_gross_volume + ": " + JSON.result["totalGrossVolume"]);
+                    $("#lblNetVolume").text(total_net_volume + ": " + JSON.result["totalNetVolume"]);
+
+                    if(JSON.isnetweight == true) {
+                        $("#lblNetWeight").text(total_net_weight + ": " + JSON.result["totalNetWeight"]);
+                        $("#lblNetWeight").show();
+                    } else {
+                        $("#lblNetWeight").hide();
+                    }
+
+                    totalContainers = JSON.result["totalContainers"];
+                    totalPieces = JSON.result["totalPieces"];
+                    totalNetVolume = JSON.result["totalNetVolume"];
+                    totalNetWeight = JSON.result["totalNetWeight"];
+                    totalGrossVolume = JSON.result["totalGrossVolume"];
+                    containerDataArray = JSON.result["dataContainers"];
+
+                    $("#divUploadedDetails").show();
+                } else {
+                    toastr.clear();
+                    toastr.error(JSON.error);
+                    $("#divUploadedDetails").hide();
+                }
+            }
+        });
+    }
+</script>
+
+<script src="<?php echo base_url() . 'assets/js/i18n/datepicker-' . $wz_lang . '.js'; ?>"></script>
+<script type="text/javascript">
+    $(function() {
+        $("#shipped_date").datepicker({
+            dateFormat: "dd/mm/yy",
+            changeMonth: true,
+            changeYear: true,
+            minDate: "-1y",
+            maxDate: "3m",
+            onSelect: function(date) {}
+        });
+
+        $("#bl_date").datepicker({
+            dateFormat: "dd/mm/yy",
+            changeMonth: true,
+            changeYear: true,
+            minDate: "-1y",
+            maxDate: "3m",
+            onSelect: function(date) {}
+        });
+
+        $('.ui-datepicker').addClass('notranslate');
+    });
+
+    function handleSameNotify(e) {
+		if (e.checked) {
+			$("#consignee_name").val($("#notify_name").val());
+            $("#consignee_details").val($("#notify_details").val());
+		} else {
+			$("#consignee_name").val("");
+            $("#consignee_details").val("");
+		}
+	}
+</script>
