@@ -146,19 +146,23 @@ class Downloadfarmmasters extends MY_Controller
                             $row_array_farmdetail["isForData"] = (bool) $farmdetail->fordata;
 
                             $return_arr_farm_data = array();
-                            $fetchFarmData = $this->Farm_model->get_farm_data_by_farm_id_detailed($farmdetail->farm_id);
-                            foreach ($fetchFarmData as $farmdata) {
-                                $row_array_farmdata["pieces"] = (int) $farmdata->no_of_pieces;
-                                $row_array_farmdata["circumference"] = $farmdata->circumference + 0;
-                                $row_array_farmdata["length"] = $farmdata->length + 0;
-                                $row_array_farmdata["grossVolume"] = $farmdata->gross_volume + 0;
-                                $row_array_farmdata["netVolume"] = $farmdata->volume + 0;
-                                $row_array_farmdata["farmDataId"] = $farmdata->farm_data_id + 0;
-                                $row_array_farmdata["farmId"] = $farmdata->farm_id + 0;
-                                array_push($return_arr_farm_data, $row_array_farmdata);
+                            if($farmdetail->fordata == 1) {
+                                //DO NOTHING
+                            } else {
+                                $fetchFarmData = $this->Farm_model->get_farm_data_by_farm_id_detailed($farmdetail->farm_id);
+                                foreach ($fetchFarmData as $farmdata) {
+                                    $row_array_farmdata["pieces"] = (int) $farmdata->no_of_pieces;
+                                    $row_array_farmdata["circumference"] = $farmdata->circumference + 0;
+                                    $row_array_farmdata["length"] = $farmdata->length + 0;
+                                    $row_array_farmdata["grossVolume"] = $farmdata->gross_volume + 0;
+                                    $row_array_farmdata["netVolume"] = $farmdata->volume + 0;
+                                    $row_array_farmdata["farmDataId"] = $farmdata->farm_data_id + 0;
+                                    $row_array_farmdata["farmId"] = $farmdata->farm_id + 0;
+                                    array_push($return_arr_farm_data, $row_array_farmdata);
+                                }
+                                $row_array_farmdetail["farmData"] = $return_arr_farm_data;
                             }
-                            $row_array_farmdetail["farmData"] = $return_arr_farm_data;
-
+                            
                             array_push($return_arr_farmdetails, $row_array_farmdetail);
                         }
                         $row_array_final["farmDetails"] = $return_arr_farmdetails;
