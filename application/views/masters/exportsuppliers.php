@@ -8,7 +8,7 @@ $applicable_origins = $session["applicable_origins"];
 	<div class="card-header table-responsive">
 		<div class="row flex-between-end">
 			<div class="col-auto align-self-center">
-				<h3> <?php echo $this->lang->line('supplier_title'); ?> </h3>
+				<h3> <?php echo $this->lang->line('export_suppliers'); ?> </h3>
 			</div>
 			<div class="col-auto ms-auto">
 				<button class="btn btn-primary btn-md btn-right-margin" title="<?php echo $this->lang->line('download_excel'); ?>" type="button" id="generate_report">

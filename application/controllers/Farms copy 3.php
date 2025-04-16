@@ -142,15 +142,7 @@ class Farms extends MY_Controller
                 if ($createdFrom == 2) {
                     $this->generate_farm_report_field_purchase($farmId, $contractId, $inventoryOrder);
                 } else {
-                    
-                    $fetchContractDetails = $this->Contract_model->get_contracts_by_contractid($contractId);
-                    
-                    if($fetchContractDetails[0]->existing_price_condition == 1) {
-                        $this->generate_farm_report_existing($farmId, $contractId, $inventoryOrder);
-                    } else {
-                        $this->generate_farm_report($farmId, $contractId, $inventoryOrder);
-                    }
-                    
+                    $this->generate_farm_report($farmId, $contractId, $inventoryOrder);
                 }
             } else if ($this->input->get('type') == "downloadreceipt") {
 
@@ -159,23 +151,10 @@ class Farms extends MY_Controller
                 $inventoryOrder = $this->input->get('io');
                 $createdFrom = $this->input->get('cf');
 
-                $fetchContractDetails = $this->Contract_model->get_contracts_by_contractid($contractId);
-
                 if ($createdFrom == 2) {
-                    
-                    if($fetchContractDetails[0]->existing_price_condition == 1) {
-                        $this->generate_supplier_receipt_existing($farmId, $contractId, $inventoryOrder);
-                    } else {
-                        $this->generate_supplier_receipt($farmId, $contractId, $inventoryOrder);
-                    }
-                    
+                    $this->generate_supplier_receipt($farmId, $contractId, $inventoryOrder);
                 } else {
-                    
-                    if($fetchContractDetails[0]->existing_price_condition == 1) {
-                        $this->generate_supplier_receipt_existing($farmId, $contractId, $inventoryOrder);
-                    } else {
-                        $this->generate_supplier_receipt($farmId, $contractId, $inventoryOrder);
-                    }
+                    $this->generate_supplier_receipt($farmId, $contractId, $inventoryOrder);
                 }
             } else if ($this->input->get('type') == "viewfarm") {
                 $farmId = $this->input->get('fid');
@@ -534,7 +513,7 @@ class Farms extends MY_Controller
         }
     }
 
-    public function add1()
+    public function add123()
     {
         $Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
         $session = $this->session->userdata('fullname');
@@ -565,16 +544,16 @@ class Farms extends MY_Controller
                     $shippingline = $this->input->post('shippingline');
                     $sealnumber = $this->input->post('sealnumber');
                     $roundingfactor = $this->input->post('roundingfactor');
-                    
-                    if($originid == 4) {
+
+                    if ($originid == 4) {
                         $circumferenceallowance = $this->input->post('circumference_allowance');
                         $lengthallowance = $this->input->post('length_allowance');
                     } else {
                         $circumferenceallowance = 0;
                         $lengthallowance = 0;
                     }
-                    
-                    
+
+
                     $warehouseid_rounglogs = $this->input->post('warehouseid_rounglogs');
                     $measurement_system_roundlogs = $this->input->post('measurement_system_roundlogs');
                     $mandatoryreception = $this->input->post('mandatoryreception');
@@ -640,17 +619,29 @@ class Farms extends MY_Controller
                                 if ($totalCount > 0 && $metricTon > 0 && $jasVolume > 0 && count($farm["containerData"]) > 0) {
 
                                     $dataFarm = array(
-                                        "supplier_id" => $supplierid, "contract_id" => $purchasecontractid,
-                                        "product_id" => $productid, "product_type_id" => $producttypeid,
-                                        "inventory_order" => $containerNumber, "plate_number" => "",
-                                        "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                        "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                        "total_volume" => $jasVolume, "total_value" => $totalPurchasePrice, 
-                                        "unit_price" => $purchasePrice, "wood_value" => $totalPurchasePrice,
-                                        "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                        "exchange_rate" => $conversionrate, "is_adjust_rf" => $adjustrf,
-                                        "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
-                                        "origin_id" => $originid, "metric_ton" => $metricTon,
+                                        "supplier_id" => $supplierid,
+                                        "contract_id" => $purchasecontractid,
+                                        "product_id" => $productid,
+                                        "product_type_id" => $producttypeid,
+                                        "inventory_order" => $containerNumber,
+                                        "plate_number" => "",
+                                        "purchase_date" => $purchase_date,
+                                        "service_cost" => $servicecost,
+                                        "logistic_cost" => $logisticcost,
+                                        "adjustment" => $farmadjustment,
+                                        "total_volume" => $jasVolume,
+                                        "total_value" => $totalPurchasePrice,
+                                        "unit_price" => $purchasePrice,
+                                        "wood_value" => $totalPurchasePrice,
+                                        "pay_service_to" => $servicepayto,
+                                        "pay_logistics_to" => $logisticpayto,
+                                        "exchange_rate" => $conversionrate,
+                                        "is_adjust_rf" => $adjustrf,
+                                        "created_by" => $session['user_id'],
+                                        "updated_by" => $session['user_id'],
+                                        "is_active" => 1,
+                                        "origin_id" => $originid,
+                                        "metric_ton" => $metricTon,
                                     );
 
                                     $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -667,13 +658,25 @@ class Farms extends MY_Controller
 
                                             if ($noOfPieces > 0) {
                                                 $dataFarmData[] = array(
-                                                    "farm_id" => $insertFarm, "scanned_code" => $noOfPieces,
-                                                    "no_of_pieces" => $noOfPieces, "circumference" => $diameterData,
-                                                    "length" => $lengthData, "width" => 0, "thickness" => 0, "volume" => $volume,
-                                                    "volume_pie" => 0, "grade_id" => 0, "length_export" => 0, "width_export" => 0,
-                                                    "thickness_export" => 0, "volume_bought" => $volume, "created_by" => $session['user_id'],
-                                                    "updated_by" => $session['user_id'], "is_active" => 1,
-                                                    "created_date" => date('Y-m-d H:i:s'), "updated_date" => date('Y-m-d H:i:s')
+                                                    "farm_id" => $insertFarm,
+                                                    "scanned_code" => $noOfPieces,
+                                                    "no_of_pieces" => $noOfPieces,
+                                                    "circumference" => $diameterData,
+                                                    "length" => $lengthData,
+                                                    "width" => 0,
+                                                    "thickness" => 0,
+                                                    "volume" => $volume,
+                                                    "volume_pie" => 0,
+                                                    "grade_id" => 0,
+                                                    "length_export" => 0,
+                                                    "width_export" => 0,
+                                                    "thickness_export" => 0,
+                                                    "volume_bought" => $volume,
+                                                    "created_by" => $session['user_id'],
+                                                    "updated_by" => $session['user_id'],
+                                                    "is_active" => 1,
+                                                    "created_date" => date('Y-m-d H:i:s'),
+                                                    "updated_date" => date('Y-m-d H:i:s')
                                                 );
                                             }
                                         }
@@ -686,10 +689,14 @@ class Farms extends MY_Controller
                                                 //CONTRACT MAPPING
 
                                                 $dataContractMapping = array(
-                                                    "contract_id" => $purchasecontractid, "supplier_id" => $supplierid,
-                                                    "inventory_order" => $containerNumber, "total_volume" => $metricTon,
-                                                    "invoice_number" => "", "created_by" => $session['user_id'],
-                                                    "updated_by" => $session['user_id'], "is_active" => 1,
+                                                    "contract_id" => $purchasecontractid,
+                                                    "supplier_id" => $supplierid,
+                                                    "inventory_order" => $containerNumber,
+                                                    "total_volume" => $metricTon,
+                                                    "invoice_number" => "",
+                                                    "created_by" => $session['user_id'],
+                                                    "updated_by" => $session['user_id'],
+                                                    "is_active" => 1,
                                                 );
 
                                                 $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
@@ -700,9 +707,13 @@ class Farms extends MY_Controller
 
                                                 $dataInventoryLedger = array(
                                                     "contract_id" => $purchasecontractid,
-                                                    "inventory_order" => $containerNumber, "ledger_type" => 2,
-                                                    "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                                    "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
+                                                    "inventory_order" => $containerNumber,
+                                                    "ledger_type" => 2,
+                                                    "expense_date" => $purchase_date,
+                                                    "created_by" => $session['user_id'],
+                                                    "updated_by" => $session['user_id'],
+                                                    "is_active" => 1,
+                                                    "is_advance_app" => 0,
                                                 );
 
                                                 if ($totalPurchasePrice != 0) {
@@ -726,15 +737,27 @@ class Farms extends MY_Controller
 
                                                 if (count($getSupplierDetails) == 1) {
                                                     $dataReception = array(
-                                                        "warehouse_id" => 10, "supplier_id" => $supplierid,
-                                                        "supplier_code" => $getSupplierDetails[0]->supplier_code, "supplier_product_id" => $getSupplierDetails[0]->product_name,
-                                                        "supplier_product_typeid" => $getSupplierDetails[0]->product_type,  "measurementsystem_id" => 7,
-                                                        "received_date" => $receptiondate, "salvoconducto" => $containerNumber,
-                                                        "total_volume" => $jasVolume, "total_pieces" => $totalCount,
-                                                        "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                        "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'],
-                                                        "captured_timestamp" => 0, "isduplicatecaptured" => 0, "is_contract_added" => 0,
-                                                        "is_special_uploaded" => 1, "origin_id" => $originid, "metric_ton" => $metricTon,
+                                                        "warehouse_id" => 10,
+                                                        "supplier_id" => $supplierid,
+                                                        "supplier_code" => $getSupplierDetails[0]->supplier_code,
+                                                        "supplier_product_id" => $getSupplierDetails[0]->product_name,
+                                                        "supplier_product_typeid" => $getSupplierDetails[0]->product_type,
+                                                        "measurementsystem_id" => 7,
+                                                        "received_date" => $receptiondate,
+                                                        "salvoconducto" => $containerNumber,
+                                                        "total_volume" => $jasVolume,
+                                                        "total_pieces" => $totalCount,
+                                                        "createdby" => $session['user_id'],
+                                                        "updatedby" => $session['user_id'],
+                                                        "isactive" => 1,
+                                                        "isclosed" => 1,
+                                                        "closedby" => $session['user_id'],
+                                                        "captured_timestamp" => 0,
+                                                        "isduplicatecaptured" => 0,
+                                                        "is_contract_added" => 0,
+                                                        "is_special_uploaded" => 1,
+                                                        "origin_id" => $originid,
+                                                        "metric_ton" => $metricTon,
                                                     );
 
                                                     $insertReception = $this->Reception_model->add_reception($dataReception);
@@ -746,17 +769,33 @@ class Farms extends MY_Controller
                                                             //DISPATCH
 
                                                             $dataDispatch = array(
-                                                                "container_number" => $containerNumber, "warehouse_id" => $warehouseid,
-                                                                "shipping_line" => $shippingline, "product_id" => $productid,
-                                                                "product_type_id" => $producttypeid,  "dispatch_date" => $receptiondate,
-                                                                "seal_number" => $seal, "container_pic_url" => "",
-                                                                "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                                "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'],
-                                                                "is_special_uploaded" => 1, "origin_id" => $originid, "total_gross_volume" => $jasVolume,
-                                                                "total_volume" => $jasVolume, "total_pieces" => $totalCount, "category" => 0, "captured_from_app" => 0,
-                                                                "metric_ton" => $metricTon, "short_ton" => $shortTons, "net_lbs" => $netLbs,
-                                                                "diameter_text" => $diameter, "length_text" => $length, 
-                                                                "unit_price" => $salesPrice, "total_value" => $totalSalesPrice,
+                                                                "container_number" => $containerNumber,
+                                                                "warehouse_id" => $warehouseid,
+                                                                "shipping_line" => $shippingline,
+                                                                "product_id" => $productid,
+                                                                "product_type_id" => $producttypeid,
+                                                                "dispatch_date" => $receptiondate,
+                                                                "seal_number" => $seal,
+                                                                "container_pic_url" => "",
+                                                                "createdby" => $session['user_id'],
+                                                                "updatedby" => $session['user_id'],
+                                                                "isactive" => 1,
+                                                                "isclosed" => 1,
+                                                                "closedby" => $session['user_id'],
+                                                                "is_special_uploaded" => 1,
+                                                                "origin_id" => $originid,
+                                                                "total_gross_volume" => $jasVolume,
+                                                                "total_volume" => $jasVolume,
+                                                                "total_pieces" => $totalCount,
+                                                                "category" => 0,
+                                                                "captured_from_app" => 0,
+                                                                "metric_ton" => $metricTon,
+                                                                "short_ton" => $shortTons,
+                                                                "net_lbs" => $netLbs,
+                                                                "diameter_text" => $diameter,
+                                                                "length_text" => $length,
+                                                                "unit_price" => $salesPrice,
+                                                                "total_value" => $totalSalesPrice,
                                                             );
 
                                                             $insertDispatch = $this->Dispatch_model->add_dispatch($dataDispatch);
@@ -802,7 +841,7 @@ class Farms extends MY_Controller
                             if ($logisticcost == null || $logisticcost == "") {
                                 $logisticcost = 0;
                             }
-                            
+
                             if ($farmadjustment == null || $farmadjustment == "") {
                                 $farmadjustment = 0;
                             }
@@ -1038,15 +1077,26 @@ class Farms extends MY_Controller
                                 $totalValue = $woodValue + $logisticcost + $servicecost;
 
                                 $dataFarm = array(
-                                    "supplier_id" => $supplierid, "contract_id" => $purchasecontractid,
-                                    "product_id" => $productid, "product_type_id" => $producttypeid,
-                                    "inventory_order" => $inventoryorder, "plate_number" => $truckplatenumber,
-                                    "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                    "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                    "total_volume" => $totalVolume, "total_value" => $totalValue, "wood_value" => $woodValue,
-                                    "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                    "exchange_rate" => $conversionrate, "is_adjust_rf" => $adjustrf,
-                                    "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
+                                    "supplier_id" => $supplierid,
+                                    "contract_id" => $purchasecontractid,
+                                    "product_id" => $productid,
+                                    "product_type_id" => $producttypeid,
+                                    "inventory_order" => $inventoryorder,
+                                    "plate_number" => $truckplatenumber,
+                                    "purchase_date" => $purchase_date,
+                                    "service_cost" => $servicecost,
+                                    "logistic_cost" => $logisticcost,
+                                    "adjustment" => $farmadjustment,
+                                    "total_volume" => $totalVolume,
+                                    "total_value" => $totalValue,
+                                    "wood_value" => $woodValue,
+                                    "pay_service_to" => $servicepayto,
+                                    "pay_logistics_to" => $logisticpayto,
+                                    "exchange_rate" => $conversionrate,
+                                    "is_adjust_rf" => $adjustrf,
+                                    "created_by" => $session['user_id'],
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 1,
                                     "origin_id" => $originid,
                                 );
 
@@ -1072,13 +1122,26 @@ class Farms extends MY_Controller
 
                                         if ($noOfPieces > 0) {
                                             $dataFarmData[] = array(
-                                                "farm_id" => $insertFarm, "scanned_code" => $scannedCode,
-                                                "no_of_pieces" => $noOfPieces, "circumference" => 0,
-                                                "length" => $length, "width" => $width, "thickness" => $thickness, "volume" => $netVolume,
-                                                "volume_pie" => $volumePie, "grade_id" => $grade, "face" => $face, "length_export" => $lengthExport, "width_export" => $widthExport,
-                                                "thickness_export" => $thicknessExport, "volume_bought" => $grossVolume, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
-                                                "created_date" => date('Y-m-d H:i:s'), "updated_date" => date('Y-m-d H:i:s')
+                                                "farm_id" => $insertFarm,
+                                                "scanned_code" => $scannedCode,
+                                                "no_of_pieces" => $noOfPieces,
+                                                "circumference" => 0,
+                                                "length" => $length,
+                                                "width" => $width,
+                                                "thickness" => $thickness,
+                                                "volume" => $netVolume,
+                                                "volume_pie" => $volumePie,
+                                                "grade_id" => $grade,
+                                                "face" => $face,
+                                                "length_export" => $lengthExport,
+                                                "width_export" => $widthExport,
+                                                "thickness_export" => $thicknessExport,
+                                                "volume_bought" => $grossVolume,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "created_date" => date('Y-m-d H:i:s'),
+                                                "updated_date" => date('Y-m-d H:i:s')
                                             );
                                         }
                                     }
@@ -1097,19 +1160,27 @@ class Farms extends MY_Controller
 
                                             //CONTRACT INVENTORY MAPPING
                                             $dataContractMapping = array(
-                                                "contract_id" => $purchasecontractid, "supplier_id" => $supplierid,
-                                                "inventory_order" => $inventoryorder, "total_volume" => $totalVolume,
-                                                "invoice_number" => "", "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
+                                                "contract_id" => $purchasecontractid,
+                                                "supplier_id" => $supplierid,
+                                                "inventory_order" => $inventoryorder,
+                                                "total_volume" => $totalVolume,
+                                                "invoice_number" => "",
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
                                             );
 
                                             $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
 
                                             $dataInventoryLedger = array(
                                                 "contract_id" => $purchasecontractid,
-                                                "inventory_order" => $inventoryorder, "ledger_type" => 2,
-                                                "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
+                                                "inventory_order" => $inventoryorder,
+                                                "ledger_type" => 2,
+                                                "expense_date" => $purchase_date,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "is_advance_app" => 0,
                                             );
 
                                             if ($woodValueWithSupplierTaxes != 0) {
@@ -1147,14 +1218,25 @@ class Farms extends MY_Controller
 
                                             if (count($getSupplierDetails) == 1) {
                                                 $dataReception = array(
-                                                    "warehouse_id" => $warehouseid, "supplier_id" => $supplierid,
-                                                    "supplier_code" => $getSupplierDetails[0]->supplier_code, "supplier_product_id" => $getSupplierDetails[0]->product_name,
-                                                    "supplier_product_typeid" => $getSupplierDetails[0]->product_type,  "measurementsystem_id" => 1,
-                                                    "received_date" => $receptiondate, "salvoconducto" => $inventoryorder, "total_volume" => $totalVolume,
-                                                    "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                    "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'],
-                                                    "captured_timestamp" => 0, "isduplicatecaptured" => 0, "is_contract_added" => 0,
-                                                    "is_special_uploaded" => 0, "origin_id" => $originid,
+                                                    "warehouse_id" => $warehouseid,
+                                                    "supplier_id" => $supplierid,
+                                                    "supplier_code" => $getSupplierDetails[0]->supplier_code,
+                                                    "supplier_product_id" => $getSupplierDetails[0]->product_name,
+                                                    "supplier_product_typeid" => $getSupplierDetails[0]->product_type,
+                                                    "measurementsystem_id" => 1,
+                                                    "received_date" => $receptiondate,
+                                                    "salvoconducto" => $inventoryorder,
+                                                    "total_volume" => $totalVolume,
+                                                    "createdby" => $session['user_id'],
+                                                    "updatedby" => $session['user_id'],
+                                                    "isactive" => 1,
+                                                    "isclosed" => 1,
+                                                    "closedby" => $session['user_id'],
+                                                    "captured_timestamp" => 0,
+                                                    "isduplicatecaptured" => 0,
+                                                    "is_contract_added" => 0,
+                                                    "is_special_uploaded" => 0,
+                                                    "origin_id" => $originid,
                                                 );
 
                                                 $insertReception = $this->Reception_model->add_reception($dataReception);
@@ -1390,15 +1472,26 @@ class Farms extends MY_Controller
                                 $totalValue = $woodValue + $logisticcost + $servicecost;
 
                                 $dataFarm = array(
-                                    "supplier_id" => $supplierid, "contract_id" => $purchasecontractid,
-                                    "product_id" => $productid, "product_type_id" => $producttypeid,
-                                    "inventory_order" => $inventoryorder, "plate_number" => $truckplatenumber,
-                                    "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                    "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                    "total_volume" => $totalVolume, "total_value" => $totalValue, "wood_value" => $woodValue,
-                                    "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                    "exchange_rate" => $conversionrate, "is_adjust_rf" => $adjustrf,
-                                    "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
+                                    "supplier_id" => $supplierid,
+                                    "contract_id" => $purchasecontractid,
+                                    "product_id" => $productid,
+                                    "product_type_id" => $producttypeid,
+                                    "inventory_order" => $inventoryorder,
+                                    "plate_number" => $truckplatenumber,
+                                    "purchase_date" => $purchase_date,
+                                    "service_cost" => $servicecost,
+                                    "logistic_cost" => $logisticcost,
+                                    "adjustment" => $farmadjustment,
+                                    "total_volume" => $totalVolume,
+                                    "total_value" => $totalValue,
+                                    "wood_value" => $woodValue,
+                                    "pay_service_to" => $servicepayto,
+                                    "pay_logistics_to" => $logisticpayto,
+                                    "exchange_rate" => $conversionrate,
+                                    "is_adjust_rf" => $adjustrf,
+                                    "created_by" => $session['user_id'],
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 1,
                                     "origin_id" => $originid,
                                 );
 
@@ -1423,13 +1516,25 @@ class Farms extends MY_Controller
 
                                         if ($noOfPieces > 0) {
                                             $dataFarmData[] = array(
-                                                "farm_id" => $insertFarm, "scanned_code" => $scannedCode,
-                                                "no_of_pieces" => $noOfPieces, "circumference" => 0,
-                                                "length" => $length, "width" => $width, "thickness" => $thickness, "volume" => $netVolume,
-                                                "volume_pie" => $volumePie, "grade_id" => $grade, "length_export" => $lengthExport, "width_export" => $widthExport,
-                                                "thickness_export" => $thicknessExport, "volume_bought" => $grossVolume, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
-                                                "created_date" => date('Y-m-d H:i:s'), "updated_date" => date('Y-m-d H:i:s')
+                                                "farm_id" => $insertFarm,
+                                                "scanned_code" => $scannedCode,
+                                                "no_of_pieces" => $noOfPieces,
+                                                "circumference" => 0,
+                                                "length" => $length,
+                                                "width" => $width,
+                                                "thickness" => $thickness,
+                                                "volume" => $netVolume,
+                                                "volume_pie" => $volumePie,
+                                                "grade_id" => $grade,
+                                                "length_export" => $lengthExport,
+                                                "width_export" => $widthExport,
+                                                "thickness_export" => $thicknessExport,
+                                                "volume_bought" => $grossVolume,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "created_date" => date('Y-m-d H:i:s'),
+                                                "updated_date" => date('Y-m-d H:i:s')
                                             );
                                         }
                                     }
@@ -1448,19 +1553,27 @@ class Farms extends MY_Controller
 
                                             //CONTRACT INVENTORY MAPPING
                                             $dataContractMapping = array(
-                                                "contract_id" => $purchasecontractid, "supplier_id" => $supplierid,
-                                                "inventory_order" => $inventoryorder, "total_volume" => $totalVolume,
-                                                "invoice_number" => "", "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
+                                                "contract_id" => $purchasecontractid,
+                                                "supplier_id" => $supplierid,
+                                                "inventory_order" => $inventoryorder,
+                                                "total_volume" => $totalVolume,
+                                                "invoice_number" => "",
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
                                             );
 
                                             $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
 
                                             $dataInventoryLedger = array(
                                                 "contract_id" => $purchasecontractid,
-                                                "inventory_order" => $inventoryorder, "ledger_type" => 2,
-                                                "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
+                                                "inventory_order" => $inventoryorder,
+                                                "ledger_type" => 2,
+                                                "expense_date" => $purchase_date,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "is_advance_app" => 0,
                                             );
 
                                             if ($woodValueWithSupplierTaxes != 0) {
@@ -1498,14 +1611,24 @@ class Farms extends MY_Controller
 
                                             if (count($getSupplierDetails) == 1) {
                                                 $dataReception = array(
-                                                    "warehouse_id" => $warehouseid, "supplier_id" => $supplierid,
-                                                    "supplier_code" => $getSupplierDetails[0]->supplier_code, "supplier_product_id" => $getSupplierDetails[0]->product_name,
-                                                    "supplier_product_typeid" => $getSupplierDetails[0]->product_type,  "measurementsystem_id" => 1,
-                                                    "received_date" => $receptiondate, "salvoconducto" => $inventoryorder,
-                                                    "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                    "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'],
-                                                    "captured_timestamp" => 0, "isduplicatecaptured" => 0, "is_contract_added" => 0,
-                                                    "is_special_uploaded" => 0, "origin_id" => $originid,
+                                                    "warehouse_id" => $warehouseid,
+                                                    "supplier_id" => $supplierid,
+                                                    "supplier_code" => $getSupplierDetails[0]->supplier_code,
+                                                    "supplier_product_id" => $getSupplierDetails[0]->product_name,
+                                                    "supplier_product_typeid" => $getSupplierDetails[0]->product_type,
+                                                    "measurementsystem_id" => 1,
+                                                    "received_date" => $receptiondate,
+                                                    "salvoconducto" => $inventoryorder,
+                                                    "createdby" => $session['user_id'],
+                                                    "updatedby" => $session['user_id'],
+                                                    "isactive" => 1,
+                                                    "isclosed" => 1,
+                                                    "closedby" => $session['user_id'],
+                                                    "captured_timestamp" => 0,
+                                                    "isduplicatecaptured" => 0,
+                                                    "is_contract_added" => 0,
+                                                    "is_special_uploaded" => 0,
+                                                    "origin_id" => $originid,
                                                 );
 
                                                 $insertReception = $this->Reception_model->add_reception($dataReception);
@@ -1557,7 +1680,7 @@ class Farms extends MY_Controller
 
                                     if ($purchaseunit == 3 || $purchaseunit == 4 || $purchaseunit == 5 || $purchaseunit == 15) {
 
-                                        
+
                                         if ($noOfPieces > 0) {
                                             $getPriceRanges = $this->Farm_model->get_price_for_circumference($circumference, $purchasecontractid);
 
@@ -1566,7 +1689,7 @@ class Farms extends MY_Controller
                                                     $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $noOfPieces));
                                                 } else if ($purchaseunit == 4 || $purchaseunit == 5) {
                                                     $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $farm["netVolume"]));
-                                                } else if($purchaseunit == 15) {
+                                                } else if ($purchaseunit == 15) {
                                                     $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3));;
                                                 }
                                             }
@@ -1577,15 +1700,15 @@ class Farms extends MY_Controller
                                         $totalPiecesFarm = $totalPiecesFarm + $noOfPieces;
                                         $totalVolumeFarm = $totalVolumeFarm + $farm["netVolume"];
                                     } else if ($purchaseunit == 8 || $purchaseunit == 9 || $purchaseunit == 12 || $purchaseunit == 14) {
-                                        
+
                                         $totalVolumeFarm = $totalVolumeFarm + $farm["netVolume"];
                                         $totalGrossVolumeFarm = $totalGrossVolumeFarm + $farm["grossVolume"];
                                         $totalPiecesFarm = $totalPiecesFarm + $noOfPieces;
                                     }
                                 }
-                                
-                                if($originid == 4 && $roundingfactor > 0) {
-                                    
+
+                                if ($originid == 4 && $roundingfactor > 0) {
+
                                     $precision = (int) $roundingfactor; // Ensure it's an integer
                                     $totalVolume = number_format($totalVolume, $precision, '.', '');
                                     $totalVolumeFarm = number_format($totalVolumeFarm, $precision, '.', '');
@@ -1615,8 +1738,8 @@ class Farms extends MY_Controller
                                 if ($conversionrate > 0) {
                                     $woodValue = $woodValue * $conversionrate;
                                 }
-                                
-                                if($originid == 4) {
+
+                                if ($originid == 4) {
                                     $woodValue = ($woodValue + 0);
                                 } else {
                                     $woodValue = sprintf('%0.3f', ($woodValue + 0));
@@ -1956,27 +2079,46 @@ class Farms extends MY_Controller
                                 $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
                                 $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
                                 $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
-                                
+
                                 $dataFarm = array(
-                                    "supplier_id" => $supplierid, "contract_id" => $purchasecontractid,
-                                    "product_id" => $productid, "product_type_id" => $producttypeid, "purchase_unit_id" => $purchaseunit,
-                                    "inventory_order" => $inventoryorder, "plate_number" => $truckplatenumber,
-                                    "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                    "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                    "total_volume" => $totalVolume, "total_value" => $totalValue, "wood_value" => $woodValue,
-                                    "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
+                                    "supplier_id" => $supplierid,
+                                    "contract_id" => $purchasecontractid,
+                                    "product_id" => $productid,
+                                    "product_type_id" => $producttypeid,
+                                    "purchase_unit_id" => $purchaseunit,
+                                    "inventory_order" => $inventoryorder,
+                                    "plate_number" => $truckplatenumber,
+                                    "purchase_date" => $purchase_date,
+                                    "service_cost" => $servicecost,
+                                    "logistic_cost" => $logisticcost,
+                                    "adjustment" => $farmadjustment,
+                                    "total_volume" => $totalVolume,
+                                    "total_value" => $totalValue,
+                                    "wood_value" => $woodValue,
+                                    "pay_service_to" => $servicepayto,
+                                    "pay_logistics_to" => $logisticpayto,
                                     "exchange_rate" => $conversionrate,
-                                    "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
-                                    "origin_id" => $originid, "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
-                                    "service_cost_withtaxes" => $servicesCostWithTaxes, "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
-                                    "supplier_taxes" => $supplierTaxesArrList, "logistic_taxes" => $supplierLogisticTaxesArrList,
-                                    "service_taxes" => $supplierServiceTaxesArrList, "adjust_taxes" => $adjustrf,
-                                    "is_adjust_rf" => $isAdjustEnabled, "logistic_provider_taxes" => $providerLogisticTaxesArrList,
-                                    "service_provider_taxes" => $providerServiceTaxesArrList, "adjusted_value" => $adjustmentValues,
+                                    "created_by" => $session['user_id'],
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 1,
+                                    "origin_id" => $originid,
+                                    "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
+                                    "service_cost_withtaxes" => $servicesCostWithTaxes,
+                                    "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
+                                    "supplier_taxes" => $supplierTaxesArrList,
+                                    "logistic_taxes" => $supplierLogisticTaxesArrList,
+                                    "service_taxes" => $supplierServiceTaxesArrList,
+                                    "adjust_taxes" => $adjustrf,
+                                    "is_adjust_rf" => $isAdjustEnabled,
+                                    "logistic_provider_taxes" => $providerLogisticTaxesArrList,
+                                    "service_provider_taxes" => $providerServiceTaxesArrList,
+                                    "adjusted_value" => $adjustmentValues,
                                     "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                     "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
-                                    "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr), 
-                                    "circ_allowance" => $circumferenceallowance, "length_allowance" => $lengthallowance, "rounding_factor" => $roundingfactor
+                                    "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                    "circ_allowance" => $circumferenceallowance,
+                                    "length_allowance" => $lengthallowance,
+                                    "rounding_factor" => $roundingfactor
                                 );
 
                                 $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -1991,13 +2133,25 @@ class Farms extends MY_Controller
 
                                         if ($noOfPieces > 0) {
                                             $dataFarmData[] = array(
-                                                "farm_id" => $insertFarm, "scanned_code" => "",
-                                                "no_of_pieces" => $noOfPieces, "circumference" => $circumference,
-                                                "length" => $length, "width" => 0, "thickness" => 0, "volume" => $netVolume,
-                                                "volume_pie" => 0, "grade_id" => 0, "length_export" => 0, "width_export" => 0,
-                                                "thickness_export" => 0, "volume_bought" => 0, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
-                                                "created_date" => date('Y-m-d H:i:s'), "updated_date" => date('Y-m-d H:i:s')
+                                                "farm_id" => $insertFarm,
+                                                "scanned_code" => "",
+                                                "no_of_pieces" => $noOfPieces,
+                                                "circumference" => $circumference,
+                                                "length" => $length,
+                                                "width" => 0,
+                                                "thickness" => 0,
+                                                "volume" => $netVolume,
+                                                "volume_pie" => 0,
+                                                "grade_id" => 0,
+                                                "length_export" => 0,
+                                                "width_export" => 0,
+                                                "thickness_export" => 0,
+                                                "volume_bought" => 0,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "created_date" => date('Y-m-d H:i:s'),
+                                                "updated_date" => date('Y-m-d H:i:s')
                                             );
                                         }
                                     }
@@ -2016,19 +2170,27 @@ class Farms extends MY_Controller
 
                                             //CONTRACT INVENTORY MAPPING
                                             $dataContractMapping = array(
-                                                "contract_id" => $purchasecontractid, "supplier_id" => $supplierid,
-                                                "inventory_order" => $inventoryorder, "total_volume" => $totalVolume,
-                                                "invoice_number" => "", "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
+                                                "contract_id" => $purchasecontractid,
+                                                "supplier_id" => $supplierid,
+                                                "inventory_order" => $inventoryorder,
+                                                "total_volume" => $totalVolume,
+                                                "invoice_number" => "",
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
                                             );
 
                                             $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
 
                                             $dataInventoryLedger = array(
                                                 "contract_id" => $purchasecontractid,
-                                                "inventory_order" => $inventoryorder, "ledger_type" => 2,
-                                                "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
+                                                "inventory_order" => $inventoryorder,
+                                                "ledger_type" => 2,
+                                                "expense_date" => $purchase_date,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "is_advance_app" => 0,
                                             );
 
                                             if ($woodValueWithSupplierTaxes != 0) {
@@ -2096,28 +2258,56 @@ class Farms extends MY_Controller
                                                         if ($getSupplierDetails[0]->product_type == 3) {
                                                             $productTypeId = 4;
                                                         }
-                                                        
-                                                        if($originid == 4) {
+
+                                                        if ($originid == 4) {
                                                             $dataReception = array(
-                                                                "warehouse_id" => $warehouseid_rounglogs, "supplier_id" => $supplierid,
-                                                                "supplier_code" => $getSupplierDetails[0]->supplier_code, "supplier_product_id" => $getSupplierDetails[0]->product_name,
-                                                                "supplier_product_typeid" => $productTypeId,  "measurementsystem_id" => $measurement_system_roundlogs,
-                                                                "received_date" => $receptiondate, "salvoconducto" => $inventoryorder,
-                                                                "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                                "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'], "closeddate" => date('Y-m-d H:i:s'),
-                                                                "captured_timestamp" => 0, "isduplicatecaptured" => 0, "is_contract_added" => 0,
-                                                                "is_special_uploaded" => 1, "origin_id" => $originid, "circ_allowance" => $circumferenceallowance, "length_allowance" => $lengthallowance, "rounding_factor" => $roundingfactor
-                                                            ); 
+                                                                "warehouse_id" => $warehouseid_rounglogs,
+                                                                "supplier_id" => $supplierid,
+                                                                "supplier_code" => $getSupplierDetails[0]->supplier_code,
+                                                                "supplier_product_id" => $getSupplierDetails[0]->product_name,
+                                                                "supplier_product_typeid" => $productTypeId,
+                                                                "measurementsystem_id" => $measurement_system_roundlogs,
+                                                                "received_date" => $receptiondate,
+                                                                "salvoconducto" => $inventoryorder,
+                                                                "createdby" => $session['user_id'],
+                                                                "updatedby" => $session['user_id'],
+                                                                "isactive" => 1,
+                                                                "isclosed" => 1,
+                                                                "closedby" => $session['user_id'],
+                                                                "closeddate" => date('Y-m-d H:i:s'),
+                                                                "captured_timestamp" => 0,
+                                                                "isduplicatecaptured" => 0,
+                                                                "is_contract_added" => 0,
+                                                                "is_special_uploaded" => 1,
+                                                                "origin_id" => $originid,
+                                                                "circ_allowance" => $circumferenceallowance,
+                                                                "length_allowance" => $lengthallowance,
+                                                                "rounding_factor" => $roundingfactor
+                                                            );
                                                         } else {
                                                             $dataReception = array(
-                                                                "warehouse_id" => $warehouseid_rounglogs, "supplier_id" => $supplierid,
-                                                                "supplier_code" => $getSupplierDetails[0]->supplier_code, "supplier_product_id" => $getSupplierDetails[0]->product_name,
-                                                                "supplier_product_typeid" => $productTypeId,  "measurementsystem_id" => $measurement_system_roundlogs,
-                                                                "received_date" => $receptiondate_roundlogs, "salvoconducto" => $inventoryorder,
-                                                                "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                                "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'], "closeddate" => date('Y-m-d H:i:s'),
-                                                                "captured_timestamp" => 0, "isduplicatecaptured" => 0, "is_contract_added" => 0,
-                                                                "is_special_uploaded" => 1, "origin_id" => $originid, "circ_allowance" => $circumferenceallowance, "length_allowance" => $lengthallowance, "rounding_factor" => $roundingfactor
+                                                                "warehouse_id" => $warehouseid_rounglogs,
+                                                                "supplier_id" => $supplierid,
+                                                                "supplier_code" => $getSupplierDetails[0]->supplier_code,
+                                                                "supplier_product_id" => $getSupplierDetails[0]->product_name,
+                                                                "supplier_product_typeid" => $productTypeId,
+                                                                "measurementsystem_id" => $measurement_system_roundlogs,
+                                                                "received_date" => $receptiondate_roundlogs,
+                                                                "salvoconducto" => $inventoryorder,
+                                                                "createdby" => $session['user_id'],
+                                                                "updatedby" => $session['user_id'],
+                                                                "isactive" => 1,
+                                                                "isclosed" => 1,
+                                                                "closedby" => $session['user_id'],
+                                                                "closeddate" => date('Y-m-d H:i:s'),
+                                                                "captured_timestamp" => 0,
+                                                                "isduplicatecaptured" => 0,
+                                                                "is_contract_added" => 0,
+                                                                "is_special_uploaded" => 1,
+                                                                "origin_id" => $originid,
+                                                                "circ_allowance" => $circumferenceallowance,
+                                                                "length_allowance" => $lengthallowance,
+                                                                "rounding_factor" => $roundingfactor
                                                             );
                                                         }
 
@@ -2127,8 +2317,12 @@ class Farms extends MY_Controller
                                                         if ($insertReception > 0) {
 
                                                             $dataReceptionTracking = array(
-                                                                "reception_id" => $insertReception, "user_id" => $session['user_id'],
-                                                                "isclosed" => 1, "createdby" => $session['user_id'], "updatedby" => $session['user_id'], "isactive" => 1,
+                                                                "reception_id" => $insertReception,
+                                                                "user_id" => $session['user_id'],
+                                                                "isclosed" => 1,
+                                                                "createdby" => $session['user_id'],
+                                                                "updatedby" => $session['user_id'],
+                                                                "isactive" => 1,
                                                             );
 
                                                             $insertReceptionTracking = $this->Reception_model->add_reception_tracking($dataReceptionTracking);
@@ -2144,18 +2338,18 @@ class Farms extends MY_Controller
                                                                 $length = $farm["length"];
                                                                 $lengthAllowance = $farm["lengthAllowance"];
                                                                 $circAllowance = $farm["circAllowance"];
-                                                                
-                                                                if($originid == 4) {
+
+                                                                if ($originid == 4) {
                                                                     $grossFormulaVal = str_replace(array('$ac', '$al', '$l', '$c', '$pcs'), array($circAllowance, $lengthAllowance, $length, $circumference, $noOfPieces), $grossFormula);
                                                                     $grossVolume = sprintf('%0.3f', eval($grossFormulaVal));
-    
+
                                                                     $netFormulaVal = str_replace(array('$ac', '$al', '$l', '$c', '$pcs'), array($circAllowance, $lengthAllowance, $length, $circumference, $noOfPieces), $netFormula);
                                                                     $netVolume = sprintf('%0.3f', eval($netFormulaVal));
                                                                 } else {
 
                                                                     $grossFormulaVal = str_replace(array('$l', '$c'), array($length, $circumference), $grossFormula);
                                                                     $grossVolume = sprintf('%0.3f', eval($grossFormulaVal) * $noOfPieces);
-    
+
                                                                     $netFormulaVal = str_replace(array('$l', '$c'), array($length, $circumference), $netFormula);
                                                                     $netVolume = sprintf('%0.3f', eval($netFormulaVal) * $noOfPieces);
                                                                 }
@@ -2165,21 +2359,36 @@ class Farms extends MY_Controller
                                                                 $totalReceptionGrossVolume = $totalReceptionGrossVolume + $grossVolume;
 
                                                                 $dataReceptionData[] = array(
-                                                                    "reception_id" => $insertReception, "salvoconducto" => $inventoryorder,
-                                                                    "scanned_code" => $noOfPieces, "length_bought" => $length,
-                                                                    "width_bought" => 0, "thickness_bought" => 0,
-                                                                    "circumference_bought" => $circumference, "volumepie_bought" => 0,
-                                                                    "cbm_bought" => $grossVolume, "length_export" => 0, "width_export" => 0,
-                                                                    "thickness_export" => 0, "cbm_export" => $netVolume, "grade" => 0,
-                                                                    "createdby" => $session['user_id'], "updatedby" => $session['user_id'], "isactive" => 1,
-                                                                    "isdispatch" => 0, "scanned_timestamp" => 0, "isduplicatescanned" => 0, "is_special" => 1,
-                                                                    "createddate" => date('Y-m-d H:i:s'), "updateddate" => date('Y-m-d H:i:s'), "remaining_stock_count" => $noOfPieces,
+                                                                    "reception_id" => $insertReception,
+                                                                    "salvoconducto" => $inventoryorder,
+                                                                    "scanned_code" => $noOfPieces,
+                                                                    "length_bought" => $length,
+                                                                    "width_bought" => 0,
+                                                                    "thickness_bought" => 0,
+                                                                    "circumference_bought" => $circumference,
+                                                                    "volumepie_bought" => 0,
+                                                                    "cbm_bought" => $grossVolume,
+                                                                    "length_export" => 0,
+                                                                    "width_export" => 0,
+                                                                    "thickness_export" => 0,
+                                                                    "cbm_export" => $netVolume,
+                                                                    "grade" => 0,
+                                                                    "createdby" => $session['user_id'],
+                                                                    "updatedby" => $session['user_id'],
+                                                                    "isactive" => 1,
+                                                                    "isdispatch" => 0,
+                                                                    "scanned_timestamp" => 0,
+                                                                    "isduplicatescanned" => 0,
+                                                                    "is_special" => 1,
+                                                                    "createddate" => date('Y-m-d H:i:s'),
+                                                                    "updateddate" => date('Y-m-d H:i:s'),
+                                                                    "remaining_stock_count" => $noOfPieces,
                                                                 );
                                                             }
 
                                                             $this->Reception_model->add_reception_data($dataReceptionData);
-                                                            
-                                                            if($roundingfactor > 0) {
+
+                                                            if ($roundingfactor > 0) {
                                                                 $precision = (int) $roundingfactor; // Ensure it's an integer
                                                                 $totalReceptionVolume = number_format($totalReceptionVolume, $precision, '.', '');
                                                                 $totalReceptionGrossVolume = number_format($totalReceptionGrossVolume, $precision, '.', '');
@@ -2187,7 +2396,8 @@ class Farms extends MY_Controller
 
                                                             //UPDATE
                                                             $dataReceptionUpdate = array(
-                                                                "total_volume" => $totalReceptionVolume, "total_pieces" => $totalReceptionPieces,
+                                                                "total_volume" => $totalReceptionVolume,
+                                                                "total_pieces" => $totalReceptionPieces,
                                                                 "updatedby" => $session['user_id'],
                                                             );
 
@@ -2241,32 +2451,51 @@ class Farms extends MY_Controller
                                                                 // $this->email->bcc("nafeel@codringroup.com");
                                                                 // $this->email->subject($mailSubject);
                                                                 // $this->email->message("$message");
-                                                              // $resultSend = $this->email->send();
+                                                                // $resultSend = $this->email->send();
                                                             }
-                                                            
+
                                                             //DISPATCH
 
-                                                            if($originid == 4) {
+                                                            if ($originid == 4) {
 
                                                                 //DISPATCH
 
-                                                                if($productTypeId == 4) {
+                                                                if ($productTypeId == 4) {
                                                                     $productTypeId = 2;
                                                                 }
 
                                                                 $dataDispatch = array(
-                                                                    "container_number" => $inventoryorder, "warehouse_id" => $warehouseid,
-                                                                    "shipping_line" => $shippingline, "product_id" => $getSupplierDetails[0]->product_id_dispatch,
-                                                                    "product_type_id" => $productTypeId,  "dispatch_date" => $receptiondate,
-                                                                    "seal_number" => $sealnumber, "container_pic_url" => "",
-                                                                    "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                                    "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'],
-                                                                    "is_special_uploaded" => 1, "origin_id" => $originid, "total_gross_volume" => $totalReceptionGrossVolume,
-                                                                    "total_volume" => $totalReceptionVolume, "total_pieces" => $totalReceptionPieces, "category" => 0, "captured_from_app" => 0,
-                                                                    "metric_ton" => 0, "short_ton" => 0, "net_lbs" => 0,
-                                                                    "diameter_text" => "", "length_text" => "", 
-                                                                    "unit_price" => 0, "total_value" => 0, "measurement_system_id" => $measurement_system_roundlogs, 
-                                                                    "circ_allowance" => $circumferenceallowance, "length_allowance" => $lengthallowance, "rounding_factor" => $roundingfactor
+                                                                    "container_number" => $inventoryorder,
+                                                                    "warehouse_id" => $warehouseid,
+                                                                    "shipping_line" => $shippingline,
+                                                                    "product_id" => $getSupplierDetails[0]->product_id_dispatch,
+                                                                    "product_type_id" => $productTypeId,
+                                                                    "dispatch_date" => $receptiondate,
+                                                                    "seal_number" => $sealnumber,
+                                                                    "container_pic_url" => "",
+                                                                    "createdby" => $session['user_id'],
+                                                                    "updatedby" => $session['user_id'],
+                                                                    "isactive" => 1,
+                                                                    "isclosed" => 1,
+                                                                    "closedby" => $session['user_id'],
+                                                                    "is_special_uploaded" => 1,
+                                                                    "origin_id" => $originid,
+                                                                    "total_gross_volume" => $totalReceptionGrossVolume,
+                                                                    "total_volume" => $totalReceptionVolume,
+                                                                    "total_pieces" => $totalReceptionPieces,
+                                                                    "category" => 0,
+                                                                    "captured_from_app" => 0,
+                                                                    "metric_ton" => 0,
+                                                                    "short_ton" => 0,
+                                                                    "net_lbs" => 0,
+                                                                    "diameter_text" => "",
+                                                                    "length_text" => "",
+                                                                    "unit_price" => 0,
+                                                                    "total_value" => 0,
+                                                                    "measurement_system_id" => $measurement_system_roundlogs,
+                                                                    "circ_allowance" => $circumferenceallowance,
+                                                                    "length_allowance" => $lengthallowance,
+                                                                    "rounding_factor" => $roundingfactor
                                                                 );
 
                                                                 $insertDispatch = $this->Dispatch_model->add_dispatch($dataDispatch);
@@ -2358,8 +2587,8 @@ class Farms extends MY_Controller
                         if ($servicecost == 0) {
                             $servicepayto = 0;
                         }
-                        
-                        
+
+
 
                         if ($logisticcost == null || $logisticcost == "") {
                             $logisticcost = 0;
@@ -2368,7 +2597,7 @@ class Farms extends MY_Controller
                         if ($logisticcost == 0) {
                             $logisticpayto = 0;
                         }
-                        
+
                         if ($farmadjustment == null || $farmadjustment == "") {
                             $farmadjustment = 0;
                         }
@@ -2733,17 +2962,29 @@ class Farms extends MY_Controller
                             $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
 
                             $dataFarm = array(
-                                "inventory_order" => $input_inventory_order, "plate_number" => $input_truck_plate_number,
-                                "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                "exchange_rate" => $input_conversion_rate, "updated_by" => $session['user_id'], "is_active" => 1,
-                                "origin_id" => $originid, "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
-                                "service_cost_withtaxes" => $servicesCostWithTaxes, "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
-                                "supplier_taxes" => $supplierTaxesArrList, "logistic_taxes" => $supplierLogisticTaxesArrList,
-                                "service_taxes" => $supplierServiceTaxesArrList, "adjust_taxes" => $adjustrf,
-                                "is_adjust_rf" => $isAdjustEnabled, "logistic_provider_taxes" => $providerLogisticTaxesArrList,
-                                "service_provider_taxes" => $providerServiceTaxesArrList, "adjusted_value" => $adjustmentValues,
+                                "inventory_order" => $input_inventory_order,
+                                "plate_number" => $input_truck_plate_number,
+                                "purchase_date" => $purchase_date,
+                                "service_cost" => $servicecost,
+                                "logistic_cost" => $logisticcost,
+                                "adjustment" => $farmadjustment,
+                                "pay_service_to" => $servicepayto,
+                                "pay_logistics_to" => $logisticpayto,
+                                "exchange_rate" => $input_conversion_rate,
+                                "updated_by" => $session['user_id'],
+                                "is_active" => 1,
+                                "origin_id" => $originid,
+                                "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
+                                "service_cost_withtaxes" => $servicesCostWithTaxes,
+                                "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
+                                "supplier_taxes" => $supplierTaxesArrList,
+                                "logistic_taxes" => $supplierLogisticTaxesArrList,
+                                "service_taxes" => $supplierServiceTaxesArrList,
+                                "adjust_taxes" => $adjustrf,
+                                "is_adjust_rf" => $isAdjustEnabled,
+                                "logistic_provider_taxes" => $providerLogisticTaxesArrList,
+                                "service_provider_taxes" => $providerServiceTaxesArrList,
+                                "adjusted_value" => $adjustmentValues,
                                 "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                 "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                 "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
@@ -2754,7 +2995,9 @@ class Farms extends MY_Controller
                             if ($updateFarm == true) {
 
                                 $dataInventoryLedgerUpdate = array(
-                                    "amount" => 0, "updated_by" => $session['user_id'], "is_active" => 0,
+                                    "amount" => 0,
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 0,
                                 );
 
                                 $updateInventoryLedger = $this->Farm_model->update_inventory_ledger($inventory_order, $contract_id, $dataInventoryLedgerUpdate);
@@ -2763,9 +3006,13 @@ class Farms extends MY_Controller
 
                                     $dataInventoryLedger = array(
                                         "contract_id" => $contract_id,
-                                        "inventory_order" => $input_inventory_order, "ledger_type" => 2,
-                                        "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                        "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
+                                        "inventory_order" => $input_inventory_order,
+                                        "ledger_type" => 2,
+                                        "expense_date" => $purchase_date,
+                                        "created_by" => $session['user_id'],
+                                        "updated_by" => $session['user_id'],
+                                        "is_active" => 1,
+                                        "is_advance_app" => 0,
                                     );
 
                                     if ($woodValueWithSupplierTaxes != 0) {
@@ -2822,7 +3069,7 @@ class Farms extends MY_Controller
                             if ($logisticcost == null || $logisticcost == "") {
                                 $logisticcost = 0;
                             }
-                            
+
                             if ($farmadjustment == null || $farmadjustment == "") {
                                 $farmadjustment = 0;
                             }
@@ -3187,17 +3434,29 @@ class Farms extends MY_Controller
                                 $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
 
                                 $dataFarm = array(
-                                    "inventory_order" => $input_inventory_order, "plate_number" => $input_truck_plate_number,
-                                    "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                    "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                    "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                    "exchange_rate" => $input_conversion_rate, "updated_by" => $session['user_id'], "is_active" => 1,
-                                    "origin_id" => $originid, "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
-                                    "service_cost_withtaxes" => $servicesCostWithTaxes, "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
-                                    "supplier_taxes" => $supplierTaxesArrList, "logistic_taxes" => $supplierLogisticTaxesArrList,
-                                    "service_taxes" => $supplierServiceTaxesArrList, "adjust_taxes" => $adjustrf,
-                                    "is_adjust_rf" => $isAdjustEnabled, "logistic_provider_taxes" => $providerLogisticTaxesArrList,
-                                    "service_provider_taxes" => $providerServiceTaxesArrList, "adjusted_value" => $adjustmentValues,
+                                    "inventory_order" => $input_inventory_order,
+                                    "plate_number" => $input_truck_plate_number,
+                                    "purchase_date" => $purchase_date,
+                                    "service_cost" => $servicecost,
+                                    "logistic_cost" => $logisticcost,
+                                    "adjustment" => $farmadjustment,
+                                    "pay_service_to" => $servicepayto,
+                                    "pay_logistics_to" => $logisticpayto,
+                                    "exchange_rate" => $input_conversion_rate,
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 1,
+                                    "origin_id" => $originid,
+                                    "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
+                                    "service_cost_withtaxes" => $servicesCostWithTaxes,
+                                    "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
+                                    "supplier_taxes" => $supplierTaxesArrList,
+                                    "logistic_taxes" => $supplierLogisticTaxesArrList,
+                                    "service_taxes" => $supplierServiceTaxesArrList,
+                                    "adjust_taxes" => $adjustrf,
+                                    "is_adjust_rf" => $isAdjustEnabled,
+                                    "logistic_provider_taxes" => $providerLogisticTaxesArrList,
+                                    "service_provider_taxes" => $providerServiceTaxesArrList,
+                                    "adjusted_value" => $adjustmentValues,
                                     "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                     "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                     "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
@@ -3208,7 +3467,9 @@ class Farms extends MY_Controller
                                 if ($updateFarm == true) {
 
                                     $dataInventoryLedgerUpdate = array(
-                                        "amount" => 0, "updated_by" => $session['user_id'], "is_active" => 0,
+                                        "amount" => 0,
+                                        "updated_by" => $session['user_id'],
+                                        "is_active" => 0,
                                     );
 
                                     $updateInventoryLedger = $this->Farm_model->update_inventory_ledger($inventory_order, $contract_id, $dataInventoryLedgerUpdate);
@@ -3217,9 +3478,13 @@ class Farms extends MY_Controller
 
                                         $dataInventoryLedger = array(
                                             "contract_id" => $contract_id,
-                                            "inventory_order" => $input_inventory_order, "ledger_type" => 2,
-                                            "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                            "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
+                                            "inventory_order" => $input_inventory_order,
+                                            "ledger_type" => 2,
+                                            "expense_date" => $purchase_date,
+                                            "created_by" => $session['user_id'],
+                                            "updated_by" => $session['user_id'],
+                                            "is_active" => 1,
+                                            "is_advance_app" => 0,
                                         );
 
                                         if ($woodValueWithSupplierTaxes != 0) {
@@ -3282,7 +3547,7 @@ class Farms extends MY_Controller
             $this->output($Return);
         }
     }
-    
+
     public function add()
     {
         $Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
@@ -6442,8 +6707,13 @@ class Farms extends MY_Controller
             $session = $this->session->userdata('fullname');
 
             $Return = array(
-                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
-                'warning' => '', 'success' => '', 'datatable' => false,
+                'result' => '',
+                'error' => '',
+                'redirect' => false,
+                'csrf_hash' => '',
+                'warning' => '',
+                'success' => '',
+                'datatable' => false,
             );
 
             if (!empty($session)) {
@@ -6624,7 +6894,7 @@ class Farms extends MY_Controller
                                                 $salesValue = 0;
                                                 $totalSalesValue = 0;
 
-                                                if($salesPriceVal != 0) {
+                                                if ($salesPriceVal != 0) {
                                                     $salesValue = $salesPriceVal;
                                                     $totalSalesValue = $salesPriceVal * $metricTonVal;
                                                 }
@@ -6633,7 +6903,6 @@ class Farms extends MY_Controller
 
                                                     $woodValue = $purchasePriceVal;
                                                     $totalPurchaseValue = $purchasePriceVal * $metricTonVal;
-
                                                 } else {
 
                                                     preg_match_all('/\d*\.?\d+/', $diameterVal, $matches);
@@ -6649,7 +6918,7 @@ class Farms extends MY_Controller
                                                         }
                                                     }
                                                 }
-                                                
+
                                                 $farmData[] = array(
                                                     'containerNumber' => $containerVal,
                                                     'seal' => $sealVal,
@@ -7126,8 +7395,8 @@ class Farms extends MY_Controller
                                                         $grossVolume = 0;
                                                         if (count($getFormulae) > 0) {
                                                             foreach ($getFormulae as $formula) {
-                                                                
-                                                                if($originId == 4) {
+
+                                                                if ($originId == 4) {
                                                                     $strFormula = str_replace(array('$ac', '$al', '$l', '$c', 'truncate', '$pcs'), array($circumferenceAllowance, $lengthAllowance, $lengthVal, $circumferenceVal, '$this->truncate', $noOfPiecesVal), $formula->formula_context);
                                                                     $strFormula = "return (" . $strFormula . ");";
 
@@ -7139,14 +7408,14 @@ class Farms extends MY_Controller
                                                                         $grossVolume = eval($strFormula);
                                                                     }
                                                                 } else {
-                                                                
+
                                                                     $strFormula = str_replace(array('$ac', '$al', '$l', '$c', 'truncate'), array($circumferenceAllowance, $lengthAllowance, $lengthVal, $circumferenceVal, '$this->truncate'), $formula->formula_context);
                                                                     $strFormula = "return (" . $strFormula . ");";
-    
+
                                                                     if ($formula->type == "netvolume") {
                                                                         $netVolume = sprintf('%0.3f', eval($strFormula)) * $noOfPiecesVal;
                                                                     }
-    
+
                                                                     if ($formula->type == "grossvolume") {
                                                                         $grossVolume = sprintf('%0.3f', eval($strFormula)) * $noOfPiecesVal;
                                                                     }
@@ -7186,19 +7455,19 @@ class Farms extends MY_Controller
                                                                     'length' => ($lengthVal + 0),
                                                                     'netVolume' => sprintf('%0.3f', $netVolume),
                                                                     'grossVolume' => sprintf('%0.3f', $grossVolume),
-                                                                    'circAllowance' => $circumferenceAllowance, 
+                                                                    'circAllowance' => $circumferenceAllowance,
                                                                     'lengthAllowance' => $lengthAllowance
                                                                 );
                                                             }
                                                         } else {
-                                                            if($originId == 4) {
+                                                            if ($originId == 4) {
                                                                 $farmData[] = array(
                                                                     'noOfPieces' => ($noOfPiecesVal + 0),
                                                                     'circumference' => ($circumferenceVal + 0),
                                                                     'length' => ($lengthVal + 0),
                                                                     'netVolume' => $netVolume,
                                                                     'grossVolume' => $grossVolume,
-                                                                    'circAllowance' => $circumferenceAllowance, 
+                                                                    'circAllowance' => $circumferenceAllowance,
                                                                     'lengthAllowance' => $lengthAllowance
                                                                 );
                                                             } else {
@@ -7208,7 +7477,7 @@ class Farms extends MY_Controller
                                                                     'length' => ($lengthVal + 0),
                                                                     'netVolume' => sprintf('%0.3f', $netVolume),
                                                                     'grossVolume' => sprintf('%0.3f', $grossVolume),
-                                                                    'circAllowance' => $circumferenceAllowance, 
+                                                                    'circAllowance' => $circumferenceAllowance,
                                                                     'lengthAllowance' => $lengthAllowance
                                                                 );
                                                             }
@@ -7227,14 +7496,14 @@ class Farms extends MY_Controller
                                                 exit;
                                             } else {
 
-                                                if($originId == 4) {
-                                                    
-                                                    if($roundingfactorInput > 0) {
+                                                if ($originId == 4) {
+
+                                                    if ($roundingfactorInput > 0) {
                                                         $precision = (int) $roundingfactorInput; // Ensure it's an integer
                                                         $totalNetVolume = number_format($totalNetVolume, $precision, '.', '');
                                                         $totalGrossVolume = number_format($totalGrossVolume, $precision, '.', '');
                                                     }
-                                                    
+
                                                     $dataUploaded = array(
                                                         "farmData" => $farmData,
                                                         "totalPieces" => $totalPieces,
@@ -7320,14 +7589,17 @@ class Farms extends MY_Controller
         }
     }
 
-    public function generate_farm_report_existing($farmId, $contractId, $inventoryOrder)
+    public function generate_farm_report123($farmId, $contractId, $inventoryOrder)
     {
         try {
 
             $session = $this->session->userdata('fullname');
 
             $Return = array(
-                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
+                'result' => '',
+                'error' => '',
+                'redirect' => false,
+                'csrf_hash' => '',
                 'successmessage' => ''
             );
 
@@ -7821,7 +8093,7 @@ class Farms extends MY_Controller
                     } else if (
                         $getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 4 || $getFarmDetails[0]->unit_of_purchase == 5
                         || $getFarmDetails[0]->unit_of_purchase == 6 || $getFarmDetails[0]->unit_of_purchase == 7
-                        || $getFarmDetails[0]->unit_of_purchase == 8 || $getFarmDetails[0]->unit_of_purchase == 9 || $getFarmDetails[0]->unit_of_purchase == 12 || $getFarmDetails[0]->unit_of_purchase == 13 || $getFarmDetails[0]->unit_of_purchase == 14 
+                        || $getFarmDetails[0]->unit_of_purchase == 8 || $getFarmDetails[0]->unit_of_purchase == 9 || $getFarmDetails[0]->unit_of_purchase == 12 || $getFarmDetails[0]->unit_of_purchase == 13 || $getFarmDetails[0]->unit_of_purchase == 14
                         || $getFarmDetails[0]->unit_of_purchase == 15
                     ) {
 
@@ -8034,69 +8306,69 @@ class Farms extends MY_Controller
 
                             foreach ($getFormulae as $formula) {
                                 if ($formula->type == "netvolume") {
-                                    
-                                    if($getFarmDetails[0]->origin_id == 4) {
+
+                                    if ($getFarmDetails[0]->origin_id == 4) {
                                         $netVolumeFormula = str_replace(
-                                        array('$ac', '$al', '$l', '$c', 'truncate', 'pow', 'round', '$pcs'),
-                                        array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, 'B' . $rowCountData, 'A' . $rowCountData, "TRUNC", "POWER", "ROUND", 'C'.$rowCountData),
-                                        $formula->formula_context
+                                            array('$ac', '$al', '$l', '$c', 'truncate', 'pow', 'round', '$pcs'),
+                                            array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, 'B' . $rowCountData, 'A' . $rowCountData, "TRUNC", "POWER", "ROUND", 'C' . $rowCountData),
+                                            $formula->formula_context
                                         );
-    
+
                                         $strFormula = str_replace(
                                             array('$ac', '$al', '$l', '$c', 'truncate', '$pcs'),
                                             array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, $farmdata->length, $farmdata->circumference, '$this->truncate', $farmdata->no_of_pieces),
                                             $formula->formula_context
                                         );
-    
+
                                         $strFormula = "return (" . $strFormula . ");";
                                     } else {
                                         $netVolumeFormula = str_replace(
-                                        array('$ac', '$al', '$l', '$c', 'truncate', 'pow', 'round'),
-                                        array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, 'B' . $rowCountData, 'A' . $rowCountData, "TRUNC", "POWER", "ROUND"),
-                                        $formula->formula_context
+                                            array('$ac', '$al', '$l', '$c', 'truncate', 'pow', 'round'),
+                                            array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, 'B' . $rowCountData, 'A' . $rowCountData, "TRUNC", "POWER", "ROUND"),
+                                            $formula->formula_context
                                         );
-    
+
                                         $strFormula = str_replace(
                                             array('$ac', '$al', '$l', '$c', 'truncate'),
                                             array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, $farmdata->length, $farmdata->circumference, '$this->truncate'),
                                             $formula->formula_context
                                         );
-    
+
                                         $strFormula = "return (" . $strFormula . ");";
                                     }
                                 }
 
                                 if ($formula->type == "grossvolume") {
 
-                                    if($getFarmDetails[0]->origin_id == 4) {
+                                    if ($getFarmDetails[0]->origin_id == 4) {
 
                                         $strFormulaGross = str_replace(
                                             array('$ac', '$al', '$l', '$c', 'truncate', '$pcs'),
                                             array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, $farmdata->length, $farmdata->circumference, '$this->truncate', $farmdata->no_of_pieces),
                                             $formula->formula_context
                                         );
-    
+
                                         $strFormulaGross = "return (" . $strFormulaGross . ");";
                                     } else {
                                         $strFormulaGross = str_replace(
-                                        array('$ac', '$al', '$l', '$c', 'truncate'),
-                                        array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, $farmdata->length, $farmdata->circumference, '$this->truncate'),
-                                        $formula->formula_context
+                                            array('$ac', '$al', '$l', '$c', 'truncate'),
+                                            array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, $farmdata->length, $farmdata->circumference, '$this->truncate'),
+                                            $formula->formula_context
                                         );
-    
+
                                         $strFormulaGross = "return (" . $strFormulaGross . ");";
                                     }
                                 }
                             }
-                            
-                            if($getFarmDetails[0]->origin_id == 4) {
+
+                            if ($getFarmDetails[0]->origin_id == 4) {
                                 $objSheet->SetCellValue('D' . $rowCountData, "=$netVolumeFormula");
                                 if ($strFormula != "") {
                                     $row_array_farmdata['netvolume'] = (eval($strFormula));
                                 } else {
-                                        $row_array_farmdata['netvolume'] = 0;
+                                    $row_array_farmdata['netvolume'] = 0;
                                 }
-        
+
                                 if ($strFormulaGross != "") {
                                     $grossVolumeTotal = $grossVolumeTotal + ((eval($strFormulaGross)));
                                 } else {
@@ -8107,22 +8379,22 @@ class Farms extends MY_Controller
                                 if ($strFormula != "") {
                                     $row_array_farmdata['netvolume'] = (eval($strFormula) * $farmdata->no_of_pieces);
                                 } else {
-                                        $row_array_farmdata['netvolume'] = 0;
+                                    $row_array_farmdata['netvolume'] = 0;
                                 }
-        
+
                                 if ($strFormulaGross != "") {
                                     $grossVolumeTotal = $grossVolumeTotal + ((eval($strFormulaGross) * $farmdata->no_of_pieces));
                                 } else {
                                     $grossVolumeTotal = $grossVolumeTotal + 0;
                                 }
                             }
-                             
+
                             $objSheet->getStyle("D$rowCountData")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
 
                             $objSheet->getStyle("A$rowCountData:D$rowCountData")->applyFromArray($styleArray);
 
                             $row_array_farmdata['circumference'] = round($farmdata->circumference, 2);
-                            
+
 
                             array_push($return_arr_farmdata, $row_array_farmdata);
 
@@ -8131,15 +8403,15 @@ class Farms extends MY_Controller
 
                         $calcLastRow = $rowCountData - 1;
                         $objSheet->SetCellValue("D2", "=SUM(C$calcStartRow:C$calcLastRow)");
-                        
-                        if($getFarmDetails[0]->rounding_factor > 0) {
+
+                        if ($getFarmDetails[0]->rounding_factor > 0) {
                             $roundingfactorVal = $getFarmDetails[0]->rounding_factor;
                             $objSheet->SetCellValue("D3", "=ROUND(SUM(D$calcStartRow:D$calcLastRow), $roundingfactorVal)");
                         } else {
                             $objSheet->SetCellValue("D3", "=SUM(D$calcStartRow:D$calcLastRow)");
                         }
-                        
-                        
+
+
 
                         if ($getFarmDetails[0]->unit_of_purchase == 6 || $getFarmDetails[0]->unit_of_purchase == 7 || $getFarmDetails[0]->unit_of_purchase == 13) {
                             $objSheet->SetCellValue("C$summaryHeaderLastRow", $this->lang->line('average_girth'));
@@ -8250,13 +8522,12 @@ class Farms extends MY_Controller
                                 } else if ($getFarmDetails[0]->unit_of_purchase == 6 || $getFarmDetails[0]->unit_of_purchase == 7 || $getFarmDetails[0]->unit_of_purchase == 9 || $getFarmDetails[0]->unit_of_purchase == 12 || $getFarmDetails[0]->unit_of_purchase == 13 || $getFarmDetails[0]->unit_of_purchase == 14) {
                                     $objSheet->SetCellValue("J$rowCountDataSummary", "=H$rowCountDataSummary*I$rowCountDataSummary");
                                 } else {
-                                    
-                                    if($getFarmDetails[0]->unit_of_purchase == 15) {
+
+                                    if ($getFarmDetails[0]->unit_of_purchase == 15) {
                                         $objSheet->SetCellValue("J$rowCountDataSummary", ($priceRange + 0));
                                     } else {
                                         $objSheet->SetCellValue("J$rowCountDataSummary", ($priceRange * $farmdatasummary->pieces_farm + 0));
                                     }
-                                    
                                 }
 
                                 $objSheet->getStyle("I$rowCountDataSummary:J$rowCountDataSummary")
@@ -8385,8 +8656,13 @@ class Farms extends MY_Controller
                                 $strFormula = str_replace(
                                     array('$l', '$w', '$t', '$vp', 'truncate', '$ew', '$et', '$el'),
                                     array(
-                                        'B' . $rowCountData, 'C' . $rowCountData, 'D' . $rowCountData,
-                                        'E' . $rowCountData, 'TRUNC', 'H' . $rowCountData, 'I' . $rowCountData,
+                                        'B' . $rowCountData,
+                                        'C' . $rowCountData,
+                                        'D' . $rowCountData,
+                                        'E' . $rowCountData,
+                                        'TRUNC',
+                                        'H' . $rowCountData,
+                                        'I' . $rowCountData,
                                         'G' . $rowCountData
                                     ),
                                     $formula->formula_context
@@ -8792,7 +9068,7 @@ class Farms extends MY_Controller
             exit;
         }
     }
-    
+
     public function generate_farm_report($farmId, $contractId, $inventoryOrder)
     {
         try {
@@ -9315,143 +9591,143 @@ class Farms extends MY_Controller
 
                         $taxCellsArray = array();
 
-                        // if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
+                        if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
 
-                        //     $objSheet->SetCellValue("J$rowCount", $this->lang->line('total_payment'));
-                        //     $totalPaymentRow = $rowCount;
-                        //     $rowCount++;
+                            $objSheet->SetCellValue("J$rowCount", $this->lang->line('total_payment'));
+                            $totalPaymentRow = $rowCount;
+                            $rowCount++;
 
-                        //     $objSheet->SetCellValue("J$rowCount", $this->lang->line('logistic_cost'));
-                        //     $objSheet->SetCellValue("K$rowCount", $getFarmDetails[0]->logistic_cost);
-                        //     $objSheet->getStyle("K$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                        //     $logisticCostRow = "$rowCount";
-                        //     $rowCount++;
+                            $objSheet->SetCellValue("J$rowCount", $this->lang->line('logistic_cost'));
+                            $objSheet->SetCellValue("K$rowCount", $getFarmDetails[0]->logistic_cost);
+                            $objSheet->getStyle("K$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                            $logisticCostRow = "$rowCount";
+                            $rowCount++;
 
-                        //     foreach ($getSupplierTaxes as $suppliertax) {
+                            foreach ($getSupplierTaxes as $suppliertax) {
 
-                        //         if ($suppliertax->number_format == 2) {
-                        //             $suppliertax->tax_name = $suppliertax->tax_name . " (%)";
-                        //         }
-                        //         $objSheet->SetCellValue("J$rowCount", $suppliertax->tax_name);
+                                if ($suppliertax->number_format == 2) {
+                                    $suppliertax->tax_name = $suppliertax->tax_name . " (%)";
+                                }
+                                $objSheet->SetCellValue("J$rowCount", $suppliertax->tax_name);
 
-                        //         if ($suppliertax->arithmetic_type == 2) {
-                        //             $objSheet->getStyle("J$rowCount")->getFont()->getColor()->setRGB("FF0000");
-                        //         }
+                                if ($suppliertax->arithmetic_type == 2) {
+                                    $objSheet->getStyle("J$rowCount")->getFont()->getColor()->setRGB("FF0000");
+                                }
 
-                        //         $supplierTaxesArr = json_decode($getFarmDetails[0]->supplier_taxes_array, true);
-                        //         $logisticsTaxesArray = json_decode($getFarmDetails[0]->logistics_taxes_array, true);
-                        //         $serviceTaxesArray = json_decode($getFarmDetails[0]->service_taxes_array, true);
+                                $supplierTaxesArr = json_decode($getFarmDetails[0]->supplier_taxes_array, true);
+                                $logisticsTaxesArray = json_decode($getFarmDetails[0]->logistics_taxes_array, true);
+                                $serviceTaxesArray = json_decode($getFarmDetails[0]->service_taxes_array, true);
 
-                        //         if (count($supplierTaxesArr) > 0) {
-                        //             $formula = "";
+                                if (count($supplierTaxesArr) > 0) {
+                                    $formula = "";
 
-                        //             foreach ($supplierTaxesArr as $tax) {
+                                    foreach ($supplierTaxesArr as $tax) {
 
-                        //                 if ($tax["taxId"] == $suppliertax->id) {
-                        //                     if ($suppliertax->arithmetic_type == 2) {
-                        //                         $taxval = $tax['taxVal'] * -1;
-                        //                     } else {
-                        //                         $taxval = $tax['taxVal'];
-                        //                     }
-                        //                     if ($suppliertax->number_format == 2) {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K$$$*$taxval%)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K$$$*$taxval%)";
-                        //                         }
-                        //                     } else {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K$$$*$taxval)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K$$$*$taxval)";
-                        //                         }
-                        //                     }
+                                        if ($tax["taxId"] == $suppliertax->id) {
+                                            if ($suppliertax->arithmetic_type == 2) {
+                                                $taxval = $tax['taxVal'] * -1;
+                                            } else {
+                                                $taxval = $tax['taxVal'];
+                                            }
+                                            if ($suppliertax->number_format == 2) {
+                                                if ($formula == "") {
+                                                    $formula = $formula . "=SUM(K$$$*$taxval%)";
+                                                } else {
+                                                    $formula = $formula . "+SUM(K$$$*$taxval%)";
+                                                }
+                                            } else {
+                                                if ($formula == "") {
+                                                    $formula = $formula . "=SUM(K$$$*$taxval)";
+                                                } else {
+                                                    $formula = $formula . "+SUM(K$$$*$taxval)";
+                                                }
+                                            }
 
-                        //                     $taxCellsArray[] = array(
-                        //                         "rowCell" => "K$rowCount",
-                        //                         "formula" => $formula,
-                        //                     );
-                        //                 }
-                        //             }
+                                            $taxCellsArray[] = array(
+                                                "rowCell" => "K$rowCount",
+                                                "formula" => $formula,
+                                            );
+                                        }
+                                    }
 
-                        //             foreach ($logisticsTaxesArray as $logistictax) {
+                                    foreach ($logisticsTaxesArray as $logistictax) {
 
-                        //                 if ($logistictax["taxId"] == $suppliertax->id) {
-                        //                     if ($suppliertax->arithmetic_type == 2) {
-                        //                         $ltaxval = $logistictax['taxVal'] * -1;
-                        //                     } else {
-                        //                         $ltaxval = $logistictax['taxVal'];
-                        //                     }
-                        //                     if ($suppliertax->number_format == 2) {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K###*$ltaxval%)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K###*$ltaxval%)";
-                        //                         }
-                        //                     } else {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K###*$ltaxval)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K###*$ltaxval)";
-                        //                         }
-                        //                     }
+                                        if ($logistictax["taxId"] == $suppliertax->id) {
+                                            if ($suppliertax->arithmetic_type == 2) {
+                                                $ltaxval = $logistictax['taxVal'] * -1;
+                                            } else {
+                                                $ltaxval = $logistictax['taxVal'];
+                                            }
+                                            if ($suppliertax->number_format == 2) {
+                                                if ($formula == "") {
+                                                    $formula = $formula . "=SUM(K###*$ltaxval%)";
+                                                } else {
+                                                    $formula = $formula . "+SUM(K###*$ltaxval%)";
+                                                }
+                                            } else {
+                                                if ($formula == "") {
+                                                    $formula = $formula . "=SUM(K###*$ltaxval)";
+                                                } else {
+                                                    $formula = $formula . "+SUM(K###*$ltaxval)";
+                                                }
+                                            }
 
-                        //                     $taxCellsArray[] = array(
-                        //                         "rowCell" => "K$rowCount",
-                        //                         "formula" => $formula,
-                        //                     );
-                        //                 }
-                        //             }
+                                            $taxCellsArray[] = array(
+                                                "rowCell" => "K$rowCount",
+                                                "formula" => $formula,
+                                            );
+                                        }
+                                    }
 
-                        //             foreach ($serviceTaxesArray as $servicetax) {
+                                    foreach ($serviceTaxesArray as $servicetax) {
 
-                        //                 if ($servicetax["taxId"] == $suppliertax->id) {
-                        //                     if ($suppliertax->arithmetic_type == 2) {
-                        //                         $staxval = $servicetax['taxVal'] * -1;
-                        //                     } else {
-                        //                         $staxval = $servicetax['taxVal'];
-                        //                     }
-                        //                     if ($suppliertax->number_format == 2) {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K&&&*$staxval%)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K&&&*$staxval%)";
-                        //                         }
-                        //                     } else {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K&&&*$staxval)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K&&&*$staxval)";
-                        //                         }
-                        //                     }
+                                        if ($servicetax["taxId"] == $suppliertax->id) {
+                                            if ($suppliertax->arithmetic_type == 2) {
+                                                $staxval = $servicetax['taxVal'] * -1;
+                                            } else {
+                                                $staxval = $servicetax['taxVal'];
+                                            }
+                                            if ($suppliertax->number_format == 2) {
+                                                if ($formula == "") {
+                                                    $formula = $formula . "=SUM(K&&&*$staxval%)";
+                                                } else {
+                                                    $formula = $formula . "+SUM(K&&&*$staxval%)";
+                                                }
+                                            } else {
+                                                if ($formula == "") {
+                                                    $formula = $formula . "=SUM(K&&&*$staxval)";
+                                                } else {
+                                                    $formula = $formula . "+SUM(K&&&*$staxval)";
+                                                }
+                                            }
 
-                        //                     $taxCellsArray[] = array(
-                        //                         "rowCell" => "K$rowCount",
-                        //                         "formula" => $formula,
-                        //                     );
-                        //                 }
-                        //             }
-                        //         }
+                                            $taxCellsArray[] = array(
+                                                "rowCell" => "K$rowCount",
+                                                "formula" => $formula,
+                                            );
+                                        }
+                                    }
+                                }
 
-                        //         $rowCount++;
-                        //     }
+                                $rowCount++;
+                            }
 
-                        //     $objSheet->SetCellValue("J$rowCount", $this->lang->line('service_cost'));
-                        //     $objSheet->SetCellValue("K$rowCount", $getFarmDetails[0]->service_cost);
-                        //     $objSheet->getStyle("K$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                        //     $serviceCostRow = "$rowCount";
-                        //     $rowCount++;
+                            $objSheet->SetCellValue("J$rowCount", $this->lang->line('service_cost'));
+                            $objSheet->SetCellValue("K$rowCount", $getFarmDetails[0]->service_cost);
+                            $objSheet->getStyle("K$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                            $serviceCostRow = "$rowCount";
+                            $rowCount++;
 
-                        //     $objSheet->SetCellValue("J$rowCount", $this->lang->line('adjustment'));
-                        //     $objSheet->getStyle("J$totalStartRow:K$rowCount")->applyFromArray($styleArray);
-                        //     $objSheet->getStyle("K$totalStartRow:K$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                        //     $rowCount++;
+                            $objSheet->SetCellValue("J$rowCount", $this->lang->line('adjustment'));
+                            $objSheet->getStyle("J$totalStartRow:K$rowCount")->applyFromArray($styleArray);
+                            $objSheet->getStyle("K$totalStartRow:K$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                            $rowCount++;
 
-                        //     $calcRow = $rowCount;
+                            $calcRow = $rowCount;
 
-                        //     $totalPaymentRow1 = $totalPaymentRow + 1;
-                        //     $objSheet->SetCellValue("K$totalPaymentRow", "=SUM(K$totalPaymentRow1:K$calcRow)");
-                        // } else {
+                            $totalPaymentRow1 = $totalPaymentRow + 1;
+                            $objSheet->SetCellValue("K$totalPaymentRow", "=SUM(K$totalPaymentRow1:K$calcRow)");
+                        } else {
                             $objSheet->SetCellValue("K$rowCount", $this->lang->line('total_payment'));
                             $totalPaymentRow = $rowCount;
                             $rowCount++;
@@ -9586,7 +9862,7 @@ class Farms extends MY_Controller
 
                             $totalPaymentRow1 = $totalPaymentRow + 1;
                             $objSheet->SetCellValue("L$totalPaymentRow", "=SUM(L$totalPaymentRow1:L$calcRow)");
-                        //}
+                        }
 
                         if (count($taxCellsArray) > 0) {
                             foreach ($taxCellsArray as $taxcell) {
@@ -9765,7 +10041,6 @@ class Farms extends MY_Controller
                             $objSheet->mergeCells("G$rowCountSummary:H$rowCountSummary");
 
                             if (
-                                $getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15 || 
                                 $getFarmDetails[0]->unit_of_purchase == 4 || $getFarmDetails[0]->unit_of_purchase == 5
                                 || $getFarmDetails[0]->unit_of_purchase == 6 || $getFarmDetails[0]->unit_of_purchase == 7
                             ) {
@@ -9783,25 +10058,24 @@ class Farms extends MY_Controller
                                 $objSheet->getStyle("G$rowCountSummary:O$rowCountSummary")->getFont()->setBold(true);
                                 $objSheet->getStyle("G$rowCountSummary:O$rowCountSummary")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                                 $objSheet->getStyle("G$rowCountSummary:O$rowCountSummary")->applyFromArray($styleArray);
-                            } 
-                            // else {
-                            //     $objSheet->SetCellValue("I$rowCountSummary", $this->lang->line("pieces_farm"));
-                            //     $objSheet->SetCellValue("J$rowCountSummary", $this->lang->line("volume_per_piece"));
+                            } else {
+                                $objSheet->SetCellValue("I$rowCountSummary", $this->lang->line("pieces_farm"));
+                                $objSheet->SetCellValue("J$rowCountSummary", $this->lang->line("volume_per_piece"));
 
-                            //     $objSheet->SetCellValue("K$rowCountSummary", $this->lang->line("farm_total_value"));
+                                $objSheet->SetCellValue("K$rowCountSummary", $this->lang->line("farm_total_value"));
 
-                            //     if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
-                            //         $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
-                            //         $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getFont()->setBold(true);
-                            //         $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                            //         $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->applyFromArray($styleArray);
-                            //     } else {
-                            //         $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
-                            //         $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getFont()->setBold(true);
-                            //         $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                            //         $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->applyFromArray($styleArray);
-                            //     }
-                            // }
+                                if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
+                                    $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
+                                    $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getFont()->setBold(true);
+                                    $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                                    $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->applyFromArray($styleArray);
+                                } else {
+                                    $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
+                                    $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getFont()->setBold(true);
+                                    $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                                    $objSheet->getStyle("G$rowCountSummary:K$rowCountSummary")->applyFromArray($styleArray);
+                                }
+                            }
 
                             $rowCountDataSummary = $rowCountSummary;
                             $priceFirstRow = $rowCountDataSummary + 1;
@@ -9818,24 +10092,23 @@ class Farms extends MY_Controller
                                 $priceRangeSemi = $farmdatasummary->pricerange_grade_semi;
                                 $priceRangeLongs = $farmdatasummary->pricerange_grade_longs;
 
-                                // if ($getFarmDetails[0]->unit_of_purchase == 15) {
-                                //     $objSheet->SetCellValue("J$rowCountDataSummary", "=$priceRangeShorts/I$rowCountDataSummary");
-                                // } else if ($getFarmDetails[0]->unit_of_purchase == 3) {
-                                //     $objSheet->SetCellValue("J$rowCountDataSummary", "=$priceRangeShorts");
-                                // } else {
+                                if ($getFarmDetails[0]->unit_of_purchase == 15) {
+                                    $objSheet->SetCellValue("J$rowCountDataSummary", "=$priceRangeShorts/N$rowCountDataSummary");
+                                } else if ($getFarmDetails[0]->unit_of_purchase == 3) {
+                                    $objSheet->SetCellValue("J$rowCountDataSummary", "=$priceRangeShorts");
+                                } else {
                                     $objSheet->SetCellValue("I$rowCountDataSummary", ($priceRangeShorts + 0));
                                     $objSheet->SetCellValue("J$rowCountDataSummary", ($priceRangeSemi + 0));
                                     $objSheet->SetCellValue("K$rowCountDataSummary", ($priceRangeLongs + 0));
-                                //}
+                                }
 
                                 if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
-                                    $objSheet->SetCellValue("M$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,M10)");
-                                    $objSheet->SetCellValue("N$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,N10)");
-                                    $objSheet->SetCellValue("O$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,O10)");
+                                    $objSheet->SetCellValue("I$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary)");
 
-                                    $objSheet->SetCellValue("L$rowCountDataSummary", "=(I$rowCountDataSummary*M$rowCountDataSummary)+(J$rowCountDataSummary*N$rowCountDataSummary)+(K$rowCountDataSummary*O$rowCountDataSummary)");
+                                    $objSheet->SetCellValue("K$rowCountDataSummary", "=(I$rowCountDataSummary*J$rowCountDataSummary)");
 
-                                    $objSheet->getStyle("I$rowCountDataSummary:L$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                                    $objSheet->getStyle("J$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                                    $objSheet->getStyle("K$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
                                 } else {
 
                                     $objSheet->SetCellValue("M$rowCountDataSummary", "=SUMIFS(" . '$D$' . "$farmDataFirstRow" . ':$D$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,M10)");
@@ -9850,31 +10123,31 @@ class Farms extends MY_Controller
 
                             $priceLastRow = $rowCountDataSummary;
 
-                            // if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
-                            //     $objSheet->getStyle("G$priceFirstRow:K$priceLastRow")->applyFromArray($styleArray);
-                            //     $objSheet->getStyle("K$piecesPriceCalcRow")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                            //     $objSheet->getStyle("K$piecesPriceCalcRow")->applyFromArray($styleArray);
-                            // } else {
+                            if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
+                                $objSheet->getStyle("G$priceFirstRow:K$priceLastRow")->applyFromArray($styleArray);
+                                $objSheet->getStyle("K$piecesPriceCalcRow")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                                $objSheet->getStyle("K$piecesPriceCalcRow")->applyFromArray($styleArray);
+                            } else {
                                 $objSheet->getStyle("G$priceFirstRow:O$priceLastRow")->applyFromArray($styleArray);
                                 $objSheet->getStyle("L$piecesPriceCalcRow")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
                                 $objSheet->getStyle("L$piecesPriceCalcRow")->applyFromArray($styleArray);
-                            //}
-
-                            if ($getFarmDetails[0]->exchange_rate > 0) {
-                                // if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
-                                //     $objSheet->SetCellValue("K$piecesPriceCalcRow", "=SUM(K$priceFirstRow:K$priceLastRow)*D$exchangeRowVal");
-                                // } else {
-                                    $objSheet->SetCellValue("L$piecesPriceCalcRow", "=SUM(L$priceFirstRow:L$priceLastRow)*D$exchangeRowVal");
-                                //}
-                            } else {
-                                // if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
-                                //     $objSheet->SetCellValue("K$piecesPriceCalcRow", "=SUM(K$priceFirstRow:K$priceLastRow)");
-                                // } else {
-                                    $objSheet->SetCellValue("L$piecesPriceCalcRow", "=SUM(L$priceFirstRow:L$priceLastRow)");
-                                //}
                             }
 
-                            
+                            if ($getFarmDetails[0]->exchange_rate > 0) {
+                                if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
+                                    $objSheet->SetCellValue("K$piecesPriceCalcRow", "=SUM(K$priceFirstRow:K$priceLastRow)*D$exchangeRowVal");
+                                } else {
+                                    $objSheet->SetCellValue("L$piecesPriceCalcRow", "=SUM(L$priceFirstRow:L$priceLastRow)*D$exchangeRowVal");
+                                }
+                            } else {
+                                if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
+                                    $objSheet->SetCellValue("K$piecesPriceCalcRow", "=SUM(K$priceFirstRow:K$priceLastRow)");
+                                } else {
+                                    $objSheet->SetCellValue("L$piecesPriceCalcRow", "=SUM(L$priceFirstRow:L$priceLastRow)");
+                                }
+                            }
+
+
 
                             $objSheet->getColumnDimension('G')->setAutoSize(false);
                             $objSheet->getColumnDimension('G')->setWidth('15');
@@ -10417,7 +10690,10 @@ class Farms extends MY_Controller
             $session = $this->session->userdata('fullname');
 
             $Return = array(
-                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
+                'result' => '',
+                'error' => '',
+                'redirect' => false,
+                'csrf_hash' => '',
                 'successmessage' => ''
             );
 
@@ -10964,8 +11240,13 @@ class Farms extends MY_Controller
                                 $strFormula = str_replace(
                                     array('$l', '$w', '$t', '$vp', 'truncate', '$ew', '$et', '$el'),
                                     array(
-                                        'B' . $rowCountData, 'C' . $rowCountData, 'D' . $rowCountData,
-                                        'E' . $rowCountData, 'TRUNC', 'H' . $rowCountData, 'I' . $rowCountData,
+                                        'B' . $rowCountData,
+                                        'C' . $rowCountData,
+                                        'D' . $rowCountData,
+                                        'E' . $rowCountData,
+                                        'TRUNC',
+                                        'H' . $rowCountData,
+                                        'I' . $rowCountData,
                                         'G' . $rowCountData
                                     ),
                                     $formula->formula_context
@@ -11372,14 +11653,17 @@ class Farms extends MY_Controller
         }
     }
 
-    public function generate_supplier_receipt_existing($farmId, $contractId, $inventoryOrder)
+    public function generate_supplier_receipt1($farmId, $contractId, $inventoryOrder)
     {
         try {
 
             $session = $this->session->userdata('fullname');
 
             $Return = array(
-                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
+                'result' => '',
+                'error' => '',
+                'redirect' => false,
+                'csrf_hash' => '',
                 'successmessage' => ''
             );
 
@@ -11878,8 +12162,13 @@ class Farms extends MY_Controller
                                 $strFormula = str_replace(
                                     array('$l', '$w', '$t', '$vp', 'truncate', '$ew', '$et', '$el'),
                                     array(
-                                        'B' . $rowCountData, 'C' . $rowCountData, 'D' . $rowCountData,
-                                        'E' . $rowCountData, 'TRUNC', 'H' . $rowCountData, 'I' . $rowCountData,
+                                        'B' . $rowCountData,
+                                        'C' . $rowCountData,
+                                        'D' . $rowCountData,
+                                        'E' . $rowCountData,
+                                        'TRUNC',
+                                        'H' . $rowCountData,
+                                        'I' . $rowCountData,
                                         'G' . $rowCountData
                                     ),
                                     $formula->formula_context
@@ -12285,7 +12574,7 @@ class Farms extends MY_Controller
             exit;
         }
     }
-    
+
     public function generate_supplier_receipt($farmId, $contractId, $inventoryOrder)
     {
         try {
@@ -12331,18 +12620,13 @@ class Farms extends MY_Controller
                         $objSheet->SetCellValue('A5', $this->lang->line('exchange_rate'));
                         $objSheet->SetCellValue('B5', $getFarmDetails[0]->exchange_rate);
                         $objSheet->getStyle("B5")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-
-                        $objSheet->getStyle("A3:A5")->getFont()->setBold(true);
-                        $objSheet->getStyle('A3:B5')->applyFromArray($styleArray);
-                    } else {
-                        $objSheet->getStyle("A3:A4")->getFont()->setBold(true);
-                        $objSheet->getStyle('A3:B4')->applyFromArray($styleArray);
                     }
 
                     $objSheet->SetCellValue('B3', $getFarmDetails[0]->inventory_order);
                     $objSheet->SetCellValue('B4', $getFarmDetails[0]->supplier_name);
 
-                    
+                    $objSheet->getStyle("A3:A5")->getFont()->setBold(true);
+                    $objSheet->getStyle('A3:B5')->applyFromArray($styleArray);
 
                     $getSupplierTaxes = $this->Master_model->get_supplier_taxes_by_origin_report($getFarmDetails[0]->origin_id);
 
@@ -12531,7 +12815,6 @@ class Farms extends MY_Controller
                             $netVolume = $shorts->volume;
                             $totalNetVolume = $totalNetVolume + $netVolume;
                             $price = 0;
-                            $pieces = 0;
 
                             foreach ($fetchContractPrice as $range) {
                                 if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
@@ -12544,7 +12827,6 @@ class Farms extends MY_Controller
                                 'circumference' => $circumference,
                                 'length' => $length,
                                 'price' => $price,
-                                'pieces' => $shorts->no_of_pieces + 0,
                                 'volume' => $netVolume,
                                 'value' => round($price * $netVolume, 2)
                             ];
@@ -12568,7 +12850,6 @@ class Farms extends MY_Controller
                                 'circumference' => $circumference,
                                 'length' => $length,
                                 'price' => $price,
-                                'pieces' => $semi->no_of_pieces + 0,
                                 'volume' => $netVolume,
                                 'value' => round($price * $netVolume, 2)
                             ];
@@ -12592,7 +12873,6 @@ class Farms extends MY_Controller
                                 'circumference' => $circumference,
                                 'length' => $length,
                                 'price' => $price,
-                                'pieces' => $longs->no_of_pieces + 0,
                                 'volume' => $netVolume,
                                 'value' => round($price * $netVolume, 2)
                             ];
@@ -12639,7 +12919,7 @@ class Farms extends MY_Controller
                             $priceCalcSRow = $rowCountDataSummary + 1;
                             $piecesCalcERow = $rowCountDataSummary;
                             $priceCalcERow = $rowCountDataSummary;
-                            
+
                             foreach ($getFarmDataSummary as $farmdatasummary) {
 
                                 $rowCountDataSummary++;
@@ -12647,7 +12927,6 @@ class Farms extends MY_Controller
                                 $priceCalcERow = $rowCountDataSummary;
                                 $totalVolumePrice = 0;
                                 $totalValuePrice = 0;
-                                $totalPiecesPrice = 0;
 
                                 $objSheet->SetCellValue("A$rowCountDataSummary", ($farmdatasummary->minrange_grade1 + 0));
                                 $objSheet->SetCellValue("B$rowCountDataSummary", ($farmdatasummary->maxrange_grade2 + 0));
@@ -12656,7 +12935,6 @@ class Farms extends MY_Controller
                                     if ($item["circumference"] >= $farmdatasummary->minrange_grade1 && $item["circumference"] <= $farmdatasummary->maxrange_grade2) {
                                         $totalVolumePrice = $totalVolumePrice + $item["volume"];
                                         $totalValuePrice = $totalValuePrice + ($item["volume"] * $item["price"]);
-                                        $totalPiecesPrice = $totalPiecesPrice + ($item["pieces"] * $item["price"]);
                                     }
                                 }
 
@@ -12676,22 +12954,6 @@ class Farms extends MY_Controller
                                      $objSheet->SetCellValue("C$rowCountDataSummary", "=IF(" . '$D$' . "$summaryHeaderLastRow" . ">=F$rowCountDataSummary,IF(" . '$D$' . "$summaryHeaderLastRow" . "<=G$rowCountDataSummary," . '$D$' . "3,0),0)");
                                 } else {
                                      $objSheet->SetCellValue("C$rowCountDataSummary", $farmdatasummary->pieces_farm);
-
-                                     if($getFarmDetails[0]->exchange_rate > 0) {
-                                        if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
-                                            $objSheet->SetCellValue("E$rowCountDataSummary", "=$totalPiecesPrice*B5");
-                                        } else {
-                                            $objSheet->SetCellValue("E$rowCountDataSummary", "=$totalValuePrice*B5");
-                                        }
-                                    } else {
-                                        if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
-                                            $objSheet->SetCellValue("E$rowCountDataSummary", $totalPiecesPrice);
-                                        } else {
-                                            $objSheet->SetCellValue("E$rowCountDataSummary", $totalValuePrice);
-                                        }
-                                    }
-
-                                     $objSheet->SetCellValue("D$rowCountDataSummary", "=IFERROR(E$rowCountDataSummary/C$rowCountDataSummary,0)");
                                 }
 
                                 $objSheet->getStyle("D$rowCountDataSummary:E$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);

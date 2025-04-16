@@ -327,11 +327,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         </div>
                                     </div>
                                 <?php } ?>
+                            </div>
 
-                                <div class="row mb-3 mt-4">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveCustoms" name="btnSaveCustoms"><?php echo $this->lang->line('save'); ?></button>
-                                    </div>
+                            <div class="row mb-3 mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveCustoms" name="btnSaveCustoms"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -992,10 +992,166 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         </div>
 
                         <div class="tab-pane fade" id="nav-coteros" role="tabpanel" aria-labelledby="nav-coteros-tab">
-                            <p><strong>This is some placeholder content the Contact tab's associated content.</strong>
-                                Clicking another tab will toggle the visibility of this one for the next.
-                                The tab JavaScript swaps classes to control the content visibility and styling. You can use it with
-                                tabs, pills, and any other <code>.nav</code>-powered navigation.</p>
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-2">
+                                    <label for="fileUploadDoc_Coteros"><?php echo $this->lang->line('upload_document'); ?></label>
+                                    <input name="fileUploadDoc_Coteros" type="file" accept=".xml,.pdf" id="fileUploadDoc_Coteros" onchange="loadFileCoteros(event)" class="form-control">
+                                    <label id="error-selectdoccoteros" class="error-text"><?php echo $this->lang->line('error_select_document'); ?></label>
+                                </div>
+                            </div>
+
+                            <div id="divXmlCoteros">
+
+                                <div class="row mb-3">
+
+                                    <div class="col-md-2">
+                                        <label for="invoice_number"><?php echo $this->lang->line("invoice_number"); ?></label>
+                                        <div class="input-group">
+                                            <label class="control-label" id="lblInvoiceNoCoteros"></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="supplier_name"><?php echo $this->lang->line("supplier_name") . " - " . $this->lang->line("supplier_id"); ?></label>
+                                        <div class="input-group">
+                                            <label class="control-label" id="lblSupplierNameCoteros"></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="issued_date"><?php echo $this->lang->line("issued_date"); ?></label>
+                                        <div class="input-group">
+                                            <label class="control-label" id="lblIssuedDateCoteros"></label>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
+                                        <div class="input-group">
+                                            <label class="control-label" id="lblTotalAmountCoteros"></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
+                                        <div class="input-group">
+                                            <label class="control-label" id="lblTotalTaxAmountCoteros"></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
+                                        <div class="input-group">
+                                            <label class="control-label" id="lblAllowanceAmountCoteros"></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
+                                        <div class="input-group">
+                                            <label class="control-label" id="lblPayableAmountCoteros"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="divPdfCoteros">
+                                <div class="row mb-3">
+                                    <div class="col-md-2">
+                                        <label for="invoice_number_coteros"><?php echo $this->lang->line("invoice_number"); ?></label>
+                                        <input type="text" id="invoice_number_coteros" name="invoice_number_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <label id="error-invoice_no_coteros" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="supplier_name_coteros"><?php echo $this->lang->line("supplier_name"); ?></label>
+                                        <select class="form-control" name="supplier_name_coteros" id="supplier_name_coteros" data-plugin="select_erp">
+                                            <option value="0"><?php echo $this->lang->line("select"); ?></option>
+                                            <?php foreach ($exportSuppliersCoteros as $supplier) { ?>
+                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                            <?php } ?>
+                                        </select>
+                                        <label id="error-supplier_name_coteros" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="issued_date_coteros"><?php echo $this->lang->line("issued_date"); ?></label>
+                                        <input type="datetime-local" id="issued_date_coteros" name="issued_date_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="text" id="formatted_date_coteros" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
+                                        <label id="error-issued_date_coteros" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
+                                        <input type="number" step="any" id="subtotal_coteros" name="subtotal_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_subtotal"); ?>" />
+                                        <label id="error-subtotal_coteros" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
+                                        <input type="number" step="any" id="iva_coteros" name="iva_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_iva"); ?>" />
+                                        <label id="error-iva_coteros" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
+                                        <input type="number" step="any" id="retefuente_coteros" name="retefuente_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_retefuente"); ?>" />
+                                        <label id="error-retefuente_coteros" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
+                                        <input type="number" step="any" id="payable_coteros" name="payable_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_total_payable"); ?>" />
+                                        <label id="error-payable_coteros" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div id="divContainersCoteros">
+
+                                <div class="row mb-3">
+                                    <label class="col-md-3 col-form-label header-profile-menu1 fontsize" for="continerNo_Coteros"><?php echo $this->lang->line('container_number'); ?></label>
+                                    <label class="col-md-3 col-form-label header-profile-menu1 fontsize" for="totalPieces_Coteros"><?php echo $this->lang->line('total_no_of_pieces'); ?></label>
+                                    <label class="col-md-3 col-form-label header-profile-menu1 fontsize" for="totalVolume_Coteros"><?php echo $this->lang->line('total_volume'); ?></label>
+                                    <label class="col-md-3 col-form-label header-profile-menu1 fontsize" for="containerValue_Coteros"><?php echo $this->lang->line('container_value'); ?></label>
+                                </div>
+
+                                <?php foreach ($containerDetails as $containerdetail) { ?>
+
+                                    <div class="row mb-3">
+
+                                        <input type="hidden" id="hdnDispatchIdCoteros" name="dispatchid_coteros[<?php echo $containerdetail->dispatch_id; ?>]" value="<?php echo $containerdetail->dispatch_id; ?>">
+
+                                        <label class="col-md-3 lbl-font header-profile-menu1 fontsize" for="lblContainerCoteros" name="containerNumberCoteros[]" value="<?php echo $containerdetail->container_number; ?>">
+                                            <?php echo strtoupper($containerdetail->container_number); ?>
+                                        </label>
+
+                                        <label class="col-md-3 col-form-label lbl-font header-profile-menu1 fontsize" for="lblContainer1Coteros" name="containerNumber1Coteros[]" value="<?php echo $containerdetail->total_pieces; ?>">
+                                            <?php echo $containerdetail->total_pieces + 0; ?>
+                                        </label>
+
+                                        <label class="col-md-3 col-form-label lbl-font header-profile-menu1 fontsize" for="lblContainer2Coteros" name="containerNumber2Coteros[]" value="<?php echo $containerdetail->total_volume; ?>">
+                                            <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
+                                        </label>
+
+                                        <div class="col-md-3">
+                                            <input type="number" step="any" value="" class="form-control text-uppercase" id="coteros_container_value" name="coteros_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                        </div>
+                                    </div>
+                                <?php } ?>
+
+                                <div class="row mb-3 mt-4">
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveCoteros" name="btnSaveCoteros"><?php echo $this->lang->line('save'); ?></button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="tab-pane fade" id="nav-phyto" role="tabpanel" aria-labelledby="nav-phyto-tab">
@@ -1052,7 +1208,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_custom").hide();
         $("#error-payable_custom").hide();
         $("#divXml").hide();
-        $("#divPdf").hide();
         $("#divContainersCustoms").hide();
 
         $("#error-selectdocitr").hide();
@@ -1065,7 +1220,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_itr").hide();
         $("#error-payable_itr").hide();
         $("#divXmlITR").hide();
-        $("#divPdfITR").hide();
         $("#divContainersITR").hide();
 
         $("#error-selectdocport").hide();
@@ -1078,7 +1232,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_port").hide();
         $("#error-payable_port").hide();
         $("#divXmlPort").hide();
-        $("#divPdfPort").hide();
         $("#divContainersPort").hide();
 
         $("#error-selectdocshipping").hide();
@@ -1091,7 +1244,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_shipping").hide();
         $("#error-payable_shipping").hide();
         $("#divXmlShipping").hide();
-        $("#divPdfShipping").hide();
         $("#divContainersShipping").hide();
 
         $("#error-selectdocfumigation").hide();
@@ -1104,8 +1256,19 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_fumigation").hide();
         $("#error-payable_fumigation").hide();
         $("#divXmlFumigation").hide();
-        $("#divPdfFumigation").hide();
         $("#divContainersFumigation").hide();
+
+        $("#error-selectdoccoteros").hide();
+        $("#error-invoice_no_coteros").hide();
+        $("#error-supplier_name_coteros").hide();
+        $("#error-supplier_id_coteros").hide();
+        $("#error-issued_date_coteros").hide();
+        $("#error-subtotal_coteros").hide();
+        $("#error-iva_coteros").hide();
+        $("#error-retefuente_coteros").hide();
+        $("#error-payable_coteros").hide();
+        $("#divXmlCoteros").hide();
+        $("#divContainersCoteros").hide();
 
         $("#btnSaveCustoms").click(function() {
 
@@ -1601,6 +1764,105 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 });
             }
         });
+
+        $("#btnSaveCoteros").click(function() {
+
+            var arrUpdateContainerValue = [];
+            var containerData = <?php echo json_encode($containerDetails); ?>;
+            var totalContainerValue = 0;
+
+            $.each(containerData, function(i, item) {
+
+                var mappingId = item.dispatch_id;
+                var containerNumber = item.container_number;
+                var isValid = true;
+
+                if (mappingId != null && mappingId != '' && mappingId != undefined && mappingId > 0) {
+
+                    var updatedContainerValue = parseFloat($('input[name="coteros_container_value[' + mappingId + ']"]').val()) || 0;
+                    arrUpdateContainerValue.push({
+                        mappingid: mappingId,
+                        containerNumber: containerNumber,
+                        updatedContainerValue: updatedContainerValue
+                    });
+
+                    totalContainerValue += updatedContainerValue;
+                }
+            });
+
+            if (arrUpdateContainerValue.length > 0) {
+
+                console.log(totalContainerValue);
+
+                if (fileExtension == "pdf" || fileExtension == "PDF") {
+                    totalPayableAmount = parseFloat($("#payable_coteros").val()) || 0;
+                }
+
+                if (totalContainerValue != totalPayableAmount) {
+                    toastr.clear();
+                    toastr.error("Total Container Value should be equal to Total Payable Amount");
+                    return false;
+                }
+
+                var fd = new FormData();
+                fd.append("exportId", $("#hdnExportId").val());
+                fd.append("originId", $("#hdnOriginId").val());
+                fd.append('saNumber', $("#hdnSaNumber").val());
+                fd.append("fileExtension", fileExtension);
+                fd.append("updateContainerValueData_Coteros", JSON.stringify(arrUpdateContainerValue));
+                if (fileExtension == "xml" || fileExtension == "XML") {
+
+                    fd.append('invoiceNo_Coteros', $("#lblInvoiceNoCoteros").text());
+                    fd.append('supplierName_Coteros', supplierId);
+                    fd.append('formattedDate_Coteros', $("#lblIssuedDateCoteros").text());
+                    fd.append('subTotal_Coteros', subTotalCustoms);
+                    fd.append('iva_Coteros', ivaCustoms);
+                    fd.append('retefuente_Coteros', retefuenteCustoms);
+                    fd.append('payable_Coteros', payableCustoms);
+                } else {
+                    fd.append("uploadPdfFileCoteros", uploadPdfFileCustomAgency);
+                    fd.append('invoiceNo_Coteros', $("#invoice_number_coteros").val());
+                    fd.append('supplierName_Coteros', $("#supplier_name_coteros").val());
+                    fd.append('formattedDate_Coteros', $("#formatted_date_coteros").val());
+                    fd.append('subTotal_Coteros', $("#subtotal_coteros").val());
+                    fd.append('iva_Coteros', $("#iva_coteros").val());
+                    fd.append('retefuente_Coteros', $("#retefuente_coteros").val());
+                    fd.append('payable_Coteros', $("#payable_coteros").val());
+                }
+
+                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                fd.append("add_type", 6);
+
+                $.ajax({
+                    url: base_url + "/save_export_documents",
+                    type: 'post',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function(jsonResult) {
+                        $('#loading').hide();
+
+                        if (jsonResult.redirect == true) {
+                            window.location.replace(login_url);
+                        } else if (jsonResult.result != '') {
+                            toastr.clear();
+
+
+                        } else if (jsonResult.error != '') {
+                            toastr.clear();
+                            toastr.error(jsonResult.error);
+                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                        } else if (jsonResult.warning != '') {
+                            toastr.clear();
+                            toastr.warning(jsonResult.warning);
+                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                        } else {
+                            toastr.clear();
+                        }
+                    }
+                });
+            }
+        });
     });
 
     var loadFileCustom = function(event) {
@@ -1648,8 +1910,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             $("#divPdf").hide();
                             $("#divContainersCustoms").show();
 
-                            $("#fileUploadDoc").val("");
-
                             totalPayableAmount = jsonResult.result["payableAmountValue"];
                             uploadPdfFileCustomAgency = "";
                             fileExtension = jsonResult.result["fileExtension"];
@@ -1672,10 +1932,56 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         toastr.clear();
                         toastr.error(jsonResult.error);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                        $("#fileUploadDoc").val("");
+
+                        $("#lblInvoiceNoCustoms").text("");
+                        $("#lblSupplierNameCustoms").text("");
+                        $("#lblIssuedDateCustoms").text("");
+                        $("#lblTotalAmountCustoms").text("");
+                        $("#lblTotalTaxAmountCustoms").text("");
+                        $("#lblAllowanceAmountCustoms").text("");
+                        $("#lblPayableAmountCustoms").text("");
+
+                        $("#divXml").hide();
+                        $("#divPdf").show();
+                        $("#divContainersCustoms").hide();
+
+                        totalPayableAmount = 0;
+                        uploadPdfFileCustomAgency = "";
+                        fileExtension = "";
+                        supplierId = 0;
+                        subTotalCustoms = 0;
+                        ivaCustoms = 0;
+                        retefuenteCustoms = 0;
+                        payableCustoms = 0;
+
                     } else if (jsonResult.warning != '') {
                         toastr.clear();
                         toastr.warning(jsonResult.warning);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+
+                        $("#divXml").hide();
+                        $("#divPdf").show();
+                        $("#divContainersCustoms").hide();
+
+                        $("#fileUploadDoc").val("");
+
+                        $("#lblInvoiceNoCustoms").text("");
+                        $("#lblSupplierNameCustoms").text("");
+                        $("#lblIssuedDateCustoms").text("");
+                        $("#lblTotalAmountCustoms").text("");
+                        $("#lblTotalTaxAmountCustoms").text("");
+                        $("#lblAllowanceAmountCustoms").text("");
+                        $("#lblPayableAmountCustoms").text("");
+
+                        totalPayableAmount = 0;
+                        uploadPdfFileCustomAgency = "";
+                        fileExtension = "";
+                        supplierId = 0;
+                        subTotalCustoms = 0;
+                        ivaCustoms = 0;
+                        retefuenteCustoms = 0;
+                        payableCustoms = 0;
                     } else {
                         toastr.clear();
                     }
@@ -1683,8 +1989,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
             });
         } else {
             toastr.clear();
-            //toastr.error(common_error);
-            $("#fileUploadDoc").val("");
         }
     };
 
@@ -2025,6 +2329,91 @@ defined('BASEPATH') or exit('No direct script access allowed');
             toastr.clear();
             //toastr.error(common_error);
             $("#fileUploadDoc_Fumigation").val("");
+        }
+    };
+
+    var loadFileCoteros = function(event) {
+        $("#error-selectdoccoteros").hide();
+        event.preventDefault();
+
+        var files = $('#fileUploadDoc_Coteros')[0].files[0];
+        if (files != null && files != "") {
+
+            $('#loading').show();
+            farm_data_array = [];
+            var fd = new FormData();
+
+            fd.append('fileUploadDoc', files);
+            fd.append('exportId', $("#hdnExportId").val());
+            fd.append('originId', $("#hdnOriginId").val());
+            fd.append('saNumber', $("#hdnSaNumber").val());
+            fd.append('exportType', 6);
+            fd.append('csrf_cgrerp', $("#hdnCsrf").val());
+
+            $.ajax({
+                url: base_url + "/upload_documents",
+                type: 'post',
+                data: fd,
+                contentType: false,
+                processData: false,
+                success: function(jsonResult) {
+                    $('#loading').hide();
+
+                    if (jsonResult.redirect == true) {
+                        window.location.replace(login_url);
+                    } else if (jsonResult.result != '') {
+                        toastr.clear();
+
+                        $("#lblInvoiceNoCoteros").text(jsonResult.result["documentId"]);
+                        $("#lblSupplierNameCoteros").text(jsonResult.result["registrationName"] + " --- " + jsonResult.result["companyId"]);
+                        $("#lblIssuedDateCoteros").text(jsonResult.result["issueDate"]);
+                        $("#lblTotalAmountCoteros").text(jsonResult.result["taxExclusiveAmount"]);
+                        $("#lblTotalTaxAmountCoteros").text(jsonResult.result["taxAmount"]);
+                        $("#lblAllowanceAmountCoteros").text(jsonResult.result["allowanceTotalAmount"]);
+                        $("#lblPayableAmountCoteros").text(jsonResult.result["payableAmount"]);
+
+                        if (jsonResult.result["fileExtension"] == "xml" || jsonResult.result["fileExtension"] == "XML") {
+                            $("#divXmlCoteros").show();
+                            $("#divPdfCoteros").hide();
+                            $("#divContainersCoteros").show();
+
+                            $("#fileUploadDoc_Coteros").val("");
+
+                            totalPayableAmount = jsonResult.result["payableAmountValue"];
+                            uploadPdfFileCustomAgency = "";
+                            fileExtension = jsonResult.result["fileExtension"];
+                            supplierId = jsonResult.result["supplierId"];
+                            subTotalCustoms = jsonResult.result["taxExclusiveAmountValue"];
+                            ivaCustoms = jsonResult.result["taxAmountValue"];
+                            retefuenteCustoms = jsonResult.result["allowanceTotalAmountValue"];
+                            payableCustoms = jsonResult.result["payableAmountValue"];
+                        } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
+                            $("#divXmlCoteros").hide();
+                            $("#divPdfCoteros").show();
+                            $("#divContainersCoteros").show();
+
+                            uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
+                            fileExtension = jsonResult.result["fileExtension"];
+                            supplierId = jsonResult.result["supplierId"];
+                        }
+
+                    } else if (jsonResult.error != '') {
+                        toastr.clear();
+                        toastr.error(jsonResult.error);
+                        $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                    } else if (jsonResult.warning != '') {
+                        toastr.clear();
+                        toastr.warning(jsonResult.warning);
+                        $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                    } else {
+                        toastr.clear();
+                    }
+                }
+            });
+        } else {
+            toastr.clear();
+            //toastr.error(common_error);
+            $("#fileUploadDoc_Coteros").val("");
         }
     };
 </script>

@@ -1157,4 +1157,78 @@ class Master_model extends CI_Model
 				FROM tbl_master_sellers WHERE is_active = 1 AND id = $sellerid");
 		return $query->result();
 	}
+
+	//EXPORT SUPPLIERS
+
+	public function fetch_export_suppliers($origin_id, $documenttype) {
+		$query = $this->db->query("SELECT id, supplier_name, supplier_id FROM tbl_export_suppliers 
+				WHERE is_active = 1 AND FIND_IN_SET($documenttype, export_type) AND origin_id = $origin_id");
+		return $query->result();
+	}
+
+	public function check_company_id_exportsupplier($supplierid) {
+		$query = $this->db->query("SELECT id, supplier_name, supplier_id FROM tbl_export_suppliers 
+				WHERE is_active = 1 AND supplier_id = $supplierid");
+		return $query->result();
+	}
+
+	public function all_exportsuppliers() {
+		$query = $this->db->query("SELECT id, supplier_name, supplier_id, getexportdocuments_byid(export_type) AS export_type, is_active 
+				FROM tbl_export_suppliers");
+		return $query->result();
+	}
+
+	public function all_exportsuppliers_origin($origin_id) {
+		$query = $this->db->query("SELECT id, supplier_name, supplier_id, getexportdocuments_byid(export_type) AS export_type, is_active 
+				FROM tbl_export_suppliers WHERE origin_id = $origin_id");
+		return $query->result();
+	}
+
+	public function all_export_types() {
+		$query = $this->db->query("SELECT id, export_type FROM tbl_export_document_type WHERE is_active = 1");
+		return $query->result();
+	}
+
+	public function add_exportsupplier($data)
+	{
+		$this->db->set('created_date', 'NOW()', FALSE);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->insert('tbl_export_suppliers', $data);
+		if ($this->db->affected_rows() > 0) {
+			$insert_id = $this->db->insert_id();
+			return $insert_id;
+		} else {
+			return 0;
+		}
+	}
+
+	public function get_exportsupplier_detail_by_id($supplierid) {
+		$query = $this->db->query("SELECT id, supplier_name, supplier_id, export_type, getexportdocuments_byid(export_type) AS export_types, 
+		        getapplicableorigins_byid(origin_id) as origin, is_active, origin_id 
+				FROM tbl_export_suppliers WHERE id = $supplierid");
+		return $query->result();
+	}
+
+	public function update_exportsupplier($data, $id)
+	{
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->where('id', $id);
+		if ($this->db->update('tbl_export_suppliers', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function get_exportsupplier_report($originid) {
+		$query = $this->db->query("SELECT supplier_name, supplier_id, getexportdocuments_byid(export_type) AS export_types, is_active 
+				FROM tbl_export_suppliers WHERE origin_id = $originid");
+		return $query->result();
+	}
+
+	public function check_company_id_exportsupplier_count($supplierid) {
+		$query = $this->db->query("SELECT COUNT(*) AS cnt FROM tbl_export_suppliers 
+				WHERE is_active = 1 AND supplier_id = $supplierid");
+		return $query->result();
+	}
 }

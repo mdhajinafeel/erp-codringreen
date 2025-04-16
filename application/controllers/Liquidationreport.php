@@ -935,6 +935,11 @@ class Liquidationreport extends MY_Controller
                                 $objWorkInventorySheet->SetCellValue("J6", $this->lang->line("exchange_rate"));
                                 $objWorkInventorySheet->SetCellValue("K6", $getFarmDetail[0]->exchange_rate + 0);
                                 $objWorkInventorySheet->getStyle("K6")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+
+                                $objWorkInventorySheet->getStyle("J6")->getFont()->setBold(true);
+                                $objWorkInventorySheet->getStyle("J6")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                                $objWorkInventorySheet->getStyle("K6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("A9D08E");
+                                $objWorkInventorySheet->getStyle("J6:K6")->applyFromArray($styleArray);
                             }
 
                             $objWorkInventorySheet->getStyle("A2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
@@ -946,7 +951,7 @@ class Liquidationreport extends MY_Controller
                             $objWorkInventorySheet->getStyle("G6")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
                             $objWorkInventorySheet->getStyle("J2")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
                             $objWorkInventorySheet->getStyle("J3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-                            $objWorkInventorySheet->getStyle("J6")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                            
 
                             $objWorkInventorySheet->getStyle("A2")->getFont()->setBold(true);
                             $objWorkInventorySheet->getStyle("D2")->getFont()->setBold(true);
@@ -957,7 +962,7 @@ class Liquidationreport extends MY_Controller
                             $objWorkInventorySheet->getStyle("G6")->getFont()->setBold(true);
                             $objWorkInventorySheet->getStyle("J2")->getFont()->setBold(true);
                             $objWorkInventorySheet->getStyle("J3")->getFont()->setBold(true);
-                            $objWorkInventorySheet->getStyle("J6")->getFont()->setBold(true);
+                            
 
                             $objWorkInventorySheet->SetCellValue("B2", $getFarmDetail[0]->purchase_date);
                             $objWorkInventorySheet->getStyle("B2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("A9D08E");
@@ -971,7 +976,7 @@ class Liquidationreport extends MY_Controller
                             $objWorkInventorySheet->getStyle("B6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("A9D08E");
                             $objWorkInventorySheet->getStyle("K2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("A9D08E");
                             $objWorkInventorySheet->getStyle("K3")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("A9D08E");
-                            $objWorkInventorySheet->getStyle("K6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("A9D08E");
+                            
                             $objWorkInventorySheet->SetCellValue("K2", $getFarmDetail[0]->purchase_allowance);
                             $objWorkInventorySheet->SetCellValue("K3", $getFarmDetail[0]->purchase_allowance_length);
 
@@ -983,7 +988,7 @@ class Liquidationreport extends MY_Controller
                             $objWorkInventorySheet->getStyle("G4:H4")->applyFromArray($styleArray);
                             $objWorkInventorySheet->getStyle("G6:H6")->applyFromArray($styleArray);
                             $objWorkInventorySheet->getStyle("J2:K3")->applyFromArray($styleArray);
-                            $objWorkInventorySheet->getStyle("J6:K6")->applyFromArray($styleArray);
+                           
 
                             if (count($getSupplierTaxes) >= 3) {
                                 $rowCount = 2;
@@ -1309,10 +1314,10 @@ class Liquidationreport extends MY_Controller
                             $objWorkInventorySheet->SetCellValue("K$headerRow", $this->lang->line("circumference_range"));
                             $objWorkInventorySheet->mergeCells("K$headerRow:L$headerRow");
 
-                            if (
-                                $getFarmDetail[0]->purchase_unit_id == 4 || $getFarmDetail[0]->purchase_unit_id == 5
-                                || $getFarmDetail[0]->purchase_unit_id == 6 || $getFarmDetail[0]->purchase_unit_id == 7
-                            ) {
+                            // if (
+                            //     $getFarmDetail[0]->purchase_unit_id == 4 || $getFarmDetail[0]->purchase_unit_id == 5
+                            //     || $getFarmDetail[0]->purchase_unit_id == 6 || $getFarmDetail[0]->purchase_unit_id == 7
+                            // ) {
                                 //$objWorkInventorySheet->SetCellValue("N$headerRow", $this->lang->line("volume_reception"));
                                 //$objWorkInventorySheet->SetCellValue("O$headerRow", $this->lang->line("volume_farm"));
                                 $objWorkInventorySheet->SetCellValue("M$headerRow", $this->lang->line("text_shorts"));
@@ -1326,26 +1331,26 @@ class Liquidationreport extends MY_Controller
                                 $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getFont()->setBold(true);
                                 $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                                 $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->applyFromArray($styleArray);
-                            } else {
-                                $objWorkInventorySheet->SetCellValue("M$headerRow", $this->lang->line("pieces_reception"));
-                                $objWorkInventorySheet->SetCellValue("N$headerRow", $this->lang->line("pieces_farm"));
-                                $objWorkInventorySheet->SetCellValue("O$headerRow", $this->lang->line("volume_per_piece"));
+                            // } else {
+                            //     $objWorkInventorySheet->SetCellValue("M$headerRow", $this->lang->line("pieces_reception"));
+                            //     $objWorkInventorySheet->SetCellValue("N$headerRow", $this->lang->line("pieces_farm"));
+                            //     $objWorkInventorySheet->SetCellValue("O$headerRow", $this->lang->line("volume_per_piece"));
 
-                                $objWorkInventorySheet->SetCellValue("P$headerRow", $this->lang->line("reception_total_value"));
-                                $objWorkInventorySheet->SetCellValue("Q$headerRow", $this->lang->line("farm_total_value"));
+                            //     $objWorkInventorySheet->SetCellValue("P$headerRow", $this->lang->line("reception_total_value"));
+                            //     $objWorkInventorySheet->SetCellValue("Q$headerRow", $this->lang->line("farm_total_value"));
 
-                                if($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
-                                    $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
-                                    $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getFont()->setBold(true);
-                                    $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                                    $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->applyFromArray($styleArray);
-                                } else {
-                                    $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
-                                    $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getFont()->setBold(true);
-                                    $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                                    $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->applyFromArray($styleArray);
-                                }
-                            }
+                            //     if($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getFont()->setBold(true);
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->applyFromArray($styleArray);
+                            //     } else {
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getFont()->setBold(true);
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->applyFromArray($styleArray);
+                            //     }
+                            // }
 
                             $getInventoryContractPrice = $this->Financemaster_model->get_contract_price_data($contractId, $getFarmDetail[0]->inventory_order);
 
@@ -1389,35 +1394,52 @@ class Liquidationreport extends MY_Controller
                                     $priceRangeSemi = $pricedata->pricerange_grade_semi;
                                     $priceRangeLongs = $pricedata->pricerange_grade_longs;
 
-                                    if ($getFarmDetail[0]->purchase_unit_id == 15) {
-                                        $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeShorts/N$priceSummaryRow");
-                                        // $objWorkInventorySheet->SetCellValue("N$priceSummaryRow", "=$priceRangeSemi/O$priceSummaryRow");
-                                        // $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeLongs/O$priceSummaryRow");
-                                    } else if($getFarmDetail[0]->purchase_unit_id == 3) {
-                                        $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeShorts");
-                                    } else {
+                                    // if ($getFarmDetail[0]->purchase_unit_id == 15) {
+                                    //     $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeShorts/N$priceSummaryRow");
+                                    //     // $objWorkInventorySheet->SetCellValue("N$priceSummaryRow", "=$priceRangeSemi/O$priceSummaryRow");
+                                    //     // $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeLongs/O$priceSummaryRow");
+                                    // } else if($getFarmDetail[0]->purchase_unit_id == 3) {
+                                    //     $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeShorts");
+                                    // } else {
                                         $objWorkInventorySheet->SetCellValue("M$priceSummaryRow", ($priceRangeShorts + 0));
                                         $objWorkInventorySheet->SetCellValue("N$priceSummaryRow", ($priceRangeSemi + 0));
                                         $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", ($priceRangeLongs + 0));
-                                    }
+                                    //}
+
+                                    // if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
+                                    //     $objWorkInventorySheet->SetCellValue("P$priceSummaryRow", "=(M$priceSummaryRow*O$priceSummaryRow)");
+                                    //     $objWorkInventorySheet->SetCellValue("Q$priceSummaryRow", "=(N$priceSummaryRow*O$priceSummaryRow)");
+                                        
+                                    //     $objWorkInventorySheet->getStyle("O$priceSummaryRow:Q$priceSummaryRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+                                    //     // $objWorkInventorySheet->SetCellValue("R$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,R10)");
+                                    //     // $objWorkInventorySheet->SetCellValue("S$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,S10)");
+                                    //     // $objWorkInventorySheet->SetCellValue("T$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,T10)");
+
+                                    //     // $objWorkInventorySheet->SetCellValue("U$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,U10)");
+                                    //     // $objWorkInventorySheet->SetCellValue("V$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,V10)");
+                                    //     // $objWorkInventorySheet->SetCellValue("W$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,W10)");
+
+                                    //     // $objWorkInventorySheet->SetCellValue("P$priceSummaryRow", "=(M$priceSummaryRow*R$priceSummaryRow)+(N$priceSummaryRow*S$priceSummaryRow)+(O$priceSummaryRow*T$priceSummaryRow)");
+                                    //     // $objWorkInventorySheet->SetCellValue("Q$priceSummaryRow", "=(M$priceSummaryRow*U$priceSummaryRow)+(N$priceSummaryRow*V$priceSummaryRow)+(O$priceSummaryRow*W$priceSummaryRow)");
+
+                                    //     // $objWorkInventorySheet->getStyle("M$priceSummaryRow:Q$priceSummaryRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+                                    // } else {
 
                                     if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
-                                        $objWorkInventorySheet->SetCellValue("P$priceSummaryRow", "=(M$priceSummaryRow*O$priceSummaryRow)");
-                                        $objWorkInventorySheet->SetCellValue("Q$priceSummaryRow", "=(N$priceSummaryRow*O$priceSummaryRow)");
-                                        
-                                        $objWorkInventorySheet->getStyle("O$priceSummaryRow:Q$priceSummaryRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
-                                        // $objWorkInventorySheet->SetCellValue("R$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,R10)");
-                                        // $objWorkInventorySheet->SetCellValue("S$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,S10)");
-                                        // $objWorkInventorySheet->SetCellValue("T$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,T10)");
 
-                                        // $objWorkInventorySheet->SetCellValue("U$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,U10)");
-                                        // $objWorkInventorySheet->SetCellValue("V$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,V10)");
-                                        // $objWorkInventorySheet->SetCellValue("W$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,W10)");
+                                        $objWorkInventorySheet->SetCellValue("R$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,R10)");
+                                        $objWorkInventorySheet->SetCellValue("S$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,S10)");
+                                        $objWorkInventorySheet->SetCellValue("T$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,T10)");
 
-                                        // $objWorkInventorySheet->SetCellValue("P$priceSummaryRow", "=(M$priceSummaryRow*R$priceSummaryRow)+(N$priceSummaryRow*S$priceSummaryRow)+(O$priceSummaryRow*T$priceSummaryRow)");
-                                        // $objWorkInventorySheet->SetCellValue("Q$priceSummaryRow", "=(M$priceSummaryRow*U$priceSummaryRow)+(N$priceSummaryRow*V$priceSummaryRow)+(O$priceSummaryRow*W$priceSummaryRow)");
+                                        $objWorkInventorySheet->SetCellValue("U$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,U10)");
+                                        $objWorkInventorySheet->SetCellValue("V$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,V10)");
+                                        $objWorkInventorySheet->SetCellValue("W$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,W10)");
 
-                                        // $objWorkInventorySheet->getStyle("M$priceSummaryRow:Q$priceSummaryRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+                                        $objWorkInventorySheet->SetCellValue("P$priceSummaryRow", "=(M$priceSummaryRow*R$priceSummaryRow)+(N$priceSummaryRow*S$priceSummaryRow)+(O$priceSummaryRow*T$priceSummaryRow)");
+                                        $objWorkInventorySheet->SetCellValue("Q$priceSummaryRow", "=(M$priceSummaryRow*U$priceSummaryRow)+(N$priceSummaryRow*V$priceSummaryRow)+(O$priceSummaryRow*W$priceSummaryRow)");
+
+                                        $objWorkInventorySheet->getStyle("M$priceSummaryRow:Q$priceSummaryRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+
                                     } else {
                                         $objWorkInventorySheet->SetCellValue("R$priceSummaryRow", "=SUMIFS(" . '$F$' . "$farmDataFirstRow" . ':$F$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,R10)");
                                         $objWorkInventorySheet->SetCellValue("S$priceSummaryRow", "=SUMIFS(" . '$F$' . "$farmDataFirstRow" . ':$F$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,S10)");
@@ -1432,6 +1454,7 @@ class Liquidationreport extends MY_Controller
 
                                         $objWorkInventorySheet->getStyle("M$priceSummaryRow:Q$priceSummaryRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
                                     }
+                                    //}
 
 
 
@@ -1450,20 +1473,26 @@ class Liquidationreport extends MY_Controller
 
                                 $objWorkInventorySheet->getStyle("P$sumCalcRow:Q$sumCalcRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
 
+                                // if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
+                                //     //$objWorkInventorySheet->getStyle("R$priceFirstRow:W$priceLastRow")->getNumberFormat()->setFormatCode('0');
+                                //     $objWorkInventorySheet->getStyle("K$priceFirstRow:Q$priceLastRow")->applyFromArray($styleArray);
+                                // } else {
+
                                 if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
-                                    //$objWorkInventorySheet->getStyle("R$priceFirstRow:W$priceLastRow")->getNumberFormat()->setFormatCode('0');
-                                    $objWorkInventorySheet->getStyle("K$priceFirstRow:Q$priceLastRow")->applyFromArray($styleArray);
+                                    $objWorkInventorySheet->getStyle("R$priceFirstRow:W$priceLastRow")->getNumberFormat()->setFormatCode('0');
                                 } else {
-                                    $objWorkInventorySheet->getStyle("K$priceFirstRow:W$priceLastRow")->applyFromArray($styleArray);
                                     $objWorkInventorySheet->getStyle("R$priceFirstRow:W$priceLastRow")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
                                 }
+                                    $objWorkInventorySheet->getStyle("K$priceFirstRow:W$priceLastRow")->applyFromArray($styleArray);
+                                    
+                                //}
 
-                                if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
-                                    $objWorkInventorySheet->SetCellValue("M$sumCalcRow", "=SUM(M$priceFirstRow:M$priceLastRow)");
-                                    $objWorkInventorySheet->SetCellValue("N$sumCalcRow", "=SUM(N$priceFirstRow:N$priceLastRow)");
+                                // if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
+                                //     $objWorkInventorySheet->SetCellValue("M$sumCalcRow", "=SUM(M$priceFirstRow:M$priceLastRow)");
+                                //     $objWorkInventorySheet->SetCellValue("N$sumCalcRow", "=SUM(N$priceFirstRow:N$priceLastRow)");
 
-                                    $objWorkInventorySheet->getStyle("M$sumCalcRow:N$sumCalcRow")->applyFromArray($styleArray);
-                                } else {
+                                //     $objWorkInventorySheet->getStyle("M$sumCalcRow:N$sumCalcRow")->applyFromArray($styleArray);
+                                // } else {
 
                                     $objWorkInventorySheet->SetCellValue("R$sumCalcRow", $this->lang->line("reception_title"));
                                     $objWorkInventorySheet->mergeCells("R$sumCalcRow:T$sumCalcRow");
@@ -1483,7 +1512,7 @@ class Liquidationreport extends MY_Controller
                                     $objWorkInventorySheet->getStyle("R$sumCalcRow:W$sumCalcRow")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
                                     $objWorkInventorySheet->getStyle("R$sumCalcRow:W$sumCalcRow")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                                     $objWorkInventorySheet->getStyle("R$sumCalcRow:W$sumCalcRow")->applyFromArray($styleArray);
-                                }
+                                //}
 
                                 
                             }
@@ -4641,10 +4670,10 @@ class Liquidationreport extends MY_Controller
                             $objWorkInventorySheet->SetCellValue("K$headerRow", $this->lang->line("circumference_range"));
                             $objWorkInventorySheet->mergeCells("K$headerRow:L$headerRow");
 
-                            if (
-                                $getFarmDetail[0]->purchase_unit_id == 4 || $getFarmDetail[0]->purchase_unit_id == 5
-                                || $getFarmDetail[0]->purchase_unit_id == 6 || $getFarmDetail[0]->purchase_unit_id == 7
-                            ) {
+                            // if (
+                            //     $getFarmDetail[0]->purchase_unit_id == 4 || $getFarmDetail[0]->purchase_unit_id == 5
+                            //     || $getFarmDetail[0]->purchase_unit_id == 6 || $getFarmDetail[0]->purchase_unit_id == 7
+                            // ) {
                                 //$objWorkInventorySheet->SetCellValue("N$headerRow", $this->lang->line("volume_reception"));
                                 //$objWorkInventorySheet->SetCellValue("O$headerRow", $this->lang->line("volume_farm"));
                                 $objWorkInventorySheet->SetCellValue("M$headerRow", $this->lang->line("text_shorts"));
@@ -4658,26 +4687,26 @@ class Liquidationreport extends MY_Controller
                                 $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getFont()->setBold(true);
                                 $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                                 $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->applyFromArray($styleArray);
-                            } else {
-                                $objWorkInventorySheet->SetCellValue("M$headerRow", $this->lang->line("pieces_reception"));
-                                $objWorkInventorySheet->SetCellValue("N$headerRow", $this->lang->line("pieces_farm"));
-                                $objWorkInventorySheet->SetCellValue("O$headerRow", $this->lang->line("volume_per_piece"));
+                            // } else {
+                            //     $objWorkInventorySheet->SetCellValue("M$headerRow", $this->lang->line("pieces_reception"));
+                            //     $objWorkInventorySheet->SetCellValue("N$headerRow", $this->lang->line("pieces_farm"));
+                            //     $objWorkInventorySheet->SetCellValue("O$headerRow", $this->lang->line("volume_per_piece"));
 
-                                $objWorkInventorySheet->SetCellValue("P$headerRow", $this->lang->line("reception_total_value"));
-                                $objWorkInventorySheet->SetCellValue("Q$headerRow", $this->lang->line("farm_total_value"));
+                            //     $objWorkInventorySheet->SetCellValue("P$headerRow", $this->lang->line("reception_total_value"));
+                            //     $objWorkInventorySheet->SetCellValue("Q$headerRow", $this->lang->line("farm_total_value"));
 
-                                if($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
-                                    $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
-                                    $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getFont()->setBold(true);
-                                    $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                                    $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->applyFromArray($styleArray);
-                                } else {
-                                    $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
-                                    $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getFont()->setBold(true);
-                                    $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                                    $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->applyFromArray($styleArray);
-                                }
-                            }
+                            //     if($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getFont()->setBold(true);
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:Q$headerRow")->applyFromArray($styleArray);
+                            //     } else {
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getFont()->setBold(true);
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                            //         $objWorkInventorySheet->getStyle("K$headerRow:W$headerRow")->applyFromArray($styleArray);
+                            //     }
+                            // }
 
                             $getInventoryContractPrice = $this->Financemaster_model->get_contract_price_data($getFarmDetail[0]->contract_id, $getFarmDetail[0]->inventory_order);
 
@@ -4721,35 +4750,31 @@ class Liquidationreport extends MY_Controller
                                     $priceRangeSemi = $pricedata->pricerange_grade_semi;
                                     $priceRangeLongs = $pricedata->pricerange_grade_longs;
 
-                                    if ($getFarmDetail[0]->purchase_unit_id == 15) {
-                                        $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeShorts/N$priceSummaryRow");
-                                        // $objWorkInventorySheet->SetCellValue("N$priceSummaryRow", "=$priceRangeSemi/O$priceSummaryRow");
-                                        // $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeLongs/O$priceSummaryRow");
-                                    } else if($getFarmDetail[0]->purchase_unit_id == 3) {
-                                        $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeShorts");
-                                    } else {
+                                    // if ($getFarmDetail[0]->purchase_unit_id == 15) {
+                                    //     $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeShorts/N$priceSummaryRow");
+                                    //     // $objWorkInventorySheet->SetCellValue("N$priceSummaryRow", "=$priceRangeSemi/O$priceSummaryRow");
+                                    //     // $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeLongs/O$priceSummaryRow");
+                                    // } else if($getFarmDetail[0]->purchase_unit_id == 3) {
+                                    //     $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", "=$priceRangeShorts");
+                                    // } else {
                                         $objWorkInventorySheet->SetCellValue("M$priceSummaryRow", ($priceRangeShorts + 0));
                                         $objWorkInventorySheet->SetCellValue("N$priceSummaryRow", ($priceRangeSemi + 0));
                                         $objWorkInventorySheet->SetCellValue("O$priceSummaryRow", ($priceRangeLongs + 0));
-                                    }
+                                    //}
 
                                     if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
-                                        $objWorkInventorySheet->SetCellValue("P$priceSummaryRow", "=(M$priceSummaryRow*O$priceSummaryRow)");
-                                        $objWorkInventorySheet->SetCellValue("Q$priceSummaryRow", "=(N$priceSummaryRow*O$priceSummaryRow)");
-                                        
-                                        $objWorkInventorySheet->getStyle("O$priceSummaryRow:Q$priceSummaryRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
-                                        // $objWorkInventorySheet->SetCellValue("R$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,R10)");
-                                        // $objWorkInventorySheet->SetCellValue("S$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,S10)");
-                                        // $objWorkInventorySheet->SetCellValue("T$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,T10)");
+                                        $objWorkInventorySheet->SetCellValue("R$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,R10)");
+                                        $objWorkInventorySheet->SetCellValue("S$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,S10)");
+                                        $objWorkInventorySheet->SetCellValue("T$priceSummaryRow", "=SUMIFS(" . '$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,T10)");
 
-                                        // $objWorkInventorySheet->SetCellValue("U$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,U10)");
-                                        // $objWorkInventorySheet->SetCellValue("V$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,V10)");
-                                        // $objWorkInventorySheet->SetCellValue("W$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,W10)");
+                                        $objWorkInventorySheet->SetCellValue("U$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,U10)");
+                                        $objWorkInventorySheet->SetCellValue("V$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,V10)");
+                                        $objWorkInventorySheet->SetCellValue("W$priceSummaryRow", "=SUMIFS(" . '$B$' . "$farmDataFirstRow" . ':$B$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,W10)");
 
-                                        // $objWorkInventorySheet->SetCellValue("P$priceSummaryRow", "=(M$priceSummaryRow*R$priceSummaryRow)+(N$priceSummaryRow*S$priceSummaryRow)+(O$priceSummaryRow*T$priceSummaryRow)");
-                                        // $objWorkInventorySheet->SetCellValue("Q$priceSummaryRow", "=(M$priceSummaryRow*U$priceSummaryRow)+(N$priceSummaryRow*V$priceSummaryRow)+(O$priceSummaryRow*W$priceSummaryRow)");
+                                        $objWorkInventorySheet->SetCellValue("P$priceSummaryRow", "=(M$priceSummaryRow*R$priceSummaryRow)+(N$priceSummaryRow*S$priceSummaryRow)+(O$priceSummaryRow*T$priceSummaryRow)");
+                                        $objWorkInventorySheet->SetCellValue("Q$priceSummaryRow", "=(M$priceSummaryRow*U$priceSummaryRow)+(N$priceSummaryRow*V$priceSummaryRow)+(O$priceSummaryRow*W$priceSummaryRow)");
 
-                                        // $objWorkInventorySheet->getStyle("M$priceSummaryRow:Q$priceSummaryRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+                                        $objWorkInventorySheet->getStyle("M$priceSummaryRow:Q$priceSummaryRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
                                     } else {
                                         $objWorkInventorySheet->SetCellValue("R$priceSummaryRow", "=SUMIFS(" . '$F$' . "$farmDataFirstRow" . ':$F$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,R10)");
                                         $objWorkInventorySheet->SetCellValue("S$priceSummaryRow", "=SUMIFS(" . '$F$' . "$farmDataFirstRow" . ':$F$' . "$lastRowFarmData" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',">="&$K$' . "$priceSummaryRow" . ',$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',"<="&$L' . "$priceSummaryRow, I$farmDataFirstRow:I$lastRowFarmData,S10)");
@@ -4782,21 +4807,28 @@ class Liquidationreport extends MY_Controller
 
                                 $objWorkInventorySheet->getStyle("P$sumCalcRow:Q$sumCalcRow")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
 
+                                // if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
+                                //     //$objWorkInventorySheet->getStyle("R$priceFirstRow:W$priceLastRow")->getNumberFormat()->setFormatCode('0');
+                                //     $objWorkInventorySheet->getStyle("K$priceFirstRow:Q$priceLastRow")->applyFromArray($styleArray);
+                                // } else {
+                                //     $objWorkInventorySheet->getStyle("K$priceFirstRow:W$priceLastRow")->applyFromArray($styleArray);
+                                //     $objWorkInventorySheet->getStyle("R$priceFirstRow:W$priceLastRow")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
+                                // }
+
                                 if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
-                                    //$objWorkInventorySheet->getStyle("R$priceFirstRow:W$priceLastRow")->getNumberFormat()->setFormatCode('0');
-                                    $objWorkInventorySheet->getStyle("K$priceFirstRow:Q$priceLastRow")->applyFromArray($styleArray);
+                                    $objWorkInventorySheet->getStyle("R$priceFirstRow:W$priceLastRow")->getNumberFormat()->setFormatCode('0');
                                 } else {
-                                    $objWorkInventorySheet->getStyle("K$priceFirstRow:W$priceLastRow")->applyFromArray($styleArray);
                                     $objWorkInventorySheet->getStyle("R$priceFirstRow:W$priceLastRow")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
                                 }
+                                $objWorkInventorySheet->getStyle("K$priceFirstRow:W$priceLastRow")->applyFromArray($styleArray);
 
-                                if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
-                                    $objWorkInventorySheet->SetCellValue("M$sumCalcRow", "=SUM(M$priceFirstRow:M$priceLastRow)");
-                                    $objWorkInventorySheet->SetCellValue("N$sumCalcRow", "=SUM(N$priceFirstRow:N$priceLastRow)");
 
-                                    $objWorkInventorySheet->getStyle("M$sumCalcRow:N$sumCalcRow")->applyFromArray($styleArray);
-                                } else {
-
+                                // if ($getFarmDetail[0]->purchase_unit_id == 3 || $getFarmDetail[0]->purchase_unit_id == 15) {
+                                //     $objWorkInventorySheet->SetCellValue("M$sumCalcRow", "=SUM(M$priceFirstRow:M$priceLastRow)");
+                                //     $objWorkInventorySheet->SetCellValue("N$sumCalcRow", "=SUM(N$priceFirstRow:N$priceLastRow)");
+                                    
+                                //     $objWorkInventorySheet->getStyle("M$sumCalcRow:N$sumCalcRow")->applyFromArray($styleArray);
+                                // } else {
                                     $objWorkInventorySheet->SetCellValue("R$sumCalcRow", $this->lang->line("reception_title"));
                                     $objWorkInventorySheet->mergeCells("R$sumCalcRow:T$sumCalcRow");
 
@@ -4815,7 +4847,7 @@ class Liquidationreport extends MY_Controller
                                     $objWorkInventorySheet->getStyle("R$sumCalcRow:W$sumCalcRow")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("DBEDFF");
                                     $objWorkInventorySheet->getStyle("R$sumCalcRow:W$sumCalcRow")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                                     $objWorkInventorySheet->getStyle("R$sumCalcRow:W$sumCalcRow")->applyFromArray($styleArray);
-                                }
+                                //}
 
                                 
                             }

@@ -849,12 +849,13 @@ class Exports extends MY_Controller
 
                                 $docXml = preg_replace('/[\x00-\x1F\x7F]/', '', $docXml);
                                 $docXml = mb_convert_encoding($docXml, 'UTF-8', 'auto');
-                                if (strpos(trim($docXml), '<?xml') !== 0) {
-                                    $Return['error'] = $this->lang->line('error_xml');
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                }
+
+                                // if (strpos(trim($docXml), '<?xml') !== 0) {
+                                //     $Return['error'] = $this->lang->line('error_xml');
+                                //     $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                //     $this->output($Return);
+                                //     exit;
+                                // }
 
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
@@ -878,7 +879,7 @@ class Exports extends MY_Controller
                         $Return['csrf_hash'] = $this->security->get_csrf_hash();
                         $this->output($Return);
                     }
-                } else  if ($exporttype == 2) {
+                } else if ($exporttype == 2) {
                     if (is_uploaded_file($_FILES['fileUploadDoc']['tmp_name'])) {
                         $allowed =  array('xml', "XML", 'pdf', "PDF");
                         $filename = $_FILES['fileUploadDoc']['name'];
@@ -926,12 +927,13 @@ class Exports extends MY_Controller
 
                                 $docXml = preg_replace('/[\x00-\x1F\x7F]/', '', $docXml);
                                 $docXml = mb_convert_encoding($docXml, 'UTF-8', 'auto');
-                                if (strpos(trim($docXml), '<?xml') !== 0) {
-                                    $Return['error'] = $this->lang->line('error_xml');
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                }
+
+                                // if (strpos(trim($docXml), '<?xml') !== 0) {
+                                //     $Return['error'] = $this->lang->line('error_xml');
+                                //     $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                //     $this->output($Return);
+                                //     exit;
+                                // }
 
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
@@ -955,7 +957,7 @@ class Exports extends MY_Controller
                         $Return['csrf_hash'] = $this->security->get_csrf_hash();
                         $this->output($Return);
                     }
-                } else  if ($exporttype == 3) {
+                } else if ($exporttype == 3) {
                     if (is_uploaded_file($_FILES['fileUploadDoc']['tmp_name'])) {
                         $allowed =  array('xml', "XML", 'pdf', "PDF");
                         $filename = $_FILES['fileUploadDoc']['name'];
@@ -1003,12 +1005,13 @@ class Exports extends MY_Controller
 
                                 $docXml = preg_replace('/[\x00-\x1F\x7F]/', '', $docXml);
                                 $docXml = mb_convert_encoding($docXml, 'UTF-8', 'auto');
-                                if (strpos(trim($docXml), '<?xml') !== 0) {
-                                    $Return['error'] = $this->lang->line('error_xml');
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                }
+
+                                // if (strpos(trim($docXml), '<?xml') !== 0) {
+                                //     $Return['error'] = $this->lang->line('error_xml');
+                                //     $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                //     $this->output($Return);
+                                //     exit;
+                                // }
 
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
@@ -1032,7 +1035,7 @@ class Exports extends MY_Controller
                         $Return['csrf_hash'] = $this->security->get_csrf_hash();
                         $this->output($Return);
                     }
-                } else  if ($exporttype == 9) {
+                } else if ($exporttype == 9) {
                     if (is_uploaded_file($_FILES['fileUploadDoc']['tmp_name'])) {
                         $allowed =  array('xml', "XML", 'pdf', "PDF");
                         $filename = $_FILES['fileUploadDoc']['name'];
@@ -1080,12 +1083,13 @@ class Exports extends MY_Controller
 
                                 $docXml = preg_replace('/[\x00-\x1F\x7F]/', '', $docXml);
                                 $docXml = mb_convert_encoding($docXml, 'UTF-8', 'auto');
-                                if (strpos(trim($docXml), '<?xml') !== 0) {
-                                    $Return['error'] = $this->lang->line('error_xml');
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                }
+
+                                // if (strpos(trim($docXml), '<?xml') !== 0) {
+                                //     $Return['error'] = $this->lang->line('error_xml');
+                                //     $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                //     $this->output($Return);
+                                //     exit;
+                                // }
 
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
@@ -1109,7 +1113,7 @@ class Exports extends MY_Controller
                         $Return['csrf_hash'] = $this->security->get_csrf_hash();
                         $this->output($Return);
                     }
-                } else  if ($exporttype == 4) {
+                } else if ($exporttype == 4) {
                     if (is_uploaded_file($_FILES['fileUploadDoc']['tmp_name'])) {
                         $allowed =  array('xml', "XML", 'pdf', "PDF");
                         $filename = $_FILES['fileUploadDoc']['name'];
@@ -1157,12 +1161,169 @@ class Exports extends MY_Controller
 
                                 $docXml = preg_replace('/[\x00-\x1F\x7F]/', '', $docXml);
                                 $docXml = mb_convert_encoding($docXml, 'UTF-8', 'auto');
-                                if (strpos(trim($docXml), '<?xml') !== 0) {
+
+                                // if (strpos(trim($docXml), '<?xml') !== 0) {
+                                //     $Return['error'] = $this->lang->line('error_xml');
+                                //     $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                //     $this->output($Return);
+                                //     exit;
+                                // }
+
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                if ($xmlResponse != null && $xmlResponse != null) {
+                                    $Return['result'] = $xmlResponse;
+                                    $Return['error'] = "";
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                } else {
+                                    $Return['error'] = $this->lang->line('error_invalid_file');
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                }
+                            }
+                        } else {
+                            $Return['error'] = $this->lang->line('error_invalid_file');
+                            $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                            $this->output($Return);
+                        }
+                    } else {
+                        $Return['error'] = $this->lang->line('error_invalid_file');
+                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                        $this->output($Return);
+                    }
+                } else if ($exporttype == 6) {
+                    if (is_uploaded_file($_FILES['fileUploadDoc']['tmp_name'])) {
+                        $allowed =  array('xml', "XML", 'pdf', "PDF");
+                        $filename = $_FILES['fileUploadDoc']['name'];
+                        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+                        if (in_array($ext, $allowed)) {
+
+                            if ($ext == "pdf" || $ext == "PDF") {
+                                $tmp_name = $_FILES["fileUploadDoc"]["tmp_name"];
+                                $invoiceFolder = "assets/exportdocs/invoices/";
+
+                                $newfilename = 'INV_' . round(microtime(true)) . '.pdf';
+                                move_uploaded_file($tmp_name, $invoiceFolder . $newfilename);
+                                $fileurl = "assets/exportdocs/invoices/" . $newfilename;
+
+                                $dados = [
+                                    'fileExtension' => $ext,
+                                    'fileUrl' => $fileurl,
+                                ];
+
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+
+                                $Return['result'] = $dataResponse;
+                                $Return['error'] = "";
+                                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                $this->output($Return);
+                                $this->output($Return);
+                            } else if ($ext == "xml" || $ext == "XML") {
+
+                                $tmp_name = $_FILES["fileUploadDoc"]["tmp_name"];
+                                $invoiceFolder = "assets/exportdocs/xmlupload/";
+
+                                $newfilename = 'XML_' . round(microtime(true)) . '.xml';
+                                move_uploaded_file($tmp_name, $invoiceFolder . $newfilename);
+                                $fileurl = "assets/exportdocs/xmlupload/" . $newfilename;
+
+                                $docXml = file_get_contents($fileurl);
+
+                                if (empty(trim($docXml))) {
                                     $Return['error'] = $this->lang->line('error_xml');
                                     $Return['csrf_hash'] = $this->security->get_csrf_hash();
                                     $this->output($Return);
                                     exit;
                                 }
+
+                                $docXml = preg_replace('/[\x00-\x1F\x7F]/', '', $docXml);
+                                $docXml = mb_convert_encoding($docXml, 'UTF-8', 'auto');
+
+                                // if (strpos(trim($docXml), '<?xml') !== 0) {
+                                //     $Return['error'] = $this->lang->line('error_xml');
+                                //     $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                //     $this->output($Return);
+                                //     exit;
+                                // }
+
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                if ($xmlResponse != null && $xmlResponse != null) {
+                                    $Return['result'] = $xmlResponse;
+                                    $Return['error'] = "";
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                } else {
+                                    $Return['error'] = $this->lang->line('error_invalid_file');
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                }
+                            }
+                        } else {
+                            $Return['error'] = $this->lang->line('error_invalid_file');
+                            $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                            $this->output($Return);
+                        }
+                    } else {
+                        $Return['error'] = $this->lang->line('error_invalid_file');
+                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                        $this->output($Return);
+                    }
+                } else if ($exporttype == 5) {
+                    if (is_uploaded_file($_FILES['fileUploadDoc']['tmp_name'])) {
+                        $allowed =  array('xml', "XML", 'pdf', "PDF");
+                        $filename = $_FILES['fileUploadDoc']['name'];
+                        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+
+                        if (in_array($ext, $allowed)) {
+
+                            if ($ext == "pdf" || $ext == "PDF") {
+                                $tmp_name = $_FILES["fileUploadDoc"]["tmp_name"];
+                                $invoiceFolder = "assets/exportdocs/invoices/";
+
+                                $newfilename = 'INV_' . round(microtime(true)) . '.pdf';
+                                move_uploaded_file($tmp_name, $invoiceFolder . $newfilename);
+                                $fileurl = "assets/exportdocs/invoices/" . $newfilename;
+
+                                $dados = [
+                                    'fileExtension' => $ext,
+                                    'fileUrl' => $fileurl,
+                                ];
+
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+
+                                $Return['result'] = $dataResponse;
+                                $Return['error'] = "";
+                                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                $this->output($Return);
+                                $this->output($Return);
+                            } else if ($ext == "xml" || $ext == "XML") {
+
+                                $tmp_name = $_FILES["fileUploadDoc"]["tmp_name"];
+                                $invoiceFolder = "assets/exportdocs/xmlupload/";
+
+                                $newfilename = 'XML_' . round(microtime(true)) . '.xml';
+                                move_uploaded_file($tmp_name, $invoiceFolder . $newfilename);
+                                $fileurl = "assets/exportdocs/xmlupload/" . $newfilename;
+
+                                $docXml = file_get_contents($fileurl);
+
+                                if (empty(trim($docXml))) {
+                                    $Return['error'] = $this->lang->line('error_xml');
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                }
+
+                                $docXml = preg_replace('/[\x00-\x1F\x7F]/', '', $docXml);
+                                $docXml = mb_convert_encoding($docXml, 'UTF-8', 'auto');
+
+                                // if (strpos(trim($docXml), '<?xml') !== 0) {
+                                //     $Return['error'] = $this->lang->line('error_xml');
+                                //     $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                //     $this->output($Return);
+                                //     exit;
+                                // }
 
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
@@ -1220,6 +1381,7 @@ class Exports extends MY_Controller
             libxml_use_internal_errors(true); // Capture XML parsing errors
 
             if (!$doc->loadXML($xml, LIBXML_NOBLANKS | LIBXML_NOEMPTYTAG)) {
+                $Return['result'] = "";
                 $Return['error'] = $this->lang->line('error_xml');
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
                 $this->output($Return);
@@ -1238,9 +1400,17 @@ class Exports extends MY_Controller
             $companyIdNode = $xpath->query('//cac:SenderParty/cac:PartyTaxScheme/cbc:CompanyID');
             $supplierId = 0;
 
+            if ($companyIdNode->item(0)->nodeValue == "" || $companyIdNode->item(0)->nodeValue == null) {
+                $Return['result'] = "";
+                $Return['error'] = $this->lang->line('error_xml');
+                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                $this->output($Return);
+                exit;
+            }
+
             //CHECK AND REGISTER COMPANY ID
-            $checkCompanyIdExists = $this->Master_model->check_company_id_exportsupplier($companyIdNode->item(0)->nodeValue);
-            if (count($checkCompanyIdExists) == 0) {
+            $checkCompanyIdExistsCount = $this->Master_model->check_company_id_exportsupplier_count($companyIdNode->item(0)->nodeValue);
+            if ($checkCompanyIdExistsCount[0]->cnt == 0) {
 
                 $dataSupplier = array(
                     "supplier_name" => $registrationNameNode,
@@ -1255,6 +1425,7 @@ class Exports extends MY_Controller
                 $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
                 $supplierId = $insertSupplier + 0;
             } else {
+                $checkCompanyIdExists = $this->Master_model->check_company_id_exportsupplier($companyIdNode->item(0)->nodeValue);
                 $supplierId = $checkCompanyIdExists[0]->id + 0;
             }
 
@@ -1360,6 +1531,7 @@ class Exports extends MY_Controller
             libxml_use_internal_errors(true); // Capture XML parsing errors
 
             if (!$doc->loadXML($xml, LIBXML_NOBLANKS | LIBXML_NOEMPTYTAG)) {
+                $Return['result'] = "";
                 $Return['error'] = $this->lang->line('error_xml');
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
                 $this->output($Return);
@@ -1382,18 +1554,18 @@ class Exports extends MY_Controller
             $checkCompanyIdExistsCount = $this->Master_model->check_company_id_exportsupplier_count($companyIdNode->item(0)->nodeValue);
             if ($checkCompanyIdExistsCount[0]->cnt == 0) {
 
-                    $dataSupplier = array(
-                        "supplier_name" => $registrationNameNode->item(0)->nodeValue,
-                        "supplier_id" => $companyIdNode->item(0)->nodeValue,
-                        "export_type" => 2,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                        'origin_id' => $originId,
-                    );
+                $dataSupplier = array(
+                    "supplier_name" => $registrationNameNode->item(0)->nodeValue,
+                    "supplier_id" => $companyIdNode->item(0)->nodeValue,
+                    "export_type" => 2,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                    'origin_id' => $originId,
+                );
 
-                    $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
-                    $supplierId = $insertSupplier + 0;
+                $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
+                $supplierId = $insertSupplier + 0;
             } else {
                 $checkCompanyIdExists = $this->Master_model->check_company_id_exportsupplier($companyIdNode->item(0)->nodeValue);
                 $supplierId = $checkCompanyIdExists[0]->id + 0;
@@ -1502,6 +1674,7 @@ class Exports extends MY_Controller
             libxml_use_internal_errors(true); // Capture XML parsing errors
 
             if (!$doc->loadXML($xml, LIBXML_NOBLANKS | LIBXML_NOEMPTYTAG)) {
+                $Return['result'] = "";
                 $Return['error'] = $this->lang->line('error_xml');
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
                 $this->output($Return);
@@ -1524,18 +1697,18 @@ class Exports extends MY_Controller
             $checkCompanyIdExistsCount = $this->Master_model->check_company_id_exportsupplier_count($companyIdNode->item(0)->nodeValue);
             if ($checkCompanyIdExistsCount[0]->cnt == 0) {
 
-                    $dataSupplier = array(
-                        "supplier_name" => $registrationNameNode->item(0)->nodeValue,
-                        "supplier_id" => $companyIdNode->item(0)->nodeValue,
-                        "export_type" => 3,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                        'origin_id' => $originId,
-                    );
+                $dataSupplier = array(
+                    "supplier_name" => $registrationNameNode->item(0)->nodeValue,
+                    "supplier_id" => $companyIdNode->item(0)->nodeValue,
+                    "export_type" => 3,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                    'origin_id' => $originId,
+                );
 
-                    $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
-                    $supplierId = $insertSupplier + 0;
+                $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
+                $supplierId = $insertSupplier + 0;
             } else {
                 $checkCompanyIdExists = $this->Master_model->check_company_id_exportsupplier($companyIdNode->item(0)->nodeValue);
                 $supplierId = $checkCompanyIdExists[0]->id + 0;
@@ -1644,6 +1817,7 @@ class Exports extends MY_Controller
             libxml_use_internal_errors(true); // Capture XML parsing errors
 
             if (!$doc->loadXML($xml, LIBXML_NOBLANKS | LIBXML_NOEMPTYTAG)) {
+                $Return['result'] = "";
                 $Return['error'] = $this->lang->line('error_xml');
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
                 $this->output($Return);
@@ -1666,18 +1840,18 @@ class Exports extends MY_Controller
             $checkCompanyIdExistsCount = $this->Master_model->check_company_id_exportsupplier_count($companyIdNode->item(0)->nodeValue);
             if ($checkCompanyIdExistsCount[0]->cnt == 0) {
 
-                    $dataSupplier = array(
-                        "supplier_name" => $registrationNameNode->item(0)->nodeValue,
-                        "supplier_id" => $companyIdNode->item(0)->nodeValue,
-                        "export_type" => 9,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                        'origin_id' => $originId,
-                    );
+                $dataSupplier = array(
+                    "supplier_name" => $registrationNameNode->item(0)->nodeValue,
+                    "supplier_id" => $companyIdNode->item(0)->nodeValue,
+                    "export_type" => 9,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                    'origin_id' => $originId,
+                );
 
-                    $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
-                    $supplierId = $insertSupplier + 0;
+                $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
+                $supplierId = $insertSupplier + 0;
             } else {
                 $checkCompanyIdExists = $this->Master_model->check_company_id_exportsupplier($companyIdNode->item(0)->nodeValue);
                 $supplierId = $checkCompanyIdExists[0]->id + 0;
@@ -1786,6 +1960,7 @@ class Exports extends MY_Controller
             libxml_use_internal_errors(true); // Capture XML parsing errors
 
             if (!$doc->loadXML($xml, LIBXML_NOBLANKS | LIBXML_NOEMPTYTAG)) {
+                $Return['result'] = "";
                 $Return['error'] = $this->lang->line('error_xml');
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
                 $this->output($Return);
@@ -1808,18 +1983,304 @@ class Exports extends MY_Controller
             $checkCompanyIdExistsCount = $this->Master_model->check_company_id_exportsupplier_count($companyIdNode->item(0)->nodeValue);
             if ($checkCompanyIdExistsCount[0]->cnt == 0) {
 
-                    $dataSupplier = array(
-                        "supplier_name" => $registrationNameNode->item(0)->nodeValue,
-                        "supplier_id" => $companyIdNode->item(0)->nodeValue,
-                        "export_type" => 4,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                        'origin_id' => $originId,
-                    );
+                $dataSupplier = array(
+                    "supplier_name" => $registrationNameNode->item(0)->nodeValue,
+                    "supplier_id" => $companyIdNode->item(0)->nodeValue,
+                    "export_type" => 4,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                    'origin_id' => $originId,
+                );
 
-                    $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
-                    $supplierId = $insertSupplier + 0;
+                $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
+                $supplierId = $insertSupplier + 0;
+            } else {
+                $checkCompanyIdExists = $this->Master_model->check_company_id_exportsupplier($companyIdNode->item(0)->nodeValue);
+                $supplierId = $checkCompanyIdExists[0]->id + 0;
+            }
+
+            // Extract Embedded XML from `cbc:Description`
+            $embeddedXmlNode = $xpath->query("//cac:Attachment/cac:ExternalReference/cbc:Description");
+            $taxExclusiveAmount = 0;
+            $taxInclusiveAmount = 0;
+            $taxAmount = 0;
+            $allowanceTotalAmount = 0;
+            $payableAmount = 0;
+
+            if ($embeddedXmlNode->length > 0) {
+                $embeddedXml = trim($embeddedXmlNode->item(0)->nodeValue);
+
+                if (!empty($embeddedXml)) {
+                    $embeddedDoc = new DOMDocument();
+                    if ($embeddedDoc->loadXML($embeddedXml)) {
+                        $embeddedXpath = new DOMXPath($embeddedDoc);
+                        $embeddedXpath->registerNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
+                        $embeddedXpath->registerNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+
+                        // Extract `TaxExclusiveAmount` from the embedded XML
+                        $taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
+                        $taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
+                        $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
+                        $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
+
+                        if ($taxExclusiveAmountNode->length > 0) {
+                            $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
+                        }
+
+                        if ($taxInclusiveAmountNode->length > 0) {
+                            $taxInclusiveAmount = $taxInclusiveAmountNode->item(0)->nodeValue + 0;
+                        }
+
+                        $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+
+                        if ($allowanceTotalAmountNode->length > 0) {
+                            $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
+                        }
+
+                        if ($payableAmountNode->length > 0) {
+                            $payableAmount = $payableAmountNode->item(0)->nodeValue + 0;
+                        }
+                    }
+                }
+            }
+
+            $issuedDate = ($issueDateNode->length > 0) ? $issueDateNode->item(0)->nodeValue : "";
+            $issuedTime = ($issueTimeNode->length > 0) ? $issueTimeNode->item(0)->nodeValue : "";
+            $formattedDate = "";
+
+            if ($issuedDate != "" && $issuedTime != "") {
+                $date = new DateTime($issuedDate . " " . $issuedTime);
+                $formattedDate = $date->format('d/m/Y h:i A');
+            }
+
+            $currencyCode = "es_CO";
+            $currencyFormat = "COP";
+
+            $taxExclusiveAmountValue = $taxExclusiveAmount + 0;
+            $taxInclusiveAmountValue = $taxInclusiveAmount + 0;
+            $taxAmountValue = $taxAmount + 0;
+            $allowanceTotalAmountValue = $allowanceTotalAmount + 0;
+            $payableAmountValue = $payableAmount + 0;
+
+            $fmt = new NumberFormatter($currencyCode, NumberFormatter::CURRENCY);
+            $taxExclusiveAmount = $fmt->formatCurrency($taxExclusiveAmount, $currencyFormat);
+            $taxInclusiveAmount = $fmt->formatCurrency($taxInclusiveAmount, $currencyFormat);
+            $taxAmount = $fmt->formatCurrency($taxAmount, $currencyFormat);
+            $allowanceTotalAmount = $fmt->formatCurrency($allowanceTotalAmount, $currencyFormat);
+            $payableAmount = $fmt->formatCurrency($payableAmount, $currencyFormat);
+
+            $dados = [
+                'issueDate' => $formattedDate,
+                //'issueTime' => ($issueTimeNode->length > 0) ? $issueTimeNode->item(0)->nodeValue : "NA",
+                'registrationName' => ($registrationNameNode->length > 0) ? $registrationNameNode->item(0)->nodeValue : "NA",
+                'companyId' => ($companyIdNode->length > 0) ? $companyIdNode->item(0)->nodeValue : "NA",
+                'documentId' => ($documentIdNode->length > 0) ? $documentIdNode->item(0)->nodeValue : "NA",
+                'taxExclusiveAmount' => $taxExclusiveAmount,
+                'taxInclusiveAmount' => $taxInclusiveAmount,
+                'taxAmount' => $taxAmount,
+                'allowanceTotalAmount' => $allowanceTotalAmount,
+                'payableAmount' => $payableAmount,
+                'taxExclusiveAmountValue' => $taxExclusiveAmountValue,
+                'taxInclusiveAmountValue' => $taxInclusiveAmountValue,
+                'taxAmountValue' => $taxAmountValue,
+                'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
+                'payableAmountValue' => $payableAmountValue,
+                'fileExtension' => $ext,
+                'supplierId' => $supplierId,
+            ];
+
+            return json_encode($dados, JSON_PRETTY_PRINT);
+        } else if ($exportType == 6) {
+
+            // Clean malformed XML
+            $xml = preg_replace('/<(\w+)xmlns=/', '<\1 xmlns=', $xml);
+            $xml = preg_replace('/\s+>/', '>', $xml);
+
+            $doc = new DOMDocument();
+            $doc->preserveWhiteSpace = false;
+            $doc->formatOutput = false;
+            libxml_use_internal_errors(true); // Capture XML parsing errors
+
+            if (!$doc->loadXML($xml, LIBXML_NOBLANKS | LIBXML_NOEMPTYTAG)) {
+                $Return['result'] = "";
+                $Return['error'] = $this->lang->line('error_xml');
+                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                $this->output($Return);
+                exit;
+            }
+
+            $xpath = new DOMXPath($doc);
+            $xpath->registerNamespace('cbc', 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2');
+            $xpath->registerNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+
+            // Extract from Main XML
+            $issueDateNode = $xpath->query('//*[local-name()="IssueDate"]');
+            $issueTimeNode = $xpath->query('//*[local-name()="IssueTime"]');
+            $documentIdNode = $xpath->query('//*[local-name()="ParentDocumentID"]');
+            $registrationNameNode = $xpath->query('//cac:SenderParty/cac:PartyTaxScheme/cbc:RegistrationName');
+            $companyIdNode = $xpath->query('//cac:SenderParty/cac:PartyTaxScheme/cbc:CompanyID');
+            $supplierId = 0;
+
+            //CHECK AND REGISTER COMPANY ID
+            $checkCompanyIdExistsCount = $this->Master_model->check_company_id_exportsupplier_count($companyIdNode->item(0)->nodeValue);
+            if ($checkCompanyIdExistsCount[0]->cnt == 0) {
+
+                $dataSupplier = array(
+                    "supplier_name" => $registrationNameNode->item(0)->nodeValue,
+                    "supplier_id" => $companyIdNode->item(0)->nodeValue,
+                    "export_type" => 6,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                    'origin_id' => $originId,
+                );
+
+                $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
+                $supplierId = $insertSupplier + 0;
+            } else {
+                $checkCompanyIdExists = $this->Master_model->check_company_id_exportsupplier($companyIdNode->item(0)->nodeValue);
+                $supplierId = $checkCompanyIdExists[0]->id + 0;
+            }
+
+            // Extract Embedded XML from `cbc:Description`
+            $embeddedXmlNode = $xpath->query("//cac:Attachment/cac:ExternalReference/cbc:Description");
+            $taxExclusiveAmount = 0;
+            $taxInclusiveAmount = 0;
+            $taxAmount = 0;
+            $allowanceTotalAmount = 0;
+            $payableAmount = 0;
+
+            if ($embeddedXmlNode->length > 0) {
+                $embeddedXml = trim($embeddedXmlNode->item(0)->nodeValue);
+
+                if (!empty($embeddedXml)) {
+                    $embeddedDoc = new DOMDocument();
+                    if ($embeddedDoc->loadXML($embeddedXml)) {
+                        $embeddedXpath = new DOMXPath($embeddedDoc);
+                        $embeddedXpath->registerNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
+                        $embeddedXpath->registerNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+
+                        // Extract `TaxExclusiveAmount` from the embedded XML
+                        $taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
+                        $taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
+                        $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
+                        $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
+
+                        if ($taxExclusiveAmountNode->length > 0) {
+                            $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
+                        }
+
+                        if ($taxInclusiveAmountNode->length > 0) {
+                            $taxInclusiveAmount = $taxInclusiveAmountNode->item(0)->nodeValue + 0;
+                        }
+
+                        $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+
+                        if ($allowanceTotalAmountNode->length > 0) {
+                            $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
+                        }
+
+                        if ($payableAmountNode->length > 0) {
+                            $payableAmount = $payableAmountNode->item(0)->nodeValue + 0;
+                        }
+                    }
+                }
+            }
+
+            $issuedDate = ($issueDateNode->length > 0) ? $issueDateNode->item(0)->nodeValue : "";
+            $issuedTime = ($issueTimeNode->length > 0) ? $issueTimeNode->item(0)->nodeValue : "";
+            $formattedDate = "";
+
+            if ($issuedDate != "" && $issuedTime != "") {
+                $date = new DateTime($issuedDate . " " . $issuedTime);
+                $formattedDate = $date->format('d/m/Y h:i A');
+            }
+
+            $currencyCode = "es_CO";
+            $currencyFormat = "COP";
+
+            $taxExclusiveAmountValue = $taxExclusiveAmount + 0;
+            $taxInclusiveAmountValue = $taxInclusiveAmount + 0;
+            $taxAmountValue = $taxAmount + 0;
+            $allowanceTotalAmountValue = $allowanceTotalAmount + 0;
+            $payableAmountValue = $payableAmount + 0;
+
+            $fmt = new NumberFormatter($currencyCode, NumberFormatter::CURRENCY);
+            $taxExclusiveAmount = $fmt->formatCurrency($taxExclusiveAmount, $currencyFormat);
+            $taxInclusiveAmount = $fmt->formatCurrency($taxInclusiveAmount, $currencyFormat);
+            $taxAmount = $fmt->formatCurrency($taxAmount, $currencyFormat);
+            $allowanceTotalAmount = $fmt->formatCurrency($allowanceTotalAmount, $currencyFormat);
+            $payableAmount = $fmt->formatCurrency($payableAmount, $currencyFormat);
+
+            $dados = [
+                'issueDate' => $formattedDate,
+                //'issueTime' => ($issueTimeNode->length > 0) ? $issueTimeNode->item(0)->nodeValue : "NA",
+                'registrationName' => ($registrationNameNode->length > 0) ? $registrationNameNode->item(0)->nodeValue : "NA",
+                'companyId' => ($companyIdNode->length > 0) ? $companyIdNode->item(0)->nodeValue : "NA",
+                'documentId' => ($documentIdNode->length > 0) ? $documentIdNode->item(0)->nodeValue : "NA",
+                'taxExclusiveAmount' => $taxExclusiveAmount,
+                'taxInclusiveAmount' => $taxInclusiveAmount,
+                'taxAmount' => $taxAmount,
+                'allowanceTotalAmount' => $allowanceTotalAmount,
+                'payableAmount' => $payableAmount,
+                'taxExclusiveAmountValue' => $taxExclusiveAmountValue,
+                'taxInclusiveAmountValue' => $taxInclusiveAmountValue,
+                'taxAmountValue' => $taxAmountValue,
+                'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
+                'payableAmountValue' => $payableAmountValue,
+                'fileExtension' => $ext,
+                'supplierId' => $supplierId,
+            ];
+
+            return json_encode($dados, JSON_PRETTY_PRINT);
+        } else if ($exportType == 5) {
+
+            // Clean malformed XML
+            $xml = preg_replace('/<(\w+)xmlns=/', '<\1 xmlns=', $xml);
+            $xml = preg_replace('/\s+>/', '>', $xml);
+
+            $doc = new DOMDocument();
+            $doc->preserveWhiteSpace = false;
+            $doc->formatOutput = false;
+            libxml_use_internal_errors(true); // Capture XML parsing errors
+
+            if (!$doc->loadXML($xml, LIBXML_NOBLANKS | LIBXML_NOEMPTYTAG)) {
+                $Return['result'] = "";
+                $Return['error'] = $this->lang->line('error_xml');
+                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                $this->output($Return);
+                exit;
+            }
+
+            $xpath = new DOMXPath($doc);
+            $xpath->registerNamespace('cbc', 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2');
+            $xpath->registerNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+
+            // Extract from Main XML
+            $issueDateNode = $xpath->query('//*[local-name()="IssueDate"]');
+            $issueTimeNode = $xpath->query('//*[local-name()="IssueTime"]');
+            $documentIdNode = $xpath->query('//*[local-name()="ParentDocumentID"]');
+            $registrationNameNode = $xpath->query('//cac:SenderParty/cac:PartyTaxScheme/cbc:RegistrationName');
+            $companyIdNode = $xpath->query('//cac:SenderParty/cac:PartyTaxScheme/cbc:CompanyID');
+            $supplierId = 0;
+
+            //CHECK AND REGISTER COMPANY ID
+            $checkCompanyIdExistsCount = $this->Master_model->check_company_id_exportsupplier_count($companyIdNode->item(0)->nodeValue);
+            if ($checkCompanyIdExistsCount[0]->cnt == 0) {
+
+                $dataSupplier = array(
+                    "supplier_name" => $registrationNameNode->item(0)->nodeValue,
+                    "supplier_id" => $companyIdNode->item(0)->nodeValue,
+                    "export_type" => 6,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                    'origin_id' => $originId,
+                );
+
+                $insertSupplier = $this->Master_model->add_exportsupplier($dataSupplier);
+                $supplierId = $insertSupplier + 0;
             } else {
                 $checkCompanyIdExists = $this->Master_model->check_company_id_exportsupplier($companyIdNode->item(0)->nodeValue);
                 $supplierId = $checkCompanyIdExists[0]->id + 0;
@@ -1980,14 +2441,19 @@ class Exports extends MY_Controller
                             "updated_by" => $session['user_id'],
                             "is_active" => 0,
                         );
-        
+
                         $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 1);
 
                         foreach ($updateContainerValueJson as $containerdata) {
                             $dataExportContainer = array(
-                                "export_doc_id" =>$insertExportDocuments, "export_id" => $exportId, "export_type" => 1, 
-                                "dispatch_id" => $containerdata["mappingid"], "container_value" => $containerdata["updatedContainerValue"],
-                                "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 1,
+                                "dispatch_id" => $containerdata["mappingid"],
+                                "container_value" => $containerdata["updatedContainerValue"],
+                                "created_by" => $session['user_id'],
+                                "updated_by" => $session['user_id'],
+                                "is_active" => 1
                             );
 
                             $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
@@ -1995,7 +2461,7 @@ class Exports extends MY_Controller
                     }
                 }
 
-                
+
 
                 if ($insertExportDocuments > 0) {
                     $Return['result'] = $this->lang->line('data_added');
@@ -2069,14 +2535,19 @@ class Exports extends MY_Controller
                             "updated_by" => $session['user_id'],
                             "is_active" => 0,
                         );
-        
+
                         $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 2);
 
                         foreach ($updateContainerValueJson as $containerdata) {
                             $dataExportContainer = array(
-                                "export_doc_id" =>$insertExportDocuments, "export_id" => $exportId, "export_type" => 2, 
-                                "dispatch_id" => $containerdata["mappingid"], "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 2,
+                                "dispatch_id" => $containerdata["mappingid"],
+                                "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
+                                "updated_by" => $session['user_id'],
+                                "is_active" => 1
                             );
 
                             $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
@@ -2156,14 +2627,19 @@ class Exports extends MY_Controller
                             "updated_by" => $session['user_id'],
                             "is_active" => 0,
                         );
-        
+
                         $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 3);
 
                         foreach ($updateContainerValueJson as $containerdata) {
                             $dataExportContainer = array(
-                                "export_doc_id" =>$insertExportDocuments, "export_id" => $exportId, "export_type" => 3, 
-                                "dispatch_id" => $containerdata["mappingid"], "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 3,
+                                "dispatch_id" => $containerdata["mappingid"],
+                                "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
+                                "updated_by" => $session['user_id'],
+                                "is_active" => 1
                             );
 
                             $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
@@ -2243,14 +2719,19 @@ class Exports extends MY_Controller
                             "updated_by" => $session['user_id'],
                             "is_active" => 0,
                         );
-        
+
                         $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 9);
 
                         foreach ($updateContainerValueJson as $containerdata) {
                             $dataExportContainer = array(
-                                "export_doc_id" =>$insertExportDocuments, "export_id" => $exportId, "export_type" => 9, 
-                                "dispatch_id" => $containerdata["mappingid"], "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 9,
+                                "dispatch_id" => $containerdata["mappingid"],
+                                "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
+                                "updated_by" => $session['user_id'],
+                                "is_active" => 1
                             );
 
                             $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
@@ -2330,14 +2811,203 @@ class Exports extends MY_Controller
                             "updated_by" => $session['user_id'],
                             "is_active" => 0,
                         );
-        
+
                         $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 4);
 
                         foreach ($updateContainerValueJson as $containerdata) {
                             $dataExportContainer = array(
-                                "export_doc_id" =>$insertExportDocuments, "export_id" => $exportId, "export_type" => 4, 
-                                "dispatch_id" => $containerdata["mappingid"], "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 4,
+                                "dispatch_id" => $containerdata["mappingid"],
+                                "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
+                                "updated_by" => $session['user_id'],
+                                "is_active" => 1
+                            );
+
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
+                        }
+                    }
+                }
+
+                if ($insertExportDocuments > 0) {
+                    $Return['result'] = $this->lang->line('data_added');
+                    $this->output($Return);
+                    exit;
+                } else {
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
+                }
+            } else {
+                $Return['error'] = "";
+                $Return['result'] = "";
+                $Return['redirect'] = true;
+                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                $this->output($Return);
+                exit;
+            }
+        } else if ($this->input->post('add_type') == 6) {
+
+            if (!empty($session)) {
+
+                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+                $exportId = $this->input->post('exportId');
+                $fileExtension = $this->input->post('fileExtension');
+                $updateContainerValueData_Coteros = $this->input->post('updateContainerValueData_Coteros');
+                $invoiceNo_Coteros = $this->input->post('invoiceNo_Coteros');
+                $supplierName_Coteros = $this->input->post('supplierName_Coteros');
+                $formattedDate_Coteros = $this->input->post('formattedDate_Coteros');
+                $subTotal_Coteros = $this->input->post('subTotal_Coteros');
+                $iva_Coteros = $this->input->post('iva_Coteros');
+                $retefuente_Coteros = $this->input->post('retefuente_Coteros');
+                $payable_Coteros = $this->input->post('payable_Coteros');
+                $updateContainerValueJson = json_decode($updateContainerValueData_Coteros, true);
+                $uploadPdfFileCoteros = $this->input->post('uploadPdfFileCoteros');
+
+                //DELETE EXISTING
+
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
+
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 6);
+
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFileCoteros,
+                    "invoice_no" => $invoiceNo_Coteros,
+                    "supplier_id" => $supplierName_Coteros,
+                    "invoice_date " => $formattedDate_Coteros,
+                    "sub_total " => $subTotal_Coteros,
+                    "tax_total" => $iva_Coteros,
+                    "allowance_total" => $retefuente_Coteros,
+                    "payable_total" => $payable_Coteros,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
+
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
+
+                if ($insertExportDocuments > 0) {
+                    if (count($updateContainerValueJson) > 0) {
+
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 6);
+
+                        foreach ($updateContainerValueJson as $containerdata) {
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 6,
+                                "dispatch_id" => $containerdata["mappingid"],
+                                "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
+                                "updated_by" => $session['user_id'],
+                                "is_active" => 1
+                            );
+
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
+                        }
+                    }
+                }
+
+                if ($insertExportDocuments > 0) {
+                    $Return['result'] = $this->lang->line('data_added');
+                    $this->output($Return);
+                    exit;
+                } else {
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
+                }
+            } else {
+                $Return['error'] = "";
+                $Return['result'] = "";
+                $Return['redirect'] = true;
+                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                $this->output($Return);
+                exit;
+            }
+        } else if ($this->input->post('add_type') == 5) {
+
+            if (!empty($session)) {
+
+                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+                $exportId = $this->input->post('exportId');
+                $fileExtension = $this->input->post('fileExtension');
+                $updateContainerValueData_Phyto = $this->input->post('updateContainerValueData_Phyto');
+                $invoiceNo_Phyto = $this->input->post('invoiceNo_Phyto');
+                $supplierName_Phyto = $this->input->post('supplierName_Phyto');
+                $formattedDate_Phyto = $this->input->post('formattedDate_Phyto');
+                $subTotal_Phyto = $this->input->post('subTotal_Phyto');
+                $iva_Phyto = $this->input->post('iva_Phyto');
+                $retefuente_Phyto = $this->input->post('retefuente_Phyto');
+                $payable_Phyto = $this->input->post('payable_Phyto');
+                $updateContainerValueJson = json_decode($updateContainerValueData_Phyto, true);
+                $uploadPdfFilePhyto = $this->input->post('uploadPdfFilePhyto');
+
+                //DELETE EXISTING
+
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
+
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 5);
+
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFilePhyto,
+                    "invoice_no" => $invoiceNo_Phyto,
+                    "supplier_id" => $supplierName_Phyto,
+                    "invoice_date " => $formattedDate_Phyto,
+                    "sub_total " => $subTotal_Phyto,
+                    "tax_total" => $iva_Phyto,
+                    "allowance_total" => $retefuente_Phyto,
+                    "payable_total" => $payable_Phyto,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
+
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
+
+                if ($insertExportDocuments > 0) {
+                    if (count($updateContainerValueJson) > 0) {
+
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 5);
+
+                        foreach ($updateContainerValueJson as $containerdata) {
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 5,
+                                "dispatch_id" => $containerdata["mappingid"],
+                                "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
+                                "updated_by" => $session['user_id'],
+                                "is_active" => 1
                             );
 
                             $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);

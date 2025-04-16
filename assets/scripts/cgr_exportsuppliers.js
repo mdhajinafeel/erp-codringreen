@@ -109,6 +109,7 @@ $(document).ready(function () {
 		$.ajax({
 			url: base_url + "/generate_supplier_report",
 			type: "GET",
+			data: 'oid=' + $("#origin_supplier").val(),
 			success: function (response) {
 				$("#loading").hide();
 				if (response.redirect == true) {

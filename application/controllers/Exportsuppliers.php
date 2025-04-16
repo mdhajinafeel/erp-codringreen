@@ -1,7 +1,7 @@
 <?php
 
- error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
-        ini_set('display_errors', '0');
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
+ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -64,7 +64,7 @@ class Exportsuppliers extends MY_Controller
 			$editSupplier = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('edit') . '"><button type="button" class="btn icon-btn btn-xs btn-edit waves-effect waves-light" data-role="editsupplier" data-supplier_id="' . $r->id . '"><span class="fas fa-pencil"></span></button></span>
 			<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('view') . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="view" data-supplier_id="' . $r->id . '"><span class="fas fa-eye"></span></button></span>';
 
-			if ($r->isactive == 1) {
+			if ($r->is_active == 1) {
 				$status = $this->lang->line('active');
 			} else {
 				$status = $this->lang->line('inactive');
@@ -164,9 +164,12 @@ class Exportsuppliers extends MY_Controller
 					}
 
 					$dataSupplier = array(
-						"supplier_name" => $name, "supplier_id" => $supplierid,
-						"export_type" => $export_type, "created_by" => $session['user_id'],
-						"updated_by" => $session['user_id'], 'is_active' => $status,
+						"supplier_name" => $name,
+						"supplier_id" => $supplierid,
+						"export_type" => $export_type,
+						"created_by" => $session['user_id'],
+						"updated_by" => $session['user_id'],
+						'is_active' => $status,
 						'origin_id' => $supplier_origin,
 					);
 
@@ -199,13 +202,15 @@ class Exportsuppliers extends MY_Controller
 					}
 
 					$dataSupplier = array(
-						"supplier_name" => $name, "supplier_id" => $supplierid,
-						"export_type" => $export_type, 
-						"updated_by" => $session['user_id'], 'is_active' => $status,
+						"supplier_name" => $name,
+						"supplier_id" => $supplierid,
+						"export_type" => $export_type,
+						"updated_by" => $session['user_id'],
+						'is_active' => $status,
 						'origin_id' => $supplier_origin,
 					);
 
-					$updateSupplier = $this->Master_model->update_exportsupplier($dataSupplier, $supplier_id, $supplier_origin);
+					$updateSupplier = $this->Master_model->update_exportsupplier($dataSupplier, $supplier_id);
 
 					if ($updateSupplier == true) {
 
@@ -280,7 +285,10 @@ class Exportsuppliers extends MY_Controller
 			$session = $this->session->userdata('fullname');
 
 			$Return = array(
-				'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
+				'result' => '',
+				'error' => '',
+				'redirect' => false,
+				'csrf_hash' => '',
 				'successmessage' => ''
 			);
 
@@ -288,64 +296,32 @@ class Exportsuppliers extends MY_Controller
 
 				$Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-				$getSupplierDetailsReport = $this->Master_model->get_supplier_details_report($session["applicable_origins_id"]);
+				$getSupplierDetailsReport = $this->Master_model->get_exportsupplier_report($this->input->get("oid"));
 
 				if (count($getSupplierDetailsReport) > 0) {
 					$this->excel->setActiveSheetIndex(0);
 					$objSheet = $this->excel->getActiveSheet();
 					$objSheet->setTitle($this->lang->line('excel_supplier_title'));
-					$objSheet->getParent()->getDefaultStyle()
-						->getFont()
-						->setName('Calibri')
-						->setSize(11);
+					$objSheet->getParent()->getDefaultStyle()->getFont()->setName('Calibri')->setSize(11);
 
 					$objSheet->SetCellValue('A1', $this->lang->line('s_no'));
 					$objSheet->SetCellValue('B1', $this->lang->line('supplier_name'));
-					$objSheet->SetCellValue('C1', $this->lang->line('supplier_code'));
-					$objSheet->SetCellValue('D1', $this->lang->line('supplier_id'));
-					$objSheet->SetCellValue('E1', $this->lang->line('company_name'));
-					$objSheet->SetCellValue('F1', $this->lang->line('company_id'));
-					$objSheet->SetCellValue('G1', $this->lang->line('address'));
-					$objSheet->SetCellValue('H1', $this->lang->line('roles'));
-					$objSheet->SetCellValue('I1', $this->lang->line('wood_details'));
-					$objSheet->SetCellValue('J1', $this->lang->line('bank_detail'));
-					$objSheet->SetCellValue('K1', $this->lang->line('supplier_taxes'));
-					$objSheet->SetCellValue('L1', $this->lang->line('provider_taxes'));
-					$objSheet->SetCellValue('M1', $this->lang->line('origin'));
-					$objSheet->SetCellValue('N1', $this->lang->line('status'));
+					$objSheet->SetCellValue('C1', $this->lang->line('supplier_id'));
+					$objSheet->SetCellValue('D1', $this->lang->line('export_type'));
+					$objSheet->SetCellValue('E1', $this->lang->line('status'));
 
-					$objSheet->getStyle("A1:N1")
-						->getFont()
-						->setBold(true);
-
-					$objSheet->setAutoFilter('A1:N1');
-
-					// HEADER ALIGNMENT
-					$objSheet->getStyle("A1:N1")
-						->getAlignment()
-						->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+					$objSheet->getStyle("A1:E1")->getFont()->setBold(true);
+					$objSheet->setAutoFilter('A1:E1');
+					$objSheet->getStyle("A1:E1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
 					$objSheet->getColumnDimension('A')->setAutoSize(true);
 					$objSheet->getColumnDimension('B')->setAutoSize(true);
 					$objSheet->getColumnDimension('C')->setAutoSize(true);
-					$objSheet->getColumnDimension('D')->setAutoSize(true);
+					$objSheet->getColumnDimension('D')->setAutoSize(false);
+					$objSheet->getColumnDimension('D')->setWidth(30);
 					$objSheet->getColumnDimension('E')->setAutoSize(true);
-					$objSheet->getColumnDimension('F')->setAutoSize(true);
-					$objSheet->getColumnDimension('G')->setAutoSize(false);
-					$objSheet->getColumnDimension('G')->setWidth(30);
-					$objSheet->getColumnDimension('H')->setAutoSize(true);
-					$objSheet->getColumnDimension('I')->setAutoSize(true);
-					$objSheet->getColumnDimension('J')->setAutoSize(true);
-					$objSheet->getColumnDimension('K')->setAutoSize(true);
-					$objSheet->getColumnDimension('L')->setAutoSize(true);
-					$objSheet->getColumnDimension('M')->setAutoSize(true);
-					$objSheet->getColumnDimension('N')->setAutoSize(true);
 
-					$objSheet->getStyle('A1:N1')
-						->getFill()
-						->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
-						->getStartColor()
-						->setRGB('add8e6');
+					$objSheet->getStyle('A1:E1')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('add8e6');
 
 					$styleArray = array(
 						'borders' => array(
@@ -355,50 +331,25 @@ class Exportsuppliers extends MY_Controller
 						)
 					);
 
-					$objSheet->getStyle('A1:N1')->applyFromArray($styleArray);
+					$objSheet->getStyle('A1:E1')->applyFromArray($styleArray);
 
 					$i = 1;
 					$rowCountData = 2;
 
 					foreach ($getSupplierDetailsReport as $supplier) {
 
-						$supplierTaxes = $this->Master_model->get_supplier_taxes_report($supplier->id);
-						$providerTaxes = $this->Master_model->get_provider_taxes_report($supplier->id);
-
 						$objSheet->SetCellValue('A' . $rowCountData, $i);
 						$objSheet->SetCellValue('B' . $rowCountData, $supplier->supplier_name);
-						$objSheet->SetCellValue('C' . $rowCountData, $supplier->supplier_code);
-
-						$objSheet->setCellValueExplicit(
-							'D' . $rowCountData,
-							$supplier->supplier_id,
-							PHPExcel_Cell_DataType::TYPE_STRING
-						);
-
-						$objSheet->SetCellValue('E' . $rowCountData, $supplier->company_name);
-
-						$objSheet->setCellValueExplicit(
-							'F' . $rowCountData,
-							$supplier->company_id,
-							PHPExcel_Cell_DataType::TYPE_STRING
-						);
-
-						$objSheet->SetCellValue('G' . $rowCountData, $supplier->supplier_address);
-						$objSheet->SetCellValue('H' . $rowCountData, $supplier->roles);
-						$objSheet->SetCellValue('I' . $rowCountData, $supplier->products);
-						$objSheet->SetCellValue('J' . $rowCountData, $supplier->bankdetails);
-						$objSheet->SetCellValue('K' . $rowCountData, $supplierTaxes[0]->supplier_taxes);
-						$objSheet->SetCellValue('L' . $rowCountData, $providerTaxes[0]->provider_taxes);
-						$objSheet->SetCellValue('M' . $rowCountData, $supplier->origin);
-
-						if ($supplier->isactive == 1) {
-							$objSheet->SetCellValue('N' . $rowCountData, $this->lang->line('active'));
+						$objSheet->SetCellValue('C' . $rowCountData, $supplier->supplier_id);
+						$objSheet->SetCellValue('D' . $rowCountData, $supplier->export_types);
+						if ($supplier->is_active == 1) {
+							$objSheet->SetCellValue('E' . $rowCountData, $this->lang->line('active'));
 						} else {
-							$objSheet->SetCellValue('N' . $rowCountData, $this->lang->line('inactive'));
+							$objSheet->SetCellValue('E' . $rowCountData, $this->lang->line('inactive'));
 						}
 
-						$objSheet->getStyle('G' . $rowCountData . ':L' . $rowCountData)->getAlignment()->setWrapText(true);
-						$objSheet->getStyle('A' . $rowCountData . ':N' . $rowCountData)->applyFromArray($styleArray);
+						$objSheet->getStyle('D' . $rowCountData . ':D' . $rowCountData)->getAlignment()->setWrapText(true);
+						$objSheet->getStyle('A' . $rowCountData . ':E' . $rowCountData)->applyFromArray($styleArray);
 
 						$i++;
 						$rowCountData++;
@@ -410,7 +361,7 @@ class Exportsuppliers extends MY_Controller
 					$six_digit_random_number = mt_rand(100000, 999999);
 					$month_name = ucfirst(date("dmY"));
 
-					$filename =  'SupplierReport_' . $month_name . '_' . $six_digit_random_number . '.xlsx';
+					$filename =  'ExportSupplierReport_' . $month_name . '_' . $six_digit_random_number . '.xlsx';
 
 					header('Content-Type: application/vnd.ms-excel');
 					header('Content-Disposition: attachment;filename="' . $filename . '"');
