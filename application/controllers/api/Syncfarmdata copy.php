@@ -71,7 +71,6 @@ class Syncfarmdata extends MY_Controller
                                 $purchaseDate = $value["purchaseDate"];
                                 $purchaseContractId = $value["purchaseContractId"];
                                 $truckPlateNumber = $value["truckPlateNumber"];
-                                $truckDriverName = $value["truckDriverName"];
                                 $createdBy = $value["createdBy"];
                                 $isClosed = $value["isClosed"];
                                 $closedBy = $value["closedBy"];
@@ -179,7 +178,7 @@ class Syncfarmdata extends MY_Controller
                                         }
 
                                         //CHECK IF FARM IS CLOSED
-                                        if ($isClosed === true || $isClosed === false) {
+                                        if ($isClosed === true) {
 
                                             //CALCULATE WOOD VALUE & TAXES
                                             $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($farmMainId, 1);
@@ -324,15 +323,6 @@ class Syncfarmdata extends MY_Controller
                                                     $totalWoodValue = $totalWoodValue * $exchangeRate;
                                                     $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                 }
-                                                
-                                                $farmClosed = 0;
-                                                $farmClosedBy = 0;
-                                                $farmClosedDate = "";
-                                                if($isClosed == true) {
-                                                    $farmClosed = 1;
-                                                    $farmClosedBy = $closedBy;
-                                                    $farmClosedDate = $closedDate;
-                                                }
 
                                                 $dataUpdateFarmDetails = array(
                                                     "exchange_rate" => $exchangeRate,
@@ -352,7 +342,7 @@ class Syncfarmdata extends MY_Controller
                                                     "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                     "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                     "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                    "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                    "updated_by" => $userid,
                                                 );
 
                                                 $updateFarmData = $this->Farm_model->update_farm($farmMainId, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
@@ -451,7 +441,7 @@ class Syncfarmdata extends MY_Controller
                                         $providerLogisticTaxesAdjustArr = array();
                                         $providerServiceTaxesAdjustArr = array();
 
-                                        if ($isClosed === true || $isClosed === false) {
+                                        if ($isClosed === true) {
 
                                             //CALCULATE WOOD VALUE & TAXES
                                             $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($farmMainId, 1);
@@ -587,15 +577,6 @@ class Syncfarmdata extends MY_Controller
                                                     $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                 }
 
-                                                $farmClosed = 0;
-                                                $farmClosedBy = 0;
-                                                $farmClosedDate = "";
-                                                if($isClosed == true) {
-                                                    $farmClosed = 1;
-                                                    $farmClosedBy = $closedBy;
-                                                    $farmClosedDate = $closedDate;
-                                                }
-
                                                 $dataUpdateFarmDetails = array(
                                                     "exchange_rate" => $exchangeRate,
                                                     "total_value" => $totalWoodValue,
@@ -614,7 +595,7 @@ class Syncfarmdata extends MY_Controller
                                                     "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                     "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                     "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                    "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                    "updated_by" => $userid,
                                                 );
 
                                                 $updateFarmData = $this->Farm_model->update_farm($farmMainId, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
@@ -807,7 +788,7 @@ class Syncfarmdata extends MY_Controller
                                             }
     
                                             //CHECK IF FARM IS CLOSED
-                                            if ($isClosed === true || $isClosed === false) {
+                                            if ($isClosed === true) {
     
                                                 //CALCULATE WOOD VALUE & TAXES
                                                 $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($farmId, 1);
@@ -952,15 +933,6 @@ class Syncfarmdata extends MY_Controller
                                                         $totalWoodValue = $totalWoodValue * $exchangeRate;
                                                         $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                     }
-                                                    
-                                                    $farmClosed = 0;
-                                                    $farmClosedBy = 0;
-                                                    $farmClosedDate = "";
-                                                    if($isClosed == true) {
-                                                        $farmClosed = 1;
-                                                        $farmClosedBy = $closedBy;
-                                                        $farmClosedDate = $closedDate;
-                                                    }
     
                                                     $dataUpdateFarmDetails = array(
                                                         "exchange_rate" => $exchangeRate,
@@ -980,7 +952,7 @@ class Syncfarmdata extends MY_Controller
                                                         "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                         "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                         "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                        "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                        "updated_by" => $userid,
                                                     );
     
                                                     $updateFarmData = $this->Farm_model->update_farm($farmId, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
@@ -1079,7 +1051,7 @@ class Syncfarmdata extends MY_Controller
                                             $providerLogisticTaxesAdjustArr = array();
                                             $providerServiceTaxesAdjustArr = array();
     
-                                            if ($isClosed === true || $isClosed === false) {
+                                            if ($isClosed === true) {
     
                                                 //CALCULATE WOOD VALUE & TAXES
                                                 $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($farmMainId, 1);
@@ -1214,15 +1186,6 @@ class Syncfarmdata extends MY_Controller
                                                         $totalWoodValue = $totalWoodValue * $exchangeRate;
                                                         $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                     }
-                                                    
-                                                    $farmClosed = 0;
-                                                    $farmClosedBy = 0;
-                                                    $farmClosedDate = "";
-                                                    if($isClosed == true) {
-                                                        $farmClosed = 1;
-                                                        $farmClosedBy = $closedBy;
-                                                        $farmClosedDate = $closedDate;
-                                                    }
     
                                                     $dataUpdateFarmDetails = array(
                                                         "exchange_rate" => $exchangeRate,
@@ -1242,7 +1205,7 @@ class Syncfarmdata extends MY_Controller
                                                         "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                         "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                         "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                        "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                        "updated_by" => $userid,
                                                     );
     
                                                     $updateFarmData = $this->Farm_model->update_farm($farmMainId, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
@@ -1339,7 +1302,6 @@ class Syncfarmdata extends MY_Controller
                                             "purchase_unit_id" => $purchaseUnitId,
                                             "inventory_order" => $inventoryOrder,
                                             "plate_number" => $truckPlateNumber,
-                                            "driver_name" => $truckDriverName,
                                             "purchase_date" => $purchaseDate,
                                             "created_by" => $createdBy,
                                             "updated_by" => $createdBy,
@@ -1423,7 +1385,7 @@ class Syncfarmdata extends MY_Controller
                                                 }
 
                                                 //CHECK IF FARM IS CLOSED
-                                                if ($isClosed === true || $isClosed === false) {
+                                                if ($isClosed === true) {
 
                                                     //CALCULATE WOOD VALUE & TAXES
                                                     $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($insertFarm, 1);
@@ -1568,15 +1530,6 @@ class Syncfarmdata extends MY_Controller
                                                             $totalWoodValue = $totalWoodValue * $exchangeRate;
                                                             $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                         }
-                                                        
-                                                        $farmClosed = 0;
-                                                        $farmClosedBy = 0;
-                                                        $farmClosedDate = "";
-                                                        if($isClosed == true) {
-                                                            $farmClosed = 1;
-                                                            $farmClosedBy = $closedBy;
-                                                            $farmClosedDate = $closedDate;
-                                                        }
 
                                                         $dataUpdateFarmDetails = array(
                                                             "exchange_rate" => $exchangeRate,
@@ -1596,7 +1549,7 @@ class Syncfarmdata extends MY_Controller
                                                             "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                             "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                             "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                            "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                            "updated_by" => $userid,
                                                         );
 
                                                         $updateFarmData = $this->Farm_model->update_farm($insertFarm, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
@@ -1695,7 +1648,7 @@ class Syncfarmdata extends MY_Controller
                                                 $providerLogisticTaxesAdjustArr = array();
                                                 $providerServiceTaxesAdjustArr = array();
 
-                                                if ($isClosed === true || $isClosed === false) {
+                                                if ($isClosed === true) {
 
                                                     //CALCULATE WOOD VALUE & TAXES
                                                     $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($insertFarm, 1);
@@ -1828,15 +1781,6 @@ class Syncfarmdata extends MY_Controller
                                                             $totalWoodValue = $totalWoodValue * $exchangeRate;
                                                             $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                         }
-                                                        
-                                                        $farmClosed = 0;
-                                                        $farmClosedBy = 0;
-                                                        $farmClosedDate = "";
-                                                        if($isClosed == true) {
-                                                            $farmClosed = 1;
-                                                            $farmClosedBy = $closedBy;
-                                                            $farmClosedDate = $closedDate;
-                                                        }
 
                                                         $dataUpdateFarmDetails = array(
                                                             "exchange_rate" => $exchangeRate,
@@ -1856,7 +1800,7 @@ class Syncfarmdata extends MY_Controller
                                                             "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                             "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                             "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                            "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                            "updated_by" => $userid,
                                                         );
 
                                                         $updateFarmData = $this->Farm_model->update_farm($insertFarm, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
@@ -1953,13 +1897,7 @@ class Syncfarmdata extends MY_Controller
                                 }
                             }
                         }
-                        
-                        //ASYNC EMAIL
-                        $data = json_encode(['farmData' => $farmData], true);
-                        $url = 'https://portal.codringreen.com/api/sendnotificationsemail';
-                        $cmd = "curl -X POST \"$url\" -H \"Content-Type: application/json\" -d '$data' > /dev/null 2>/dev/null &";
-                        exec($cmd);
-                        
+
                         $Return["status"] = true;
                         $Return["message"] = "";
                         $Return["data"] = $farm_arr_response;

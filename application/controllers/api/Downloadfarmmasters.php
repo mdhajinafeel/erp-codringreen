@@ -134,6 +134,7 @@ class Downloadfarmmasters extends MY_Controller
                             $row_array_farmdetail["purchaseUnitId"] = (int) $farmdetail->purchase_unit_id;
                             $row_array_farmdetail["purchaseDate"] = $farmdetail->purchase_date;
                             $row_array_farmdetail["truckPlateNumber"] = $farmdetail->plate_number;
+                            $row_array_farmdetail["truckDriverNumber"] = $farmdetail->driver_name;
                             $row_array_farmdetail["totalPieces"] = $farmdetail->total_pieces + 0;
                             $row_array_farmdetail["grossVolume"] = $farmdetail->total_gross_volume + 0;
                             $row_array_farmdetail["netVolume"] = $farmdetail->total_volume + 0;
@@ -162,7 +163,7 @@ class Downloadfarmmasters extends MY_Controller
                                 }
                                 $row_array_farmdetail["farmData"] = $return_arr_farm_data;
                             }
-                            
+
                             array_push($return_arr_farmdetails, $row_array_farmdetail);
                         }
                         $row_array_final["farmDetails"] = $return_arr_farmdetails;

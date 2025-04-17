@@ -8,7 +8,7 @@ class Farm_model extends CI_Model
         parent::__construct();
         $this->load->database();
     }
-    
+
     //FARMS
     public function all_farms()
     {
@@ -42,7 +42,7 @@ class Farm_model extends CI_Model
         }
 
         $query = $this->db->query("SELECT contract_id, contract_code FROM tbl_supplier_purchase_contract 
-            WHERE is_active = 1 AND is_expired = 0 AND origin_id = $originid AND supplier_id = $supplierid AND product = $productid AND product_type IN ($producttypeids) 
+            WHERE is_active = 1 AND origin_id = $originid AND supplier_id = $supplierid AND product = $productid AND product_type IN ($producttypeids) 
             ORDER BY contract_id ASC");
         return $query->result();
     }
@@ -147,19 +147,26 @@ class Farm_model extends CI_Model
 
     public function add_supplier_price($contractid, $supplierid, $inventorynumber, $userid)
     {
-        $query = $this->db->query("SELECT minrange_grade1, maxrange_grade2, pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs  
+        $query = $this->db->query("SELECT minrange_grade1, maxrange_grade2, pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs 
                     FROM tbl_supplier_contract_price WHERE is_active = 1
                     AND supplier_id = $contractid");
         $data = $query->result();
 
         foreach ($data as $r) {
             $dataPrice = array(
-                "contract_id" => $contractid, "supplier_id" => $supplierid,
-                "inventory_number" => $inventorynumber, "minrange_grade1" => $r->minrange_grade1,
-                "maxrange_grade2" => $r->maxrange_grade2, "pricerange_grade3" => $r->pricerange_grade3, 
-                "pricerange_grade_semi" => $r->pricerange_grade_semi, "pricerange_grade_longs" => $r->pricerange_grade_longs,
-                "created_date" => date('Y-m-d H:i:s'), "created_by" => $userid, "updated_date" => date('Y-m-d H:i:s'),
-                "updated_by" => $userid, "is_active" => 1
+                "contract_id" => $contractid,
+                "supplier_id" => $supplierid,
+                "inventory_number" => $inventorynumber,
+                "minrange_grade1" => $r->minrange_grade1,
+                "maxrange_grade2" => $r->maxrange_grade2,
+                "pricerange_grade3" => $r->pricerange_grade3,
+                "pricerange_grade_semi" => $r->pricerange_grade_semi,
+                "pricerange_grade_longs" => $r->pricerange_grade_longs,
+                "created_date" => date('Y-m-d H:i:s'),
+                "created_by" => $userid,
+                "updated_date" => date('Y-m-d H:i:s'),
+                "updated_by" => $userid,
+                "is_active" => 1
             );
             $this->db->insert('tbl_supplier_contract_inventory_price', $dataPrice);
         }
@@ -196,7 +203,8 @@ class Farm_model extends CI_Model
     public function delete_farm($farmid, $inventoryorder, $contractid, $userid)
     {
         $updateData = array(
-            "is_active" => 0, "updated_by" => $userid,
+            "is_active" => 0,
+            "updated_by" => $userid,
         );
         $multiClause = array('farm_id' => $farmid, 'inventory_order' => $inventoryorder);
         $this->db->where($multiClause);
@@ -206,7 +214,8 @@ class Farm_model extends CI_Model
             //FIELD PURCHASE
 
             $updateDataFieldPurchase = array(
-                "is_active" => 0, "updated_by" => $userid,
+                "is_active" => 0,
+                "updated_by" => $userid,
             );
             $multiClauseFieldPurchase = array('farm_id' => $farmid);
             $this->db->where($multiClauseFieldPurchase);
@@ -214,7 +223,8 @@ class Farm_model extends CI_Model
             $this->db->update('tbl_field_purchase_farm_data', $updateDataFieldPurchase);
 
             $updateDataFieldPurchaseConsent = array(
-                "is_active" => 0, "updated_by" => $userid,
+                "is_active" => 0,
+                "updated_by" => $userid,
             );
             $multiClauseFieldPurchaseConsent = array('farm_id' => $farmid);
             $this->db->where($multiClauseFieldPurchaseConsent);
@@ -224,14 +234,16 @@ class Farm_model extends CI_Model
             //END FIELD PURCHASE
 
             $updateData = array(
-                "is_active" => 0, "updated_by" => $userid,
+                "is_active" => 0,
+                "updated_by" => $userid,
             );
             $multiClause = array('farm_id' => $farmid);
             $this->db->where($multiClause);
             $this->db->set('updated_date', 'NOW()', FALSE);
             if ($this->db->update('tbl_farm_data', $updateData)) {
                 $updateData = array(
-                    "is_active" => 0, "updated_by" => $userid,
+                    "is_active" => 0,
+                    "updated_by" => $userid,
                 );
                 $multiClause = array('inventory_order' => $inventoryorder);
                 $this->db->where($multiClause);
@@ -239,7 +251,8 @@ class Farm_model extends CI_Model
                 if ($this->db->update('tbl_contract_inventory_mapping', $updateData)) {
 
                     $updateData = array(
-                        "is_active" => 0, "updated_by" => $userid,
+                        "is_active" => 0,
+                        "updated_by" => $userid,
                     );
                     $multiClause = array('contract_id' => $contractid, 'inventory_order' => $inventoryorder);
                     $this->db->where($multiClause);
@@ -247,7 +260,8 @@ class Farm_model extends CI_Model
                     if ($this->db->update('tbl_inventory_ledger', $updateData)) {
 
                         $updateData = array(
-                            "is_active" => 0, "updated_by" => $userid,
+                            "is_active" => 0,
+                            "updated_by" => $userid,
                         );
                         $multiClause = array('inventory_number' => $inventoryorder);
                         $this->db->where($multiClause);
@@ -308,7 +322,9 @@ class Farm_model extends CI_Model
                 CASE WHEN A.created_from = 1 THEN gettotalpieces_byfarm_contract(A.contract_id, A.farm_id, A.inventory_order) 
                 ELSE getnoofpieces_farm_fieldpurchase(A.inventory_order,0,0) END AS total_pieces, 
                 A.total_volume, getusername_byuserid(A.created_by) as uploaded_by, 
-                CASE WHEN (A.origin_id = 2 OR A.origin_id = 4) THEN 0 WHEN A.created_from = 1 THEN ABS(A.total_value - gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id)) 
+                CASE 
+                WHEN (A.origin_id = 2 OR A.origin_id = 4) THEN 0 
+                WHEN A.created_from = 1 THEN ABS(A.total_value - gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id)) 
                 ELSE ABS(A.wood_value - A.service_cost - A.logistic_cost - gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id)) END 
                 AS total_taxes, 
                 A.plate_number, A.exchange_rate, 
@@ -316,7 +332,7 @@ class Farm_model extends CI_Model
                 F.purchase_unit, C.purchase_allowance, C.purchase_allowance_length, C.unit_of_purchase, A.origin_id, 
                 CASE WHEN (getcurrencyexcelformat_origin(A.origin_id) IS NULL OR '') THEN getdefaultcurrency() ELSE getcurrencyexcelformat_origin(A.origin_id) END as currency_excel_format, A.product_type_id, 
                 A.supplier_taxes, A.logistic_taxes, A.service_taxes, A.logistic_provider_taxes, A.service_provider_taxes, 
-                A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, A.rounding_factor, C.existing_price_condition    
+                A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, A.rounding_factor   
                 FROM tbl_farm A 
                 INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                 INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
@@ -443,7 +459,7 @@ class Farm_model extends CI_Model
                     AND origin_id = $originid AND product_type_id IN (2,4)";
         }
 
-        if($inventoryorder > 0) {
+        if ($inventoryorder > 0) {
             $strQuery = $strQuery . " AND inventory_order = '$inventoryorder'";
         }
 
@@ -483,7 +499,7 @@ class Farm_model extends CI_Model
         //             circumference_allowance, length_allowance, contract_code 
         //             FROM v_fetch_farm_report_data WHERE (received_date BETWEEN '$startdate' AND '$enddate') AND origin_id = $originid AND product_type_id IN (2,4)";
         // }
-        
+
         if ($producttypeid == 1 || $producttypeid == 3) {
             $strQuery = "SELECT supplier_name, supplier_code, product_name, product_type_name, scanned_code, 
                     no_of_pieces, length, width, thickness, length_export, width_export, thickness_export, 
@@ -558,7 +574,8 @@ class Farm_model extends CI_Model
         return $query->result();
     }
 
-    public function get_contract_list_to_create() {
+    public function get_contract_list_to_create()
+    {
         $query = $this->db->query("SELECT DATE_FORMAT(A.purchase_date, '%d/%m/%Y') AS purchase_date, A.inventory_order, 
                 B.supplier_name, B.supplier_id, B.city, A.total_value, 
                 CASE WHEN B.contact_no IS NULL THEN '' ELSE B.contact_no END AS contact_no, 
@@ -584,24 +601,25 @@ class Farm_model extends CI_Model
             return false;
         }
     }
-    
+
     public function get_price_for_diameter_length($diameter, $length, $purchasecontractid)
     {
-        $query = $this->db->query("SELECT pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs 
+        $query = $this->db->query("SELECT pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs  
                 FROM tbl_supplier_contract_price WHERE is_active = 1 
                 AND minrange_grade1 = $diameter AND maxrange_grade2 = $length
                 AND supplier_id = $purchasecontractid");
         return $query->result();
     }
-    
+
     public function get_inventory_order_masters($originid)
     {
         $query = $this->db->query("SELECT DISTINCT inventory_order, supplier_id FROM tbl_farm WHERE is_active = 1 AND origin_id = $originid 
                 ORDER BY inventory_order ASC");
         return $query->result();
     }
-    
-    public function get_farm_data_by_farm_id($farmid) {
+
+    public function get_farm_data_by_farm_id($farmid)
+    {
         $query = $this->db->query("SELECT farm_data_id, farm_id, no_of_pieces, circumference, length, gross_volume, volume 
                 FROM tbl_farm_data WHERE is_active = 1 AND farm_id = $farmid");
         return $query->result();
@@ -611,7 +629,7 @@ class Farm_model extends CI_Model
     {
         $query = $this->db->query("SELECT * FROM (SELECT A.farm_id, A.supplier_id, A.product_id, A.product_type_id, A.inventory_order, 
                             A.contract_id, A.purchase_unit_id, DATE_FORMAT(STR_TO_DATE(A.purchase_date, '%Y-%m-%d'), '%d/%m/%Y') AS purchase_date, 
-                            A.plate_number, A.driver_name, A.total_pieces, A.total_gross_volume, A.total_volume, B.supplier_name, C.purchase_unit, D.product_name, 
+                            A.plate_number, A.total_pieces, A.total_gross_volume, A.total_volume, B.supplier_name, C.purchase_unit, D.product_name, 
                             A.circ_allowance, A.length_allowance, E.description, A.is_closed, A.closed_by, A.closed_date, 0 AS fordata
                             FROM tbl_farm A 
                             INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
@@ -624,7 +642,7 @@ class Farm_model extends CI_Model
 
                 SELECT A.farm_id, A.supplier_id, A.product_id, A.product_type_id, A.inventory_order, 
                             A.contract_id, A.purchase_unit_id, DATE_FORMAT(STR_TO_DATE(A.purchase_date, '%Y-%m-%d'), '%d/%m/%Y') AS purchase_date, 
-                            A.plate_number, A.driver_name, A.total_pieces, A.total_gross_volume, A.total_volume, B.supplier_name, C.purchase_unit, D.product_name, 
+                            A.plate_number, A.total_pieces, A.total_gross_volume, A.total_volume, B.supplier_name, C.purchase_unit, D.product_name, 
                             A.circ_allowance, A.length_allowance, E.description, A.is_closed, A.closed_by, A.closed_date, 1 AS fordata
                             FROM tbl_farm A 
                             INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
@@ -640,7 +658,8 @@ class Farm_model extends CI_Model
         return $query->result();
     }
 
-    public function get_farm_data_by_farm_id_detailed($farmid) {
+    public function get_farm_data_by_farm_id_detailed($farmid)
+    {
         $query = $this->db->query("SELECT A.no_of_pieces, A.circumference, A.length, A.gross_volume, A.volume, 
             A.captured_timestamp, A.farm_data_id, A.farm_id 
             FROM tbl_farm_data A 
@@ -679,13 +698,14 @@ class Farm_model extends CI_Model
         return $query->result();
     }
 
-    public function fetch_contract_prices_for_farm($contractid) {
+    public function fetch_contract_prices_for_farm($contractid)
+    {
         $query = $this->db->query("SELECT minrange_grade1, maxrange_grade2, pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs 
                 FROM tbl_supplier_contract_price A
                 WHERE A.is_active = 1 AND A.supplier_id = $contractid");
         return $query->result();
     }
-    
+
     public function get_price_for_circumference_length($circumference, $purchasecontractid, $length)
     {
         if ($circumference == -1) {
@@ -773,7 +793,7 @@ class Farm_model extends CI_Model
                 F.purchase_unit, C.purchase_allowance, C.purchase_allowance_length, C.unit_of_purchase, A.origin_id, 
                 CASE WHEN (getcurrencyexcelformat_origin(A.origin_id) IS NULL OR '') THEN getdefaultcurrency() ELSE getcurrencyexcelformat_origin(A.origin_id) END as currency_excel_format, A.product_type_id, 
                 A.supplier_taxes, A.logistic_taxes, A.service_taxes, A.logistic_provider_taxes, A.service_provider_taxes, 
-                A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, A.rounding_factor, A.is_closed, A.is_notification_sent   
+                A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, A.rounding_factor   
                 FROM tbl_farm A 
                 INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                 INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 

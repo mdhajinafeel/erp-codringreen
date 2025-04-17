@@ -324,15 +324,6 @@ class Syncfarmdata extends MY_Controller
                                                     $totalWoodValue = $totalWoodValue * $exchangeRate;
                                                     $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                 }
-                                                
-                                                $farmClosed = 0;
-                                                $farmClosedBy = 0;
-                                                $farmClosedDate = "";
-                                                if($isClosed == true) {
-                                                    $farmClosed = 1;
-                                                    $farmClosedBy = $closedBy;
-                                                    $farmClosedDate = $closedDate;
-                                                }
 
                                                 $dataUpdateFarmDetails = array(
                                                     "exchange_rate" => $exchangeRate,
@@ -352,7 +343,7 @@ class Syncfarmdata extends MY_Controller
                                                     "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                     "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                     "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                    "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                    "updated_by" => $userid,
                                                 );
 
                                                 $updateFarmData = $this->Farm_model->update_farm($farmMainId, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
@@ -587,15 +578,6 @@ class Syncfarmdata extends MY_Controller
                                                     $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                 }
 
-                                                $farmClosed = 0;
-                                                $farmClosedBy = 0;
-                                                $farmClosedDate = "";
-                                                if($isClosed == true) {
-                                                    $farmClosed = 1;
-                                                    $farmClosedBy = $closedBy;
-                                                    $farmClosedDate = $closedDate;
-                                                }
-
                                                 $dataUpdateFarmDetails = array(
                                                     "exchange_rate" => $exchangeRate,
                                                     "total_value" => $totalWoodValue,
@@ -614,7 +596,7 @@ class Syncfarmdata extends MY_Controller
                                                     "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                     "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                     "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                    "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                    "updated_by" => $userid,
                                                 );
 
                                                 $updateFarmData = $this->Farm_model->update_farm($farmMainId, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
@@ -713,10 +695,10 @@ class Syncfarmdata extends MY_Controller
                                     }
 
                                     if ($farmId > 0) {
-                                        
+
                                         if (count($farmCapturedData) > 0) {
                                             $dataFarmData = array();
-    
+
                                             foreach ($farmCapturedData as $key => $capturevalue) {
                                                 $pieces = $capturevalue["pieces"];
                                                 $farmDataId = $capturevalue["farmDataId"];
@@ -725,9 +707,9 @@ class Syncfarmdata extends MY_Controller
                                                 $grossVolume = $capturevalue["grossVolume"];
                                                 $netVolume = $capturevalue["netVolume"];
                                                 $capturedTimeStamp = $capturevalue["capturedTimeStamp"];
-    
+
                                                 if ($farmDataId > 0) {
-    
+
                                                     $dataUpdateFarm = array(
                                                         "scanned_code" => "",
                                                         "no_of_pieces" => $pieces,
@@ -746,10 +728,10 @@ class Syncfarmdata extends MY_Controller
                                                         "volume_bought" => 0,
                                                         "updated_by" => $userid,
                                                     );
-    
+
                                                     $updateFarmData = $this->Farm_model->update_farm_data($farmDataId, $farmId, $dataUpdateFarm);
                                                 } else {
-    
+
                                                     $dataFarmData[] = array(
                                                         "farm_id" => $farmId,
                                                         "scanned_code" => "",
@@ -776,46 +758,46 @@ class Syncfarmdata extends MY_Controller
                                                     );
                                                 }
                                             }
-    
+
                                             if (count($dataFarmData) > 0) {
                                                 $insertFarmData = $this->Farm_model->add_farm_data($dataFarmData);
-    
+
                                                 if ($insertFarmData) {
-    
+
                                                     //FETCH FARM DATA
                                                     $getFarmData = $this->Farm_model->get_farm_data_by_farm_id($farmId);
-    
+
                                                     $totalGrossVolume = 0;
                                                     $totalNetVolume = 0;
                                                     $totalPieces = 0;
-    
+
                                                     foreach ($getFarmData as $farmdata) {
                                                         $totalGrossVolume = $totalGrossVolume + $farmdata->gross_volume;
                                                         $totalNetVolume = $totalNetVolume + $farmdata->volume;
                                                         $totalPieces = $totalPieces + $farmdata->no_of_pieces;
                                                     }
-    
+
                                                     //UPDATE FARM DETAILS
                                                     $dataFarm = array(
                                                         "total_volume" => $totalNetVolume,
                                                         "total_gross_volume" => $totalGrossVolume,
                                                         "total_pieces" => $totalPieces,
                                                     );
-    
+
                                                     $updateFarm = $this->Farm_model->update_farm($farmId, $inventoryOrder, $purchaseContractId, $dataFarm);
                                                 }
                                             }
-    
+
                                             //CHECK IF FARM IS CLOSED
                                             if ($isClosed === true || $isClosed === false) {
-    
+
                                                 //CALCULATE WOOD VALUE & TAXES
                                                 $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($farmId, 1);
                                                 $farmDataSemi = $this->Farm_model->get_farm_data_by_farm_id_and_length($farmId, 2);
                                                 $farmDataLongs = $this->Farm_model->get_farm_data_by_farm_id_and_length($farmId, 3);
-    
+
                                                 $fetchContractPrice = $this->Farm_model->fetch_contract_prices_for_farm($purchaseContractId);
-    
+
                                                 $finalArray = [];
                                                 $totalWoodValue = 0;
                                                 $supplierTaxesValue = 0;
@@ -827,21 +809,21 @@ class Syncfarmdata extends MY_Controller
                                                 $supplierTaxesAdjustArr = array();
                                                 $providerLogisticTaxesAdjustArr = array();
                                                 $providerServiceTaxesAdjustArr = array();
-    
+
                                                 foreach ($farmDataShorts as $shorts) {
                                                     $circumference = $shorts->circumference;
                                                     $length = $shorts->length;
                                                     $netVolume = $shorts->volume;
                                                     $totalNetVolume = $totalNetVolume + $netVolume;
                                                     $price = 0;
-    
+
                                                     foreach ($fetchContractPrice as $range) {
                                                         if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
                                                             $price = $range->pricerange_grade3;
                                                             break;
                                                         }
                                                     }
-    
+
                                                     $finalArray[] = [
                                                         'circumference' => $circumference,
                                                         'length' => $length,
@@ -850,21 +832,21 @@ class Syncfarmdata extends MY_Controller
                                                         'value' => round($price * $netVolume, 2)
                                                     ];
                                                 }
-    
+
                                                 foreach ($farmDataSemi as $semi) {
                                                     $circumference = $semi->circumference;
                                                     $length = $semi->length;
                                                     $netVolume = $semi->volume;
                                                     $totalNetVolume = $totalNetVolume + $netVolume;
                                                     $price = 0;
-    
+
                                                     foreach ($fetchContractPrice as $range) {
                                                         if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
                                                             $price = $range->pricerange_grade_semi;
                                                             break;
                                                         }
                                                     }
-    
+
                                                     $finalArray[] = [
                                                         'circumference' => $circumference,
                                                         'length' => $length,
@@ -873,21 +855,21 @@ class Syncfarmdata extends MY_Controller
                                                         'value' => round($price * $netVolume, 2)
                                                     ];
                                                 }
-    
+
                                                 foreach ($farmDataLongs as $longs) {
                                                     $circumference = $longs->circumference;
                                                     $length = $longs->length;
                                                     $netVolume = $longs->volume;
                                                     $totalNetVolume = $totalNetVolume + $netVolume;
                                                     $price = 0;
-    
+
                                                     foreach ($fetchContractPrice as $range) {
                                                         if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
                                                             $price = $range->pricerange_grade_longs;
                                                             break;
                                                         }
                                                     }
-    
+
                                                     $finalArray[] = [
                                                         'circumference' => $circumference,
                                                         'length' => $length,
@@ -896,14 +878,14 @@ class Syncfarmdata extends MY_Controller
                                                         'value' => round($price * $netVolume, 2)
                                                     ];
                                                 }
-    
+
                                                 if (count($finalArray) > 0) {
-    
+
                                                     //WOOD VALUE
                                                     foreach ($finalArray as $item) {
                                                         $totalWoodValue = $totalWoodValue + $item['value'];
                                                     }
-    
+
                                                     //SUPPLIER TAXES
                                                     $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierId);
                                                     $supplierTaxesValue = 0;
@@ -915,7 +897,7 @@ class Syncfarmdata extends MY_Controller
                                                             $taxValue = $suppliertax->tax_value;
                                                             $taxFormat = $suppliertax->number_format;
                                                             $taxType = $suppliertax->arithmetic_type;
-    
+
                                                             if ($taxValue > 0) {
                                                                 if ($taxType == 2) {
                                                                     $taxValue = $taxValue * -1;
@@ -926,25 +908,25 @@ class Syncfarmdata extends MY_Controller
                                                                     $calcValue = $totalWoodValue * ($taxValue);
                                                                 }
                                                             }
-    
+
                                                             $supplierTaxesAdjustArr[] = array(
                                                                 "taxId" => $taxId,
                                                                 "taxValue" => $calcValue,
                                                                 "taxVal" => (abs($taxValue) + 0),
                                                             );
-    
+
                                                             array_push($supplierTaxesArr, $taxId);
                                                             $supplierTaxesValue = $supplierTaxesValue + $calcValue;
                                                         }
                                                     }
-    
+
                                                     $woodValueWithSupplierTaxes = $totalWoodValue + $supplierTaxesValue;
                                                     $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
                                                     $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
                                                     $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
                                                     $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
                                                     $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
-    
+
                                                     $exchangeRate = 1;
                                                     if ($getContractDetails[0]->currency == 1) {
                                                         $fetchExchangeRate = $this->Exchange_model->fetch_exchange_rate_by_date($purchaseDate);
@@ -952,16 +934,7 @@ class Syncfarmdata extends MY_Controller
                                                         $totalWoodValue = $totalWoodValue * $exchangeRate;
                                                         $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                     }
-                                                    
-                                                    $farmClosed = 0;
-                                                    $farmClosedBy = 0;
-                                                    $farmClosedDate = "";
-                                                    if($isClosed == true) {
-                                                        $farmClosed = 1;
-                                                        $farmClosedBy = $closedBy;
-                                                        $farmClosedDate = $closedDate;
-                                                    }
-    
+
                                                     $dataUpdateFarmDetails = array(
                                                         "exchange_rate" => $exchangeRate,
                                                         "total_value" => $totalWoodValue,
@@ -980,11 +953,11 @@ class Syncfarmdata extends MY_Controller
                                                         "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                         "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                         "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                        "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                        "updated_by" => $userid,
                                                     );
-    
+
                                                     $updateFarmData = $this->Farm_model->update_farm($farmId, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
-    
+
                                                     if ($updateFarmData) {
 
                                                         $dataInventoryLedgerUpdate = array(
@@ -1016,7 +989,7 @@ class Syncfarmdata extends MY_Controller
                                                             $inventoryOrder,
                                                             $createdBy
                                                         );
-    
+
                                                         //CONTRACT INVENTORY MAPPING
                                                         $dataContractMapping = array(
                                                             "contract_id" => $purchaseContractId,
@@ -1028,9 +1001,9 @@ class Syncfarmdata extends MY_Controller
                                                             "updated_by" => $createdBy,
                                                             "is_active" => 1,
                                                         );
-    
+
                                                         $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
-    
+
                                                         $dataInventoryLedger = array(
                                                             "contract_id" => $purchaseContractId,
                                                             "inventory_order" => $inventoryOrder,
@@ -1041,32 +1014,32 @@ class Syncfarmdata extends MY_Controller
                                                             "is_active" => 1,
                                                             "is_advance_app" => 0,
                                                         );
-    
+
                                                         if ($woodValueWithSupplierTaxes != 0) {
                                                             $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
                                                         }
-    
+
                                                         $getContracts = $this->Contract_model->get_contracts_by_contractid($purchaseContractId);
                                                         if (count($getContracts) == 1) {
                                                             $remainingVolume = $getContracts[0]->remaining_volume - $totalNetVolume;
-    
+
                                                             $dataRemainingVolume = array(
                                                                 "remaining_volume" => $remainingVolume,
                                                             );
-    
+
                                                             $this->Contract_model->update_purchase_contract_volume($dataRemainingVolume, $purchaseContractId, $supplierId);
                                                         }
                                                     }
                                                 }
                                             }
-    
+
                                             $row_farm_array["farmId"] = $farmId + 0;
                                             $row_farm_array["inventoryOrder"] = $inventoryOrder;
                                             $row_farm_array["syncStatus"] = true;
                                             $row_farm_array["tempFarmId"] = $tempFarmId;
                                             array_push($farm_arr_response, $row_farm_array);
                                         } else {
-    
+
                                             $finalArray = [];
                                             $totalWoodValue = 0;
                                             $supplierTaxesValue = 0;
@@ -1078,32 +1051,32 @@ class Syncfarmdata extends MY_Controller
                                             $supplierTaxesAdjustArr = array();
                                             $providerLogisticTaxesAdjustArr = array();
                                             $providerServiceTaxesAdjustArr = array();
-    
+
                                             if ($isClosed === true || $isClosed === false) {
-    
+
                                                 //CALCULATE WOOD VALUE & TAXES
                                                 $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($farmMainId, 1);
                                                 $farmDataSemi = $this->Farm_model->get_farm_data_by_farm_id_and_length($farmMainId, 2);
                                                 $farmDataLongs = $this->Farm_model->get_farm_data_by_farm_id_and_length($farmMainId, 3);
-    
+
                                                 $fetchContractPrice = $this->Farm_model->fetch_contract_prices_for_farm($purchaseContractId);
-    
+
                                                 foreach ($farmDataShorts as $shorts) {
                                                     $circumference = $shorts->circumference;
                                                     $length = $shorts->length;
                                                     $netVolume = $shorts->volume;
-    
+
                                                     $totalNetVolume = $totalNetVolume + $netVolume;
-    
+
                                                     $price = 0;
-    
+
                                                     foreach ($fetchContractPrice as $range) {
                                                         if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
                                                             $price = $range->pricerange_grade3;
                                                             break;
                                                         }
                                                     }
-    
+
                                                     $finalArray[] = [
                                                         'circumference' => $circumference,
                                                         'length' => $length,
@@ -1112,21 +1085,21 @@ class Syncfarmdata extends MY_Controller
                                                         'value' => round($price * $netVolume, 3)
                                                     ];
                                                 }
-    
+
                                                 foreach ($farmDataSemi as $semi) {
                                                     $circumference = $semi->circumference;
                                                     $length = $semi->length;
                                                     $netVolume = $semi->volume;
                                                     $totalNetVolume = $totalNetVolume + $netVolume;
                                                     $price = 0;
-    
+
                                                     foreach ($fetchContractPrice as $range) {
                                                         if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
                                                             $price = $range->pricerange_grade_semi;
                                                             break;
                                                         }
                                                     }
-    
+
                                                     $finalArray[] = [
                                                         'circumference' => $circumference,
                                                         'length' => $length,
@@ -1135,21 +1108,21 @@ class Syncfarmdata extends MY_Controller
                                                         'value' => round($price * $netVolume, 3)
                                                     ];
                                                 }
-    
+
                                                 foreach ($farmDataLongs as $longs) {
                                                     $circumference = $longs->circumference;
                                                     $length = $longs->length;
                                                     $netVolume = $longs->volume;
                                                     $totalNetVolume = $totalNetVolume + $netVolume;
                                                     $price = 0;
-    
+
                                                     foreach ($fetchContractPrice as $range) {
                                                         if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
                                                             $price = $range->pricerange_grade_longs;
                                                             break;
                                                         }
                                                     }
-    
+
                                                     $finalArray[] = [
                                                         'circumference' => $circumference,
                                                         'length' => $length,
@@ -1158,14 +1131,14 @@ class Syncfarmdata extends MY_Controller
                                                         'value' => round($price * $netVolume, 3)
                                                     ];
                                                 }
-    
+
                                                 if (count($finalArray) > 0) {
-    
+
                                                     //WOOD VALUE
                                                     foreach ($finalArray as $item) {
                                                         $totalWoodValue = $totalWoodValue + $item['value'];
                                                     }
-    
+
                                                     //SUPPLIER TAXES
                                                     $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierId);
                                                     $supplierTaxesValue = 0;
@@ -1177,7 +1150,7 @@ class Syncfarmdata extends MY_Controller
                                                             $taxValue = $suppliertax->tax_value;
                                                             $taxFormat = $suppliertax->number_format;
                                                             $taxType = $suppliertax->arithmetic_type;
-    
+
                                                             if ($taxValue > 0) {
                                                                 if ($taxType == 2) {
                                                                     $taxValue = $taxValue * -1;
@@ -1188,25 +1161,25 @@ class Syncfarmdata extends MY_Controller
                                                                     $calcValue = $totalWoodValue * ($taxValue);
                                                                 }
                                                             }
-    
+
                                                             $supplierTaxesAdjustArr[] = array(
                                                                 "taxId" => $taxId,
                                                                 "taxValue" => $calcValue,
                                                                 "taxVal" => (abs($taxValue) + 0),
                                                             );
-    
+
                                                             array_push($supplierTaxesArr, $taxId);
                                                             $supplierTaxesValue = $supplierTaxesValue + $calcValue;
                                                         }
                                                     }
-    
+
                                                     $woodValueWithSupplierTaxes = $totalWoodValue + $supplierTaxesValue;
                                                     $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
                                                     $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
                                                     $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
                                                     $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
                                                     $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
-    
+
                                                     $exchangeRate = 1;
                                                     if ($getContractDetails[0]->currency == 1) {
                                                         $fetchExchangeRate = $this->Exchange_model->fetch_exchange_rate_by_date($purchaseDate);
@@ -1214,16 +1187,7 @@ class Syncfarmdata extends MY_Controller
                                                         $totalWoodValue = $totalWoodValue * $exchangeRate;
                                                         $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                     }
-                                                    
-                                                    $farmClosed = 0;
-                                                    $farmClosedBy = 0;
-                                                    $farmClosedDate = "";
-                                                    if($isClosed == true) {
-                                                        $farmClosed = 1;
-                                                        $farmClosedBy = $closedBy;
-                                                        $farmClosedDate = $closedDate;
-                                                    }
-    
+
                                                     $dataUpdateFarmDetails = array(
                                                         "exchange_rate" => $exchangeRate,
                                                         "total_value" => $totalWoodValue,
@@ -1242,11 +1206,11 @@ class Syncfarmdata extends MY_Controller
                                                         "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                         "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                         "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                        "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                        "updated_by" => $userid,
                                                     );
-    
+
                                                     $updateFarmData = $this->Farm_model->update_farm($farmMainId, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
-    
+
                                                     if ($updateFarmData) {
 
                                                         $dataInventoryLedgerUpdate = array(
@@ -1278,7 +1242,7 @@ class Syncfarmdata extends MY_Controller
                                                             $inventoryOrder,
                                                             $createdBy
                                                         );
-    
+
                                                         //CONTRACT INVENTORY MAPPING
                                                         $dataContractMapping = array(
                                                             "contract_id" => $purchaseContractId,
@@ -1290,9 +1254,9 @@ class Syncfarmdata extends MY_Controller
                                                             "updated_by" => $createdBy,
                                                             "is_active" => 1,
                                                         );
-    
+
                                                         $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
-    
+
                                                         $dataInventoryLedger = array(
                                                             "contract_id" => $purchaseContractId,
                                                             "inventory_order" => $inventoryOrder,
@@ -1303,25 +1267,25 @@ class Syncfarmdata extends MY_Controller
                                                             "is_active" => 1,
                                                             "is_advance_app" => 0,
                                                         );
-    
+
                                                         if ($woodValueWithSupplierTaxes != 0) {
                                                             $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
                                                         }
-    
+
                                                         $getContracts = $this->Contract_model->get_contracts_by_contractid($purchaseContractId);
                                                         if (count($getContracts) == 1) {
                                                             $remainingVolume = $getContracts[0]->remaining_volume - $totalNetVolume;
-    
+
                                                             $dataRemainingVolume = array(
                                                                 "remaining_volume" => $remainingVolume,
                                                             );
-    
+
                                                             $this->Contract_model->update_purchase_contract_volume($dataRemainingVolume, $purchaseContractId, $supplierId);
                                                         }
                                                     }
                                                 }
                                             }
-    
+
                                             $row_farm_array["farmId"] = $farmId + 0;
                                             $row_farm_array["inventoryOrder"] = $inventoryOrder;
                                             $row_farm_array["syncStatus"] = true;
@@ -1329,7 +1293,7 @@ class Syncfarmdata extends MY_Controller
                                             array_push($farm_arr_response, $row_farm_array);
                                         }
                                     } else {
-                                        
+
                                         //INSERT FARM DETAILS
                                         $insertDataFarm = array(
                                             "supplier_id" => $supplierId,
@@ -1568,15 +1532,6 @@ class Syncfarmdata extends MY_Controller
                                                             $totalWoodValue = $totalWoodValue * $exchangeRate;
                                                             $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                         }
-                                                        
-                                                        $farmClosed = 0;
-                                                        $farmClosedBy = 0;
-                                                        $farmClosedDate = "";
-                                                        if($isClosed == true) {
-                                                            $farmClosed = 1;
-                                                            $farmClosedBy = $closedBy;
-                                                            $farmClosedDate = $closedDate;
-                                                        }
 
                                                         $dataUpdateFarmDetails = array(
                                                             "exchange_rate" => $exchangeRate,
@@ -1596,7 +1551,7 @@ class Syncfarmdata extends MY_Controller
                                                             "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                             "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                             "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                            "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                            "updated_by" => $userid,
                                                         );
 
                                                         $updateFarmData = $this->Farm_model->update_farm($insertFarm, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
@@ -1622,7 +1577,7 @@ class Syncfarmdata extends MY_Controller
                                                                 "updated_by" => $createdBy,
                                                                 "is_active" => 0,
                                                             );
-    
+
                                                             $updateContractMapping = $this->Farm_model->update_inventory_mapping($inventoryOrder, $purchaseContractId, $dataContractPriceUpdate);
 
                                                             //SUPPLIER PRICE
@@ -1828,15 +1783,6 @@ class Syncfarmdata extends MY_Controller
                                                             $totalWoodValue = $totalWoodValue * $exchangeRate;
                                                             $woodValueWithSupplierTaxes = $woodValueWithSupplierTaxes * $exchangeRate;
                                                         }
-                                                        
-                                                        $farmClosed = 0;
-                                                        $farmClosedBy = 0;
-                                                        $farmClosedDate = "";
-                                                        if($isClosed == true) {
-                                                            $farmClosed = 1;
-                                                            $farmClosedBy = $closedBy;
-                                                            $farmClosedDate = $closedDate;
-                                                        }
 
                                                         $dataUpdateFarmDetails = array(
                                                             "exchange_rate" => $exchangeRate,
@@ -1856,7 +1802,7 @@ class Syncfarmdata extends MY_Controller
                                                             "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                                             "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                                             "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                                            "updated_by" => $userid, "is_closed" => $farmClosed, "closed_date" => $farmClosedDate, "closed_by" => $farmClosedBy,
+                                                            "updated_by" => $userid,
                                                         );
 
                                                         $updateFarmData = $this->Farm_model->update_farm($insertFarm, $inventoryOrder, $purchaseContractId, $dataUpdateFarmDetails);
@@ -1882,7 +1828,7 @@ class Syncfarmdata extends MY_Controller
                                                                 "updated_by" => $createdBy,
                                                                 "is_active" => 0,
                                                             );
-    
+
                                                             $updateContractMapping = $this->Farm_model->update_inventory_mapping($inventoryOrder, $purchaseContractId, $dataContractPriceUpdate);
 
                                                             //SUPPLIER PRICE
@@ -1953,13 +1899,13 @@ class Syncfarmdata extends MY_Controller
                                 }
                             }
                         }
-                        
+
                         //ASYNC EMAIL
-                        $data = json_encode(['farmData' => $farmData], true);
+                        $data = json_encode($farmData, true);
                         $url = 'https://portal.codringreen.com/api/sendnotificationsemail';
                         $cmd = "curl -X POST \"$url\" -H \"Content-Type: application/json\" -d '$data' > /dev/null 2>/dev/null &";
                         exec($cmd);
-                        
+
                         $Return["status"] = true;
                         $Return["message"] = "";
                         $Return["data"] = $farm_arr_response;
