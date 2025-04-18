@@ -784,4 +784,16 @@ class Farm_model extends CI_Model
                 AND A.supplier_id = $supplierid");
         return $query->result();
     }
+
+    public function update_farm_notifications($inventoryorder, $supplierid, $data)
+    {
+        $multiClause = array('inventory_order' => $inventoryorder, 'supplier_id' => $supplierid);
+        $this->db->where($multiClause);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        if ($this->db->update('tbl_farm', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

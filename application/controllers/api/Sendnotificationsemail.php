@@ -30,14 +30,11 @@ class Sendnotificationsemail extends MY_Controller
                 $mailSubject = $fetchEmailTemplate[0]->template_subject;
                 $logo = base_url() . 'assets/img/iconz/cgrlogo_new.png';
 
-                $tableHeadData = "<tr><td colspan='10' style='border: 1px solid; background: #ACB9CA; font-size: 15px; font-weight: 600; text-align:center !important;'>FARM DETAILS</td></tr>";
+                $tableHeadData = "";
                 $tableHeadData = $tableHeadData . "<tr>
                     <td width='250' style='border: 1px solid; background: #DEEDF2; font-size: 15px; font-weight: 600; text-align:center !important;'>Supplier</th>
                     <td width='130' style='border: 1px solid; background: #DEEDF2; font-size: 15px; font-weight: 600; text-align:center !important;'>Date</th>
                     <td width='130' style='border: 1px solid; background: #DEEDF2; font-size: 15px; font-weight: 600; text-align:center !important;'>ICA</th>
-                    <td width='120' style='border: 1px solid; background: #DEEDF2; font-size: 15px; font-weight: 600; text-align:center !important;'>Specie</th>
-                    <td width='120' style='border: 1px solid; background: #DEEDF2; font-size: 15px; font-weight: 600; text-align:center !important;'>Plate Number</th>
-                    <td width='120' style='border: 1px solid; background: #DEEDF2; font-size: 15px; font-weight: 600; text-align:center !important;'>Driver Name</th>
                     <td width='120' style='border: 1px solid; background: #DEEDF2; font-size: 15px; font-weight: 600; text-align:center !important;'>Pieces</th>
                     <td width='120' style='border: 1px solid; background: #DEEDF2; font-size: 15px; font-weight: 600; text-align:center !important;'>Volume (m³)</th>
                     </tr>";
@@ -52,16 +49,19 @@ class Sendnotificationsemail extends MY_Controller
                     $getFarmDetails = $this->Farm_model->get_farm_details_byid_supplier($inventoryOrder, $supplierId);
 
                     if($getFarmDetails[0]->is_closed == 1 && $getFarmDetails[0]->is_notification_sent == 0){
+
+                        $supplierName = $getFarmDetails[0]->supplier_name;
+                        $purchaseDate = $getFarmDetails[0]->purchase_date;
+                        $ica = $getFarmDetails[0]->inventory_order;
+                        $totalPieces = $getFarmDetails[0]->total_pieces;
+                        $totalVolume = sprintf("%0.3f", $getFarmDetails[0]->total_volume + 0);
                         
                         $tableRowData = $tableRowData . "<tr>
-                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'></td>
-                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'></td>
-                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'>$inventoryOrder</td>
-                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'></td>
-                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'></td>
-                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'></td>
-                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'></td>
-                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'></td>
+                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'>$supplierName</td>
+                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'>$purchaseDate</td>
+                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'>$ica</td>
+                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'>$totalPieces</td>
+                            <td style='border: 1px solid; background: #FFFFFF; font-size: 14px; font-weight: 400; text-align:center !important;'>$totalVolume</td>
                             </tr>";
                     }
                 }
@@ -97,7 +97,21 @@ class Sendnotificationsemail extends MY_Controller
                 $this->email->bcc("Mohamed Haji Nafeel <nafeel@codringroup.com>");
                 $this->email->subject($mailSubject);
                 $this->email->message("$message");
-                $this->email->send();
+                
+                if($this->email->send()) {
+                    //UPDATE FARM DETAILS
+                    foreach ($farmData as $key => $value) {
+                        $inventoryOrder = $value["inventoryOrder"];
+                        $supplierId = $value["supplierId"];
+
+                        $dataFarm = array(
+                            "is_notification_sent" => 1,
+                            "notification_sent_date" => date("Y-m-d H:i:s"),
+                        );
+
+                        $this->Farm_model->update_farm_notifications($inventoryOrder, $supplierId, $dataFarm);
+                    }
+                }
 
                 //END SEND MAIL
             }
