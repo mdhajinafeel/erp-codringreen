@@ -242,9 +242,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div id="divPdf">
                                 <div class="row mb-3">
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <label for="invoice_number_custom"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_custom" name="invoice_number_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_custom" name="invoice_number_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->invoice_no) ? $exportDocumentsCustoms[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_custom" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -253,15 +253,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_custom" id="supplier_name_custom" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersCustoms as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsCustoms[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_custom" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="issued_date_custom"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_custom" name="issued_date_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_custom" name="issued_date_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->invoice_date) ? $exportDocumentsCustoms[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_custom" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_custom" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -270,26 +270,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_custom" name="subtotal_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
-                                        <label id="error-subtotal_custom" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="subtotal_custom" name="subtotal_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->sub_total) ? $exportDocumentsCustoms[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        <label id="error-subtotal_custom" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_custom" name="iva_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
-                                        <label id="error-iva_custom" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="iva_custom" name="iva_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->tax_total) ? $exportDocumentsCustoms[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        <label id="error-iva_custom" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_custom" name="retefuente_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
-                                        <label id="error-retefuente_custom" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="retefuente_custom" name="retefuente_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->allowance_total) ? $exportDocumentsCustoms[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        <label id="error-retefuente_custom" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_custom" name="payable_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
-                                        <label id="error-payable_custom" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="payable_custom" name="payable_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->payable_total) ? $exportDocumentsCustoms[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        <label id="error-payable_custom" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
                                 </div>
 
@@ -406,9 +406,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div id="divPdfITR">
                                 <div class="row mb-3">
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <label for="invoice_number_itr"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_itr" name="invoice_number_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_itr" name="invoice_number_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->invoice_no) ? $exportDocumentsTransport[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_itr" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -417,15 +417,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_itr" id="supplier_name_itr" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersItr as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsTransport[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_itr" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="issued_date_itr"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_itr" name="issued_date_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_itr" name="issued_date_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->invoice_date) ? $exportDocumentsTransport[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_itr" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_itr" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -434,29 +434,28 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_itr" name="subtotal_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
-                                        <label id="error-subtotal_itr" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="subtotal_itr" name="subtotal_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->sub_total) ? $exportDocumentsTransport[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        <label id="error-subtotal_itr" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_itr" name="iva_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
-                                        <label id="error-iva_itr" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="iva_itr" name="iva_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->tax_total) ? $exportDocumentsTransport[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        <label id="error-iva_itr" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_itr" name="retefuente_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
-                                        <label id="error-retefuente_itr" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="retefuente_itr" name="retefuente_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->allowance_total) ? $exportDocumentsTransport[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        <label id="error-retefuente_itr" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_itr" name="payable_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
-                                        <label id="error-payable_itr" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="payable_itr" name="payable_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->payable_total) ? $exportDocumentsTransport[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        <label id="error-payable_itr" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
                                 </div>
-
                             </div>
 
                             <div id="divContainersITR">
@@ -491,11 +490,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         </div>
                                     </div>
                                 <?php } ?>
+                            </div>
 
-                                <div class="row mb-3 mt-4">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveITR" name="btnSaveITR"><?php echo $this->lang->line('save'); ?></button>
-                                    </div>
+                            <div class="row mb-3 mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveITR" name="btnSaveITR"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -569,9 +568,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div id="divPdfPort">
                                 <div class="row mb-3">
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <label for="invoice_number_port"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_port" name="invoice_number_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_port" name="invoice_number_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->invoice_no) ? $exportDocumentsPort[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_port" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -580,15 +579,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_port" id="supplier_name_port" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersPort as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsPort[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_port" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="issued_date_port"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_port" name="issued_date_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_port" name="issued_date_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->invoice_date) ? $exportDocumentsPort[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_port" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_port" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -597,26 +596,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_port" name="subtotal_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
-                                        <label id="error-subtotal_port" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="subtotal_port" name="subtotal_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->sub_total) ? $exportDocumentsPort[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        <label id="error-subtotal_port" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_port" name="iva_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
-                                        <label id="error-iva_port" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="iva_port" name="iva_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->tax_total) ? $exportDocumentsPort[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        <label id="error-iva_port" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_port" name="retefuente_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
-                                        <label id="error-retefuente_port" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="retefuente_port" name="retefuente_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->allowance_total) ? $exportDocumentsPort[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        <label id="error-retefuente_port" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_port" name="payable_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
-                                        <label id="error-payable_port" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="payable_port" name="payable_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->payable_total) ? $exportDocumentsPort[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        <label id="error-payable_port" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
                                 </div>
 
@@ -733,9 +732,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div id="divPdfShipping">
                                 <div class="row mb-3">
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <label for="invoice_number_shipping"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_shipping" name="invoice_number_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_shipping" name="invoice_number_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->invoice_no) ? $exportDocumentsShipping[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_shipping" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -744,15 +743,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_shipping" id="supplier_name_shipping" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersShipping as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsShipping[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_shipping" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="issued_date_shipping"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_shipping" name="issued_date_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_shipping" name="issued_date_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->invoice_date) ? $exportDocumentsShipping[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_shipping" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_shipping" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -761,26 +760,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_shipping" name="subtotal_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exshipping_subtotal"); ?>" />
-                                        <label id="error-subtotal_shipping" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="subtotal_shipping" name="subtotal_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->sub_total) ? $exportDocumentsShipping[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exshipping_subtotal"); ?>" />
+                                        <label id="error-subtotal_shipping" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_shipping" name="iva_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exshipping_iva"); ?>" />
-                                        <label id="error-iva_shipping" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="iva_shipping" name="iva_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->tax_total) ? $exportDocumentsShipping[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exshipping_iva"); ?>" />
+                                        <label id="error-iva_shipping" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_shipping" name="retefuente_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exshipping_retefuente"); ?>" />
-                                        <label id="error-retefuente_shipping" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="retefuente_shipping" name="retefuente_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->allowance_total) ? $exportDocumentsShipping[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exshipping_retefuente"); ?>" />
+                                        <label id="error-retefuente_shipping" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_shipping" name="payable_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exshipping_total_payable"); ?>" />
-                                        <label id="error-payable_shipping" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="payable_shipping" name="payable_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->payable_total) ? $exportDocumentsShipping[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exshipping_total_payable"); ?>" />
+                                        <label id="error-payable_shipping" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
                                 </div>
 
@@ -897,9 +896,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div id="divPdfFumigation">
                                 <div class="row mb-3">
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <label for="invoice_number_fumigation"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_fumigation" name="invoice_number_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_fumigation" name="invoice_number_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->invoice_no) ? $exportDocumentsFumigation[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_fumigation" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -908,15 +907,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_fumigation" id="supplier_name_fumigation" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersFumigation as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsFumigation[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_fumigation" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="issued_date_fumigation"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_fumigation" name="issued_date_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_fumigation" name="issued_date_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->invoice_date) ? $exportDocumentsFumigation[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_fumigation" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_fumigation" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -925,26 +924,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_fumigation" name="subtotal_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exfumigation_subtotal"); ?>" />
-                                        <label id="error-subtotal_fumigation" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="subtotal_fumigation" name="subtotal_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->sub_total) ? $exportDocumentsFumigation[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exfumigation_subtotal"); ?>" />
+                                        <label id="error-subtotal_fumigation" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_fumigation" name="iva_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exfumigation_iva"); ?>" />
-                                        <label id="error-iva_fumigation" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="iva_fumigation" name="iva_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->tax_total) ? $exportDocumentsFumigation[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exfumigation_iva"); ?>" />
+                                        <label id="error-iva_fumigation" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_fumigation" name="retefuente_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exfumigation_retefuente"); ?>" />
-                                        <label id="error-retefuente_fumigation" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="retefuente_fumigation" name="retefuente_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->allowance_total) ? $exportDocumentsFumigation[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exfumigation_retefuente"); ?>" />
+                                        <label id="error-retefuente_fumigation" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_fumigation" name="payable_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exfumigation_total_payable"); ?>" />
-                                        <label id="error-payable_fumigation" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="payable_fumigation" name="payable_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->payable_total) ? $exportDocumentsFumigation[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exfumigation_total_payable"); ?>" />
+                                        <label id="error-payable_fumigation" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
                                 </div>
 
@@ -1060,9 +1059,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div id="divPdfCoteros">
                                 <div class="row mb-3">
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <label for="invoice_number_coteros"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_coteros" name="invoice_number_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_coteros" name="invoice_number_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->invoice_no) ? $exportDocumentsCoteros[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_coteros" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -1071,15 +1070,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_coteros" id="supplier_name_coteros" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersCoteros as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsCoteros[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_coteros" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="issued_date_coteros"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_coteros" name="issued_date_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_coteros" name="issued_date_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->invoice_date) ? $exportDocumentsCoteros[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_coteros" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_coteros" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -1088,26 +1087,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_coteros" name="subtotal_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_subtotal"); ?>" />
-                                        <label id="error-subtotal_coteros" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="subtotal_coteros" name="subtotal_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->sub_total) ? $exportDocumentsCoteros[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("excoteros_subtotal"); ?>" />
+                                        <label id="error-subtotal_coteros" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_coteros" name="iva_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_iva"); ?>" />
-                                        <label id="error-iva_coteros" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="iva_coteros" name="iva_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->tax_total) ? $exportDocumentsCoteros[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("excoteros_iva"); ?>" />
+                                        <label id="error-iva_coteros" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_coteros" name="retefuente_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_retefuente"); ?>" />
-                                        <label id="error-retefuente_coteros" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="retefuente_coteros" name="retefuente_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->allowance_total) ? $exportDocumentsCoteros[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("excoteros_retefuente"); ?>" />
+                                        <label id="error-retefuente_coteros" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_coteros" name="payable_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_total_payable"); ?>" />
-                                        <label id="error-payable_coteros" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="payable_coteros" name="payable_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->payable_total) ? $exportDocumentsCoteros[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("excoteros_total_payable"); ?>" />
+                                        <label id="error-payable_coteros" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
                                 </div>
 
@@ -1223,9 +1222,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div id="divPdfPhyto">
                                 <div class="row mb-3">
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <label for="invoice_number_phyto"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_phyto" name="invoice_number_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_phyto" name="invoice_number_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->invoice_no) ? $exportDocumentsPhyto[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_phyto" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -1234,15 +1233,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_phyto" id="supplier_name_phyto" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersPhyto as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsPhyto[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_phyto" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="issued_date_phyto"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_phyto" name="issued_date_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_phyto" name="issued_date_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->invoice_date) ? $exportDocumentsPhyto[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_phyto" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_phyto" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -1251,26 +1250,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_phyto" name="subtotal_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exphyto_subtotal"); ?>" />
-                                        <label id="error-subtotal_phyto" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="subtotal_phyto" name="subtotal_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->sub_total) ? $exportDocumentsPhyto[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exphyto_subtotal"); ?>" />
+                                        <label id="error-subtotal_phyto" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_phyto" name="iva_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exphyto_iva"); ?>" />
-                                        <label id="error-iva_phyto" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="iva_phyto" name="iva_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->tax_total) ? $exportDocumentsPhyto[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exphyto_iva"); ?>" />
+                                        <label id="error-iva_phyto" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_phyto" name="retefuente_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exphyto_retefuente"); ?>" />
-                                        <label id="error-retefuente_phyto" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="retefuente_phyto" name="retefuente_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->allowance_total) ? $exportDocumentsPhyto[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exphyto_retefuente"); ?>" />
+                                        <label id="error-retefuente_phyto" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_phyto" name="payable_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exphyto_total_payable"); ?>" />
-                                        <label id="error-payable_phyto" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="payable_phyto" name="payable_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->payable_total) ? $exportDocumentsPhyto[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exphyto_total_payable"); ?>" />
+                                        <label id="error-payable_phyto" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
                                 </div>
 
@@ -1386,9 +1385,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div id="divPdfIncentives">
                                 <div class="row mb-3">
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <label for="invoice_number_incentives"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_incentives" name="invoice_number_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_incentives" name="invoice_number_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->invoice_no) ? $exportDocumentsIncentives[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_incentives" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -1397,15 +1396,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_incentives" id="supplier_name_incentives" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersIncentives as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsIncentives[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_incentives" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="issued_date_incentives"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_incentives" name="issued_date_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_incentives" name="issued_date_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->invoice_date) ? $exportDocumentsIncentives[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_incentives" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_incentives" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -1414,26 +1413,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_incentives" name="subtotal_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exincentives_subtotal"); ?>" />
-                                        <label id="error-subtotal_incentives" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="subtotal_incentives" name="subtotal_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->sub_total) ? $exportDocumentsIncentives[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exincentives_subtotal"); ?>" />
+                                        <label id="error-subtotal_incentives" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_incentives" name="iva_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exincentives_iva"); ?>" />
-                                        <label id="error-iva_incentives" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="iva_incentives" name="iva_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->tax_total) ? $exportDocumentsIncentives[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exincentives_iva"); ?>" />
+                                        <label id="error-iva_incentives" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_incentives" name="retefuente_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exincentives_retefuente"); ?>" />
-                                        <label id="error-retefuente_incentives" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="retefuente_incentives" name="retefuente_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->allowance_total) ? $exportDocumentsIncentives[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exincentives_retefuente"); ?>" />
+                                        <label id="error-retefuente_incentives" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_incentives" name="payable_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exincentives_total_payable"); ?>" />
-                                        <label id="error-payable_incentives" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="payable_incentives" name="payable_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->payable_total) ? $exportDocumentsIncentives[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exincentives_total_payable"); ?>" />
+                                        <label id="error-payable_incentives" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
                                 </div>
 
@@ -1549,9 +1548,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div id="divPdfRemobilization">
                                 <div class="row mb-3">
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <label for="invoice_number_remobilization"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_remobilization" name="invoice_number_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_remobilization" name="invoice_number_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->invoice_no) ? $exportDocumentsRemobilization[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_remobilization" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -1560,15 +1559,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_remobilization" id="supplier_name_remobilization" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersRemobilization as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsRemobilization[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_remobilization" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label for="issued_date_remobilization"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_remobilization" name="issued_date_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_remobilization" name="issued_date_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->invoice_date) ? $exportDocumentsRemobilization[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_remobilization" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_remobilization" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -1577,29 +1576,28 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_remobilization" name="subtotal_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exremobilization_subtotal"); ?>" />
-                                        <label id="error-subtotal_remobilization" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="subtotal_remobilization" name="subtotal_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->sub_total) ? $exportDocumentsRemobilization[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exremobilization_subtotal"); ?>" />
+                                        <label id="error-subtotal_remobilization" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_remobilization" name="iva_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exremobilization_iva"); ?>" />
-                                        <label id="error-iva_remobilization" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="iva_remobilization" name="iva_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->tax_total) ? $exportDocumentsRemobilization[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exremobilization_iva"); ?>" />
+                                        <label id="error-iva_remobilization" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_remobilization" name="retefuente_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exremobilization_retefuente"); ?>" />
-                                        <label id="error-retefuente_remobilization" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="retefuente_remobilization" name="retefuente_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->allowance_total) ? $exportDocumentsRemobilization[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exremobilization_retefuente"); ?>" />
+                                        <label id="error-retefuente_remobilization" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_remobilization" name="payable_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exremobilization_total_payable"); ?>" />
-                                        <label id="error-payable_remobilization" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
+                                        <input type="number" step="any" id="payable_remobilization" name="payable_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->payable_total) ? $exportDocumentsRemobilization[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exremobilization_total_payable"); ?>" />
+                                        <label id="error-payable_remobilization" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
                                 </div>
-
                             </div>
 
                             <div id="divContainersRemobilization">
@@ -1801,8 +1799,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                console.log(totalContainerValue);
-
                 if (fileExtension == "pdf" || fileExtension == "PDF") {
                     totalPayableAmount = parseFloat($("#payable_custom").val()) || 0;
                 }
@@ -1813,63 +1809,126 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     return false;
                 }
 
-                var fd = new FormData();
-                fd.append("exportId", $("#hdnExportId").val());
-                fd.append("originId", $("#hdnOriginId").val());
-                fd.append('saNumber', $("#hdnSaNumber").val());
-                fd.append("fileExtension", fileExtension);
-                fd.append("updateContainerValueData_Custom", JSON.stringify(arrUpdateContainerValue));
-                if (fileExtension == "xml" || fileExtension == "XML") {
+                var isValid = true;
+                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
 
-                    fd.append('invoiceNo_Custom', $("#lblInvoiceNoCustoms").text());
-                    fd.append('supplierName_Custom', supplierId);
-                    fd.append('formattedDate_Custom', $("#lblIssuedDateCustoms").text());
-                    fd.append('subTotal_Custom', subTotalCustoms);
-                    fd.append('iva_Custom', ivaCustoms);
-                    fd.append('retefuente_Custom', retefuenteCustoms);
-                    fd.append('payable_Custom', payableCustoms);
-                } else {
-                    fd.append("uploadPdfFileCustomAgency", uploadPdfFileCustomAgency);
-                    fd.append('invoiceNo_Custom', $("#invoice_number_custom").val());
-                    fd.append('supplierName_Custom', $("#supplier_name_custom").val());
-                    fd.append('formattedDate_Custom', $("#formatted_date_custom").val());
-                    fd.append('subTotal_Custom', $("#subtotal_custom").val());
-                    fd.append('iva_Custom', $("#iva_custom").val());
-                    fd.append('retefuente_Custom', $("#retefuente_custom").val());
-                    fd.append('payable_Custom', $("#payable_custom").val());
+                    if ($("#invoice_number_custom").val().length == 0) {
+                        $("#error-invoice_no_custom").show();
+                        isValid = false
+                    } else {
+                        $("#error-invoice_no_custom").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#supplier_name_custom").val() == 0) {
+                        $("#error-supplier_name_custom").show();
+                        isValid = false
+                    } else {
+                        $("#error-supplier_name_custom").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#issued_date_custom").val().length == 0) {
+                        $("#error-issued_date_custom").show();
+                        isValid = false
+                    } else {
+                        $("#error-issued_date_custom").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#subtotal_custom").val().length == 0) {
+                        $("#error-subtotal_custom").show();
+                        isValid = false
+                    } else {
+                        $("#error-subtotal_custom").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#iva_custom").val().length == 0) {
+                        $("#error-iva_custom").show();
+                        isValid = false
+                    } else {
+                        $("#error-iva_custom").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#retefuente_custom").val().length == 0) {
+                        $("#error-retefuente_custom").show();
+                        isValid = false
+                    } else {
+                        $("#error-retefuente_custom").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#payable_custom").val().length == 0) {
+                        $("#error-payable_custom").show();
+                        isValid = false
+                    } else {
+                        $("#error-payable_custom").hide();
+                        isValid = true;
+                    }
                 }
 
-                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                fd.append("add_type", 1);
+                if (isValid) {
+                    var fd = new FormData();
+                    fd.append("exportId", $("#hdnExportId").val());
+                    fd.append("originId", $("#hdnOriginId").val());
+                    fd.append('saNumber', $("#hdnSaNumber").val());
+                    fd.append("fileExtension", fileExtension);
+                    fd.append("updateContainerValueData_Custom", JSON.stringify(arrUpdateContainerValue));
+                    fd.append("uploadPdfFileCustomAgency", uploadPdfFileCustomAgency);
+                    if (fileExtension == "xml" || fileExtension == "XML") {
 
-                $.ajax({
-                    url: base_url + "/save_export_documents",
-                    type: 'post',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(jsonResult) {
-                        $('#loading').hide();
+                        fd.append('invoiceNo_Custom', $("#lblInvoiceNoCustoms").text());
+                        fd.append('supplierName_Custom', supplierId);
+                        fd.append('formattedDate_Custom', $("#lblIssuedDateCustoms").text());
+                        fd.append('subTotal_Custom', subTotalCustoms);
+                        fd.append('iva_Custom', ivaCustoms);
+                        fd.append('retefuente_Custom', retefuenteCustoms);
+                        fd.append('payable_Custom', payableCustoms);
+                    } else {
 
-                        if (jsonResult.redirect == true) {
-                            window.location.replace(login_url);
-                        } else if (jsonResult.result != '') {
-                            toastr.clear();
-
-
-                        } else if (jsonResult.error != '') {
-                            toastr.clear();
-                            toastr.error(jsonResult.error);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else if (jsonResult.warning != '') {
-                            toastr.clear();
-                            toastr.warning(jsonResult.warning);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else {
-                            toastr.clear();
-                        }
+                        fd.append('invoiceNo_Custom', $("#invoice_number_custom").val());
+                        fd.append('supplierName_Custom', $("#supplier_name_custom").val());
+                        fd.append('formattedDate_Custom', $("#formatted_date_custom").val());
+                        fd.append('subTotal_Custom', $("#subtotal_custom").val());
+                        fd.append('iva_Custom', $("#iva_custom").val());
+                        fd.append('retefuente_Custom', $("#retefuente_custom").val());
+                        fd.append('payable_Custom', $("#payable_custom").val());
                     }
-                });
+
+                    fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                    fd.append("add_type", 1);
+
+                    $.ajax({
+                        url: base_url + "/save_export_documents",
+                        type: 'post',
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function(jsonResult) {
+                            $('#loading').hide();
+
+                            if (jsonResult.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (jsonResult.result != '') {
+                                toastr.clear();
+
+
+                            } else if (jsonResult.error != '') {
+                                toastr.clear();
+                                toastr.error(jsonResult.error);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else if (jsonResult.warning != '') {
+                                toastr.clear();
+                                toastr.warning(jsonResult.warning);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else {
+                                toastr.clear();
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -1900,8 +1959,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                console.log(totalContainerValue);
-
                 if (fileExtension == "pdf" || fileExtension == "PDF") {
                     totalPayableAmount = parseFloat($("#payable_itr").val()) || 0;
                 }
@@ -1912,63 +1969,127 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     return false;
                 }
 
-                var fd = new FormData();
-                fd.append("exportId", $("#hdnExportId").val());
-                fd.append("originId", $("#hdnOriginId").val());
-                fd.append('saNumber', $("#hdnSaNumber").val());
-                fd.append("fileExtension", fileExtension);
-                fd.append("updateContainerValueData_ITR", JSON.stringify(arrUpdateContainerValue));
-                if (fileExtension == "xml" || fileExtension == "XML") {
+                var isValid = true;
+                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
 
-                    fd.append('invoiceNo_ITR', $("#lblInvoiceNoITR").text());
-                    fd.append('supplierName_ITR', supplierId);
-                    fd.append('formattedDate_ITR', $("#lblIssuedDateITR").text());
-                    fd.append('subTotal_ITR', subTotalCustoms);
-                    fd.append('iva_ITR', ivaCustoms);
-                    fd.append('retefuente_ITR', retefuenteCustoms);
-                    fd.append('payable_ITR', payableCustoms);
-                } else {
-                    fd.append("uploadPdfFileITR", uploadPdfFileCustomAgency);
-                    fd.append('invoiceNo_ITR', $("#invoice_number_itr").val());
-                    fd.append('supplierName_ITR', $("#supplier_name_itr").val());
-                    fd.append('formattedDate_ITR', $("#formatted_date_itr").val());
-                    fd.append('subTotal_ITR', $("#subtotal_itr").val());
-                    fd.append('iva_ITR', $("#iva_itr").val());
-                    fd.append('retefuente_ITR', $("#retefuente_itr").val());
-                    fd.append('payable_ITR', $("#payable_itr").val());
+                    if ($("#invoice_number_itr").val().length == 0) {
+                        $("#error-invoice_no_itr").show();
+                        isValid = false
+                    } else {
+                        $("#error-invoice_no_itr").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#supplier_name_itr").val() == 0) {
+                        $("#error-supplier_name_itr").show();
+                        isValid = false
+                    } else {
+                        $("#error-supplier_name_itr").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#issued_date_itr").val().length == 0) {
+                        $("#error-issued_date_itr").show();
+                        isValid = false
+                    } else {
+                        $("#error-issued_date_itr").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#subtotal_itr").val().length == 0) {
+                        $("#error-subtotal_itr").show();
+                        isValid = false
+                    } else {
+                        $("#error-subtotal_itr").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#iva_itr").val().length == 0) {
+                        $("#error-iva_itr").show();
+                        isValid = false
+                    } else {
+                        $("#error-iva_itr").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#retefuente_itr").val().length == 0) {
+                        $("#error-retefuente_itr").show();
+                        isValid = false
+                    } else {
+                        $("#error-retefuente_itr").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#payable_itr").val().length == 0) {
+                        $("#error-payable_itr").show();
+                        isValid = false
+                    } else {
+                        $("#error-payable_itr").hide();
+                        isValid = true;
+                    }
                 }
 
-                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                fd.append("add_type", 2);
+                if (isValid) {
+                    var fd = new FormData();
+                    fd.append("exportId", $("#hdnExportId").val());
+                    fd.append("originId", $("#hdnOriginId").val());
+                    fd.append('saNumber', $("#hdnSaNumber").val());
+                    fd.append("fileExtension", fileExtension);
+                    fd.append("updateContainerValueData_ITR", JSON.stringify(arrUpdateContainerValue));
+                    fd.append("uploadPdfFileITR", uploadPdfFileCustomAgency);
 
-                $.ajax({
-                    url: base_url + "/save_export_documents",
-                    type: 'post',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(jsonResult) {
-                        $('#loading').hide();
+                    if (fileExtension == "xml" || fileExtension == "XML") {
 
-                        if (jsonResult.redirect == true) {
-                            window.location.replace(login_url);
-                        } else if (jsonResult.result != '') {
-                            toastr.clear();
+                        fd.append('invoiceNo_ITR', $("#lblInvoiceNoITR").text());
+                        fd.append('supplierName_ITR', supplierId);
+                        fd.append('formattedDate_ITR', $("#lblIssuedDateITR").text());
+                        fd.append('subTotal_ITR', subTotalCustoms);
+                        fd.append('iva_ITR', ivaCustoms);
+                        fd.append('retefuente_ITR', retefuenteCustoms);
+                        fd.append('payable_ITR', payableCustoms);
+                    } else {
 
-
-                        } else if (jsonResult.error != '') {
-                            toastr.clear();
-                            toastr.error(jsonResult.error);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else if (jsonResult.warning != '') {
-                            toastr.clear();
-                            toastr.warning(jsonResult.warning);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else {
-                            toastr.clear();
-                        }
+                        fd.append('invoiceNo_ITR', $("#invoice_number_itr").val());
+                        fd.append('supplierName_ITR', $("#supplier_name_itr").val());
+                        fd.append('formattedDate_ITR', $("#formatted_date_itr").val());
+                        fd.append('subTotal_ITR', $("#subtotal_itr").val());
+                        fd.append('iva_ITR', $("#iva_itr").val());
+                        fd.append('retefuente_ITR', $("#retefuente_itr").val());
+                        fd.append('payable_ITR', $("#payable_itr").val());
                     }
-                });
+
+                    fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                    fd.append("add_type", 2);
+
+                    $.ajax({
+                        url: base_url + "/save_export_documents",
+                        type: 'post',
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function(jsonResult) {
+                            $('#loading').hide();
+
+                            if (jsonResult.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (jsonResult.result != '') {
+                                toastr.clear();
+
+
+                            } else if (jsonResult.error != '') {
+                                toastr.clear();
+                                toastr.error(jsonResult.error);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else if (jsonResult.warning != '') {
+                                toastr.clear();
+                                toastr.warning(jsonResult.warning);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else {
+                                toastr.clear();
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -1999,8 +2120,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                console.log(totalContainerValue);
-
                 if (fileExtension == "pdf" || fileExtension == "PDF") {
                     totalPayableAmount = parseFloat($("#payable_port").val()) || 0;
                 }
@@ -2011,63 +2130,128 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     return false;
                 }
 
-                var fd = new FormData();
-                fd.append("exportId", $("#hdnExportId").val());
-                fd.append("originId", $("#hdnOriginId").val());
-                fd.append('saNumber', $("#hdnSaNumber").val());
-                fd.append("fileExtension", fileExtension);
-                fd.append("updateContainerValueData_Port", JSON.stringify(arrUpdateContainerValue));
-                if (fileExtension == "xml" || fileExtension == "XML") {
+                var isValid = true;
+                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
 
-                    fd.append('invoiceNo_Port', $("#lblInvoiceNoPort").text());
-                    fd.append('supplierName_Port', supplierId);
-                    fd.append('formattedDate_Port', $("#lblIssuedDatePort").text());
-                    fd.append('subTotal_Port', subTotalCustoms);
-                    fd.append('iva_Port', ivaCustoms);
-                    fd.append('retefuente_Port', retefuenteCustoms);
-                    fd.append('payable_Port', payableCustoms);
-                } else {
-                    fd.append("uploadPdfFilePort", uploadPdfFileCustomAgency);
-                    fd.append('invoiceNo_Port', $("#invoice_number_port").val());
-                    fd.append('supplierName_Port', $("#supplier_name_port").val());
-                    fd.append('formattedDate_Port', $("#formatted_date_port").val());
-                    fd.append('subTotal_Port', $("#subtotal_port").val());
-                    fd.append('iva_Port', $("#iva_port").val());
-                    fd.append('retefuente_Port', $("#retefuente_port").val());
-                    fd.append('payable_Port', $("#payable_port").val());
+                    if ($("#invoice_number_port").val().length == 0) {
+                        $("#error-invoice_no_port").show();
+                        isValid = false
+                    } else {
+                        $("#error-invoice_no_port").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#supplier_name_port").val() == 0) {
+                        $("#error-supplier_name_port").show();
+                        isValid = false
+                    } else {
+                        $("#error-supplier_name_port").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#issued_date_port").val().length == 0) {
+                        $("#error-issued_date_port").show();
+                        isValid = false
+                    } else {
+                        $("#error-issued_date_port").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#subtotal_port").val().length == 0) {
+                        $("#error-subtotal_port").show();
+                        isValid = false
+                    } else {
+                        $("#error-subtotal_port").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#iva_port").val().length == 0) {
+                        $("#error-iva_port").show();
+                        isValid = false
+                    } else {
+                        $("#error-iva_port").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#retefuente_port").val().length == 0) {
+                        $("#error-retefuente_port").show();
+                        isValid = false
+                    } else {
+                        $("#error-retefuente_port").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#payable_port").val().length == 0) {
+                        $("#error-payable_port").show();
+                        isValid = false
+                    } else {
+                        $("#error-payable_port").hide();
+                        isValid = true;
+                    }
                 }
 
-                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                fd.append("add_type", 3);
+                if (isValid) {
 
-                $.ajax({
-                    url: base_url + "/save_export_documents",
-                    type: 'post',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(jsonResult) {
-                        $('#loading').hide();
+                    var fd = new FormData();
+                    fd.append("exportId", $("#hdnExportId").val());
+                    fd.append("originId", $("#hdnOriginId").val());
+                    fd.append('saNumber', $("#hdnSaNumber").val());
+                    fd.append("fileExtension", fileExtension);
+                    fd.append("updateContainerValueData_Port", JSON.stringify(arrUpdateContainerValue));
+                    fd.append("uploadPdfFilePort", uploadPdfFileCustomAgency);
 
-                        if (jsonResult.redirect == true) {
-                            window.location.replace(login_url);
-                        } else if (jsonResult.result != '') {
-                            toastr.clear();
+                    if (fileExtension == "xml" || fileExtension == "XML") {
 
+                        fd.append('invoiceNo_Port', $("#lblInvoiceNoPort").text());
+                        fd.append('supplierName_Port', supplierId);
+                        fd.append('formattedDate_Port', $("#lblIssuedDatePort").text());
+                        fd.append('subTotal_Port', subTotalCustoms);
+                        fd.append('iva_Port', ivaCustoms);
+                        fd.append('retefuente_Port', retefuenteCustoms);
+                        fd.append('payable_Port', payableCustoms);
+                    } else {
 
-                        } else if (jsonResult.error != '') {
-                            toastr.clear();
-                            toastr.error(jsonResult.error);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else if (jsonResult.warning != '') {
-                            toastr.clear();
-                            toastr.warning(jsonResult.warning);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else {
-                            toastr.clear();
-                        }
+                        fd.append('invoiceNo_Port', $("#invoice_number_port").val());
+                        fd.append('supplierName_Port', $("#supplier_name_port").val());
+                        fd.append('formattedDate_Port', $("#formatted_date_port").val());
+                        fd.append('subTotal_Port', $("#subtotal_port").val());
+                        fd.append('iva_Port', $("#iva_port").val());
+                        fd.append('retefuente_Port', $("#retefuente_port").val());
+                        fd.append('payable_Port', $("#payable_port").val());
                     }
-                });
+
+                    fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                    fd.append("add_type", 3);
+
+                    $.ajax({
+                        url: base_url + "/save_export_documents",
+                        type: 'post',
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function(jsonResult) {
+                            $('#loading').hide();
+
+                            if (jsonResult.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (jsonResult.result != '') {
+                                toastr.clear();
+
+
+                            } else if (jsonResult.error != '') {
+                                toastr.clear();
+                                toastr.error(jsonResult.error);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else if (jsonResult.warning != '') {
+                                toastr.clear();
+                                toastr.warning(jsonResult.warning);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else {
+                                toastr.clear();
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -2098,8 +2282,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                console.log(totalContainerValue);
-
                 if (fileExtension == "pdf" || fileExtension == "PDF") {
                     totalPayableAmount = parseFloat($("#payable_shipping").val()) || 0;
                 }
@@ -2110,63 +2292,128 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     return false;
                 }
 
-                var fd = new FormData();
-                fd.append("exportId", $("#hdnExportId").val());
-                fd.append("originId", $("#hdnOriginId").val());
-                fd.append('saNumber', $("#hdnSaNumber").val());
-                fd.append("fileExtension", fileExtension);
-                fd.append("updateContainerValueData_Shipping", JSON.stringify(arrUpdateContainerValue));
-                if (fileExtension == "xml" || fileExtension == "XML") {
+                var isValid = true;
+                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
 
-                    fd.append('invoiceNo_Shipping', $("#lblInvoiceNoShipping").text());
-                    fd.append('supplierName_Shipping', supplierId);
-                    fd.append('formattedDate_Shipping', $("#lblIssuedDateShipping").text());
-                    fd.append('subTotal_Shipping', subTotalCustoms);
-                    fd.append('iva_Shipping', ivaCustoms);
-                    fd.append('retefuente_Shipping', retefuenteCustoms);
-                    fd.append('payable_Shipping', payableCustoms);
-                } else {
-                    fd.append("uploadPdfFileShipping", uploadPdfFileCustomAgency);
-                    fd.append('invoiceNo_Shipping', $("#invoice_number_shipping").val());
-                    fd.append('supplierName_Shipping', $("#supplier_name_shipping").val());
-                    fd.append('formattedDate_Shipping', $("#formatted_date_shipping").val());
-                    fd.append('subTotal_Shipping', $("#subtotal_shipping").val());
-                    fd.append('iva_Shipping', $("#iva_shipping").val());
-                    fd.append('retefuente_Shipping', $("#retefuente_shipping").val());
-                    fd.append('payable_Shipping', $("#payable_shipping").val());
+                    if ($("#invoice_number_shipping").val().length == 0) {
+                        $("#error-invoice_no_shipping").show();
+                        isValid = false
+                    } else {
+                        $("#error-invoice_no_shipping").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#supplier_name_shipping").val() == 0) {
+                        $("#error-supplier_name_shipping").show();
+                        isValid = false
+                    } else {
+                        $("#error-supplier_name_shipping").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#issued_date_shipping").val().length == 0) {
+                        $("#error-issued_date_shipping").show();
+                        isValid = false
+                    } else {
+                        $("#error-issued_date_shipping").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#subtotal_shipping").val().length == 0) {
+                        $("#error-subtotal_shipping").show();
+                        isValid = false
+                    } else {
+                        $("#error-subtotal_shipping").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#iva_shipping").val().length == 0) {
+                        $("#error-iva_shipping").show();
+                        isValid = false
+                    } else {
+                        $("#error-iva_shipping").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#retefuente_shipping").val().length == 0) {
+                        $("#error-retefuente_shipping").show();
+                        isValid = false
+                    } else {
+                        $("#error-retefuente_shipping").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#payable_shipping").val().length == 0) {
+                        $("#error-payable_shipping").show();
+                        isValid = false
+                    } else {
+                        $("#error-payable_shipping").hide();
+                        isValid = true;
+                    }
                 }
 
-                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                fd.append("add_type", 9);
+                if (isValid) {
 
-                $.ajax({
-                    url: base_url + "/save_export_documents",
-                    type: 'post',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(jsonResult) {
-                        $('#loading').hide();
+                    var fd = new FormData();
+                    fd.append("exportId", $("#hdnExportId").val());
+                    fd.append("originId", $("#hdnOriginId").val());
+                    fd.append('saNumber', $("#hdnSaNumber").val());
+                    fd.append("fileExtension", fileExtension);
+                    fd.append("updateContainerValueData_Shipping", JSON.stringify(arrUpdateContainerValue));
+                    fd.append("uploadPdfFileShipping", uploadPdfFileCustomAgency);
 
-                        if (jsonResult.redirect == true) {
-                            window.location.replace(login_url);
-                        } else if (jsonResult.result != '') {
-                            toastr.clear();
+                    if (fileExtension == "xml" || fileExtension == "XML") {
 
+                        fd.append('invoiceNo_Shipping', $("#lblInvoiceNoShipping").text());
+                        fd.append('supplierName_Shipping', supplierId);
+                        fd.append('formattedDate_Shipping', $("#lblIssuedDateShipping").text());
+                        fd.append('subTotal_Shipping', subTotalCustoms);
+                        fd.append('iva_Shipping', ivaCustoms);
+                        fd.append('retefuente_Shipping', retefuenteCustoms);
+                        fd.append('payable_Shipping', payableCustoms);
+                    } else {
 
-                        } else if (jsonResult.error != '') {
-                            toastr.clear();
-                            toastr.error(jsonResult.error);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else if (jsonResult.warning != '') {
-                            toastr.clear();
-                            toastr.warning(jsonResult.warning);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else {
-                            toastr.clear();
-                        }
+                        fd.append('invoiceNo_Shipping', $("#invoice_number_shipping").val());
+                        fd.append('supplierName_Shipping', $("#supplier_name_shipping").val());
+                        fd.append('formattedDate_Shipping', $("#formatted_date_shipping").val());
+                        fd.append('subTotal_Shipping', $("#subtotal_shipping").val());
+                        fd.append('iva_Shipping', $("#iva_shipping").val());
+                        fd.append('retefuente_Shipping', $("#retefuente_shipping").val());
+                        fd.append('payable_Shipping', $("#payable_shipping").val());
                     }
-                });
+
+                    fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                    fd.append("add_type", 9);
+
+                    $.ajax({
+                        url: base_url + "/save_export_documents",
+                        type: 'post',
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function(jsonResult) {
+                            $('#loading').hide();
+
+                            if (jsonResult.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (jsonResult.result != '') {
+                                toastr.clear();
+
+
+                            } else if (jsonResult.error != '') {
+                                toastr.clear();
+                                toastr.error(jsonResult.error);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else if (jsonResult.warning != '') {
+                                toastr.clear();
+                                toastr.warning(jsonResult.warning);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else {
+                                toastr.clear();
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -2197,8 +2444,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                console.log(totalContainerValue);
-
                 if (fileExtension == "pdf" || fileExtension == "PDF") {
                     totalPayableAmount = parseFloat($("#payable_fumigation").val()) || 0;
                 }
@@ -2209,63 +2454,128 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     return false;
                 }
 
-                var fd = new FormData();
-                fd.append("exportId", $("#hdnExportId").val());
-                fd.append("originId", $("#hdnOriginId").val());
-                fd.append('saNumber', $("#hdnSaNumber").val());
-                fd.append("fileExtension", fileExtension);
-                fd.append("updateContainerValueData_Fumigation", JSON.stringify(arrUpdateContainerValue));
-                if (fileExtension == "xml" || fileExtension == "XML") {
+                var isValid = true;
+                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
 
-                    fd.append('invoiceNo_Fumigation', $("#lblInvoiceNoFumigation").text());
-                    fd.append('supplierName_Fumigation', supplierId);
-                    fd.append('formattedDate_Fumigation', $("#lblIssuedDateFumigation").text());
-                    fd.append('subTotal_Fumigation', subTotalCustoms);
-                    fd.append('iva_Fumigation', ivaCustoms);
-                    fd.append('retefuente_Fumigation', retefuenteCustoms);
-                    fd.append('payable_Fumigation', payableCustoms);
-                } else {
-                    fd.append("uploadPdfFileFumigation", uploadPdfFileCustomAgency);
-                    fd.append('invoiceNo_Fumigation', $("#invoice_number_fumigation").val());
-                    fd.append('supplierName_Fumigation', $("#supplier_name_fumigation").val());
-                    fd.append('formattedDate_Fumigation', $("#formatted_date_fumigation").val());
-                    fd.append('subTotal_Fumigation', $("#subtotal_fumigation").val());
-                    fd.append('iva_Fumigation', $("#iva_fumigation").val());
-                    fd.append('retefuente_Fumigation', $("#retefuente_fumigation").val());
-                    fd.append('payable_Fumigation', $("#payable_fumigation").val());
+                    if ($("#invoice_number_fumigation").val().length == 0) {
+                        $("#error-invoice_no_fumigation").show();
+                        isValid = false
+                    } else {
+                        $("#error-invoice_no_fumigation").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#supplier_name_fumigation").val() == 0) {
+                        $("#error-supplier_name_fumigation").show();
+                        isValid = false
+                    } else {
+                        $("#error-supplier_name_fumigation").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#issued_date_fumigation").val().length == 0) {
+                        $("#error-issued_date_fumigation").show();
+                        isValid = false
+                    } else {
+                        $("#error-issued_date_fumigation").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#subtotal_fumigation").val().length == 0) {
+                        $("#error-subtotal_fumigation").show();
+                        isValid = false
+                    } else {
+                        $("#error-subtotal_fumigation").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#iva_fumigation").val().length == 0) {
+                        $("#error-iva_fumigation").show();
+                        isValid = false
+                    } else {
+                        $("#error-iva_fumigation").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#retefuente_fumigation").val().length == 0) {
+                        $("#error-retefuente_fumigation").show();
+                        isValid = false
+                    } else {
+                        $("#error-retefuente_fumigation").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#payable_fumigation").val().length == 0) {
+                        $("#error-payable_fumigation").show();
+                        isValid = false
+                    } else {
+                        $("#error-payable_fumigation").hide();
+                        isValid = true;
+                    }
                 }
 
-                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                fd.append("add_type", 4);
+                if (isValid) {
 
-                $.ajax({
-                    url: base_url + "/save_export_documents",
-                    type: 'post',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(jsonResult) {
-                        $('#loading').hide();
+                    var fd = new FormData();
+                    fd.append("exportId", $("#hdnExportId").val());
+                    fd.append("originId", $("#hdnOriginId").val());
+                    fd.append('saNumber', $("#hdnSaNumber").val());
+                    fd.append("fileExtension", fileExtension);
+                    fd.append("updateContainerValueData_Fumigation", JSON.stringify(arrUpdateContainerValue));
+                    fd.append("uploadPdfFileFumigation", uploadPdfFileCustomAgency);
 
-                        if (jsonResult.redirect == true) {
-                            window.location.replace(login_url);
-                        } else if (jsonResult.result != '') {
-                            toastr.clear();
+                    if (fileExtension == "xml" || fileExtension == "XML") {
 
+                        fd.append('invoiceNo_Fumigation', $("#lblInvoiceNoFumigation").text());
+                        fd.append('supplierName_Fumigation', supplierId);
+                        fd.append('formattedDate_Fumigation', $("#lblIssuedDateFumigation").text());
+                        fd.append('subTotal_Fumigation', subTotalCustoms);
+                        fd.append('iva_Fumigation', ivaCustoms);
+                        fd.append('retefuente_Fumigation', retefuenteCustoms);
+                        fd.append('payable_Fumigation', payableCustoms);
+                    } else {
 
-                        } else if (jsonResult.error != '') {
-                            toastr.clear();
-                            toastr.error(jsonResult.error);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else if (jsonResult.warning != '') {
-                            toastr.clear();
-                            toastr.warning(jsonResult.warning);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else {
-                            toastr.clear();
-                        }
+                        fd.append('invoiceNo_Fumigation', $("#invoice_number_fumigation").val());
+                        fd.append('supplierName_Fumigation', $("#supplier_name_fumigation").val());
+                        fd.append('formattedDate_Fumigation', $("#formatted_date_fumigation").val());
+                        fd.append('subTotal_Fumigation', $("#subtotal_fumigation").val());
+                        fd.append('iva_Fumigation', $("#iva_fumigation").val());
+                        fd.append('retefuente_Fumigation', $("#retefuente_fumigation").val());
+                        fd.append('payable_Fumigation', $("#payable_fumigation").val());
                     }
-                });
+
+                    fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                    fd.append("add_type", 4);
+
+                    $.ajax({
+                        url: base_url + "/save_export_documents",
+                        type: 'post',
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function(jsonResult) {
+                            $('#loading').hide();
+
+                            if (jsonResult.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (jsonResult.result != '') {
+                                toastr.clear();
+
+
+                            } else if (jsonResult.error != '') {
+                                toastr.clear();
+                                toastr.error(jsonResult.error);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else if (jsonResult.warning != '') {
+                                toastr.clear();
+                                toastr.warning(jsonResult.warning);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else {
+                                toastr.clear();
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -2296,8 +2606,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                console.log(totalContainerValue);
-
                 if (fileExtension == "pdf" || fileExtension == "PDF") {
                     totalPayableAmount = parseFloat($("#payable_coteros").val()) || 0;
                 }
@@ -2308,63 +2616,127 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     return false;
                 }
 
-                var fd = new FormData();
-                fd.append("exportId", $("#hdnExportId").val());
-                fd.append("originId", $("#hdnOriginId").val());
-                fd.append('saNumber', $("#hdnSaNumber").val());
-                fd.append("fileExtension", fileExtension);
-                fd.append("updateContainerValueData_Coteros", JSON.stringify(arrUpdateContainerValue));
-                if (fileExtension == "xml" || fileExtension == "XML") {
+                var isValid = true;
+                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
 
-                    fd.append('invoiceNo_Coteros', $("#lblInvoiceNoCoteros").text());
-                    fd.append('supplierName_Coteros', supplierId);
-                    fd.append('formattedDate_Coteros', $("#lblIssuedDateCoteros").text());
-                    fd.append('subTotal_Coteros', subTotalCustoms);
-                    fd.append('iva_Coteros', ivaCustoms);
-                    fd.append('retefuente_Coteros', retefuenteCustoms);
-                    fd.append('payable_Coteros', payableCustoms);
-                } else {
-                    fd.append("uploadPdfFileCoteros", uploadPdfFileCustomAgency);
-                    fd.append('invoiceNo_Coteros', $("#invoice_number_coteros").val());
-                    fd.append('supplierName_Coteros', $("#supplier_name_coteros").val());
-                    fd.append('formattedDate_Coteros', $("#formatted_date_coteros").val());
-                    fd.append('subTotal_Coteros', $("#subtotal_coteros").val());
-                    fd.append('iva_Coteros', $("#iva_coteros").val());
-                    fd.append('retefuente_Coteros', $("#retefuente_coteros").val());
-                    fd.append('payable_Coteros', $("#payable_coteros").val());
+                    if ($("#invoice_number_coteros").val().length == 0) {
+                        $("#error-invoice_no_coteros").show();
+                        isValid = false
+                    } else {
+                        $("#error-invoice_no_coteros").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#supplier_name_coteros").val() == 0) {
+                        $("#error-supplier_name_coteros").show();
+                        isValid = false
+                    } else {
+                        $("#error-supplier_name_coteros").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#issued_date_coteros").val().length == 0) {
+                        $("#error-issued_date_coteros").show();
+                        isValid = false
+                    } else {
+                        $("#error-issued_date_coteros").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#subtotal_coteros").val().length == 0) {
+                        $("#error-subtotal_coteros").show();
+                        isValid = false
+                    } else {
+                        $("#error-subtotal_coteros").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#iva_coteros").val().length == 0) {
+                        $("#error-iva_coteros").show();
+                        isValid = false
+                    } else {
+                        $("#error-iva_coteros").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#retefuente_coteros").val().length == 0) {
+                        $("#error-retefuente_coteros").show();
+                        isValid = false
+                    } else {
+                        $("#error-retefuente_coteros").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#payable_coteros").val().length == 0) {
+                        $("#error-payable_coteros").show();
+                        isValid = false
+                    } else {
+                        $("#error-payable_coteros").hide();
+                        isValid = true;
+                    }
                 }
 
-                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                fd.append("add_type", 6);
+                if (isValid) {
 
-                $.ajax({
-                    url: base_url + "/save_export_documents",
-                    type: 'post',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(jsonResult) {
-                        $('#loading').hide();
+                    var fd = new FormData();
+                    fd.append("exportId", $("#hdnExportId").val());
+                    fd.append("originId", $("#hdnOriginId").val());
+                    fd.append('saNumber', $("#hdnSaNumber").val());
+                    fd.append("fileExtension", fileExtension);
+                    fd.append("updateContainerValueData_Coteros", JSON.stringify(arrUpdateContainerValue));
+                    fd.append("uploadPdfFileCoteros", uploadPdfFileCustomAgency);
 
-                        if (jsonResult.redirect == true) {
-                            window.location.replace(login_url);
-                        } else if (jsonResult.result != '') {
-                            toastr.clear();
+                    if (fileExtension == "xml" || fileExtension == "XML") {
 
-
-                        } else if (jsonResult.error != '') {
-                            toastr.clear();
-                            toastr.error(jsonResult.error);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else if (jsonResult.warning != '') {
-                            toastr.clear();
-                            toastr.warning(jsonResult.warning);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else {
-                            toastr.clear();
-                        }
+                        fd.append('invoiceNo_Coteros', $("#lblInvoiceNoCoteros").text());
+                        fd.append('supplierName_Coteros', supplierId);
+                        fd.append('formattedDate_Coteros', $("#lblIssuedDateCoteros").text());
+                        fd.append('subTotal_Coteros', subTotalCustoms);
+                        fd.append('iva_Coteros', ivaCustoms);
+                        fd.append('retefuente_Coteros', retefuenteCustoms);
+                        fd.append('payable_Coteros', payableCustoms);
+                    } else {
+                        fd.append('invoiceNo_Coteros', $("#invoice_number_coteros").val());
+                        fd.append('supplierName_Coteros', $("#supplier_name_coteros").val());
+                        fd.append('formattedDate_Coteros', $("#formatted_date_coteros").val());
+                        fd.append('subTotal_Coteros', $("#subtotal_coteros").val());
+                        fd.append('iva_Coteros', $("#iva_coteros").val());
+                        fd.append('retefuente_Coteros', $("#retefuente_coteros").val());
+                        fd.append('payable_Coteros', $("#payable_coteros").val());
                     }
-                });
+
+                    fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                    fd.append("add_type", 6);
+
+                    $.ajax({
+                        url: base_url + "/save_export_documents",
+                        type: 'post',
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function(jsonResult) {
+                            $('#loading').hide();
+
+                            if (jsonResult.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (jsonResult.result != '') {
+                                toastr.clear();
+
+
+                            } else if (jsonResult.error != '') {
+                                toastr.clear();
+                                toastr.error(jsonResult.error);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else if (jsonResult.warning != '') {
+                                toastr.clear();
+                                toastr.warning(jsonResult.warning);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else {
+                                toastr.clear();
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -2395,8 +2767,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                console.log(totalContainerValue);
-
                 if (fileExtension == "pdf" || fileExtension == "PDF") {
                     totalPayableAmount = parseFloat($("#payable_phyto").val()) || 0;
                 }
@@ -2407,63 +2777,127 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     return false;
                 }
 
-                var fd = new FormData();
-                fd.append("exportId", $("#hdnExportId").val());
-                fd.append("originId", $("#hdnOriginId").val());
-                fd.append('saNumber', $("#hdnSaNumber").val());
-                fd.append("fileExtension", fileExtension);
-                fd.append("updateContainerValueData_Phyto", JSON.stringify(arrUpdateContainerValue));
-                if (fileExtension == "xml" || fileExtension == "XML") {
+                var isValid = true;
+                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
 
-                    fd.append('invoiceNo_Phyto', $("#lblInvoiceNoPhyto").text());
-                    fd.append('supplierName_Phyto', supplierId);
-                    fd.append('formattedDate_Phyto', $("#lblIssuedDatePhyto").text());
-                    fd.append('subTotal_Phyto', subTotalCustoms);
-                    fd.append('iva_Phyto', ivaCustoms);
-                    fd.append('retefuente_Phyto', retefuenteCustoms);
-                    fd.append('payable_Phyto', payableCustoms);
-                } else {
-                    fd.append("uploadPdfFilePhyto", uploadPdfFileCustomAgency);
-                    fd.append('invoiceNo_Phyto', $("#invoice_number_phyto").val());
-                    fd.append('supplierName_Phyto', $("#supplier_name_phyto").val());
-                    fd.append('formattedDate_Phyto', $("#formatted_date_phyto").val());
-                    fd.append('subTotal_Phyto', $("#subtotal_phyto").val());
-                    fd.append('iva_Phyto', $("#iva_phyto").val());
-                    fd.append('retefuente_Phyto', $("#retefuente_phyto").val());
-                    fd.append('payable_Phyto', $("#payable_phyto").val());
+                    if ($("#invoice_number_phyto").val().length == 0) {
+                        $("#error-invoice_no_phyto").show();
+                        isValid = false
+                    } else {
+                        $("#error-invoice_no_phyto").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#supplier_name_phyto").val() == 0) {
+                        $("#error-supplier_name_phyto").show();
+                        isValid = false
+                    } else {
+                        $("#error-supplier_name_phyto").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#issued_date_phyto").val().length == 0) {
+                        $("#error-issued_date_phyto").show();
+                        isValid = false
+                    } else {
+                        $("#error-issued_date_phyto").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#subtotal_phyto").val().length == 0) {
+                        $("#error-subtotal_phyto").show();
+                        isValid = false
+                    } else {
+                        $("#error-subtotal_phyto").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#iva_phyto").val().length == 0) {
+                        $("#error-iva_phyto").show();
+                        isValid = false
+                    } else {
+                        $("#error-iva_phyto").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#retefuente_phyto").val().length == 0) {
+                        $("#error-retefuente_phyto").show();
+                        isValid = false
+                    } else {
+                        $("#error-retefuente_phyto").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#payable_phyto").val().length == 0) {
+                        $("#error-payable_phyto").show();
+                        isValid = false
+                    } else {
+                        $("#error-payable_phyto").hide();
+                        isValid = true;
+                    }
                 }
 
-                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                fd.append("add_type", 6);
+                if (isValid) {
+                    var fd = new FormData();
+                    fd.append("exportId", $("#hdnExportId").val());
+                    fd.append("originId", $("#hdnOriginId").val());
+                    fd.append('saNumber', $("#hdnSaNumber").val());
+                    fd.append("fileExtension", fileExtension);
+                    fd.append("updateContainerValueData_Phyto", JSON.stringify(arrUpdateContainerValue));
+                    fd.append("uploadPdfFilePhyto", uploadPdfFileCustomAgency);
 
-                $.ajax({
-                    url: base_url + "/save_export_documents",
-                    type: 'post',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(jsonResult) {
-                        $('#loading').hide();
+                    if (fileExtension == "xml" || fileExtension == "XML") {
 
-                        if (jsonResult.redirect == true) {
-                            window.location.replace(login_url);
-                        } else if (jsonResult.result != '') {
-                            toastr.clear();
+                        fd.append('invoiceNo_Phyto', $("#lblInvoiceNoPhyto").text());
+                        fd.append('supplierName_Phyto', supplierId);
+                        fd.append('formattedDate_Phyto', $("#lblIssuedDatePhyto").text());
+                        fd.append('subTotal_Phyto', subTotalCustoms);
+                        fd.append('iva_Phyto', ivaCustoms);
+                        fd.append('retefuente_Phyto', retefuenteCustoms);
+                        fd.append('payable_Phyto', payableCustoms);
+                    } else {
 
-
-                        } else if (jsonResult.error != '') {
-                            toastr.clear();
-                            toastr.error(jsonResult.error);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else if (jsonResult.warning != '') {
-                            toastr.clear();
-                            toastr.warning(jsonResult.warning);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else {
-                            toastr.clear();
-                        }
+                        fd.append('invoiceNo_Phyto', $("#invoice_number_phyto").val());
+                        fd.append('supplierName_Phyto', $("#supplier_name_phyto").val());
+                        fd.append('formattedDate_Phyto', $("#formatted_date_phyto").val());
+                        fd.append('subTotal_Phyto', $("#subtotal_phyto").val());
+                        fd.append('iva_Phyto', $("#iva_phyto").val());
+                        fd.append('retefuente_Phyto', $("#retefuente_phyto").val());
+                        fd.append('payable_Phyto', $("#payable_phyto").val());
                     }
-                });
+
+                    fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                    fd.append("add_type", 6);
+
+                    $.ajax({
+                        url: base_url + "/save_export_documents",
+                        type: 'post',
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function(jsonResult) {
+                            $('#loading').hide();
+
+                            if (jsonResult.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (jsonResult.result != '') {
+                                toastr.clear();
+
+
+                            } else if (jsonResult.error != '') {
+                                toastr.clear();
+                                toastr.error(jsonResult.error);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else if (jsonResult.warning != '') {
+                                toastr.clear();
+                                toastr.warning(jsonResult.warning);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else {
+                                toastr.clear();
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -2494,8 +2928,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                console.log(totalContainerValue);
-
                 if (fileExtension == "pdf" || fileExtension == "PDF") {
                     totalPayableAmount = parseFloat($("#payable_incentives").val()) || 0;
                 }
@@ -2506,63 +2938,127 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     return false;
                 }
 
-                var fd = new FormData();
-                fd.append("exportId", $("#hdnExportId").val());
-                fd.append("originId", $("#hdnOriginId").val());
-                fd.append('saNumber', $("#hdnSaNumber").val());
-                fd.append("fileExtension", fileExtension);
-                fd.append("updateContainerValueData_Incentives", JSON.stringify(arrUpdateContainerValue));
-                if (fileExtension == "xml" || fileExtension == "XML") {
+                var isValid = true;
+                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
 
-                    fd.append('invoiceNo_Incentives', $("#lblInvoiceNoIncentives").text());
-                    fd.append('supplierName_Incentives', supplierId);
-                    fd.append('formattedDate_Incentives', $("#lblIssuedDateIncentives").text());
-                    fd.append('subTotal_Incentives', subTotalCustoms);
-                    fd.append('iva_Incentives', ivaCustoms);
-                    fd.append('retefuente_Incentives', retefuenteCustoms);
-                    fd.append('payable_Incentives', payableCustoms);
-                } else {
-                    fd.append("uploadPdfFileIncentives", uploadPdfFileCustomAgency);
-                    fd.append('invoiceNo_Incentives', $("#invoice_number_incentives").val());
-                    fd.append('supplierName_Incentives', $("#supplier_name_incentives").val());
-                    fd.append('formattedDate_Incentives', $("#formatted_date_incentives").val());
-                    fd.append('subTotal_Incentives', $("#subtotal_incentives").val());
-                    fd.append('iva_Incentives', $("#iva_incentives").val());
-                    fd.append('retefuente_Incentives', $("#retefuente_incentives").val());
-                    fd.append('payable_Incentives', $("#payable_incentives").val());
+                    if ($("#invoice_number_incentives").val().length == 0) {
+                        $("#error-invoice_no_incentives").show();
+                        isValid = false
+                    } else {
+                        $("#error-invoice_no_incentives").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#supplier_name_incentives").val() == 0) {
+                        $("#error-supplier_name_incentives").show();
+                        isValid = false
+                    } else {
+                        $("#error-supplier_name_incentives").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#issued_date_incentives").val().length == 0) {
+                        $("#error-issued_date_incentives").show();
+                        isValid = false
+                    } else {
+                        $("#error-issued_date_incentives").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#subtotal_incentives").val().length == 0) {
+                        $("#error-subtotal_incentives").show();
+                        isValid = false
+                    } else {
+                        $("#error-subtotal_incentives").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#iva_incentives").val().length == 0) {
+                        $("#error-iva_incentives").show();
+                        isValid = false
+                    } else {
+                        $("#error-iva_incentives").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#retefuente_incentives").val().length == 0) {
+                        $("#error-retefuente_incentives").show();
+                        isValid = false
+                    } else {
+                        $("#error-retefuente_incentives").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#payable_incentives").val().length == 0) {
+                        $("#error-payable_incentives").show();
+                        isValid = false
+                    } else {
+                        $("#error-payable_incentives").hide();
+                        isValid = true;
+                    }
                 }
 
-                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                fd.append("add_type", 6);
+                if (isValid) {
+                    var fd = new FormData();
+                    fd.append("exportId", $("#hdnExportId").val());
+                    fd.append("originId", $("#hdnOriginId").val());
+                    fd.append('saNumber', $("#hdnSaNumber").val());
+                    fd.append("fileExtension", fileExtension);
+                    fd.append("updateContainerValueData_Incentives", JSON.stringify(arrUpdateContainerValue));
+                    fd.append("uploadPdfFileIncentives", uploadPdfFileCustomAgency);
 
-                $.ajax({
-                    url: base_url + "/save_export_documents",
-                    type: 'post',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(jsonResult) {
-                        $('#loading').hide();
+                    if (fileExtension == "xml" || fileExtension == "XML") {
 
-                        if (jsonResult.redirect == true) {
-                            window.location.replace(login_url);
-                        } else if (jsonResult.result != '') {
-                            toastr.clear();
+                        fd.append('invoiceNo_Incentives', $("#lblInvoiceNoIncentives").text());
+                        fd.append('supplierName_Incentives', supplierId);
+                        fd.append('formattedDate_Incentives', $("#lblIssuedDateIncentives").text());
+                        fd.append('subTotal_Incentives', subTotalCustoms);
+                        fd.append('iva_Incentives', ivaCustoms);
+                        fd.append('retefuente_Incentives', retefuenteCustoms);
+                        fd.append('payable_Incentives', payableCustoms);
+                    } else {
 
-
-                        } else if (jsonResult.error != '') {
-                            toastr.clear();
-                            toastr.error(jsonResult.error);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else if (jsonResult.warning != '') {
-                            toastr.clear();
-                            toastr.warning(jsonResult.warning);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else {
-                            toastr.clear();
-                        }
+                        fd.append('invoiceNo_Incentives', $("#invoice_number_incentives").val());
+                        fd.append('supplierName_Incentives', $("#supplier_name_incentives").val());
+                        fd.append('formattedDate_Incentives', $("#formatted_date_incentives").val());
+                        fd.append('subTotal_Incentives', $("#subtotal_incentives").val());
+                        fd.append('iva_Incentives', $("#iva_incentives").val());
+                        fd.append('retefuente_Incentives', $("#retefuente_incentives").val());
+                        fd.append('payable_Incentives', $("#payable_incentives").val());
                     }
-                });
+
+                    fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                    fd.append("add_type", 6);
+
+                    $.ajax({
+                        url: base_url + "/save_export_documents",
+                        type: 'post',
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function(jsonResult) {
+                            $('#loading').hide();
+
+                            if (jsonResult.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (jsonResult.result != '') {
+                                toastr.clear();
+
+
+                            } else if (jsonResult.error != '') {
+                                toastr.clear();
+                                toastr.error(jsonResult.error);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else if (jsonResult.warning != '') {
+                                toastr.clear();
+                                toastr.warning(jsonResult.warning);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else {
+                                toastr.clear();
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -2593,8 +3089,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                console.log(totalContainerValue);
-
                 if (fileExtension == "pdf" || fileExtension == "PDF") {
                     totalPayableAmount = parseFloat($("#payable_remobilization").val()) || 0;
                 }
@@ -2605,63 +3099,127 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     return false;
                 }
 
-                var fd = new FormData();
-                fd.append("exportId", $("#hdnExportId").val());
-                fd.append("originId", $("#hdnOriginId").val());
-                fd.append('saNumber', $("#hdnSaNumber").val());
-                fd.append("fileExtension", fileExtension);
-                fd.append("updateContainerValueData_Remobilization", JSON.stringify(arrUpdateContainerValue));
-                if (fileExtension == "xml" || fileExtension == "XML") {
+                var isValid = true;
+                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
 
-                    fd.append('invoiceNo_Remobilization', $("#lblInvoiceNoRemobilization").text());
-                    fd.append('supplierName_Remobilization', supplierId);
-                    fd.append('formattedDate_Remobilization', $("#lblIssuedDateRemobilization").text());
-                    fd.append('subTotal_Remobilization', subTotalCustoms);
-                    fd.append('iva_Remobilization', ivaCustoms);
-                    fd.append('retefuente_Remobilization', retefuenteCustoms);
-                    fd.append('payable_Remobilization', payableCustoms);
-                } else {
-                    fd.append("uploadPdfFileRemobilization", uploadPdfFileCustomAgency);
-                    fd.append('invoiceNo_Remobilization', $("#invoice_number_remobilization").val());
-                    fd.append('supplierName_Remobilization', $("#supplier_name_remobilization").val());
-                    fd.append('formattedDate_Remobilization', $("#formatted_date_remobilization").val());
-                    fd.append('subTotal_Remobilization', $("#subtotal_remobilization").val());
-                    fd.append('iva_Remobilization', $("#iva_remobilization").val());
-                    fd.append('retefuente_Remobilization', $("#retefuente_remobilization").val());
-                    fd.append('payable_Remobilization', $("#payable_remobilization").val());
+                    if ($("#invoice_number_remobilization").val().length == 0) {
+                        $("#error-invoice_no_remobilization").show();
+                        isValid = false
+                    } else {
+                        $("#error-invoice_no_remobilization").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#supplier_name_remobilization").val() == 0) {
+                        $("#error-supplier_name_remobilization").show();
+                        isValid = false
+                    } else {
+                        $("#error-supplier_name_remobilization").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#issued_date_remobilization").val().length == 0) {
+                        $("#error-issued_date_remobilization").show();
+                        isValid = false
+                    } else {
+                        $("#error-issued_date_remobilization").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#subtotal_remobilization").val().length == 0) {
+                        $("#error-subtotal_remobilization").show();
+                        isValid = false
+                    } else {
+                        $("#error-subtotal_remobilization").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#iva_remobilization").val().length == 0) {
+                        $("#error-iva_remobilization").show();
+                        isValid = false
+                    } else {
+                        $("#error-iva_remobilization").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#retefuente_remobilization").val().length == 0) {
+                        $("#error-retefuente_remobilization").show();
+                        isValid = false
+                    } else {
+                        $("#error-retefuente_remobilization").hide();
+                        isValid = true;
+                    }
+
+                    if ($("#payable_remobilization").val().length == 0) {
+                        $("#error-payable_remobilization").show();
+                        isValid = false
+                    } else {
+                        $("#error-payable_remobilization").hide();
+                        isValid = true;
+                    }
                 }
 
-                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                fd.append("add_type", 6);
+                if (isValid) {
+                    var fd = new FormData();
+                    fd.append("exportId", $("#hdnExportId").val());
+                    fd.append("originId", $("#hdnOriginId").val());
+                    fd.append('saNumber', $("#hdnSaNumber").val());
+                    fd.append("fileExtension", fileExtension);
+                    fd.append("updateContainerValueData_Remobilization", JSON.stringify(arrUpdateContainerValue));
+                    fd.append("uploadPdfFileRemobilization", uploadPdfFileCustomAgency);
 
-                $.ajax({
-                    url: base_url + "/save_export_documents",
-                    type: 'post',
-                    data: fd,
-                    contentType: false,
-                    processData: false,
-                    success: function(jsonResult) {
-                        $('#loading').hide();
+                    if (fileExtension == "xml" || fileExtension == "XML") {
 
-                        if (jsonResult.redirect == true) {
-                            window.location.replace(login_url);
-                        } else if (jsonResult.result != '') {
-                            toastr.clear();
+                        fd.append('invoiceNo_Remobilization', $("#lblInvoiceNoRemobilization").text());
+                        fd.append('supplierName_Remobilization', supplierId);
+                        fd.append('formattedDate_Remobilization', $("#lblIssuedDateRemobilization").text());
+                        fd.append('subTotal_Remobilization', subTotalCustoms);
+                        fd.append('iva_Remobilization', ivaCustoms);
+                        fd.append('retefuente_Remobilization', retefuenteCustoms);
+                        fd.append('payable_Remobilization', payableCustoms);
+                    } else {
 
-
-                        } else if (jsonResult.error != '') {
-                            toastr.clear();
-                            toastr.error(jsonResult.error);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else if (jsonResult.warning != '') {
-                            toastr.clear();
-                            toastr.warning(jsonResult.warning);
-                            $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-                        } else {
-                            toastr.clear();
-                        }
+                        fd.append('invoiceNo_Remobilization', $("#invoice_number_remobilization").val());
+                        fd.append('supplierName_Remobilization', $("#supplier_name_remobilization").val());
+                        fd.append('formattedDate_Remobilization', $("#formatted_date_remobilization").val());
+                        fd.append('subTotal_Remobilization', $("#subtotal_remobilization").val());
+                        fd.append('iva_Remobilization', $("#iva_remobilization").val());
+                        fd.append('retefuente_Remobilization', $("#retefuente_remobilization").val());
+                        fd.append('payable_Remobilization', $("#payable_remobilization").val());
                     }
-                });
+
+                    fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                    fd.append("add_type", 6);
+
+                    $.ajax({
+                        url: base_url + "/save_export_documents",
+                        type: 'post',
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function(jsonResult) {
+                            $('#loading').hide();
+
+                            if (jsonResult.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (jsonResult.result != '') {
+                                toastr.clear();
+
+
+                            } else if (jsonResult.error != '') {
+                                toastr.clear();
+                                toastr.error(jsonResult.error);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else if (jsonResult.warning != '') {
+                                toastr.clear();
+                                toastr.warning(jsonResult.warning);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else {
+                                toastr.clear();
+                            }
+                        }
+                    });
+                }
             }
         });
     });
@@ -2712,7 +3270,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             $("#divContainersCustoms").show();
 
                             totalPayableAmount = jsonResult.result["payableAmountValue"];
-                            uploadPdfFileCustomAgency = "";
+                            uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
                             subTotalCustoms = jsonResult.result["taxExclusiveAmountValue"];
@@ -2841,7 +3399,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             $("#fileUploadDoc_ITR").val("");
 
                             totalPayableAmount = jsonResult.result["payableAmountValue"];
-                            uploadPdfFileCustomAgency = "";
+                            uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
                             subTotalCustoms = jsonResult.result["taxExclusiveAmountValue"];
@@ -2926,7 +3484,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             $("#fileUploadDoc_Port").val("");
 
                             totalPayableAmount = jsonResult.result["payableAmountValue"];
-                            uploadPdfFileCustomAgency = "";
+                            uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
                             subTotalCustoms = jsonResult.result["taxExclusiveAmountValue"];
@@ -3011,7 +3569,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             $("#fileUploadDoc_Shipping").val("");
 
                             totalPayableAmount = jsonResult.result["payableAmountValue"];
-                            uploadPdfFileCustomAgency = "";
+                            uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
                             subTotalCustoms = jsonResult.result["taxExclusiveAmountValue"];
@@ -3096,7 +3654,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             $("#fileUploadDoc_Fumigation").val("");
 
                             totalPayableAmount = jsonResult.result["payableAmountValue"];
-                            uploadPdfFileCustomAgency = "";
+                            uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
                             subTotalCustoms = jsonResult.result["taxExclusiveAmountValue"];
@@ -3181,7 +3739,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             $("#fileUploadDoc_Coteros").val("");
 
                             totalPayableAmount = jsonResult.result["payableAmountValue"];
-                            uploadPdfFileCustomAgency = "";
+                            uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
                             subTotalCustoms = jsonResult.result["taxExclusiveAmountValue"];
@@ -3266,7 +3824,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             $("#fileUploadDoc_Phyto").val("");
 
                             totalPayableAmount = jsonResult.result["payableAmountValue"];
-                            uploadPdfFileCustomAgency = "";
+                            uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
                             subTotalCustoms = jsonResult.result["taxExclusiveAmountValue"];
@@ -3351,7 +3909,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             $("#fileUploadDoc_Incentives").val("");
 
                             totalPayableAmount = jsonResult.result["payableAmountValue"];
-                            uploadPdfFileCustomAgency = "";
+                            uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
                             subTotalCustoms = jsonResult.result["taxExclusiveAmountValue"];
@@ -3436,7 +3994,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             $("#fileUploadDoc_Remobilization").val("");
 
                             totalPayableAmount = jsonResult.result["payableAmountValue"];
-                            uploadPdfFileCustomAgency = "";
+                            uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
                             subTotalCustoms = jsonResult.result["taxExclusiveAmountValue"];

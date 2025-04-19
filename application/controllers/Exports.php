@@ -136,8 +136,115 @@ class Exports extends MY_Controller
                 $saNumber = $this->input->post("sn");
 
                 $getExportDetails = $this->Export_model->get_export_details_by_id($exportId, $saNumber);
-                //$getWH = $this->Master_model->get_warehouse_by_origin($getDispatchDetails[0]->origin_id);
                 $getShippingLines = $this->Master_model->get_shippinglines_by_origin($getExportDetails[0]->origin_id);
+
+                //CUSTOMS
+                $getExportDocumentsCustoms = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 1);
+                if (!empty($getExportDocumentsCustoms[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsCustoms[0]->invoice_date);
+                    $getExportDocumentsCustoms[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsCustomsContainers = array();
+                if(count($getExportDocumentsCustoms) == 1){
+                    $getExportDocumentsCustomsContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsCustoms[0]->export_id, 1, $getExportDocumentsCustoms[0]->id);
+                }
+
+                //TRANSPORT
+                $getExportDocumentsTransport = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 2);
+                if (!empty($getExportDocumentsTransport[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsTransport[0]->invoice_date);
+                    $getExportDocumentsTransport[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsTransportContainers = array();
+                if(count($getExportDocumentsTransport) == 1){
+                    $getExportDocumentsTransportContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsTransport[0]->export_id, 2, $getExportDocumentsTransport[0]->id);
+                }
+
+                //PORT
+                $getExportDocumentsPort = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 3);
+                if (!empty($getExportDocumentsPort[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsPort[0]->invoice_date);
+                    $getExportDocumentsPort[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsPortContainers = array();
+                if(count($getExportDocumentsPort) == 1){
+                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsPort[0]->export_id, 3, $getExportDocumentsPort[0]->id);
+                }
+
+                //FUMIGATION
+                $getExportDocumentsFumigation = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 4);
+                if (!empty($getExportDocumentsFumigation[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsFumigation[0]->invoice_date);
+                    $getExportDocumentsFumigation[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsFumigationContainers = array();
+                if(count($getExportDocumentsFumigation) == 1){
+                    $getExportDocumentsFumigationContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsFumigation[0]->export_id, 4, $getExportDocumentsFumigation[0]->id);
+                }
+
+                //PHYTO
+                $getExportDocumentsPhyto = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 5);
+                if (!empty($getExportDocumentsPhyto[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsPhyto[0]->invoice_date);
+                    $getExportDocumentsPhyto[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsPhytoContainers = array();
+                if(count($getExportDocumentsPhyto) == 1){
+                    $getExportDocumentsPhytoContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsPhyto[0]->export_id, 5, $getExportDocumentsPhyto[0]->id);
+                }
+
+                //COTEROS
+                $getExportDocumentsCoteros = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 6);
+                if (!empty($getExportDocumentsCoteros[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsCoteros[0]->invoice_date);
+                    $getExportDocumentsCoteros[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsCoterosContainers = array();
+                if(count($getExportDocumentsCoteros) == 1){
+                    $getExportDocumentsCoterosContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsCoteros[0]->export_id, 6, $getExportDocumentsCoteros[0]->id);
+                }
+
+                //INCENTIVES
+                $getExportDocumentsIncentives = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 7);
+                if (!empty($getExportDocumentsIncentives[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsIncentives[0]->invoice_date);
+                    $getExportDocumentsIncentives[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsIncentivesContainers = array();
+                if(count($getExportDocumentsIncentives) == 1){
+                    $getExportDocumentsIncentivesContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsIncentives[0]->export_id, 7, $getExportDocumentsIncentives[0]->id);
+                }
+
+                //REMOBILIZATION
+                $getExportDocumentsRemobilization = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 8);
+                if (!empty($getExportDocumentsRemobilization[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsRemobilization[0]->invoice_date);
+                    $getExportDocumentsRemobilization[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsRemobilizationContainers = array();
+                if(count($getExportDocumentsRemobilization) == 1){
+                    $getExportDocumentsRemobilizationContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsRemobilization[0]->export_id, 8, $getExportDocumentsRemobilization[0]->id);
+                }
+
+                //SHIPPING
+                $getExportDocumentsShipping = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 9);
+                if (!empty($getExportDocumentsShipping[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsShipping[0]->invoice_date);
+                    $getExportDocumentsShipping[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsShippingContainers = array();
+                if(count($getExportDocumentsShipping) == 1){
+                    $getExportDocumentsShippingContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsShipping[0]->export_id, 9, $getExportDocumentsShipping[0]->id);
+                }
 
                 $data = array(
                     "pageheading" => $this->lang->line("document_view"),
@@ -157,6 +264,24 @@ class Exports extends MY_Controller
                     'exportSuppliersShipping' => $this->Master_model->fetch_export_suppliers($getExportDetails[0]->origin_id, 9),
                     'exportSuppliersFumigation' => $this->Master_model->fetch_export_suppliers($getExportDetails[0]->origin_id, 4),
                     'containerDetails' => $this->Export_model->fetch_container_details_bydispatchids($getExportDetails[0]->dispatchids),
+                    'exportDocumentsCustoms' => $getExportDocumentsCustoms,
+                    'exportDocumentsCustomsContainers' => $getExportDocumentsCustomsContainers,
+                    'exportDocumentsTransport' => $getExportDocumentsTransport,
+                    'exportDocumentsTransportContainers' => $getExportDocumentsTransportContainers,
+                    'exportDocumentsPort' => $getExportDocumentsPort,
+                    'exportDocumentsPortContainers' => $getExportDocumentsPortContainers,
+                    'exportDocumentsFumigation' => $getExportDocumentsFumigation,
+                    'exportDocumentsFumigationContainers' => $getExportDocumentsFumigationContainers,
+                    'exportDocumentsPhyto' => $getExportDocumentsPhyto,
+                    'exportDocumentsPhytoContainers' => $getExportDocumentsPhytoContainers,
+                    'exportDocumentsCoteros' => $getExportDocumentsCoteros,
+                    'exportDocumentsCoterosContainers' => $getExportDocumentsCoterosContainers,
+                    'exportDocumentsIncentives' => $getExportDocumentsIncentives,
+                    'exportDocumentsIncentivesContainers' => $getExportDocumentsIncentivesContainers,
+                    'exportDocumentsRemobilization' => $getExportDocumentsRemobilization,
+                    'exportDocumentsRemobilizationContainers' => $getExportDocumentsRemobilizationContainers,
+                    'exportDocumentsShipping' => $getExportDocumentsShipping,
+                    'exportDocumentsShippingContainers' => $getExportDocumentsShippingContainers,
                     "csrfhash" => $this->security->get_csrf_hash(),
                 );
                 $this->load->view("export/dialog_view_export_documents", $data);
@@ -857,7 +982,7 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
-                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -935,7 +1060,7 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
-                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1013,7 +1138,7 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
-                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1091,7 +1216,7 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
-                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1169,7 +1294,7 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
-                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1247,7 +1372,7 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
-                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1325,7 +1450,7 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
-                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1403,7 +1528,7 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
-                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1481,7 +1606,7 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
-                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype), true);
+                                $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1522,7 +1647,7 @@ class Exports extends MY_Controller
         }
     }
 
-    public function importInvoice($xml, $ext, $originId, $exportType)
+    public function importInvoice($xml, $ext, $originId, $exportType, $fileurl = null)
     {
         $session = $this->session->userdata('fullname');
 
@@ -1671,6 +1796,7 @@ class Exports extends MY_Controller
                 'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
                 'payableAmountValue' => $payableAmountValue,
                 'fileExtension' => $ext,
+                'fileUrl' => $fileurl,
                 'supplierId' => $supplierId,
             ];
 
@@ -1814,6 +1940,7 @@ class Exports extends MY_Controller
                 'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
                 'payableAmountValue' => $payableAmountValue,
                 'fileExtension' => $ext,
+                'fileUrl' => $fileurl,
                 'supplierId' => $supplierId,
             ];
 
@@ -1957,6 +2084,7 @@ class Exports extends MY_Controller
                 'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
                 'payableAmountValue' => $payableAmountValue,
                 'fileExtension' => $ext,
+                'fileUrl' => $fileurl,
                 'supplierId' => $supplierId,
             ];
 
@@ -2100,6 +2228,7 @@ class Exports extends MY_Controller
                 'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
                 'payableAmountValue' => $payableAmountValue,
                 'fileExtension' => $ext,
+                'fileUrl' => $fileurl,
                 'supplierId' => $supplierId,
             ];
 
@@ -2243,6 +2372,7 @@ class Exports extends MY_Controller
                 'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
                 'payableAmountValue' => $payableAmountValue,
                 'fileExtension' => $ext,
+                'fileUrl' => $fileurl,
                 'supplierId' => $supplierId,
             ];
 
@@ -2386,6 +2516,7 @@ class Exports extends MY_Controller
                 'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
                 'payableAmountValue' => $payableAmountValue,
                 'fileExtension' => $ext,
+                'fileUrl' => $fileurl,
                 'supplierId' => $supplierId,
             ];
 
@@ -2529,6 +2660,7 @@ class Exports extends MY_Controller
                 'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
                 'payableAmountValue' => $payableAmountValue,
                 'fileExtension' => $ext,
+                'fileUrl' => $fileurl,
                 'supplierId' => $supplierId,
             ];
 
@@ -2672,6 +2804,7 @@ class Exports extends MY_Controller
                 'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
                 'payableAmountValue' => $payableAmountValue,
                 'fileExtension' => $ext,
+                'fileUrl' => $fileurl,
                 'supplierId' => $supplierId,
             ];
 
@@ -2815,6 +2948,7 @@ class Exports extends MY_Controller
                 'allowanceTotalAmountValue' => $allowanceTotalAmountValue,
                 'payableAmountValue' => $payableAmountValue,
                 'fileExtension' => $ext,
+                'fileUrl' => $fileurl,
                 'supplierId' => $supplierId,
             ];
 

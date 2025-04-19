@@ -954,4 +954,20 @@ class Export_model extends CI_Model
 			return false;
 		}
 	}
+
+    public function fetch_export_documents($exportid, $exporttype)
+    {
+        $strQuery = "SELECT id, export_id, invoice_no, supplier_id, REPLACE(invoice_date, '/', '-') AS invoice_date, sub_total, tax_total, allowance_total, payable_total 
+            FROM tbl_export_documents WHERE is_active = 1 AND export_type = $exporttype AND export_id = $exportid";
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function fetch_export_container_documents($exportid, $exporttype, $exportdocid)
+    {
+        $strQuery = "SELECT dispatch_id, container_value FROM tbl_export_document_container 
+            WHERE is_active = 1 AND export_type = $exporttype AND export_id = $exportid AND export_doc_id = $exportdocid";
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
 }
