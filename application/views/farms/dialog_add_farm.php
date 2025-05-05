@@ -191,6 +191,15 @@ $applicable_origins = $session["applicable_origins"];
                 <select class="form-control" name="adjustment_tax[]" id="adjustment_tax" data-plugin="select_erp" multiple>
                 </select>
             </div>
+
+            <div class="col-md-6">
+                <label for="process"><?php echo $this->lang->line('process'); ?></label>
+                <select class="form-control" name="process" id="process" data-plugin="select_erp">
+                    <option value="0"><?php echo $this->lang->line("select"); ?></option>
+                    <option value="1"><?php echo $this->lang->line("sawmill"); ?></option>
+                    <option value="2"><?php echo $this->lang->line("local_sales"); ?></option>
+                </select>
+            </div>
         </div>
 
         <div class="row mb-3" id="divReceptionDetail">
@@ -590,6 +599,8 @@ $applicable_origins = $session["applicable_origins"];
             var mandatoryreceptiondetails = $("#hdnmandatoryreceptiondetails").val().trim();
             var warehouseid_roundlogs = $("#wh_name_roundlogs").val();
             var measurement_system_roundlogs = $("#measurement_system_roundlogs").val();
+            var process = $("#process").val();
+            
 
             var isValid1 = true,
                 isValid2 = true,
@@ -908,6 +919,7 @@ $applicable_origins = $session["applicable_origins"];
                     fd.append("measurement_system_roundlogs", 0);
                     fd.append("mandatoryreception", true);
                     fd.append("shippingline", $("#shipping_name_pine").val());
+                    fd.append("processType", 0);
                 } else {
                     fd.append("inventoryorder", inventoryorder);
                     fd.append("truckplatenumber", truckplatenumber);
@@ -925,6 +937,7 @@ $applicable_origins = $session["applicable_origins"];
                     fd.append("measurement_system_roundlogs", measurement_system_roundlogs);
                     fd.append("mandatoryreception", $("#hdnmandatoryreceptiondetails").val());
                     fd.append("shippingline", 0);
+                    fd.append("processType", process);
                 }
                 
                 if (origin == 4) {

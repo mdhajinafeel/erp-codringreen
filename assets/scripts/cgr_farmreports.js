@@ -2,14 +2,14 @@ $(document).ready(function () {
 
 	$("#loading").hide();
 
-	$("#origin_farmreport").select2({ dropdownCssClass: "myFont" });
-	$("#download_criteria_farmreport").select2({ dropdownCssClass: "myFont" });
-	$("#supplier_name_farmrepport").select2({ dropdownCssClass: "myFont" });
-	$("#inventory_order_farmrepport").select2({ dropdownCssClass: "myFont" });
-	$("#product_name_farmreport").select2({ dropdownCssClass: "myFont" });
-	$("#product_type_farmreport").select2({ dropdownCssClass: "myFont" });
+	// $("#origin_farmreport").select2({ dropdownCssClass: "myFont" });
+	// $("#download_criteria_farmreport").select2({ dropdownCssClass: "myFont" });
+	// $("#supplier_name_farmrepport").select2({ dropdownCssClass: "myFont" });
+	// $("#inventory_order_farmrepport").select2({ dropdownCssClass: "myFont" });
+	// $("#product_name_farmreport").select2({ dropdownCssClass: "myFont" });
+	// $("#product_type_farmreport").select2({ dropdownCssClass: "myFont" });
 
-	$("#download_criteria_farmreport").attr("disabled", "disabled");
+	//$("#download_criteria_farmreport").attr("disabled", "disabled");
 
 	$("#divSupplierNameFarmReports").hide();
 	$("#divInventoryOrderFarmReports").hide();
@@ -38,7 +38,7 @@ $(document).ready(function () {
 			$("#download_criteria_farmreport").removeAttr("disabled");
 		}
 
-		$("#download_criteria_farmreport").select2("val", "0");
+		//$("#download_criteria_farmreport").select2("val", "0");
 
 		$("#divSupplierNameFarmReports").hide();
 		$("#divInventoryOrderFarmReports").hide();
@@ -48,10 +48,10 @@ $(document).ready(function () {
 		$("#divProductTypeFarmReports").hide();
 		$("#divInputInventoryOrderFarmReports").hide();
 
-		$("#supplier_name_farmrepport").select2("val", "0");
-		$("#inventory_order_farmrepport").select2("val", "0");
-		$("#product_name_farmreport").select2("val", "0");
-		$("#product_type_farmreport").select2("val", "0");
+		// $("#supplier_name_farmrepport").select2("val", "0");
+		// $("#inventory_order_farmrepport").select2("val", "0");
+		// $("#product_name_farmreport").select2("val", "0");
+		// $("#product_type_farmreport").select2("val", "0");
 		$("#start_date_farmreport").val("");
 		$("#end_date_farmreport").val("");
 		$("#input_inventory_order_farmreport").val("");
@@ -71,10 +71,10 @@ $(document).ready(function () {
 			$("#divProductTypeFarmReports").hide();
 			$("#divInputInventoryOrderFarmReports").hide();
 
-			$("#supplier_name_farmrepport").select2("val", "0");
-			$("#inventory_order_farmrepport").select2("val", "0");
-			$("#product_name_farmreport").select2("val", "0");
-			$("#product_type_farmreport").select2("val", "0");
+			// $("#supplier_name_farmrepport").select2("val", "0");
+			// $("#inventory_order_farmrepport").select2("val", "0");
+			// $("#product_name_farmreport").select2("val", "0");
+			// $("#product_type_farmreport").select2("val", "0");
 			$("#start_date_farmreport").val("");
 			$("#end_date_farmreport").val("");
 			$("#input_inventory_order_farmreport").val("");
@@ -85,8 +85,8 @@ $(document).ready(function () {
 
 			$("#divSupplierNameFarmReports").show();
 			$("#divInventoryOrderFarmReports").show();
-			$("#supplier_name_farmrepport").select2("val", "0");
-			$("#inventory_order_farmrepport").select2("val", "0");
+			// $("#supplier_name_farmrepport").select2("val", "0");
+			// $("#inventory_order_farmrepport").select2("val", "0");
 
 			$("#divStartDateFarmReports").hide();
 			$("#divEndDateFarmReports").hide();
@@ -94,8 +94,8 @@ $(document).ready(function () {
 			$("#divProductTypeFarmReports").hide();
 			$("#divInputInventoryOrderFarmReports").hide();
 
-			$("#product_name_farmreport").select2("val", "0");
-			$("#product_type_farmreport").select2("val", "0");
+			// $("#product_name_farmreport").select2("val", "0");
+			// $("#product_type_farmreport").select2("val", "0");
 			$("#start_date_farmreport").val("");
 			$("#end_date_farmreport").val("");
 			$("#input_inventory_order_farmreport").val("");
@@ -117,10 +117,10 @@ $(document).ready(function () {
 			$("#divProductTypeFarmReports").hide();
 			$("#divInputInventoryOrderFarmReports").hide();
 
-			$("#supplier_name_farmrepport").select2("val", "0");
-			$("#inventory_order_farmrepport").select2("val", "0");
-			$("#product_name_farmreport").select2("val", "0");
-			$("#product_type_farmreport").select2("val", "0");
+			// $("#supplier_name_farmrepport").select2("val", "0");
+			// $("#inventory_order_farmrepport").select2("val", "0");
+			// $("#product_name_farmreport").select2("val", "0");
+			// $("#product_type_farmreport").select2("val", "0");
 			$("#input_inventory_order_farmreport").val("");
 
 		} else if ($("#download_criteria_farmreport").val() == 3) {
@@ -128,7 +128,7 @@ $(document).ready(function () {
 			$("#error-farmreportdownload").hide();
 
 			$("#divProductFarmReports").show();
-			$("#product_name_farmreport").select2("val", "0");
+			//$("#product_name_farmreport").select2("val", "0");
 
 			$("#divSupplierNameFarmReports").hide();
 			$("#divInventoryOrderFarmReports").hide();
@@ -137,9 +137,9 @@ $(document).ready(function () {
 			$("#divProductTypeFarmReports").hide();
 			$("#divInputInventoryOrderFarmReports").hide();
 
-			$("#supplier_name_farmrepport").select2("val", "0");
-			$("#inventory_order_farmrepport").select2("val", "0");
-			$("#product_type_farmreport").select2("val", "0");
+			// $("#supplier_name_farmrepport").select2("val", "0");
+			// $("#inventory_order_farmrepport").select2("val", "0");
+			// $("#product_type_farmreport").select2("val", "0");
 			$("#start_date_farmreport").val("");
 			$("#end_date_farmreport").val("");
 			$("#input_inventory_order_farmreport").val("");
@@ -151,7 +151,7 @@ $(document).ready(function () {
 			$("#error-farmreportdownload").hide();
 
 			$("#divProductTypeFarmReports").show();
-			$("#product_type_farmreport").select2("val", "0");
+			//$("#product_type_farmreport").select2("val", "0");
 
 			$("#divSupplierNameFarmReports").hide();
 			$("#divInventoryOrderFarmReports").hide();
@@ -160,9 +160,9 @@ $(document).ready(function () {
 			$("#divProductFarmReports").hide();
 			$("#divInputInventoryOrderFarmReports").hide();
 
-			$("#supplier_name_farmrepport").select2("val", "0");
-			$("#inventory_order_farmrepport").select2("val", "0");
-			$("#product_name_farmreport").select2("val", "0");
+			// $("#supplier_name_farmrepport").select2("val", "0");
+			// $("#inventory_order_farmrepport").select2("val", "0");
+			// $("#product_name_farmreport").select2("val", "0");
 			$("#start_date_farmreport").val("");
 			$("#end_date_farmreport").val("");
 			$("#input_inventory_order_farmreport").val("");
@@ -183,12 +183,12 @@ $(document).ready(function () {
 			$("#divEndDateFarmReports").hide();
 			$("#divProductFarmReports").hide();
 
-			$("#inventory_order_farmrepport").select2("val", "0");
-			$("#supplier_name_farmrepport").select2("val", "0");
-			$("#product_name_farmreport").select2("val", "0");
+			// $("#inventory_order_farmrepport").select2("val", "0");
+			// $("#supplier_name_farmrepport").select2("val", "0");
+			// $("#product_name_farmreport").select2("val", "0");
 			$("#start_date_farmreport").val("");
 			$("#end_date_farmreport").val("");
-			$("#product_type_farmreport").select2("val", "0");
+			//$("#product_type_farmreport").select2("val", "0");
 		}
 	});
 

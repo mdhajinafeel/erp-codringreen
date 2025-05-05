@@ -64,7 +64,7 @@ class Exportordersales extends MY_Controller
                 //     $actionExport = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("generate") . '"><button type="button" class="btn icon-btn btn-xs btn-download waves-effect waves-light" data-role="proformainvoice" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '"><span class="fa fa-receipt"></span></button></span>
                 //     <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("view") . '/' . $this->lang->line("download") . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="viewexportorder" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '"><span class="fas fa-eye"></span></button></span>';
                 // }
-                
+
                 if ($this->input->get("originid") == 3) {
                     $actionExport = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("invoice_history") . '"><button type="button" class="btn icon-btn btn-xs btn-edit waves-effect waves-light" data-role="invoicehistory" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '"><span class="fa fa-history"></span></button></span>
                     <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("generate_proforma_invoice") . '"><button type="button" class="btn icon-btn btn-xs btn-download waves-effect waves-light" data-role="proformainvoice" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '"><span class="fa fa-receipt"></span></button></span>
@@ -72,7 +72,7 @@ class Exportordersales extends MY_Controller
                 } else {
 
                     // if($r->id >= 531) {
-                        $actionExport = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("invoice_history") . '"><button type="button" class="btn icon-btn btn-xs btn-edit waves-effect waves-light" data-role="invoicehistory" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '"><span class="fa fa-history"></span></button></span> 
+                    $actionExport = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("invoice_history") . '"><button type="button" class="btn icon-btn btn-xs btn-edit waves-effect waves-light" data-role="invoicehistory" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '"><span class="fa fa-history"></span></button></span> 
                         <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("generate_proforma_invoice") . '"><button type="button" class="btn icon-btn btn-xs btn-download waves-effect waves-light" data-role="proformainvoice" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '"><span class="fa fa-receipt"></span></button></span>
                         <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("view") . '/' . $this->lang->line("download") . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="viewexportorder" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '"><span class="fas fa-eye"></span></button></span>';
                     // } else {
@@ -417,12 +417,12 @@ class Exportordersales extends MY_Controller
                                 $objSheet->getStyle("E$summaryDataCount")->getNumberFormat()->setFormatCode('_(* #,##0_);_(* (#,##0);_(* "-"??_);_(@_)');
 
                                 $objSheet->SetCellValue("F$summaryDataCount", html_entity_decode($containerdetails->length_text, ENT_QUOTES, 'UTF-8'));
-                                
-                                $int_var = preg_replace('/[^0-9]/', '', html_entity_decode($containerdetails->diameter_text, ENT_QUOTES, 'UTF-8'));  
+
+                                $int_var = preg_replace('/[^0-9]/', '', html_entity_decode($containerdetails->diameter_text, ENT_QUOTES, 'UTF-8'));
                                 $diameterValue = substr($int_var, -2) + 0;
                                 $avgDiameterValue = $objSheet->getCell("E$summaryDataCount")->getFormattedValue() + 0;
 
-                                if($avgDiameterValue < $diameterValue){
+                                if ($avgDiameterValue < $diameterValue) {
                                     $objSheet->getStyle("A$summaryDataCount:J$summaryDataCount")->getFont()->getColor()->setRGB('C00000');
                                 } else {
                                     $objSheet->getStyle("A$summaryDataCount:J$summaryDataCount")->getFont()->getColor()->setRGB('000000');
@@ -1601,7 +1601,7 @@ class Exportordersales extends MY_Controller
             );
 
             if (!empty($session)) {
-                
+
                 $this->deletefilesfromfolder();
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
@@ -1633,7 +1633,7 @@ class Exportordersales extends MY_Controller
                 } else {
                     $saNumber = str_replace("/", "-", $saNumber);
                 }
-                
+
                 $accountingInvoice = $this->input->post("accountinginvoice");
 
                 $objExcel = PHPExcel_IOFactory::createReader('Excel2007');
@@ -1652,7 +1652,7 @@ class Exportordersales extends MY_Controller
                 } else {
                     $objExcel = $objExcel->load('./assets/templates/' . $getSellerDetails[0]->template_file);
                 }
-                
+
 
                 $objExcel->setActiveSheetIndex(0);
                 $objSheet = $objExcel->getActiveSheet();
@@ -1687,7 +1687,7 @@ class Exportordersales extends MY_Controller
                     $servicesalesPercentage = $this->input->post("servicesales_percentage");
                     $salesAdvance = $this->input->post("salesadvance");
                     $salesAdvanceCost = $this->input->post("salesadvance_cost");
-                    
+
                     $updateContainerNumberDataJson = json_decode($this->input->post("updatecontainerprice"), true);
                     $creditnotes = $this->input->post("creditnotes");
 
@@ -1697,7 +1697,7 @@ class Exportordersales extends MY_Controller
                     $enableJumpSemiBool = false;
                     $priceLongsBase = 0;
                     $enableJumpLongsBool = false;
-                    
+
                     $excelVolumeValue = 0;
                     $excelInvoicePrice = 0;
 
@@ -1799,7 +1799,7 @@ class Exportordersales extends MY_Controller
                         foreach ($getExportItemDetails as $exportitem) {
                             $exportItemsRowCount = $exportItemsRowCount + 1;
                             $containerUPrice = 0;
-                            
+
                             $objSheet->setCellValue("B$exportItemsRowCount", $exportitem->total_containers);
                             $objSheet->setCellValue("C$exportItemsRowCount", $exportitem->description);
                             $objSheet->setCellValue("D$exportItemsRowCount", $exportitem->metric_ton);
@@ -1827,14 +1827,14 @@ class Exportordersales extends MY_Controller
                     $excelInvoicePrice = $objSheet->getCell('F40')->getCalculatedValue();
 
                     $tempNum = explode('.', $excelInvoiceValue);
-                    
+
                     $convertedNumber = (isset($tempNum[0]) ? $this->convertNumber($tempNum[0]) : '');
-                    
-                    if(isset($tempNum[1]) && $tempNum[1] > 0) {
+
+                    if (isset($tempNum[1]) && $tempNum[1] > 0) {
                         $convertedNumber .= ((isset($tempNum[0]) and isset($tempNum[1]))  ? ' With ' : '');
-    
+
                         $tempNum[1] = ltrim($tempNum[1], '0');
-    
+
                         $convertedNumber .= (isset($tempNum[1]) ? $this->convertNumber($tempNum[1]) . ' Cents' : '');
                     }
 
@@ -1848,8 +1848,8 @@ class Exportordersales extends MY_Controller
                     $objSheet->setCellValue("C49", $getBankDetails[0]->swift_code);
                     $objSheet->setCellValue("C50", $getBankDetails[0]->account_number);
                     $objSheet->getStyle("C50")->getNumberFormat()->setFormatCode('0');
-                } else if($originId == 1 && $accountingInvoice == 1) {
-                    
+                } else if ($originId == 1 && $accountingInvoice == 1) {
+
                     $serviceSales = $this->input->post("servicesales");
                     $servicesalesPercentage = $this->input->post("servicesales_percentage");
                     $salesAdvance = $this->input->post("salesadvance");
@@ -2359,7 +2359,7 @@ class Exportordersales extends MY_Controller
 
                             $exportItemsRowCount = $exportItemsRowCount + 1;
                             $containerUPrice = 0;
-                            
+
                             $objSheet->setCellValue("B$exportItemsRowCount", $container["containerNumber"]);
                             $objSheet->setCellValue("C$exportItemsRowCount", "TEAK WOOD ROUND LOGS");
                             $objSheet->setCellValue("D$exportItemsRowCount", $container["volume"] + 0);
@@ -2408,12 +2408,12 @@ class Exportordersales extends MY_Controller
                     $tempNum = explode('.', $excelInvoiceValue);
 
                     $convertedNumber = (isset($tempNum[0]) ? $this->convertNumber($tempNum[0]) : '');
-                    
-                    if(isset($tempNum[1]) && $tempNum[1] > 0) {
+
+                    if (isset($tempNum[1]) && $tempNum[1] > 0) {
                         $convertedNumber .= ((isset($tempNum[0]) and isset($tempNum[1]))  ? ' WITH ' : '');
-    
+
                         $tempNum[1] = ltrim($tempNum[1], '0');
-    
+
                         $convertedNumber .= (isset($tempNum[1]) ? $this->convertNumber($tempNum[1]) . ' CENTS' : '');
                     }
 
@@ -2428,7 +2428,6 @@ class Exportordersales extends MY_Controller
                     $objSheet->setCellValue("C49", $getBankDetails[0]->swift_code);
                     $objSheet->setCellValue("C50", $getBankDetails[0]->account_number);
                     $objSheet->getStyle("C50")->getNumberFormat()->setFormatCode('0');
-                    
                 } else {
 
                     $serviceSales = $this->input->post("servicesales");
@@ -2802,7 +2801,7 @@ class Exportordersales extends MY_Controller
                     } else {
                         $containerDataArray = array_merge($containerDataArray, $containerFinalArray);
                     }
-                    
+
                     if (count($containerDataArray) > 0) {
                         $exportItemsRowCount = 19;
 
@@ -2975,12 +2974,12 @@ class Exportordersales extends MY_Controller
                     $tempNum = explode('.', $excelInvoiceValue);
 
                     $convertedNumber = (isset($tempNum[0]) ? $this->convertNumber($tempNum[0]) : '');
-                    
-                    if(isset($tempNum[1]) && $tempNum[1] > 0) {
+
+                    if (isset($tempNum[1]) && $tempNum[1] > 0) {
                         $convertedNumber .= ((isset($tempNum[0]) and isset($tempNum[1]))  ? ' WITH ' : '');
-    
+
                         $tempNum[1] = ltrim($tempNum[1], '0');
-    
+
                         $convertedNumber .= (isset($tempNum[1]) ? $this->convertNumber($tempNum[1]) . ' CENTS' : '');
                     }
 
@@ -3045,7 +3044,7 @@ class Exportordersales extends MY_Controller
                     $enableJumpLongsBool = true;
                 }
 
-                if($originId == 3) {
+                if ($originId == 3) {
                     $dataExportInvoiceHistory = array(
                         "export_id" => $exportOrderId,
                         "invoice_date" => $invoiceDate,
@@ -3083,43 +3082,43 @@ class Exportordersales extends MY_Controller
                     );
                 } else {
                     $dataExportInvoiceHistory = array(
-                    "export_id" => $exportOrderId,
-                    "invoice_date" => $invoiceDate,
-                    "total_containers" => $getExportDetails[0]->d_total_containers,
-                    "circ_allowance" => $circAllowance,
-                    "length_allowance" => $lengthAllowance,
-                    "circ_adjustment" => $circAdjustment,
-                    "measurement_system" => $measurementsystem,
-                    "service_enabled" => $serviceSalesBool,
-                    "service_sales_percentage" => $servicesalesPercentage,
-                    "total_service_cost" => $salesServiceCost,
-                    "advance_enabled" => $advanceCostBool,
-                    "advance_cost" => $salesAdvanceCost,
-                    "total_advance_cost" => $advanceCost,
-                    "accounting_invoice" => $accountingInvoiceBool,
-                    "claim_id" => $creditnotes,
-                    "claim_amount" => abs($claimCost) + 0,
-                    "shorts_base_price" => $priceShortsBase,
-                    "enabled_jump_shorts" => $enableJumpShortsBool,
-                    "semi_base_price" => $priceSemiBase,
-                    "enabled_jump_semi" => $enableJumpSemiBool,
-                    "long_base_price" => $priceLongsBase,
-                    "enabled_jump_long" => $enableJumpLongsBool,
-                    "credit_notes" => $creditnotes,
-                    "buyer_id" => $buyerId,
-                    "bank_id" => $bankId,
-                    "seller_id" => $sellerId,
-                    "total_volume" => $excelVolumeValue,
-                    "invoice_unit_price" => $excelInvoicePrice,
-                    "total_invoice_value" => $excelVolumeValue * $excelInvoicePrice,
-                    "total_sales_value" => ($excelVolumeValue * $excelInvoicePrice) + (abs($claimCost) + 0) + $advanceCost + $salesServiceCost,
-                    "created_by" => $session['user_id'],
-                    "updated_by" => $session['user_id'],
-                    'is_active' => 1,
-                );
+                        "export_id" => $exportOrderId,
+                        "invoice_date" => $invoiceDate,
+                        "total_containers" => $getExportDetails[0]->d_total_containers,
+                        "circ_allowance" => $circAllowance,
+                        "length_allowance" => $lengthAllowance,
+                        "circ_adjustment" => $circAdjustment,
+                        "measurement_system" => $measurementsystem,
+                        "service_enabled" => $serviceSalesBool,
+                        "service_sales_percentage" => $servicesalesPercentage,
+                        "total_service_cost" => $salesServiceCost,
+                        "advance_enabled" => $advanceCostBool,
+                        "advance_cost" => $salesAdvanceCost,
+                        "total_advance_cost" => $advanceCost,
+                        "accounting_invoice" => $accountingInvoiceBool,
+                        "claim_id" => $creditnotes,
+                        "claim_amount" => abs($claimCost) + 0,
+                        "shorts_base_price" => $priceShortsBase,
+                        "enabled_jump_shorts" => $enableJumpShortsBool,
+                        "semi_base_price" => $priceSemiBase,
+                        "enabled_jump_semi" => $enableJumpSemiBool,
+                        "long_base_price" => $priceLongsBase,
+                        "enabled_jump_long" => $enableJumpLongsBool,
+                        "credit_notes" => $creditnotes,
+                        "buyer_id" => $buyerId,
+                        "bank_id" => $bankId,
+                        "seller_id" => $sellerId,
+                        "total_volume" => $excelVolumeValue,
+                        "invoice_unit_price" => $excelInvoicePrice,
+                        "total_invoice_value" => $excelVolumeValue * $excelInvoicePrice,
+                        "total_sales_value" => ($excelVolumeValue * $excelInvoicePrice) + (abs($claimCost) + 0) + $advanceCost + $salesServiceCost,
+                        "created_by" => $session['user_id'],
+                        "updated_by" => $session['user_id'],
+                        'is_active' => 1,
+                    );
                 }
 
-                
+
 
                 $insertExportInvoice = $this->Export_model->add_export_invoice_history($dataExportInvoiceHistory);
 
@@ -3140,17 +3139,17 @@ class Exportordersales extends MY_Controller
                         }
                     }
                 }
-                
+
                 //DELETE EXISTING LEDGER
-                
+
                 if ($updateBuyerLedger == 1) {
 
                     $deleteSalesBuyer = $this->Export_model->update_sales_buyer_ledger($exportOrderId, $session['user_id']);
-    
+
                     if ($deleteSalesBuyer) {
-                        
-                        if($originId == 3) {
-                            
+
+                        if ($originId == 3) {
+
                             $dataSalesBuyerLedger = array(
                                 "buyer_id" => $buyerId,
                                 "export_id" => $exportOrderId,
@@ -3167,7 +3166,6 @@ class Exportordersales extends MY_Controller
                                 "updated_by" => $session['user_id'],
                                 'is_active' => 1,
                             );
-                            
                         } else {
                             $dataSalesBuyerLedger = array(
                                 "buyer_id" => $buyerId,
@@ -3186,12 +3184,11 @@ class Exportordersales extends MY_Controller
                                 'is_active' => 1,
                             );
                         }
-                        
-                        
-    
+
+
+
                         $insertSalesLedger = $this->Export_model->add_sales_buyer_ledger($dataSalesBuyerLedger);
                     }
-                
                 }
 
                 //END DATA ADDING
@@ -3417,7 +3414,7 @@ class Exportordersales extends MY_Controller
             exit;
         }
     }
-    
+
     public function dialog_invoice_history_option()
     {
         $Return = array("pages" => "", "redirect" => false, "result" => "", "error" => "", "csrf_hash" => "");
@@ -3485,7 +3482,7 @@ class Exportordersales extends MY_Controller
             );
 
             if (!empty($session)) {
-                
+
                 $this->deletefilesfromfolder();
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
@@ -3526,16 +3523,16 @@ class Exportordersales extends MY_Controller
                 //         $objExcel = $objExcel->load('./assets/templates/ProForma_Invoice_Template_Colombia.xlsx');
                 //     }
                 // }
-                
+
                 $accountingInvoice = $this->input->post("accountingInvoice");
-                
+
                 if ($originId == 1 && $accountingInvoice == 1) {
                     $objExcel = $objExcel->load('./assets/templates/ProForma_Invoice_Template_Colombia_AcccoutingInvoice.xlsx');
                 } else {
                     $objExcel = $objExcel->load('./assets/templates/' . $getSellerDetails[0]->template_file);
                 }
 
-                
+
                 $objExcel->setActiveSheetIndex(0);
                 $objSheet = $objExcel->getActiveSheet();
 
@@ -3562,7 +3559,7 @@ class Exportordersales extends MY_Controller
 
                     $servicesalesPercentage = $invoiceData[0]->service_sales_percentage;
                     $salesAdvanceCost = $invoiceData[0]->advance_cost;
-                    
+
                     $updateContainerNumberDataJson = json_decode($this->input->post("updatecontainerprice"), true);
                     $creditnotes = $invoiceData[0]->claim_id;
 
@@ -3665,7 +3662,7 @@ class Exportordersales extends MY_Controller
                         foreach ($getExportItemDetails as $exportitem) {
                             $exportItemsRowCount = $exportItemsRowCount + 1;
                             $containerUPrice = 0;
-                            
+
                             $objSheet->setCellValue("B$exportItemsRowCount", $exportitem->total_containers);
                             $objSheet->setCellValue("C$exportItemsRowCount", $exportitem->description);
                             $objSheet->setCellValue("D$exportItemsRowCount", $exportitem->metric_ton);
@@ -3692,15 +3689,15 @@ class Exportordersales extends MY_Controller
                     $excelInvoiceValue = sprintf("%.2f", $objSheet->getCell('G40')->getCalculatedValue());
 
                     $tempNum = explode('.', $excelInvoiceValue);
-                    
+
                     $convertedNumber = (isset($tempNum[0]) ? $this->convertNumber($tempNum[0]) : '');
-                    
-                    if(isset($tempNum[1]) && $tempNum[1] > 0) {
-                    
+
+                    if (isset($tempNum[1]) && $tempNum[1] > 0) {
+
                         $convertedNumber .= ((isset($tempNum[0]) and isset($tempNum[1]))  ? ' With ' : '');
-    
+
                         $tempNum[1] = ltrim($tempNum[1], '0');
-    
+
                         $convertedNumber .= (isset($tempNum[1]) ? $this->convertNumber($tempNum[1]) . ' Cents' : '');
                     }
 
@@ -3714,8 +3711,8 @@ class Exportordersales extends MY_Controller
                     $objSheet->setCellValue("C49", $getBankDetails[0]->swift_code);
                     $objSheet->setCellValue("C50", $getBankDetails[0]->account_number);
                     $objSheet->getStyle("C50")->getNumberFormat()->setFormatCode('0');
-                } else if($originId == 1 && $accountingInvoice == 1) {
-                    
+                } else if ($originId == 1 && $accountingInvoice == 1) {
+
                     $servicesalesPercentage = $invoiceData[0]->service_sales_percentage;
                     $salesAdvanceCost = $invoiceData[0]->advance_cost;
                     $accountingInvoice = $this->input->post("accountingInvoice");
@@ -4049,7 +4046,7 @@ class Exportordersales extends MY_Controller
                             }
                         }
                     }
-                    
+
                     $containerDataArray = array();
                     if (count($duplicateContainers) > 0) {
                         $containerDuplicateDataArray = array();
@@ -4107,7 +4104,7 @@ class Exportordersales extends MY_Controller
                             $containerUPrice = 0;
 
                             if ($accountingInvoice == 0) {
-                                
+
                                 $objSheet->setCellValue("B$exportItemsRowCount", $container["containerNumber"]);
                                 $objSheet->setCellValue("C$exportItemsRowCount", "TEAK WOOD ROUND LOGS");
                                 $objSheet->setCellValue("D$exportItemsRowCount", $container["volume"] + 0);
@@ -4273,13 +4270,13 @@ class Exportordersales extends MY_Controller
                     $tempNum = explode('.', $excelInvoiceValue);
 
                     $convertedNumber = (isset($tempNum[0]) ? $this->convertNumber($tempNum[0]) : '');
-                    
-                    if(isset($tempNum[1]) && $tempNum[1] > 0) {
-                    
+
+                    if (isset($tempNum[1]) && $tempNum[1] > 0) {
+
                         $convertedNumber .= ((isset($tempNum[0]) and isset($tempNum[1]))  ? ' WITH ' : '');
-    
+
                         $tempNum[1] = ltrim($tempNum[1], '0');
-    
+
                         $convertedNumber .= (isset($tempNum[1]) ? $this->convertNumber($tempNum[1]) . ' CENTS' : '');
                     }
 
@@ -4294,7 +4291,6 @@ class Exportordersales extends MY_Controller
                     $objSheet->setCellValue("C49", $getBankDetails[0]->swift_code);
                     $objSheet->setCellValue("C50", $getBankDetails[0]->account_number);
                     $objSheet->getStyle("C50")->getNumberFormat()->setFormatCode('0');
-                    
                 } else {
 
                     $servicesalesPercentage = $invoiceData[0]->service_sales_percentage;
@@ -4622,7 +4618,7 @@ class Exportordersales extends MY_Controller
                             }
                         }
                     }
-                    
+
                     $containerDataArray = array();
                     if (count($duplicateContainers) > 0) {
                         $containerDuplicateDataArray = array();
@@ -4676,7 +4672,7 @@ class Exportordersales extends MY_Controller
                             $containerUPrice = 0;
 
                             if ($accountingInvoice == 0) {
-                                
+
                                 $objSheet->setCellValue("B$exportItemsRowCount", $container["containerNumber"]);
                                 $objSheet->setCellValue("C$exportItemsRowCount", "TEAK WOOD ROUND LOGS");
                                 $objSheet->setCellValue("D$exportItemsRowCount", $container["volume"] + 0);
@@ -4839,13 +4835,13 @@ class Exportordersales extends MY_Controller
                     $tempNum = explode('.', $excelInvoiceValue);
 
                     $convertedNumber = (isset($tempNum[0]) ? $this->convertNumber($tempNum[0]) : '');
-                    
-                    if(isset($tempNum[1]) && $tempNum[1] > 0) {
-                    
+
+                    if (isset($tempNum[1]) && $tempNum[1] > 0) {
+
                         $convertedNumber .= ((isset($tempNum[0]) and isset($tempNum[1]))  ? ' WITH ' : '');
-    
+
                         $tempNum[1] = ltrim($tempNum[1], '0');
-    
+
                         $convertedNumber .= (isset($tempNum[1]) ? $this->convertNumber($tempNum[1]) . ' CENTS' : '');
                     }
 
@@ -5101,8 +5097,8 @@ class Exportordersales extends MY_Controller
     function convertDigit($digit)
     {
         switch ($digit) {
-                // case "0":
-                //     return "zero";
+            // case "0":
+            //     return "zero";
             case "1":
                 return "one";
             case "2":
@@ -5121,6 +5117,635 @@ class Exportordersales extends MY_Controller
                 return "eight";
             case "9":
                 return "nine";
+        }
+    }
+
+    public function generate_merge_invoice_from_history()
+    {
+        try {
+            $session = $this->session->userdata("fullname");
+
+            $Return = array(
+                "result" => "",
+                "error" => "",
+                "redirect" => false,
+                "csrf_hash" => "",
+                "successmessage" => ""
+            );
+
+            if (!empty($session)) {
+
+                $this->deletefilesfromfolder();
+
+                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+                $originId = $this->input->post("originid");
+                $saNumber = $this->input->post("sanumber");
+                $originalSANumber = $this->input->post("sanumber");
+                $exportOrderId = $this->input->post("exportid");
+
+                $invoiceData = $this->Export_model->fetch_merge_invoice_history_invoice();
+
+                $getBuyerDetails = $this->Master_model->get_buyers_details_by_id($invoiceData[0]->buyer_id);
+                $getBankDetails = $this->Master_model->get_bank_details_by_id($invoiceData[0]->bank_id);
+                $getSellerDetails = $this->Master_model->get_seller_details_by_id($invoiceData[0]->seller_id);
+
+                if ($originId == 3) {
+                    $getExportDetails = $this->Export_model->get_export_details_invoice_id($exportOrderId);
+                } else {
+                    $getExportDetails = $this->Export_model->get_export_details_invoice_export_origin(622);
+                }
+
+                $arrBuyerAddress = explode("\n", $getBuyerDetails[0]->address);
+
+                if ($originId == 3) {
+                    $saNumber = $getExportDetails[0]->booking_no . "-" . str_replace("/", "-", $saNumber);
+                } else {
+                    $saNumber = str_replace("/", "-", $saNumber);
+                }
+
+                $objExcel = PHPExcel_IOFactory::createReader('Excel2007');
+
+                $accountingInvoice = $this->input->post("accountingInvoice");
+
+                if ($originId == 1 && $accountingInvoice == 1) {
+                    $objExcel = $objExcel->load('./assets/templates/ProForma_Invoice_Template_Colombia_AcccoutingInvoice.xlsx');
+                } else {
+                    $objExcel = $objExcel->load('./assets/templates/' . $getSellerDetails[0]->template_file);
+                }
+
+
+                $objExcel->setActiveSheetIndex(0);
+                $objSheet = $objExcel->getActiveSheet();
+
+                //BUYER DETAILS
+                $buyerRowCount = 11;
+                $objSheet->setCellValue("B$buyerRowCount", $getBuyerDetails[0]->buyer_name);
+
+                foreach ($arrBuyerAddress as $buyeraddress) {
+                    $buyerRowCount = $buyerRowCount + 1;
+                    $objSheet->setCellValue("B$buyerRowCount", $buyeraddress);
+                }
+
+                $buyerRowCount = $buyerRowCount + 1;
+                $objSheet->setCellValue("B$buyerRowCount", "Contact : " . $getBuyerDetails[0]->contact_name);
+
+                $buyerRowCount = $buyerRowCount + 1;
+                $objSheet->setCellValue("B$buyerRowCount", "Phone : " . $getBuyerDetails[0]->contact_no);
+
+                $buyerRowCount = $buyerRowCount + 1;
+                $objSheet->setCellValue("B$buyerRowCount", "Email : " . $getBuyerDetails[0]->email);
+
+                //EXPORT ITEMS
+
+                $servicesalesPercentage = $invoiceData[0]->service_sales_percentage;
+                $salesAdvanceCost = $invoiceData[0]->advance_cost;
+                $accountingInvoice = $this->input->post("accountingInvoice");
+                $updateContainerNumberDataJson = json_decode($this->input->post("updatecontainerprice"), true);
+                $creditnotes = $invoiceData[0]->claim_id;
+
+                date_default_timezone_set($getExportDetails[0]->timezone_abbreviation);
+                $invoiceBuyerName = $getBuyerDetails[0]->invoice_name;
+                $objSheet->setCellValue('C8', "INVOICE -$invoiceBuyerName-$saNumber");
+
+                //EXPORT DETAILS
+
+                $todayDate = date($invoiceData[0]->invoice_date);
+
+                $shippedDate = PHPExcel_Shared_Date::PHPToExcel(DateTime::createFromFormat('!d/m/Y', $todayDate));
+                $objSheet->setCellValue("G11", $shippedDate);
+                $objSheet->getStyle("G11")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_XLSX15);
+
+                $objSheet->setCellValue("G12", strtoupper($getExportDetails[0]->origin_name));
+                $objSheet->setCellValue("G13", strtoupper($getExportDetails[0]->pol));
+                $objSheet->setCellValue("G14", strtoupper($getExportDetails[0]->pod));
+
+                $enableJumpShorts = $invoiceData[0]->enabled_jump_shorts;
+                $enableJumpSemi = $invoiceData[0]->enabled_jump_semi;
+                $enableJumpLongs = $invoiceData[0]->enabled_jump_long;
+                $priceShortsBase = $invoiceData[0]->shorts_base_price;
+                $priceSemiBase = $invoiceData[0]->semi_base_price;
+                $priceLongsBase = $invoiceData[0]->long_base_price;
+
+                //SHORTS
+                $shortsArray = array();
+                $priceShorts = $priceShortsBase;
+                if ($priceShorts > 0) {
+                    for ($i = 1.75; $i >= 1; $i -= 0.25) {
+                        $shortsArray[] = array(
+                            'minRange' => $i + 0,
+                            'maxRange' => $i + 0.24,
+                            'rangePrice' => $priceShorts - 15,
+                        );
+
+                        $priceShorts = $priceShorts - 15;
+                    }
+
+                    $priceShorts = $priceShortsBase;
+                    for ($i = 2; $i <= 20; $i += 0.25) {
+
+                        if ($i == 5) {
+
+                            if ($enableJumpShorts == 1) {
+                                $shortsArray[] = array(
+                                    'minRange' => $i + 0,
+                                    'maxRange' => $i + 0.24,
+                                    'rangePrice' => $priceShorts + 20,
+                                );
+
+                                $priceShorts = $priceShorts + 15 + 20;
+                            } else {
+                                $shortsArray[] = array(
+                                    'minRange' => $i + 0,
+                                    'maxRange' => $i + 0.24,
+                                    'rangePrice' => $priceShorts,
+                                );
+
+                                $priceShorts = $priceShorts + 15;
+                            }
+                        } else {
+                            $shortsArray[] = array(
+                                'minRange' => $i + 0,
+                                'maxRange' => $i + 0.24,
+                                'rangePrice' => $priceShorts,
+                            );
+
+                            $priceShorts = $priceShorts + 15;
+                        }
+                    }
+                }
+
+                //SEMI
+                $semiArray = array();
+                $priceSemi = $priceSemiBase;
+                if ($priceSemi > 0) {
+                    for ($i = 55; $i >= 30; $i -= 5) {
+
+                        $semiArray[] = array(
+                            'minRange' => $i + 0,
+                            'maxRange' => $i + 4.99,
+                            'rangePrice' => $priceSemi - 50,
+                        );
+
+                        $priceSemi = $priceSemi - 50;
+                    }
+
+                    $priceSemi = $priceSemiBase;
+                    for ($i = 60; $i <= 199; $i += 5) {
+
+                        if ($i == 100) {
+
+                            if ($enableJumpSemi == 1) {
+                                $semiArray[] = array(
+                                    'minRange' => $i + 0,
+                                    'maxRange' => $i + 4.99,
+                                    'rangePrice' => $priceSemi + 20,
+                                );
+
+                                $priceSemi = $priceSemi + 30 + 20;
+                            } else {
+                                $semiArray[] = array(
+                                    'minRange' => $i + 0,
+                                    'maxRange' => $i + 4.99,
+                                    'rangePrice' => $priceSemi,
+                                );
+
+                                $priceSemi = $priceSemi + 30;
+                            }
+                        } else {
+                            $semiArray[] = array(
+                                'minRange' => $i + 0,
+                                'maxRange' => $i + 4.99,
+                                'rangePrice' => $priceSemi,
+                            );
+
+                            $priceSemi = $priceSemi + 30;
+                        }
+                    }
+                }
+
+                //LONGS
+                $longsArray = array();
+                $priceLongs = $priceLongsBase;
+                if ($priceLongs > 0) {
+                    for ($i = 55; $i >= 30; $i -= 5) {
+                        $longsArray[] = array(
+                            'minRange' => $i + 0,
+                            'maxRange' => $i + 4.99,
+                            'rangePrice' => $priceLongs - 50,
+                        );
+
+                        $priceLongs = $priceLongs - 50;
+                    }
+
+                    $priceLongs = $priceLongsBase;
+                    for ($i = 60; $i <= 199; $i += 5) {
+
+                        if ($i == 100) {
+                            if ($enableJumpLongs == 1) {
+                                $longsArray[] = array(
+                                    'minRange' => $i + 0,
+                                    'maxRange' => $i + 4.99,
+                                    'rangePrice' => $priceLongs + 20,
+                                );
+
+                                $priceLongs = $priceLongs + 30 + 20;
+                            } else {
+                                $longsArray[] = array(
+                                    'minRange' => $i + 0,
+                                    'maxRange' => $i + 4.99,
+                                    'rangePrice' => $priceLongs,
+                                );
+
+                                $priceLongs = $priceLongs + 30;
+                            }
+                        } else {
+                            $longsArray[] = array(
+                                'minRange' => $i + 0,
+                                'maxRange' => $i + 4.99,
+                                'rangePrice' => $priceLongs,
+                            );
+
+                            $priceLongs = $priceLongs + 30;
+                        }
+                    }
+                }
+
+                $circAllowance = $invoiceData[0]->circ_allowance;
+                $lengthAllowance = $invoiceData[0]->length_allowance;
+                $circAdjustment = $invoiceData[0]->circ_adjustment;
+                $measurementsystem = $invoiceData[0]->measurement_system;
+
+                $getExportItemDetails = $this->Export_model->get_export_data_by_export_id_merge($originId, $circAllowance, $lengthAllowance, $circAdjustment, $measurementsystem);
+
+                $totalValue = 0;
+                $containerItemArray = array();
+                $containerNumberArray = array();
+
+                if (count($getExportItemDetails) > 0) {
+                    $exportItemsRowCount = 19;
+
+                    foreach ($getExportItemDetails as $exportitem) {
+
+                        array_push($containerNumberArray, $exportitem->container_number);
+
+                        if ($exportitem->product_type == 1) {
+                            if ($priceShorts > 0) {
+                                $containerUnitPrice = 0;
+                                if (count($shortsArray) > 0) {
+                                    foreach ($shortsArray as $shortprice) {
+
+                                        if (($shortprice["minRange"] <= $exportitem->gross_cft) && ($shortprice["maxRange"] >= $exportitem->gross_cft)) {
+                                            $containerUnitPrice = $shortprice["rangePrice"] + 0;
+
+                                            $containerItemArray[] = array(
+                                                "containerNumber" => $exportitem->container_number,
+                                                "unitPrice" => $shortprice["rangePrice"] + 0,
+                                                "volume" => $exportitem->net_volume + 0,
+                                            );
+
+                                            //$totalValue = $totalValue + ($exportitem->net_volume * $shortprice["rangePrice"]);
+                                        }
+                                    }
+                                }
+
+                                //$objSheet->setCellValue("F$exportItemsRowCount", $containerUnitPrice + 0);
+                            } else {
+
+                                $containerItemArray[] = array(
+                                    "containerNumber" => $exportitem->container_number,
+                                    "unitPrice" => 0,
+                                    "volume" => $exportitem->net_volume + 0,
+                                );
+
+                                //$objSheet->setCellValue("F$exportItemsRowCount",  0);
+                            }
+                        } else if ($exportitem->product_type == 2) {
+                            if ($priceSemi > 0) {
+                                $containerUnitPrice = 0;
+
+                                if (count($semiArray) > 0) {
+                                    foreach ($semiArray as $semiprice) {
+
+                                        if (($semiprice["minRange"] <= $exportitem->avg_circumference) && ($semiprice["maxRange"] >= $exportitem->avg_circumference)) {
+                                            $containerUnitPrice = $semiprice["rangePrice"] + 0;
+
+                                            $containerItemArray[] = array(
+                                                "containerNumber" => $exportitem->container_number,
+                                                "unitPrice" => $semiprice["rangePrice"] + 0,
+                                                "volume" => $exportitem->net_volume + 0,
+                                            );
+
+                                            //$totalValue = $totalValue + ($exportitem->net_volume * $semiprice["rangePrice"]);
+                                        }
+                                    }
+                                }
+
+                                //$objSheet->setCellValue("F$exportItemsRowCount", $containerUnitPrice + 0);
+                            } else {
+
+                                $containerItemArray[] = array(
+                                    "containerNumber" => $exportitem->container_number,
+                                    "unitPrice" => 0,
+                                    "volume" => $exportitem->net_volume + 0,
+                                );
+
+                                //$objSheet->setCellValue("F$exportItemsRowCount",  0);
+                            }
+                        } else if ($exportitem->product_type == 3) {
+                            if ($priceLongs > 0) {
+                                $containerUnitPrice = 0;
+
+                                if (count($longsArray) > 0) {
+                                    foreach ($longsArray as $longprice) {
+
+                                        if (($longprice["minRange"] <= $exportitem->avg_circumference) && ($longprice["maxRange"] >= $exportitem->avg_circumference)) {
+                                            $containerUnitPrice = $longprice["rangePrice"] + 0;
+
+                                            $containerItemArray[] = array(
+                                                "containerNumber" => $exportitem->container_number,
+                                                "unitPrice" => $longprice["rangePrice"] + 0,
+                                                "volume" => $exportitem->net_volume + 0,
+                                            );
+
+                                            //$totalValue = $totalValue + ($exportitem->net_volume * $longprice["rangePrice"]);
+                                        }
+                                    }
+                                }
+
+                                //$objSheet->setCellValue("F$exportItemsRowCount", $containerUnitPrice + 0);
+                            } else {
+
+                                $containerItemArray[] = array(
+                                    "containerNumber" => $exportitem->container_number,
+                                    "unitPrice" => 0,
+                                    "volume" => $exportitem->net_volume + 0,
+                                );
+
+                                //$objSheet->setCellValue("F$exportItemsRowCount",  0);
+                            }
+                        } else {
+                            //$objSheet->setCellValue("F$exportItemsRowCount",  0);
+                        }
+
+                        //$objSheet->getStyle("F$exportItemsRowCount")->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* (#,##0.00);_("$"* "-"??_);_(@_)');
+                        //$objSheet->setCellValue("G$exportItemsRowCount", "=D$exportItemsRowCount*F$exportItemsRowCount");
+                    }
+                }
+
+                $duplicateContainers = array_diff_assoc($containerNumberArray, array_unique($containerNumberArray));
+                $containerFinalArray = array();
+
+                $totalInvoiceValue = 0;
+                $totalInvoiceVolume = 0;
+                if (count($containerItemArray) > 0) {
+                    foreach ($containerItemArray as $containerdata) {
+                        if (count($duplicateContainers) > 0) {
+                            foreach ($duplicateContainers as $duplicatecontainer) {
+                                if ($containerdata["containerNumber"] == $duplicatecontainer) {
+                                    //DO NOTHING
+                                } else {
+                                    $containerFinalArray[] = array(
+                                        "containerNumber" => $containerdata["containerNumber"],
+                                        "unitPrice" => $containerdata["unitPrice"] + 0,
+                                        "volume" => $containerdata["volume"] + 0,
+                                    );
+
+                                    break;
+                                }
+                            }
+                        } else {
+                            $containerFinalArray[] = array(
+                                "containerNumber" => $containerdata["containerNumber"],
+                                "unitPrice" => $containerdata["unitPrice"] + 0,
+                                "volume" => $containerdata["volume"] + 0,
+                            );
+                        }
+                    }
+                }
+
+                $containerDataArray = array();
+                if (count($duplicateContainers) > 0) {
+                    $containerDuplicateDataArray = array();
+                    foreach ($duplicateContainers as $containernum) {
+                        $totalVolume = 0;
+                        $totalValue = 0;
+                        $unitPrice = 0;
+                        foreach ($containerItemArray as $containeritem) {
+                            if ($containeritem["containerNumber"] == $containernum) {
+                                $totalVolume = $totalVolume + $containeritem["volume"];
+                                $totalValue = $totalValue + ($containeritem["volume"] * $containeritem["unitPrice"]);
+                            }
+                        }
+
+                        if ($totalVolume > 0 && $totalValue > 0) {
+                            $unitPrice = $totalValue / $totalVolume;
+                        }
+
+                        $containerDuplicateDataArray[] = array(
+                            "containerNumber" => $containernum,
+                            "unitPrice" => $unitPrice + 0,
+                            "volume" => $totalVolume + 0,
+                        );
+                    }
+
+                    if (count($containerFinalArray) > 0) {
+                        foreach ($containerFinalArray as $containerfinal) {
+                            if (array_search($containerfinal["containerNumber"], $duplicateContainers) !== false) {
+                                //DO NOTHING
+                            } else {
+                                $containerDataArray[] = array(
+                                    "containerNumber" => $containerfinal["containerNumber"],
+                                    "unitPrice" => $containerfinal["unitPrice"] + 0,
+                                    "volume" => $containerfinal["volume"] + 0,
+                                );
+                            }
+                        }
+                    }
+
+                    $containerDataArray = array_merge($containerDataArray, $containerDuplicateDataArray);
+                } else {
+                    $containerDataArray = array_merge($containerDataArray, $containerFinalArray);
+                }
+
+                if (count($containerDataArray) > 0) {
+                    $exportItemsRowCount = 19;
+
+                    foreach ($containerDataArray as $container) {
+
+                        $exportItemsRowCount = $exportItemsRowCount + 1;
+                        $containerUPrice = 0;
+
+                        if ($accountingInvoice == 0) {
+
+                            $objSheet->setCellValue("B$exportItemsRowCount", $container["containerNumber"]);
+                            $objSheet->setCellValue("C$exportItemsRowCount", "TEAK WOOD ROUND LOGS");
+                            $objSheet->setCellValue("D$exportItemsRowCount", $container["volume"] + 0);
+                            $objSheet->getStyle("D$exportItemsRowCount")->getNumberFormat()->setFormatCode('0.000');
+                            $objSheet->setCellValue("E$exportItemsRowCount", "CBM");
+
+                            if (is_array($updateContainerNumberDataJson) && count($updateContainerNumberDataJson) > 0) {
+                                foreach ($updateContainerNumberDataJson as $containerno) {
+                                    if ($containerno["containerNumber"] == $container["containerNumber"]) {
+                                        $containerUPrice = $containerno["containerPrice"] + 0;
+                                        $objSheet->setCellValue("F$exportItemsRowCount", $containerno["containerPrice"] + 0);
+
+                                        //$totalInvoiceVolume = $totalInvoiceVolume + $container["volume"] + 0;
+                                        //$totalInvoiceValue = $totalInvoiceValue + ($container["volume"] + 0) * ($containerno["containerPrice"] + 0);
+
+                                        break;
+                                    } else {
+                                        $containerUPrice = $container["unitPrice"] + 0;
+                                        $objSheet->setCellValue("F$exportItemsRowCount", $container["unitPrice"] + 0);
+
+                                        //$totalInvoiceVolume = $totalInvoiceVolume + $container["volume"] + 0;
+                                        //$totalInvoiceValue = $totalInvoiceValue + ($container["volume"] + 0) * ($container["unitPrice"] + 0);
+                                    }
+                                }
+                            } else {
+                                $containerUPrice = $container["unitPrice"] + 0;
+                                $objSheet->setCellValue("F$exportItemsRowCount", $container["unitPrice"] + 0);
+
+                                //$totalInvoiceVolume = $totalInvoiceVolume + $container["volume"] + 0;
+                                //$totalInvoiceValue = $totalInvoiceValue + ($container["volume"] + 0) * ($container["unitPrice"] + 0);
+                            }
+
+                            $objSheet->getStyle("F$exportItemsRowCount")->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* (#,##0.00);_("$"* "-"??_);_(@_)');
+                            $objSheet->setCellValue("G$exportItemsRowCount", "=D$exportItemsRowCount*F$exportItemsRowCount");
+                        }
+
+                        $totalInvoiceVolume = $totalInvoiceVolume + $container["volume"] + 0;
+
+                        if ($accountingInvoice == 1) {
+                            if (count($updateContainerNumberDataJson) > 0) {
+                                foreach ($updateContainerNumberDataJson as $containerno) {
+                                    if ($containerno["containerNumber"] == $container["containerNumber"]) {
+                                        $containerUPrice = $containerno["containerPrice"] + 0;
+                                        $totalInvoiceValue = $totalInvoiceValue + ($container["volume"] + 0) * ($containerno["containerPrice"] + 0);
+                                        break;
+                                    } else {
+                                        $totalInvoiceValue = $totalInvoiceValue + ($container["volume"] + 0) * ($container["unitPrice"] + 0);
+                                    }
+                                }
+                            } else {
+                                $totalInvoiceValue = $totalInvoiceValue + ($container["volume"] + 0) * ($container["unitPrice"] + 0);
+                            }
+                        } else {
+                            $totalInvoiceValue = $totalInvoiceValue + ($container["volume"] + 0) * ($container["unitPrice"] + 0);
+                        }
+                    }
+                }
+
+                $lastRowDetails = 63;
+                $advanceCost = 0;
+                if ($invoiceData[0]->advance_enabled == 1 && $salesAdvanceCost != 0) {
+                    $lastRowDetails = $lastRowDetails - 1;
+                    $objSheet->setCellValue("B$lastRowDetails", "(Less Advance)");
+                    $objSheet->setCellValue("G$lastRowDetails", "=COUNT(G20:G$exportItemsRowCount)*-$salesAdvanceCost");
+
+                    $advanceCost = $getExportDetails[0]->d_total_containers * ($salesAdvanceCost);
+                }
+
+                $salesServiceCost = 0;
+                if ($invoiceData[0]->service_enabled == 1 && $servicesalesPercentage != 0) {
+
+                    if ($accountingInvoice == 0) {
+                        $lastRowDetails = $lastRowDetails - 1;
+                        $objSheet->setCellValue("B$lastRowDetails", "(Less Sales Serv Fees)");
+                        $objSheet->setCellValue("G$lastRowDetails", "=SUM(G20:G$exportItemsRowCount)*-$servicesalesPercentage%");
+                    }
+
+                    $salesServiceCost = $totalInvoiceValue *  ($servicesalesPercentage / 100);
+                }
+
+                $totalInvoiceValue = $totalInvoiceValue - $salesServiceCost;
+
+                $claimCost = 0;
+                if ($creditnotes != null && $creditnotes != "") {
+                    $creditNotesArray = explode(",", $creditnotes);
+                    if (count($creditNotesArray) > 0) {
+                        $getCreditNoteDetails = $this->Claimtracker_model->get_claim_details_history_byid($creditnotes);
+                        if (count($getCreditNoteDetails) == 1) {
+                            $lastRowDetails = $lastRowDetails - 1;
+                            $objSheet->setCellValue("B$lastRowDetails", "(Less Credit Note)");
+                            $objSheet->setCellValue("C$lastRowDetails", $getCreditNoteDetails[0]->claim_reference);
+                            $objSheet->getRowDimension("$lastRowDetails")->setRowHeight(-1);
+                            $objSheet->getStyle("C$lastRowDetails")->getAlignment()->setWrapText(true);
+                            $objSheet->setCellValue("G$lastRowDetails", (-1 * $getCreditNoteDetails[0]->claim_amount + 0));
+
+                            $claimCost = (-1 * $getCreditNoteDetails[0]->claim_amount + 0);
+                        }
+                    }
+                }
+                
+                $totalInvoiceValue = $totalInvoiceValue - $advanceCost + $claimCost;
+
+                $objSheet->setCellValue("D63", "=SUM(D20:D62)");
+                $objSheet->setCellValue("G63", "=SUM(G20:G62)");
+                $objSheet->setCellValue("F63", "=G63/D63");
+
+                //if ($totalInvoiceValue > 0) {
+
+                //$excelInvoiceValue = round($objSheet->getCell('G40')->getCalculatedValue(), 2);
+                $excelInvoiceValue = sprintf("%.2f", $objSheet->getCell('G63')->getCalculatedValue());
+                $excelVolumeValue = round($objSheet->getCell('D63')->getCalculatedValue(), 3);
+                $excelInvoicePrice = $objSheet->getCell('F63')->getCalculatedValue();
+
+                $tempNum = explode('.', $excelInvoiceValue);
+
+                $convertedNumber = (isset($tempNum[0]) ? $this->convertNumber($tempNum[0]) : '');
+
+                if (isset($tempNum[1]) && $tempNum[1] > 0) {
+
+                    $convertedNumber .= ((isset($tempNum[0]) and isset($tempNum[1]))  ? ' WITH ' : '');
+
+                    $tempNum[1] = ltrim($tempNum[1], '0');
+
+                    $convertedNumber .= (isset($tempNum[1]) ? $this->convertNumber($tempNum[1]) . ' CENTS' : '');
+                }
+
+                //$numberToWords = $this->getIndianCurrency(round(60453.31, 2));
+                $objSheet->setCellValue("C65", "US Dollars " . str_replace("  ", " ", strtoupper($convertedNumber)) . " ONLY");
+                //}
+
+                //BANK NAME
+                $objSheet->setCellValue("C68", $getBankDetails[0]->pay_to);
+                $objSheet->setCellValue("C70", $getBankDetails[0]->bank_name);
+                $objSheet->setCellValue("C71", $getBankDetails[0]->bank_address);
+                $objSheet->setCellValue("C72", $getBankDetails[0]->swift_code);
+                $objSheet->setCellValue("C73", $getBankDetails[0]->account_number);
+                $objSheet->getStyle("C73")->getNumberFormat()->setFormatCode('0');
+
+                $saNumber = str_replace("/", "_", $saNumber);
+                $month_name = ucfirst(date("dmY"));
+
+
+                $filename =  "Proforma_Invoice_" . $saNumber . "_" . $month_name . ".xlsx";
+
+                $objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
+                $objWriter->save("./reports/ExportReports/" . $filename);
+                $objWriter->setPreCalculateFormulas(true);
+                $Return["error"] = "";
+                $Return["result"] = site_url() . "reports/ExportReports/" . $filename;
+                $Return["successmessage"] = $this->lang->line("report_downloaded");
+                if ($Return["result"] != "") {
+                    $this->output($Return);
+                }
+            } else {
+                $Return["error"] = "";
+                $Return["result"] = "";
+                $Return["redirect"] = true;
+                $Return["csrf_hash"] = $this->security->get_csrf_hash();
+                $this->output($Return);
+                exit;
+            }
+        } catch (Exception $e) {
+            $Return["error"] = $e->getMessage(); // $this->lang->line("error_reports');
+            $Return["result"] = "";
+            $Return["redirect"] = false;
+            $Return["csrf_hash"] = $this->security->get_csrf_hash();
+            $this->output($Return);
+            exit;
         }
     }
 }

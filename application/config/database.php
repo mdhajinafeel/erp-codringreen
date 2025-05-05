@@ -74,7 +74,7 @@ $active_group = 'default';
 $query_builder = TRUE;
 
 $db['default'] = array(
-	'dsn'	=> 'mysql:host=localhost;dbname=db_cgr_prod',
+	'dsn'	=> 'mysql:host=localhost;dbname=db_codringroup_prod',
 	//'dsn'	=> 'mysql:host=localhost;dbname=u906036610_db_cgr_dev',
 	//'dsn'	=> 'mysql:host=localhost;dbname=u906036610_db_codringroup',
 	'hostname' => 'localhost',
@@ -86,7 +86,7 @@ $db['default'] = array(
 	//'password' => '28^DYpYsYJW$iPcnAjTSsIZ2*RpTAAwj', //PROD PASSWORD
 	//'database' => 'db_codringreen',
 	//'database' => 'u906036610_db_cgr_dev',
-	'database' => 'db_cgr_prod',
+	'database' => 'db_codringroup_prod',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

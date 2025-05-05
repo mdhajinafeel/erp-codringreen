@@ -1,7 +1,7 @@
 <?php
 
-//error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
-//ini_set('display_errors', '0');
+// error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
+// ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -56,18 +56,14 @@ class Exports extends MY_Controller
             $data = array();
 
             foreach ($exportContainers as $r) {
-
                 if ($this->input->get("originid") == 1) {
                     $actionExport = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("document_view") . '"><button type="button" class="btn icon-btn btn-xs btn-download waves-effect waves-light" data-role="viewexportdocuments" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-file"></span></button></span>
                     <span style="margin-left:1px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("view") . '/' . $this->lang->line("edit") . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="viewexport" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-pencil"></span></button></span>
                     <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("delete") . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deleteexport" data-toggle="modal" data-target=".download-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-trash"></span></button></span>';
                 } else {
-                    $actionExport = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("document_view") . '"><button type="button" class="btn icon-btn btn-xs btn-download waves-effect waves-light" data-role="viewexportdocuments" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-file"></span></button></span>
-                    <span style="margin-left:1px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("view") . '/' . $this->lang->line("edit") . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="viewexport" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-pencil"></span></button></span>
+                    $actionExport = '<span style="margin-left:1px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("view") . '/' . $this->lang->line("edit") . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="viewexport" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-pencil"></span></button></span>
                     <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("delete") . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deleteexport" data-toggle="modal" data-target=".download-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-trash"></span></button></span>';
                 }
-
-
 
                 $product_type = $this->lang->line($r->product_type_name);
 
@@ -146,7 +142,7 @@ class Exports extends MY_Controller
                 }
 
                 $getExportDocumentsCustomsContainers = array();
-                if(count($getExportDocumentsCustoms) == 1){
+                if (count($getExportDocumentsCustoms) == 1) {
                     $getExportDocumentsCustomsContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsCustoms[0]->export_id, 1, $getExportDocumentsCustoms[0]->id);
                 }
 
@@ -158,7 +154,7 @@ class Exports extends MY_Controller
                 }
 
                 $getExportDocumentsTransportContainers = array();
-                if(count($getExportDocumentsTransport) == 1){
+                if (count($getExportDocumentsTransport) == 1) {
                     $getExportDocumentsTransportContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsTransport[0]->export_id, 2, $getExportDocumentsTransport[0]->id);
                 }
 
@@ -170,7 +166,7 @@ class Exports extends MY_Controller
                 }
 
                 $getExportDocumentsPortContainers = array();
-                if(count($getExportDocumentsPort) == 1){
+                if (count($getExportDocumentsPort) == 1) {
                     $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsPort[0]->export_id, 3, $getExportDocumentsPort[0]->id);
                 }
 
@@ -182,7 +178,7 @@ class Exports extends MY_Controller
                 }
 
                 $getExportDocumentsFumigationContainers = array();
-                if(count($getExportDocumentsFumigation) == 1){
+                if (count($getExportDocumentsFumigation) == 1) {
                     $getExportDocumentsFumigationContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsFumigation[0]->export_id, 4, $getExportDocumentsFumigation[0]->id);
                 }
 
@@ -194,7 +190,7 @@ class Exports extends MY_Controller
                 }
 
                 $getExportDocumentsPhytoContainers = array();
-                if(count($getExportDocumentsPhyto) == 1){
+                if (count($getExportDocumentsPhyto) == 1) {
                     $getExportDocumentsPhytoContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsPhyto[0]->export_id, 5, $getExportDocumentsPhyto[0]->id);
                 }
 
@@ -206,7 +202,7 @@ class Exports extends MY_Controller
                 }
 
                 $getExportDocumentsCoterosContainers = array();
-                if(count($getExportDocumentsCoteros) == 1){
+                if (count($getExportDocumentsCoteros) == 1) {
                     $getExportDocumentsCoterosContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsCoteros[0]->export_id, 6, $getExportDocumentsCoteros[0]->id);
                 }
 
@@ -218,7 +214,7 @@ class Exports extends MY_Controller
                 }
 
                 $getExportDocumentsIncentivesContainers = array();
-                if(count($getExportDocumentsIncentives) == 1){
+                if (count($getExportDocumentsIncentives) == 1) {
                     $getExportDocumentsIncentivesContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsIncentives[0]->export_id, 7, $getExportDocumentsIncentives[0]->id);
                 }
 
@@ -230,7 +226,7 @@ class Exports extends MY_Controller
                 }
 
                 $getExportDocumentsRemobilizationContainers = array();
-                if(count($getExportDocumentsRemobilization) == 1){
+                if (count($getExportDocumentsRemobilization) == 1) {
                     $getExportDocumentsRemobilizationContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsRemobilization[0]->export_id, 8, $getExportDocumentsRemobilization[0]->id);
                 }
 
@@ -242,9 +238,12 @@ class Exports extends MY_Controller
                 }
 
                 $getExportDocumentsShippingContainers = array();
-                if(count($getExportDocumentsShipping) == 1){
+                if (count($getExportDocumentsShipping) == 1) {
                     $getExportDocumentsShippingContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsShipping[0]->export_id, 9, $getExportDocumentsShipping[0]->id);
                 }
+
+                //CONTAINER COSTS
+                $getExportContainerCosts = $this->Export_model->fetch_export_container_costs($exportId);
 
                 $data = array(
                     "pageheading" => $this->lang->line("document_view"),
@@ -263,6 +262,10 @@ class Exports extends MY_Controller
                     'exportSuppliersPort' => $this->Master_model->fetch_export_suppliers($getExportDetails[0]->origin_id, 3),
                     'exportSuppliersShipping' => $this->Master_model->fetch_export_suppliers($getExportDetails[0]->origin_id, 9),
                     'exportSuppliersFumigation' => $this->Master_model->fetch_export_suppliers($getExportDetails[0]->origin_id, 4),
+                    'exportSuppliersPhyto' => $this->Master_model->fetch_export_suppliers($getExportDetails[0]->origin_id, 5),
+                    'exportSuppliersCoteros' => $this->Master_model->fetch_export_suppliers($getExportDetails[0]->origin_id, 6),
+                    'exportSuppliersIncentives' => $this->Master_model->fetch_export_suppliers($getExportDetails[0]->origin_id, 7),
+                    'exportSuppliersRemobilization' => $this->Master_model->fetch_export_suppliers($getExportDetails[0]->origin_id, 8),
                     'containerDetails' => $this->Export_model->fetch_container_details_bydispatchids($getExportDetails[0]->dispatchids),
                     'exportDocumentsCustoms' => $getExportDocumentsCustoms,
                     'exportDocumentsCustomsContainers' => $getExportDocumentsCustomsContainers,
@@ -282,6 +285,7 @@ class Exports extends MY_Controller
                     'exportDocumentsRemobilizationContainers' => $getExportDocumentsRemobilizationContainers,
                     'exportDocumentsShipping' => $getExportDocumentsShipping,
                     'exportDocumentsShippingContainers' => $getExportDocumentsShippingContainers,
+                    'exportContainerCosts' => $getExportContainerCosts,
                     "csrfhash" => $this->security->get_csrf_hash(),
                 );
                 $this->load->view("export/dialog_view_export_documents", $data);
@@ -975,12 +979,12 @@ class Exports extends MY_Controller
                                 $docXml = preg_replace('/[\x00-\x1F\x7F]/', '', $docXml);
                                 $docXml = mb_convert_encoding($docXml, 'UTF-8', 'auto');
 
-                                // if (strpos(trim($docXml), '<?xml') !== 0) {
-                                //     $Return['error'] = $this->lang->line('error_xml');
-                                //     $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                //     $this->output($Return);
-                                //     exit;
-                                // }
+                                if (strpos(trim($docXml), '<?xml') !== 0) {
+                                    $Return['error'] = $this->lang->line('error_xml');
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                }
 
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
@@ -1694,8 +1698,8 @@ class Exports extends MY_Controller
             if ($checkCompanyIdExistsCount[0]->cnt == 0) {
 
                 $dataSupplier = array(
-                    "supplier_name" => $registrationNameNode,
-                    "supplier_id" => $companyIdNode,
+                    "supplier_name" => $registrationNameNode->item(0)->nodeValue,
+                    "supplier_id" => $companyIdNode->item(0)->nodeValue,
                     "export_type" => 1,
                     "created_by" => $session['user_id'],
                     "updated_by" => $session['user_id'],
@@ -1743,6 +1747,12 @@ class Exports extends MY_Controller
                         }
 
                         $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
 
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
@@ -1886,6 +1896,12 @@ class Exports extends MY_Controller
                         }
 
                         $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
 
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
@@ -2031,6 +2047,12 @@ class Exports extends MY_Controller
 
                         $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
 
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
+
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
                         }
@@ -2174,6 +2196,12 @@ class Exports extends MY_Controller
                         }
 
                         $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
 
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
@@ -2319,6 +2347,12 @@ class Exports extends MY_Controller
 
                         $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
 
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
+
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
                         }
@@ -2462,6 +2496,12 @@ class Exports extends MY_Controller
                         }
 
                         $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
 
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
@@ -2607,6 +2647,12 @@ class Exports extends MY_Controller
 
                         $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
 
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
+
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
                         }
@@ -2751,6 +2797,12 @@ class Exports extends MY_Controller
 
                         $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
 
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
+
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
                         }
@@ -2894,6 +2946,12 @@ class Exports extends MY_Controller
                         }
 
                         $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
 
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
@@ -3040,7 +3098,7 @@ class Exports extends MY_Controller
 
 
                 if ($insertExportDocuments > 0) {
-                    $Return['result'] = $this->lang->line('data_added');
+                    $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
@@ -3132,7 +3190,7 @@ class Exports extends MY_Controller
                 }
 
                 if ($insertExportDocuments > 0) {
-                    $Return['result'] = $this->lang->line('data_added');
+                    $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
@@ -3224,7 +3282,7 @@ class Exports extends MY_Controller
                 }
 
                 if ($insertExportDocuments > 0) {
-                    $Return['result'] = $this->lang->line('data_added');
+                    $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
@@ -3316,7 +3374,7 @@ class Exports extends MY_Controller
                 }
 
                 if ($insertExportDocuments > 0) {
-                    $Return['result'] = $this->lang->line('data_added');
+                    $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
@@ -3408,7 +3466,7 @@ class Exports extends MY_Controller
                 }
 
                 if ($insertExportDocuments > 0) {
-                    $Return['result'] = $this->lang->line('data_added');
+                    $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
@@ -3500,7 +3558,7 @@ class Exports extends MY_Controller
                 }
 
                 if ($insertExportDocuments > 0) {
-                    $Return['result'] = $this->lang->line('data_added');
+                    $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
@@ -3592,7 +3650,7 @@ class Exports extends MY_Controller
                 }
 
                 if ($insertExportDocuments > 0) {
-                    $Return['result'] = $this->lang->line('data_added');
+                    $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
@@ -3684,7 +3742,7 @@ class Exports extends MY_Controller
                 }
 
                 if ($insertExportDocuments > 0) {
-                    $Return['result'] = $this->lang->line('data_added');
+                    $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
@@ -3708,16 +3766,16 @@ class Exports extends MY_Controller
 
                 $exportId = $this->input->post('exportId');
                 $fileExtension = $this->input->post('fileExtension');
-                $updateContainerValueData_Incentives = $this->input->post('updateContainerValueData_Incentives');
-                $invoiceNo_Incentives = $this->input->post('invoiceNo_Incentives');
-                $supplierName_Incentives = $this->input->post('supplierName_Incentives');
-                $formattedDate_Incentives = $this->input->post('formattedDate_Incentives');
-                $subTotal_Incentives = $this->input->post('subTotal_Incentives');
-                $iva_Incentives = $this->input->post('iva_Incentives');
-                $retefuente_Incentives = $this->input->post('retefuente_Incentives');
-                $payable_Incentives = $this->input->post('payable_Incentives');
-                $updateContainerValueJson = json_decode($updateContainerValueData_Incentives, true);
-                $uploadPdfFileIncentives = $this->input->post('uploadPdfFileIncentives');
+                $updateContainerValueData_Remobilization = $this->input->post('updateContainerValueData_Remobilization');
+                $invoiceNo_Remobilization = $this->input->post('invoiceNo_Remobilization');
+                $supplierName_Remobilization = $this->input->post('supplierName_Remobilization');
+                $formattedDate_Remobilization = $this->input->post('formattedDate_Remobilization');
+                $subTotal_Remobilization = $this->input->post('subTotal_Remobilization');
+                $iva_Remobilization = $this->input->post('iva_Remobilization');
+                $retefuente_Remobilization = $this->input->post('retefuente_Remobilization');
+                $payable_Remobilization = $this->input->post('payable_Remobilization');
+                $updateContainerValueJson = json_decode($updateContainerValueData_Remobilization, true);
+                $uploadPdfFileRemobilization = $this->input->post('uploadPdfFileRemobilization');
 
                 //DELETE EXISTING
 
@@ -3733,14 +3791,14 @@ class Exports extends MY_Controller
                     "export_id " => $exportId,
                     "export_type " => $this->input->post('add_type'),
                     "file_extension " => $fileExtension,
-                    "file_url" => $uploadPdfFileIncentives,
-                    "invoice_no" => $invoiceNo_Incentives,
-                    "supplier_id" => $supplierName_Incentives,
-                    "invoice_date " => $formattedDate_Incentives,
-                    "sub_total " => $subTotal_Incentives,
-                    "tax_total" => $iva_Incentives,
-                    "allowance_total" => $retefuente_Incentives,
-                    "payable_total" => $payable_Incentives,
+                    "file_url" => $uploadPdfFileRemobilization,
+                    "invoice_no" => $invoiceNo_Remobilization,
+                    "supplier_id" => $supplierName_Remobilization,
+                    "invoice_date " => $formattedDate_Remobilization,
+                    "sub_total " => $subTotal_Remobilization,
+                    "tax_total" => $iva_Remobilization,
+                    "allowance_total" => $retefuente_Remobilization,
+                    "payable_total" => $payable_Remobilization,
                     "created_by" => $session['user_id'],
                     "updated_by" => $session['user_id'],
                     'is_active' => 1,
@@ -3776,7 +3834,58 @@ class Exports extends MY_Controller
                 }
 
                 if ($insertExportDocuments > 0) {
-                    $Return['result'] = $this->lang->line('data_added');
+                    $Return['result'] = $this->lang->line('data_updated');
+                    $this->output($Return);
+                    exit;
+                } else {
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
+                }
+            } else {
+                $Return['error'] = "";
+                $Return['result'] = "";
+                $Return['redirect'] = true;
+                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                $this->output($Return);
+                exit;
+            }
+        } else if ($this->input->post('add_type') == 10) {
+
+            if (!empty($session)) {
+
+                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+                $exportId = $this->input->post('exportId');
+                $updateContainerValueData_ContainerCost = $this->input->post('updateContainerValueData_ContainerCost');
+                $updateContainerValueJson = json_decode($updateContainerValueData_ContainerCost, true);
+
+                if (count($updateContainerValueJson) > 0) {
+
+                    $updateExportDocContainer = array(
+                        "updated_by" => $session['user_id'],
+                        "is_active" => 0,
+                    );
+
+                    $this->Export_model->update_exportcontainercost($updateExportDocContainer, $exportId);
+
+                    foreach ($updateContainerValueJson as $containerdata) {
+                        $dataExportContainer = array(
+                            "export_id" => $exportId,
+                            "dispatch_id" => $containerdata["mappingid"],
+                            "unit_price" => $containerdata["updatedContainerCostValue"] + 0,
+                            "exchange_rate" => $containerdata["updatedContainerCostTrmValue"] + 0,
+                            "created_by" => $session['user_id'],
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 1
+                        );
+
+                        $insertExportContainerValue = $this->Export_model->add_exportcontainercost($dataExportContainer);
+                    }
+                }
+
+                if ($insertExportContainerValue > 0) {
+                    $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {

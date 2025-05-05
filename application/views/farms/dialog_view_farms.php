@@ -187,6 +187,23 @@ defined('BASEPATH') or exit('No direct script access allowed');
 				<label class="control-label"><?php echo isset($farm_details[0]->origin) ? $farm_details[0]->origin : ''; ?></label>
 			</div>
 		</div>
+
+		<?php if($farm_details[0]->origin_id == 1) { ?>
+
+			<div class="col-md-6">
+				<label for="process"><?php echo $this->lang->line('process'); ?></label>
+				<select class="form-control" name="process" id="process" data-plugin="select_erp">
+					<option value="0"><?php echo $this->lang->line("select"); ?></option>
+					<option value="1" <?php if ($farm_details[0]->process_type == 1) {
+																				echo "selected";
+																			} ?>><?php echo $this->lang->line("sawmill"); ?></option>
+					<option value="2" <?php if ($farm_details[0]->process_type == 2) {
+																				echo "selected";
+																			} ?>><?php echo $this->lang->line("local_sales"); ?></option>
+				</select>
+			</div>
+
+		<?php } ?>
 	</div>
 </div>
 <div class="modal-footer">
@@ -242,6 +259,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			var logisticpayto = $("#logistic_payto").val();
 			var farmadjustment = $("#adjustment").val().trim();
 			var adjustrf = $("#adjust_rf").is(':checked');
+			var process = $("#process").val();
 
 			var isValid1 = true,
 				isValid2 = true,
@@ -342,6 +360,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 fd.append("logisticpayto", logisticpayto);
                 fd.append("farmadjustment", farmadjustment);
                 fd.append("adjustrf", $("#adjustment_tax").val());
+				fd.append("processType", process);
 
 				$(".action_button").prop('disabled', true);
 				toastr.info(processing_request);

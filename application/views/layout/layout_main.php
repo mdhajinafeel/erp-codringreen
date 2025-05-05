@@ -514,7 +514,8 @@ endif;
 													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('supplier_title'); ?></span></span>
 													</div>
 												</a>
-
+											</li>
+											<li class="nav-item">
 												<a class="nav-link <?php if ($this->router->fetch_class() == "exportsuppliers") {
 																		echo 'active';
 																	} else {

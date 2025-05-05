@@ -83,8 +83,18 @@ class Syncfarmdata extends MY_Controller
                                 $totalNetVolume = 0;
 
                                 $getContractDetails = $this->Contract_model->get_contracts_by_contractid($purchaseContractId);
+                                $getSupplierDetails = $this->Master_model->get_supplier_detail_by_id($supplierId);
 
                                 if ($farmMainId > 0 && $inventoryOrder != null && $inventoryOrder != "") {
+                                    
+                                    //UPDATE FARM DETAILS
+                                    $dataFarm = array(
+                                        "inventory_order" => $inventoryOrder,
+                                        "plate_number" => $truckPlateNumber,
+                                        "driver_name" => $truckDriverName,
+                                        "supplier_id" => $supplierId,
+                                    );
+                                    $updateFarm = $this->Farm_model->update_farm_inventory_order($farmMainId, $purchaseContractId, $supplierId, $dataFarm);
 
                                     if (count($farmCapturedData) > 0) {
                                         $dataFarmData = array();
@@ -403,19 +413,39 @@ class Syncfarmdata extends MY_Controller
 
                                                     $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
 
-                                                    $dataInventoryLedger = array(
-                                                        "contract_id" => $purchaseContractId,
-                                                        "inventory_order" => $inventoryOrder,
-                                                        "ledger_type" => 2,
-                                                        "expense_date" => $purchaseDate,
-                                                        "created_by" => $createdBy,
-                                                        "updated_by" => $createdBy,
-                                                        "is_active" => 1,
-                                                        "is_advance_app" => 0,
-                                                    );
+                                                    if($getSupplierDetails[0]->is_saw_mill == 1) {
+                                                        $dataInventoryLedger = array(
+                                                            "contract_id" => $purchaseContractId,
+                                                            "inventory_order" => $inventoryOrder,
+                                                            "ledger_type" => 2,
+                                                            "expense_date" => $purchaseDate,
+                                                            "created_by" => $createdBy,
+                                                            "updated_by" => $createdBy,
+                                                            "is_active" => 1,
+                                                            "is_advance_app" => 0,
+                                                        );
 
-                                                    if ($woodValueWithSupplierTaxes != 0) {
-                                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                        $processingCost = $totalNetVolume * 75;
+                                                        $processingCost = round($processingCost * $exchangeRate, 3);
+    
+                                                        if ($processingCost != 0) {
+                                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $processingCost, 5, $supplierId);
+                                                        }
+                                                    } else {
+                                                        $dataInventoryLedger = array(
+                                                            "contract_id" => $purchaseContractId,
+                                                            "inventory_order" => $inventoryOrder,
+                                                            "ledger_type" => 2,
+                                                            "expense_date" => $purchaseDate,
+                                                            "created_by" => $createdBy,
+                                                            "updated_by" => $createdBy,
+                                                            "is_active" => 1,
+                                                            "is_advance_app" => 0,
+                                                        );
+    
+                                                        if ($woodValueWithSupplierTaxes != 0) {
+                                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                        }
                                                     }
 
                                                     $getContracts = $this->Contract_model->get_contracts_by_contractid($purchaseContractId);
@@ -665,19 +695,40 @@ class Syncfarmdata extends MY_Controller
 
                                                     $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
 
-                                                    $dataInventoryLedger = array(
-                                                        "contract_id" => $purchaseContractId,
-                                                        "inventory_order" => $inventoryOrder,
-                                                        "ledger_type" => 2,
-                                                        "expense_date" => $purchaseDate,
-                                                        "created_by" => $createdBy,
-                                                        "updated_by" => $createdBy,
-                                                        "is_active" => 1,
-                                                        "is_advance_app" => 0,
-                                                    );
 
-                                                    if ($woodValueWithSupplierTaxes != 0) {
-                                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                    if($getSupplierDetails[0]->is_saw_mill == 1) {
+                                                        $dataInventoryLedger = array(
+                                                            "contract_id" => $purchaseContractId,
+                                                            "inventory_order" => $inventoryOrder,
+                                                            "ledger_type" => 2,
+                                                            "expense_date" => $purchaseDate,
+                                                            "created_by" => $createdBy,
+                                                            "updated_by" => $createdBy,
+                                                            "is_active" => 1,
+                                                            "is_advance_app" => 0,
+                                                        );
+
+                                                        $processingCost = $totalNetVolume * 75;
+                                                        $processingCost = round($processingCost * $exchangeRate, 3);
+    
+                                                        if ($processingCost != 0) {
+                                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $processingCost, 5, $supplierId);
+                                                        }
+                                                    } else {
+                                                        $dataInventoryLedger = array(
+                                                            "contract_id" => $purchaseContractId,
+                                                            "inventory_order" => $inventoryOrder,
+                                                            "ledger_type" => 2,
+                                                            "expense_date" => $purchaseDate,
+                                                            "created_by" => $createdBy,
+                                                            "updated_by" => $createdBy,
+                                                            "is_active" => 1,
+                                                            "is_advance_app" => 0,
+                                                        );
+
+                                                        if ($woodValueWithSupplierTaxes != 0) {
+                                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                        }
                                                     }
 
                                                     $getContracts = $this->Contract_model->get_contracts_by_contractid($purchaseContractId);
@@ -713,6 +764,15 @@ class Syncfarmdata extends MY_Controller
                                     }
 
                                     if ($farmId > 0) {
+                                        
+                                        //UPDATE FARM DETAILS
+                                        $dataFarm = array(
+                                            "inventory_order" => $inventoryOrder,
+                                            "plate_number" => $truckPlateNumber,
+                                            "driver_name" => $truckDriverName,
+                                            "supplier_id" => $supplierId,
+                                        );
+                                        $updateFarm = $this->Farm_model->update_farm_inventory_order($farmId, $purchaseContractId, $supplierId, $dataFarm);
                                         
                                         if (count($farmCapturedData) > 0) {
                                             $dataFarmData = array();
@@ -1031,19 +1091,40 @@ class Syncfarmdata extends MY_Controller
     
                                                         $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
     
-                                                        $dataInventoryLedger = array(
-                                                            "contract_id" => $purchaseContractId,
-                                                            "inventory_order" => $inventoryOrder,
-                                                            "ledger_type" => 2,
-                                                            "expense_date" => $purchaseDate,
-                                                            "created_by" => $createdBy,
-                                                            "updated_by" => $createdBy,
-                                                            "is_active" => 1,
-                                                            "is_advance_app" => 0,
-                                                        );
+                                                        if($getSupplierDetails[0]->is_saw_mill == 1) {
+                                                            $dataInventoryLedger = array(
+                                                                "contract_id" => $purchaseContractId,
+                                                                "inventory_order" => $inventoryOrder,
+                                                                "ledger_type" => 2,
+                                                                "expense_date" => $purchaseDate,
+                                                                "created_by" => $createdBy,
+                                                                "updated_by" => $createdBy,
+                                                                "is_active" => 1,
+                                                                "is_advance_app" => 0,
+                                                            );
     
-                                                        if ($woodValueWithSupplierTaxes != 0) {
-                                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                            $processingCost = $totalNetVolume * 75;
+                                                            $processingCost = round($processingCost * $exchangeRate, 3);
+        
+                                                            if ($processingCost != 0) {
+                                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $processingCost, 5, $supplierId);
+                                                            }
+                                                        } else {
+
+                                                            $dataInventoryLedger = array(
+                                                                "contract_id" => $purchaseContractId,
+                                                                "inventory_order" => $inventoryOrder,
+                                                                "ledger_type" => 2,
+                                                                "expense_date" => $purchaseDate,
+                                                                "created_by" => $createdBy,
+                                                                "updated_by" => $createdBy,
+                                                                "is_active" => 1,
+                                                                "is_advance_app" => 0,
+                                                            );
+        
+                                                            if ($woodValueWithSupplierTaxes != 0) {
+                                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                            }
                                                         }
     
                                                         $getContracts = $this->Contract_model->get_contracts_by_contractid($purchaseContractId);
@@ -1293,19 +1374,39 @@ class Syncfarmdata extends MY_Controller
     
                                                         $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
     
-                                                        $dataInventoryLedger = array(
-                                                            "contract_id" => $purchaseContractId,
-                                                            "inventory_order" => $inventoryOrder,
-                                                            "ledger_type" => 2,
-                                                            "expense_date" => $purchaseDate,
-                                                            "created_by" => $createdBy,
-                                                            "updated_by" => $createdBy,
-                                                            "is_active" => 1,
-                                                            "is_advance_app" => 0,
-                                                        );
+                                                        if($getSupplierDetails[0]->is_saw_mill == 1) {
+                                                            $dataInventoryLedger = array(
+                                                                "contract_id" => $purchaseContractId,
+                                                                "inventory_order" => $inventoryOrder,
+                                                                "ledger_type" => 2,
+                                                                "expense_date" => $purchaseDate,
+                                                                "created_by" => $createdBy,
+                                                                "updated_by" => $createdBy,
+                                                                "is_active" => 1,
+                                                                "is_advance_app" => 0,
+                                                            );
     
-                                                        if ($woodValueWithSupplierTaxes != 0) {
-                                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                            $processingCost = $totalNetVolume * 75;
+                                                            $processingCost = round($processingCost * $exchangeRate, 3);
+        
+                                                            if ($processingCost != 0) {
+                                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $processingCost, 5, $supplierId);
+                                                            }
+                                                        } else {
+                                                            $dataInventoryLedger = array(
+                                                                "contract_id" => $purchaseContractId,
+                                                                "inventory_order" => $inventoryOrder,
+                                                                "ledger_type" => 2,
+                                                                "expense_date" => $purchaseDate,
+                                                                "created_by" => $createdBy,
+                                                                "updated_by" => $createdBy,
+                                                                "is_active" => 1,
+                                                                "is_advance_app" => 0,
+                                                            );
+        
+                                                            if ($woodValueWithSupplierTaxes != 0) {
+                                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                            }
                                                         }
     
                                                         $getContracts = $this->Contract_model->get_contracts_by_contractid($purchaseContractId);
@@ -1647,19 +1748,39 @@ class Syncfarmdata extends MY_Controller
 
                                                             $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
 
-                                                            $dataInventoryLedger = array(
-                                                                "contract_id" => $purchaseContractId,
-                                                                "inventory_order" => $inventoryOrder,
-                                                                "ledger_type" => 2,
-                                                                "expense_date" => $purchaseDate,
-                                                                "created_by" => $createdBy,
-                                                                "updated_by" => $createdBy,
-                                                                "is_active" => 1,
-                                                                "is_advance_app" => 0,
-                                                            );
+                                                            if($getSupplierDetails[0]->is_saw_mill == 1) {
+                                                                $dataInventoryLedger = array(
+                                                                    "contract_id" => $purchaseContractId,
+                                                                    "inventory_order" => $inventoryOrder,
+                                                                    "ledger_type" => 2,
+                                                                    "expense_date" => $purchaseDate,
+                                                                    "created_by" => $createdBy,
+                                                                    "updated_by" => $createdBy,
+                                                                    "is_active" => 1,
+                                                                    "is_advance_app" => 0,
+                                                                );
+        
+                                                                $processingCost = $totalNetVolume * 75;
+                                                                $processingCost = round($processingCost * $exchangeRate, 3);
+            
+                                                                if ($processingCost != 0) {
+                                                                    $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $processingCost, 5, $supplierId);
+                                                                }
+                                                            } else {
+                                                                $dataInventoryLedger = array(
+                                                                    "contract_id" => $purchaseContractId,
+                                                                    "inventory_order" => $inventoryOrder,
+                                                                    "ledger_type" => 2,
+                                                                    "expense_date" => $purchaseDate,
+                                                                    "created_by" => $createdBy,
+                                                                    "updated_by" => $createdBy,
+                                                                    "is_active" => 1,
+                                                                    "is_advance_app" => 0,
+                                                                );
 
-                                                            if ($woodValueWithSupplierTaxes != 0) {
-                                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                                if ($woodValueWithSupplierTaxes != 0) {
+                                                                    $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                                }
                                                             }
 
                                                             $getContracts = $this->Contract_model->get_contracts_by_contractid($purchaseContractId);
@@ -1907,19 +2028,39 @@ class Syncfarmdata extends MY_Controller
 
                                                             $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
 
-                                                            $dataInventoryLedger = array(
-                                                                "contract_id" => $purchaseContractId,
-                                                                "inventory_order" => $inventoryOrder,
-                                                                "ledger_type" => 2,
-                                                                "expense_date" => $purchaseDate,
-                                                                "created_by" => $createdBy,
-                                                                "updated_by" => $createdBy,
-                                                                "is_active" => 1,
-                                                                "is_advance_app" => 0,
-                                                            );
+                                                            if($getSupplierDetails[0]->is_saw_mill == 1) {
+                                                                $dataInventoryLedger = array(
+                                                                    "contract_id" => $purchaseContractId,
+                                                                    "inventory_order" => $inventoryOrder,
+                                                                    "ledger_type" => 2,
+                                                                    "expense_date" => $purchaseDate,
+                                                                    "created_by" => $createdBy,
+                                                                    "updated_by" => $createdBy,
+                                                                    "is_active" => 1,
+                                                                    "is_advance_app" => 0,
+                                                                );
+        
+                                                                $processingCost = $totalNetVolume * 75;
+                                                                $processingCost = round($processingCost * $exchangeRate, 3);
+            
+                                                                if ($processingCost != 0) {
+                                                                    $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $processingCost, 5, $supplierId);
+                                                                }
+                                                            } else {
+                                                                $dataInventoryLedger = array(
+                                                                    "contract_id" => $purchaseContractId,
+                                                                    "inventory_order" => $inventoryOrder,
+                                                                    "ledger_type" => 2,
+                                                                    "expense_date" => $purchaseDate,
+                                                                    "created_by" => $createdBy,
+                                                                    "updated_by" => $createdBy,
+                                                                    "is_active" => 1,
+                                                                    "is_advance_app" => 0,
+                                                                );
 
-                                                            if ($woodValueWithSupplierTaxes != 0) {
-                                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                                if ($woodValueWithSupplierTaxes != 0) {
+                                                                    $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierId);
+                                                                }
                                                             }
 
                                                             $getContracts = $this->Contract_model->get_contracts_by_contractid($purchaseContractId);

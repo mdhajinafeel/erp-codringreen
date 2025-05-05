@@ -312,7 +312,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             $("#loading").show();
             toastr.info(processing_request);
             $.ajax({
-                url: base_url + "/generate_invoice_from_history",
+                url: base_url + "/generate_merge_invoice_from_history",
                 type: "POST",
                 data: fd,
                 contentType: false,

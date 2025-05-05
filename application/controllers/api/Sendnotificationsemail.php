@@ -28,7 +28,7 @@ class Sendnotificationsemail extends MY_Controller
 
                 $fetchEmailTemplate = $this->Master_model->get_email_template_by_code("FARMDATA");
                 $mailSubject = $fetchEmailTemplate[0]->template_subject;
-                $logo = base_url() . 'assets/img/iconz/cgrlogo_new.png';
+                $logo = base_url() . 'assets/img/iconz/cgrlogo_new_small.png';
 
                 $tableHeadData = "";
                 $tableHeadData = $tableHeadData . "<tr>
@@ -65,51 +65,54 @@ class Sendnotificationsemail extends MY_Controller
                             </tr>";
                     }
                 }
-
-                $tableData = '<table style="border: 1px solid black;border-spacing: 0;border-collapse: collapse;">' . $tableHeadData . '
-                    ' . $tableRowData . '</table><br/>';
-
-                $message = '<div style="background:#f6f6f6;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:14px;margin:0;padding:0;padding: 20px;">
-                    <img src="' . $logo . '" title="Codrin Green"> <br/><br/>' . str_replace(
-                    array("{var tabledata}"),
-                    array($tableData),
-                    htmlspecialchars_decode(stripslashes($fetchEmailTemplate[0]->template_message))
-                ) . '</div>';
-
-                $config = array(
-                    'protocol' => 'smtp',
-                    'smtp_host' => 'smtp.titan.email',
-                    'smtp_port' => 587,
-                    'smtp_user' => 'codrinsystems@codringreen.com',
-                    'smtp_pass' => "Tb]-(g3Bjh&t[,K5",
-                    'mailtype'  => 'html',
-                    'charset'   => 'utf-8',
-                    'wordwrap' => TRUE
-                );
-
-                $this->load->library('email', $config);
-                $this->email->set_newline("\r\n");
-
-                //$listReceivers = array('Raj Shekhar Singh <raj@codringroup.com>');
-                $listReceivers = array('Mohamed Haji Nafeel <nafeel@codringroup.com>');
-                $this->email->to($listReceivers);
-                $this->email->from("codrinsystems@codringreen.com", "Codrin Systems");
-                $this->email->bcc("Mohamed Haji Nafeel <nafeel@codringroup.com>");
-                $this->email->subject($mailSubject);
-                $this->email->message("$message");
                 
-                if($this->email->send()) {
-                    //UPDATE FARM DETAILS
-                    foreach ($farmData as $key => $value) {
-                        $inventoryOrder = $value["inventoryOrder"];
-                        $supplierId = $value["supplierId"];
-
-                        $dataFarm = array(
-                            "is_notification_sent" => 1,
-                            "notification_sent_date" => date("Y-m-d H:i:s"),
-                        );
-
-                        $this->Farm_model->update_farm_notifications($inventoryOrder, $supplierId, $dataFarm);
+                if($tableRowData != "") {
+                    
+                    $tableData = '<table style="border: 1px solid black;border-spacing: 0;border-collapse: collapse;">' . $tableHeadData . '
+                        ' . $tableRowData . '</table><br/>';
+    
+                    $message = '<div style="background:#f6f6f6;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:14px;margin:0;padding:0;padding: 20px;">
+                        <img src="' . $logo . '" title="Codrin Green"> <br/><br/>' . str_replace(
+                        array("{var tabledata}"),
+                        array($tableData),
+                        htmlspecialchars_decode(stripslashes($fetchEmailTemplate[0]->template_message))
+                    ) . '</div>';
+    
+                    $config = array(
+                        'protocol' => 'smtp',
+                        'smtp_host' => 'smtp.titan.email',
+                        'smtp_port' => 587,
+                        'smtp_user' => 'codrinsystems@codringreen.com',
+                        'smtp_pass' => "Tb]-(g3Bjh&t[,K5",
+                        'mailtype'  => 'html',
+                        'charset'   => 'utf-8',
+                        'wordwrap' => TRUE
+                    );
+    
+                    $this->load->library('email', $config);
+                    $this->email->set_newline("\r\n");
+    
+                    $listReceivers = array('Raj Shekhar Singh <raj@codringroup.com>');
+                    //$listReceivers = array('Mohamed Haji Nafeel <nafeel@codringroup.com>');
+                    $this->email->to($listReceivers);
+                    $this->email->from("codrinsystems@codringreen.com", "Codrin Systems");
+                    $this->email->bcc("Mohamed Haji Nafeel <nafeel@codringroup.com>");
+                    $this->email->subject($mailSubject);
+                    $this->email->message("$message");
+                   
+                    if($this->email->send()) {
+                        //UPDATE FARM DETAILS
+                        foreach ($farmData as $key => $value) {
+                            $inventoryOrder = $value["inventoryOrder"];
+                            $supplierId = $value["supplierId"];
+    
+                            $dataFarm = array(
+                                "is_notification_sent" => 1,
+                                "notification_sent_date" => date("Y-m-d H:i:s"),
+                            );
+    
+                            $this->Farm_model->update_farm_notifications($inventoryOrder, $supplierId, $dataFarm);
+                        }
                     }
                 }
 

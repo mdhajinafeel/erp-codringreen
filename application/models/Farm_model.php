@@ -316,7 +316,8 @@ class Farm_model extends CI_Model
                 F.purchase_unit, C.purchase_allowance, C.purchase_allowance_length, C.unit_of_purchase, A.origin_id, 
                 CASE WHEN (getcurrencyexcelformat_origin(A.origin_id) IS NULL OR '') THEN getdefaultcurrency() ELSE getcurrencyexcelformat_origin(A.origin_id) END as currency_excel_format, A.product_type_id, 
                 A.supplier_taxes, A.logistic_taxes, A.service_taxes, A.logistic_provider_taxes, A.service_provider_taxes, 
-                A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, A.rounding_factor, C.existing_price_condition    
+                A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, 
+                A.rounding_factor, C.existing_price_condition, A.driver_name, A.process_type    
                 FROM tbl_farm A 
                 INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                 INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
@@ -773,7 +774,7 @@ class Farm_model extends CI_Model
                 F.purchase_unit, C.purchase_allowance, C.purchase_allowance_length, C.unit_of_purchase, A.origin_id, 
                 CASE WHEN (getcurrencyexcelformat_origin(A.origin_id) IS NULL OR '') THEN getdefaultcurrency() ELSE getcurrencyexcelformat_origin(A.origin_id) END as currency_excel_format, A.product_type_id, 
                 A.supplier_taxes, A.logistic_taxes, A.service_taxes, A.logistic_provider_taxes, A.service_provider_taxes, 
-                A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, A.rounding_factor, A.is_closed, A.is_notification_sent   
+                A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, A.rounding_factor, A.is_closed, A.is_notification_sent 
                 FROM tbl_farm A 
                 INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                 INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
@@ -784,10 +785,22 @@ class Farm_model extends CI_Model
                 AND A.supplier_id = $supplierid");
         return $query->result();
     }
-
+    
     public function update_farm_notifications($inventoryorder, $supplierid, $data)
     {
         $multiClause = array('inventory_order' => $inventoryorder, 'supplier_id' => $supplierid);
+        $this->db->where($multiClause);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        if ($this->db->update('tbl_farm', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function update_farm_inventory_order($farmid, $contractid, $supplierid, $data)
+    {
+        $multiClause = array('farm_id' => $farmid, 'contract_id' => $contractid, 'supplier_id' => $supplierid, 'is_active' => 1);
         $this->db->where($multiClause);
         $this->db->set('updated_date', 'NOW()', FALSE);
         if ($this->db->update('tbl_farm', $data)) {

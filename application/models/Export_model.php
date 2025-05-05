@@ -970,4 +970,117 @@ class Export_model extends CI_Model
         $query = $this->db->query($strQuery);
         return $query->result();
     }
+
+    public function update_exportcontainercost($data, $exportid)
+	{
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$multiClause = array('export_id' => $exportid);
+		$this->db->where($multiClause);
+		if ($this->db->update('tbl_export_document_container_cost', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+    public function add_exportcontainercost($data)
+	{
+		$this->db->set('created_date', 'NOW()', FALSE);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->insert('tbl_export_document_container_cost', $data);
+		if ($this->db->affected_rows() > 0) {
+			$insert_id = $this->db->insert_id();
+			return $insert_id;
+		} else {
+			return 0;
+		}
+	}
+
+    public function fetch_export_container_costs($exportid)
+    {
+        $strQuery = "SELECT dispatch_id, unit_price, exchange_rate FROM tbl_export_document_container_cost 
+            WHERE is_active = 1 AND export_id = $exportid";
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function fetch_merge_invoice_history_invoice() {
+        $strQuery = "SELECT A.id, A.invoice_date, A.total_containers, A.circ_allowance, A.length_allowance, 
+            A.circ_adjustment, A.measurement_system, A.service_enabled, A.service_sales_percentage, A.total_service_cost, 
+            A.advance_enabled, A.advance_cost, A.total_advance_cost, A.accounting_invoice, A.claim_id, A.claim_amount, 
+            A.shorts_base_price, A.enabled_jump_shorts, A.semi_base_price, A.enabled_jump_semi, A.long_base_price, 
+            A.enabled_jump_long, A.credit_notes, A.buyer_id, A.bank_id, A.total_volume, A.invoice_unit_price, 
+            A.total_invoice_value, B.fullname AS created_by, C.buyer_name, D.bank_name, A.seller_id, E.seller_name 
+            FROM tbl_export_invoice_history A 
+            INNER JOIN tbl_user_registration B ON B.userid = A.created_by 
+            INNER JOIN tbl_master_buyers C ON C.id = A.buyer_id 
+            INNER JOIN tbl_master_invoice_banks D ON D.id = A.bank_id 
+            INNER JOIN tbl_master_sellers E ON E.id = A.seller_id 
+            WHERE A.is_active = 1 AND A.id IN (219, 221, 222) ORDER BY A.id DESC";
+
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function get_export_data_by_export_id_merge($originid, $circallowance, $lengthallowance, $circadjust, $measurementsystem)
+    {
+        if($measurementsystem == 2 || $measurementsystem == 5) {
+            $strQuery = "SELECT Y.dispatch_id, LEFT(REPLACE(TRIM(Y.container_number), ' ', ''), 11) AS container_number, Y.total_pieces, Y.gross_volume, Y.net_volume, Y.gross_cft, Y.net_cft, Y.avg_circumference, Y.avg_length, 
+            CASE WHEN (Y.product_type_id = 1 OR Y.product_type_id = 3) THEN 4 ELSE CASE WHEN Y.avg_length < 2.75 THEN 1 WHEN Y.avg_length < 6 THEN 2 ELSE 3 END END AS product_type
+            FROM (
+                SELECT X.dispatch_id, X.container_number, X.product_type_id, SUM(X.total_pieces) AS total_pieces, SUM(X.gross_volume * X.total_pieces) AS gross_volume, SUM(X.net_volume * X.total_pieces) AS net_volume, ROUND(SUM(X.gross_volume * X.total_pieces)/ SUM(X.total_pieces)*35.315,2) AS gross_cft, ROUND(SUM(X.net_volume * X.total_pieces)/ SUM(X.total_pieces)*35.315,2) AS net_cft, TRUNCATE(SUM(X.circumference * X.total_pieces)/SUM(X.total_pieces),0) AS avg_circumference, ROUND(SUM(X.length * X.total_pieces)/SUM(X.total_pieces),2) AS avg_length
+            FROM (
+                SELECT E.container_number, B.dispatch_id, E.product_type_id, SUM(C.dispatch_pieces) AS total_pieces, (D.circumference_bought + $circadjust) AS circumference, (D.length_bought / 100) AS length, 
+                TRUNCATE((D.circumference_bought + $circadjust) * (D.circumference_bought + $circadjust) * (D.length_bought) / 16000000, 3) AS gross_volume, 
+                TRUNCATE(((D.circumference_bought + $circadjust) - $circallowance) * ((D.circumference_bought + $circadjust) - $circallowance)*((D.length_bought) - $lengthallowance) / 16000000, 3) AS net_volume
+            FROM tbl_export_container_details A 
+            INNER JOIN tbl_export_container B ON B.container_details_id = A.id 
+            INNER JOIN tbl_dispatch_container E ON E.dispatch_id = B.dispatch_id 
+            INNER JOIN tbl_dispatch_data C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+            INNER JOIN tbl_reception_data D ON D.reception_data_id = C.reception_data_id AND D.isactive = 1
+            WHERE A.isactive = 1 AND A.id IN (622, 623, 624) AND A.origin_id = $originid AND B.isactive = 1 
+            GROUP BY E.container_number, D.circumference_bought, D.length_bought) X 
+            GROUP BY X.container_number) Y
+            ORDER BY Y.dispatch_id ASC ";
+        } else if ($measurementsystem == 12) {
+            $strQuery = "SELECT Y.dispatch_id, LEFT(REPLACE(TRIM(Y.container_number), ' ', ''), 11) AS container_number, Y.total_pieces, Y.gross_volume, Y.net_volume, Y.gross_cft, Y.net_cft, Y.avg_circumference, Y.avg_length, 
+            CASE WHEN (Y.product_type_id = 1 OR Y.product_type_id = 3) THEN 4 ELSE CASE WHEN Y.avg_length < 2.75 THEN 1 WHEN Y.avg_length < 6 THEN 2 ELSE 3 END END AS product_type
+            FROM (
+                SELECT X.dispatch_id, X.container_number, X.product_type_id, SUM(X.total_pieces) AS total_pieces, SUM(X.gross_volume) AS gross_volume, SUM(X.net_volume) AS net_volume, ROUND(SUM(X.gross_volume)/ SUM(X.total_pieces)*35.315,2) AS gross_cft, ROUND(SUM(X.net_volume)/ SUM(X.total_pieces)*35.315,2) AS net_cft, TRUNCATE(SUM(X.circumference * X.total_pieces)/SUM(X.total_pieces),0) AS avg_circumference, ROUND(SUM(X.length * X.total_pieces)/SUM(X.total_pieces),2) AS avg_length
+            FROM (
+                SELECT E.container_number, B.dispatch_id, E.product_type_id, SUM(C.dispatch_pieces) AS total_pieces, (D.circumference_bought + $circadjust) AS circumference, (D.length_bought / 100) AS length, 
+                TRUNCATE((D.circumference_bought + $circadjust) * (D.circumference_bought + $circadjust) * (D.length_bought) / 16000000, 3)  * SUM(C.dispatch_pieces) AS gross_volume, 
+                TRUNCATE(((D.circumference_bought + $circadjust) - $circallowance) * ((D.circumference_bought + $circadjust) - $circallowance)*((D.length_bought) - $lengthallowance) / 16000000, 3) * SUM(C.dispatch_pieces) AS net_volume
+            FROM tbl_export_container_details A 
+            INNER JOIN tbl_export_container B ON B.container_details_id = A.id 
+            INNER JOIN tbl_dispatch_container E ON E.dispatch_id = B.dispatch_id 
+            INNER JOIN tbl_dispatch_data C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+            INNER JOIN tbl_reception_data D ON D.reception_data_id = C.reception_data_id AND D.isactive = 1
+            WHERE A.isactive = 1 AND A.id IN (622, 623, 624) AND A.origin_id = $originid AND B.isactive = 1 
+            GROUP BY E.container_number, D.circumference_bought, D.length_bought) X 
+            GROUP BY X.container_number) Y
+            ORDER BY Y.dispatch_id ASC ";
+        } else {
+            $strQuery = "SELECT Y.dispatch_id, LEFT(REPLACE(TRIM(Y.container_number), ' ', ''), 11) AS container_number, Y.total_pieces, Y.gross_volume, Y.net_volume, Y.gross_cft, Y.net_cft, Y.avg_circumference, Y.avg_length, 
+            CASE WHEN (Y.product_type_id = 1 OR Y.product_type_id = 3) THEN 4 ELSE CASE WHEN Y.avg_length < 2.75 THEN 1 WHEN Y.avg_length < 6 THEN 2 ELSE 3 END END AS product_type
+            FROM (
+                SELECT X.dispatch_id, X.container_number, X.product_type_id, SUM(X.total_pieces) AS total_pieces, SUM(X.gross_volume * X.total_pieces) AS gross_volume, SUM(X.net_volume * X.total_pieces) AS net_volume, ROUND(SUM(X.gross_volume * X.total_pieces)/ SUM(X.total_pieces)*35.315,2) AS gross_cft, ROUND(SUM(X.net_volume * X.total_pieces)/ SUM(X.total_pieces)*35.315,2) AS net_cft, TRUNCATE(SUM(X.circumference * X.total_pieces)/SUM(X.total_pieces),0) AS avg_circumference, ROUND(SUM(X.length * X.total_pieces)/SUM(X.total_pieces),2) AS avg_length
+            FROM (
+                SELECT E.container_number, B.dispatch_id, E.product_type_id, SUM(C.dispatch_pieces) AS total_pieces, (D.circumference_bought + $circadjust) AS circumference, (D.length_bought / 100) AS length, 
+                ROUND((D.circumference_bought + $circadjust) * (D.circumference_bought + $circadjust) * (D.length_bought) * 0.0796 / 1000000, 3) AS gross_volume, 
+                ROUND(((D.circumference_bought + $circadjust) - $circallowance) * ((D.circumference_bought + $circadjust) - $circallowance)*((D.length_bought) - $lengthallowance) * 0.0796 / 1000000, 3) AS net_volume
+            FROM tbl_export_container_details A 
+            INNER JOIN tbl_export_container B ON B.container_details_id = A.id 
+            INNER JOIN tbl_dispatch_container E ON E.dispatch_id = B.dispatch_id 
+            INNER JOIN tbl_dispatch_data C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+            INNER JOIN tbl_reception_data D ON D.reception_data_id = C.reception_data_id AND D.isactive = 1
+            WHERE A.isactive = 1 A.id IN (622, 623, 624) AND A.origin_id = $originid AND B.isactive = 1 
+            GROUP BY E.container_number, D.circumference_bought, D.length_bought) X 
+            GROUP BY X.container_number) Y
+            ORDER BY Y.dispatch_id ASC ";
+        }
+        
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
 }

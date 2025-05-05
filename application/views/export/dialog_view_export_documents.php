@@ -164,6 +164,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <button class="nav-link text-white" id="nav-remobilization-tab" data-bs-toggle="tab" data-bs-target="#nav-remobilization" type="button" role="tab" aria-controls="nav-remobilization" aria-selected="false">
                                 <?php echo $this->lang->line("doc_remobilization"); ?>
                             </button>
+                            <button class="nav-link text-white" id="nav-containercost-tab" data-bs-toggle="tab" data-bs-target="#nav-containercost" type="button" role="tab" aria-controls="nav-containercost" aria-selected="false">
+                                <?php echo $this->lang->line("doc_containercost"); ?>
+                            </button>
                         </div>
                     </nav>
 
@@ -322,8 +325,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerCustomValue = 0;
+                                        foreach ($exportDocumentsCustomsContainers as $customcontainers) { ?>
+                                            <?php if ($customcontainers->dispatch_id == $containerdetail->dispatch_id) {
+                                                $containerCustomValue = $customcontainers->container_value + 0;
+                                                break;
+                                            } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="" class="form-control text-uppercase" id="custom_container_value" name="custom_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerCustomValue + 0; ?>" class="form-control text-uppercase" id="custom_container_value" name="custom_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
@@ -485,8 +496,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerTransportValue = 0;
+                                        foreach ($exportDocumentsTransportContainers as $transportcontainers) { ?>
+                                            <?php if ($transportcontainers->dispatch_id == $containerdetail->dispatch_id) {
+                                                $containerTransportValue = $transportcontainers->container_value + 0;
+                                                break;
+                                            } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="" class="form-control text-uppercase" id="itr_container_value" name="itr_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerTransportValue + 0; ?>" class="form-control text-uppercase" id="itr_container_value" name="itr_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
@@ -648,16 +667,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerPortValue = 0;
+                                        foreach ($exportDocumentsPortContainers as $portcontainers) { ?>
+                                            <?php if ($portcontainers->dispatch_id == $containerdetail->dispatch_id) {
+                                                $containerPortValue = $portcontainers->container_value + 0;
+                                                break;
+                                            } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="" class="form-control text-uppercase" id="port_container_value" name="port_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerPortValue + 0; ?>" class="form-control text-uppercase" id="port_container_value" name="port_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
+                            </div>
 
-                                <div class="row mb-3 mt-4">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary col-md-4" id="btnSavePort" name="btnSavePort"><?php echo $this->lang->line('save'); ?></button>
-                                    </div>
+                            <div class="row mb-3 mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSavePort" name="btnSavePort"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -812,16 +839,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerShippingValue = 0;
+                                        foreach ($exportDocumentsShippingContainers as $shippingcontainer) { ?>
+                                            <?php if ($shippingcontainer->dispatch_id == $containerdetail->dispatch_id) {
+                                                $containerShippingValue = $shippingcontainer->container_value + 0;
+                                                break;
+                                            } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="" class="form-control text-uppercase" id="shipping_container_value" name="shipping_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerShippingValue + 0; ?>" class="form-control text-uppercase" id="shipping_container_value" name="shipping_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
 
-                                <div class="row mb-3 mt-4">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveShipping" name="btnSaveShipping"><?php echo $this->lang->line('save'); ?></button>
-                                    </div>
+
+                            </div>
+
+                            <div class="row mb-3 mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveShipping" name="btnSaveShipping"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
 
@@ -976,16 +1013,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerFumigationValue = 0;
+                                        foreach ($exportDocumentsFumigationContainers as $fumigationcontainers) { ?>
+                                            <?php if ($fumigationcontainers->dispatch_id == $containerdetail->dispatch_id) {
+                                                $containerFumigationValue = $fumigationcontainers->container_value + 0;
+                                                break;
+                                            } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="" class="form-control text-uppercase" id="fumigation_container_value" name="fumigation_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerFumigationValue + 0; ?>" class="form-control text-uppercase" id="fumigation_container_value" name="fumigation_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
+                            </div>
 
-                                <div class="row mb-3 mt-4">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveFumigation" name="btnSaveFumigation"><?php echo $this->lang->line('save'); ?></button>
-                                    </div>
+                            <div class="row mb-3 mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveFumigation" name="btnSaveFumigation"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -1139,16 +1184,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerCoterosValue = 0;
+                                        foreach ($exportDocumentsCoterosContainers as $coteroscontainers) { ?>
+                                            <?php if ($coteroscontainers->dispatch_id == $containerdetail->dispatch_id) {
+                                                $containerCoterosValue = $coteroscontainers->container_value + 0;
+                                                break;
+                                            } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="" class="form-control text-uppercase" id="coteros_container_value" name="coteros_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerCoterosValue + 0; ?>" class="form-control text-uppercase" id="coteros_container_value" name="coteros_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
+                            </div>
 
-                                <div class="row mb-3 mt-4">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveCoteros" name="btnSaveCoteros"><?php echo $this->lang->line('save'); ?></button>
-                                    </div>
+                            <div class="row mb-3 mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveCoteros" name="btnSaveCoteros"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -1302,16 +1355,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerPhytoValue = 0;
+                                        foreach ($exportDocumentsPhytoContainers as $phytocontainers) { ?>
+                                            <?php if ($phytocontainers->dispatch_id == $containerdetail->dispatch_id) {
+                                                $containerPhytoValue = $phytocontainers->container_value + 0;
+                                                break;
+                                            } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="" class="form-control text-uppercase" id="phyto_container_value" name="phyto_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerPhytoValue + 0; ?>" class="form-control text-uppercase" id="phyto_container_value" name="phyto_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
+                            </div>
 
-                                <div class="row mb-3 mt-4">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary col-md-4" id="btnSavePhyto" name="btnSavePhyto"><?php echo $this->lang->line('save'); ?></button>
-                                    </div>
+                            <div class="row mb-3 mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSavePhyto" name="btnSavePhyto"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -1465,16 +1526,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerIncentivesValue = 0;
+                                        foreach ($exportDocumentsIncentivesContainers as $incentivescontainers) { ?>
+                                            <?php if ($incentivescontainers->dispatch_id == $containerdetail->dispatch_id) {
+                                                $containerIncentivesValue = $incentivescontainers->container_value + 0;
+                                                break;
+                                            } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="" class="form-control text-uppercase" id="incentives_container_value" name="incentives_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerIncentivesValue + 0; ?>" class="form-control text-uppercase" id="incentives_container_value" name="incentives_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
+                            </div>
 
-                                <div class="row mb-3 mt-4">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveIncentives" name="btnSaveIncentives"><?php echo $this->lang->line('save'); ?></button>
-                                    </div>
+                            <div class="row mb-3 mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveIncentives" name="btnSaveIncentives"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -1627,16 +1696,81 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerRemobilizationValue = 0;
+                                        foreach ($exportDocumentsRemobilizationContainers as $remobilizationcontainers) { ?>
+                                            <?php if ($remobilizationcontainers->dispatch_id == $containerdetail->dispatch_id) {
+                                                $containerRemobilizationValue = $remobilizationcontainers->container_value + 0;
+                                                break;
+                                            } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="" class="form-control text-uppercase" id="remobilization_container_value" name="remobilization_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerRemobilizationValue + 0; ?>" class="form-control text-uppercase" id="remobilization_container_value" name="remobilization_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
+                            </div>
 
-                                <div class="row mb-3 mt-4">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveRemobilization" name="btnSaveRemobilization"><?php echo $this->lang->line('save'); ?></button>
+                            <div class="row mb-3 mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveRemobilization" name="btnSaveRemobilization"><?php echo $this->lang->line('save'); ?></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="nav-containercost" role="tabpanel" aria-labelledby="nav-remobilization-tab">
+                            <div id="divContainersContainer">
+
+                                <div class="row mb-3">
+                                    <label class="col-md-3 col-form-label header-profile-menu1 fontsize" for="continerNo_ContainerCost"><?php echo $this->lang->line('container_number'); ?></label>
+                                    <label class="col-md-2 col-form-label header-profile-menu1 fontsize" for="totalPieces_ContainerCost"><?php echo $this->lang->line('total_no_of_pieces'); ?></label>
+                                    <label class="col-md-2 col-form-label header-profile-menu1 fontsize" for="totalVolume_ContainerCost"><?php echo $this->lang->line('total_volume'); ?></label>
+                                    <label class="col-md-2 col-form-label header-profile-menu1 fontsize" for="containerValue_ContainerCost"><?php echo $this->lang->line('container_unit_price'); ?></label>
+                                    <label class="col-md-2 col-form-label header-profile-menu1 fontsize" for="containerValue_ContainerCost"><?php echo $this->lang->line('container_trm'); ?></label>
+                                </div>
+
+                                <?php foreach ($containerDetails as $containerdetail) { ?>
+
+                                    <div class="row mb-3">
+
+                                        <input type="hidden" id="hdnDispatchIdContainerCost" name="dispatchid_containercost[<?php echo $containerdetail->dispatch_id; ?>]" value="<?php echo $containerdetail->dispatch_id; ?>">
+
+                                        <label class="col-md-3 lbl-font header-profile-menu1 fontsize" for="lblContainerContainerCost" name="containerNumberContainerCost[]" value="<?php echo $containerdetail->container_number; ?>">
+                                            <?php echo strtoupper($containerdetail->container_number); ?>
+                                        </label>
+
+                                        <label class="col-md-2 col-form-label lbl-font header-profile-menu1 fontsize" for="lblContainer1ContainerCost" name="containerNumber1ContainerCost[]" value="<?php echo $containerdetail->total_pieces; ?>">
+                                            <?php echo $containerdetail->total_pieces + 0; ?>
+                                        </label>
+
+                                        <label class="col-md-2 col-form-label lbl-font header-profile-menu1 fontsize" for="lblContainer2ContainerCost" name="containerNumber2ContainerCost[]" value="<?php echo $containerdetail->total_volume; ?>">
+                                            <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
+                                        </label>
+
+                                        <?php $containerCostValue = 0;
+                                        $containerTrmValue = 0;
+                                        foreach ($exportContainerCosts as $containercost) { ?>
+                                            <?php if ($containercost->dispatch_id == $containerdetail->dispatch_id) {
+                                                $containerCostValue = $containercost->unit_price + 0;
+                                                $containerTrmValue = $containercost->exchange_rate + 0;
+                                                break;
+                                            } ?>
+                                        <?php } ?>
+
+                                        <div class="col-md-2">
+                                            <input type="number" step="any" value="<?php echo $containerCostValue + 0; ?>" class="form-control text-uppercase" id="containercost_container_value" name="containercost_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <input type="number" step="any" value="<?php echo $containerTrmValue + 0; ?>" class="form-control text-uppercase" id="containercosttrm_container_value" name="containercosttrm_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                        </div>
                                     </div>
+                                <?php } ?>
+                            </div>
+
+                            <div class="row mb-3 mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveContainerCost" name="btnSaveContainerCost"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -1653,6 +1787,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 <script type="text/javascript">
     var common_error = "<?php echo $this->lang->line("common_error"); ?>";
+    var total_error = "<?php echo $this->lang->line("total_error"); ?>";
+    var data_updated = "<?php echo $this->lang->line("data_updated"); ?>";
     var totalPayableAmount = 0;
     var uploadPdfFileCustomAgency = "";
     var fileExtension = "";
@@ -1674,7 +1810,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_custom").hide();
         $("#error-payable_custom").hide();
         $("#divXml").hide();
-        $("#divContainersCustoms").hide();
 
         $("#error-selectdocitr").hide();
         $("#error-invoice_no_itr").hide();
@@ -1686,7 +1821,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_itr").hide();
         $("#error-payable_itr").hide();
         $("#divXmlITR").hide();
-        $("#divContainersITR").hide();
 
         $("#error-selectdocport").hide();
         $("#error-invoice_no_port").hide();
@@ -1698,7 +1832,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_port").hide();
         $("#error-payable_port").hide();
         $("#divXmlPort").hide();
-        $("#divContainersPort").hide();
 
         $("#error-selectdocshipping").hide();
         $("#error-invoice_no_shipping").hide();
@@ -1710,7 +1843,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_shipping").hide();
         $("#error-payable_shipping").hide();
         $("#divXmlShipping").hide();
-        $("#divContainersShipping").hide();
 
         $("#error-selectdocfumigation").hide();
         $("#error-invoice_no_fumigation").hide();
@@ -1722,7 +1854,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_fumigation").hide();
         $("#error-payable_fumigation").hide();
         $("#divXmlFumigation").hide();
-        $("#divContainersFumigation").hide();
 
         $("#error-selectdoccoteros").hide();
         $("#error-invoice_no_coteros").hide();
@@ -1734,7 +1865,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_coteros").hide();
         $("#error-payable_coteros").hide();
         $("#divXmlCoteros").hide();
-        $("#divContainersCoteros").hide();
 
         $("#error-selectdocphyto").hide();
         $("#error-invoice_no_phyto").hide();
@@ -1746,7 +1876,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_phyto").hide();
         $("#error-payable_phyto").hide();
         $("#divXmlPhyto").hide();
-        $("#divContainersPhyto").hide();
 
         $("#error-selectdocincentives").hide();
         $("#error-invoice_no_incentives").hide();
@@ -1758,7 +1887,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_incentives").hide();
         $("#error-payable_incentives").hide();
         $("#divXmlIncentives").hide();
-        $("#divContainersIncentives").hide();
 
         $("#error-selectdocremobilization").hide();
         $("#error-invoice_no_remobilization").hide();
@@ -1770,7 +1898,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_remobilization").hide();
         $("#error-payable_remobilization").hide();
         $("#divXmlRemobilization").hide();
-        $("#divContainersRemobilization").hide();
 
         $("#btnSaveCustoms").click(function() {
 
@@ -1799,77 +1926,83 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                if (fileExtension == "pdf" || fileExtension == "PDF") {
+                if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
                     totalPayableAmount = parseFloat($("#payable_custom").val()) || 0;
                 }
 
-                if (totalContainerValue != totalPayableAmount) {
-                    toastr.clear();
-                    toastr.error("Total Container Value should be equal to Total Payable Amount");
-                    return false;
-                }
+                // if (totalContainerValue != totalPayableAmount) {
+                //     toastr.clear();
+                //     toastr.error(total_error);
+                //     return false;
+                // }
 
-                var isValid = true;
-                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
+                var isValid1 = true,
+                    isValid2 = true,
+                    isValid3 = true,
+                    isValid4 = true,
+                    isValid5 = true,
+                    isValid6 = true,
+                    isValid7 = true;
+                if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdf').is(':visible')) {
 
                     if ($("#invoice_number_custom").val().length == 0) {
                         $("#error-invoice_no_custom").show();
-                        isValid = false
+                        isValid1 = false;
                     } else {
                         $("#error-invoice_no_custom").hide();
-                        isValid = true;
+                        isValid1 = true;
                     }
 
                     if ($("#supplier_name_custom").val() == 0) {
                         $("#error-supplier_name_custom").show();
-                        isValid = false
+                        isValid2 = false;
                     } else {
                         $("#error-supplier_name_custom").hide();
-                        isValid = true;
+                        isValid2 = true;
                     }
 
                     if ($("#issued_date_custom").val().length == 0) {
                         $("#error-issued_date_custom").show();
-                        isValid = false
+                        isValid3 = false;
                     } else {
                         $("#error-issued_date_custom").hide();
-                        isValid = true;
+                        isValid3 = true;
                     }
 
                     if ($("#subtotal_custom").val().length == 0) {
                         $("#error-subtotal_custom").show();
-                        isValid = false
+                        isValid4 = false;
                     } else {
                         $("#error-subtotal_custom").hide();
-                        isValid = true;
+                        isValid4 = true;
                     }
 
                     if ($("#iva_custom").val().length == 0) {
                         $("#error-iva_custom").show();
-                        isValid = false
+                        isValid5 = false;
                     } else {
                         $("#error-iva_custom").hide();
-                        isValid = true;
+                        isValid5 = true;
                     }
 
                     if ($("#retefuente_custom").val().length == 0) {
                         $("#error-retefuente_custom").show();
-                        isValid = false
+                        isValid6 = false;
                     } else {
                         $("#error-retefuente_custom").hide();
-                        isValid = true;
+                        isValid6 = true;
                     }
 
                     if ($("#payable_custom").val().length == 0) {
                         $("#error-payable_custom").show();
-                        isValid = false
+                        isValid7 = false;
                     } else {
                         $("#error-payable_custom").hide();
-                        isValid = true;
+                        isValid7 = true;
                     }
                 }
 
-                if (isValid) {
+                if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
                     var fd = new FormData();
                     fd.append("exportId", $("#hdnExportId").val());
                     fd.append("originId", $("#hdnOriginId").val());
@@ -1900,6 +2033,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("csrf_cgrerp", $("#hdnCsrf").val());
                     fd.append("add_type", 1);
 
+                    $('#loading').show();
                     $.ajax({
                         url: base_url + "/save_export_documents",
                         type: 'post',
@@ -1913,8 +2047,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
-
-
+                                toastr.success(data_updated);
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -1957,79 +2090,87 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 }
             });
 
+            console.log(arrUpdateContainerValue);
+
             if (arrUpdateContainerValue.length > 0) {
 
-                if (fileExtension == "pdf" || fileExtension == "PDF") {
+                if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
                     totalPayableAmount = parseFloat($("#payable_itr").val()) || 0;
                 }
 
-                if (totalContainerValue != totalPayableAmount) {
-                    toastr.clear();
-                    toastr.error("Total Container Value should be equal to Total Payable Amount");
-                    return false;
-                }
+                // if (totalContainerValue != totalPayableAmount) {
+                //     toastr.clear();
+                //     toastr.error(total_error);
+                //     return false;
+                // }
 
-                var isValid = true;
-                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
+                var isValid1 = true,
+                    isValid2 = true,
+                    isValid3 = true,
+                    isValid4 = true,
+                    isValid5 = true,
+                    isValid6 = true,
+                    isValid7 = true;
+                if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfITR').is(':visible')) {
 
                     if ($("#invoice_number_itr").val().length == 0) {
                         $("#error-invoice_no_itr").show();
-                        isValid = false
+                        isValid1 = false;
                     } else {
                         $("#error-invoice_no_itr").hide();
-                        isValid = true;
+                        isValid1 = true;
                     }
 
                     if ($("#supplier_name_itr").val() == 0) {
                         $("#error-supplier_name_itr").show();
-                        isValid = false
+                        isValid2 = false;
                     } else {
                         $("#error-supplier_name_itr").hide();
-                        isValid = true;
+                        isValid2 = true;
                     }
 
                     if ($("#issued_date_itr").val().length == 0) {
                         $("#error-issued_date_itr").show();
-                        isValid = false
+                        isValid3 = false;
                     } else {
                         $("#error-issued_date_itr").hide();
-                        isValid = true;
+                        isValid3 = true;
                     }
 
                     if ($("#subtotal_itr").val().length == 0) {
                         $("#error-subtotal_itr").show();
-                        isValid = false
+                        isValid4 = false;
                     } else {
                         $("#error-subtotal_itr").hide();
-                        isValid = true;
+                        isValid4 = true;
                     }
 
                     if ($("#iva_itr").val().length == 0) {
                         $("#error-iva_itr").show();
-                        isValid = false
+                        isValid5 = false;
                     } else {
                         $("#error-iva_itr").hide();
-                        isValid = true;
+                        isValid5 = true;
                     }
 
                     if ($("#retefuente_itr").val().length == 0) {
                         $("#error-retefuente_itr").show();
-                        isValid = false
+                        isValid6 = false;
                     } else {
                         $("#error-retefuente_itr").hide();
-                        isValid = true;
+                        isValid6 = true;
                     }
 
                     if ($("#payable_itr").val().length == 0) {
                         $("#error-payable_itr").show();
-                        isValid = false
+                        isValid7 = false;
                     } else {
                         $("#error-payable_itr").hide();
-                        isValid = true;
+                        isValid7 = true;
                     }
                 }
 
-                if (isValid) {
+                if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
                     var fd = new FormData();
                     fd.append("exportId", $("#hdnExportId").val());
                     fd.append("originId", $("#hdnOriginId").val());
@@ -2061,6 +2202,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("csrf_cgrerp", $("#hdnCsrf").val());
                     fd.append("add_type", 2);
 
+                    $('#loading').show();
                     $.ajax({
                         url: base_url + "/save_export_documents",
                         type: 'post',
@@ -2074,8 +2216,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
-
-
+                                toastr.success(data_updated);
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -2120,77 +2261,83 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                if (fileExtension == "pdf" || fileExtension == "PDF") {
+                if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
                     totalPayableAmount = parseFloat($("#payable_port").val()) || 0;
                 }
 
-                if (totalContainerValue != totalPayableAmount) {
-                    toastr.clear();
-                    toastr.error("Total Container Value should be equal to Total Payable Amount");
-                    return false;
-                }
+                // if (totalContainerValue != totalPayableAmount) {
+                //     toastr.clear();
+                //     toastr.error(total_error);
+                //     return false;
+                // }
 
-                var isValid = true;
-                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
+                var isValid1 = true,
+                    isValid2 = true,
+                    isValid3 = true,
+                    isValid4 = true,
+                    isValid5 = true,
+                    isValid6 = true,
+                    isValid7 = true;
+                if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfPort').is(':visible')) {
 
                     if ($("#invoice_number_port").val().length == 0) {
                         $("#error-invoice_no_port").show();
-                        isValid = false
+                        isValid1 = false;
                     } else {
                         $("#error-invoice_no_port").hide();
-                        isValid = true;
+                        isValid1 = true;
                     }
 
                     if ($("#supplier_name_port").val() == 0) {
                         $("#error-supplier_name_port").show();
-                        isValid = false
+                        isValid2 = false;
                     } else {
                         $("#error-supplier_name_port").hide();
-                        isValid = true;
+                        isValid2 = true;
                     }
 
                     if ($("#issued_date_port").val().length == 0) {
                         $("#error-issued_date_port").show();
-                        isValid = false
+                        isValid3 = false;
                     } else {
                         $("#error-issued_date_port").hide();
-                        isValid = true;
+                        isValid3 = true;
                     }
 
                     if ($("#subtotal_port").val().length == 0) {
                         $("#error-subtotal_port").show();
-                        isValid = false
+                        isValid4 = false;
                     } else {
                         $("#error-subtotal_port").hide();
-                        isValid = true;
+                        isValid4 = true;
                     }
 
                     if ($("#iva_port").val().length == 0) {
                         $("#error-iva_port").show();
-                        isValid = false
+                        isValid5 = false;
                     } else {
                         $("#error-iva_port").hide();
-                        isValid = true;
+                        isValid5 = true;
                     }
 
                     if ($("#retefuente_port").val().length == 0) {
                         $("#error-retefuente_port").show();
-                        isValid = false
+                        isValid6 = false;
                     } else {
                         $("#error-retefuente_port").hide();
-                        isValid = true;
+                        isValid6 = true;
                     }
 
                     if ($("#payable_port").val().length == 0) {
                         $("#error-payable_port").show();
-                        isValid = false
+                        isValid7 = false;
                     } else {
                         $("#error-payable_port").hide();
-                        isValid = true;
+                        isValid7 = true;
                     }
                 }
 
-                if (isValid) {
+                if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
 
                     var fd = new FormData();
                     fd.append("exportId", $("#hdnExportId").val());
@@ -2223,6 +2370,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("csrf_cgrerp", $("#hdnCsrf").val());
                     fd.append("add_type", 3);
 
+                    $('#loading').show();
                     $.ajax({
                         url: base_url + "/save_export_documents",
                         type: 'post',
@@ -2236,8 +2384,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
-
-
+                                toastr.success(data_updated);
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -2282,77 +2429,83 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                if (fileExtension == "pdf" || fileExtension == "PDF") {
+                if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
                     totalPayableAmount = parseFloat($("#payable_shipping").val()) || 0;
                 }
 
-                if (totalContainerValue != totalPayableAmount) {
-                    toastr.clear();
-                    toastr.error("Total Container Value should be equal to Total Payable Amount");
-                    return false;
-                }
+                // if (totalContainerValue != totalPayableAmount) {
+                //     toastr.clear();
+                //     toastr.error(total_error);
+                //     return false;
+                // }
 
-                var isValid = true;
-                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
+                var isValid1 = true,
+                    isValid2 = true,
+                    isValid3 = true,
+                    isValid4 = true,
+                    isValid5 = true,
+                    isValid6 = true,
+                    isValid7 = true;
+                if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfShipping').is(':visible')) {
 
                     if ($("#invoice_number_shipping").val().length == 0) {
                         $("#error-invoice_no_shipping").show();
-                        isValid = false
+                        isValid1 = false;
                     } else {
                         $("#error-invoice_no_shipping").hide();
-                        isValid = true;
+                        isValid1 = true;
                     }
 
                     if ($("#supplier_name_shipping").val() == 0) {
                         $("#error-supplier_name_shipping").show();
-                        isValid = false
+                        isValid2 = false;
                     } else {
                         $("#error-supplier_name_shipping").hide();
-                        isValid = true;
+                        isValid2 = true;
                     }
 
                     if ($("#issued_date_shipping").val().length == 0) {
                         $("#error-issued_date_shipping").show();
-                        isValid = false
+                        isValid3 = false;
                     } else {
                         $("#error-issued_date_shipping").hide();
-                        isValid = true;
+                        isValid3 = true;
                     }
 
                     if ($("#subtotal_shipping").val().length == 0) {
                         $("#error-subtotal_shipping").show();
-                        isValid = false
+                        isValid4 = false;
                     } else {
                         $("#error-subtotal_shipping").hide();
-                        isValid = true;
+                        isValid4 = true;
                     }
 
                     if ($("#iva_shipping").val().length == 0) {
                         $("#error-iva_shipping").show();
-                        isValid = false
+                        isValid5 = false;
                     } else {
                         $("#error-iva_shipping").hide();
-                        isValid = true;
+                        isValid5 = true;
                     }
 
                     if ($("#retefuente_shipping").val().length == 0) {
                         $("#error-retefuente_shipping").show();
-                        isValid = false
+                        isValid6 = false;
                     } else {
                         $("#error-retefuente_shipping").hide();
-                        isValid = true;
+                        isValid6 = true;
                     }
 
                     if ($("#payable_shipping").val().length == 0) {
                         $("#error-payable_shipping").show();
-                        isValid = false
+                        isValid7 = false;
                     } else {
                         $("#error-payable_shipping").hide();
-                        isValid = true;
+                        isValid7 = true;
                     }
                 }
 
-                if (isValid) {
+                if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
 
                     var fd = new FormData();
                     fd.append("exportId", $("#hdnExportId").val());
@@ -2385,6 +2538,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("csrf_cgrerp", $("#hdnCsrf").val());
                     fd.append("add_type", 9);
 
+                    $('#loading').show();
                     $.ajax({
                         url: base_url + "/save_export_documents",
                         type: 'post',
@@ -2398,8 +2552,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
-
-
+                                toastr.success(data_updated);
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -2444,77 +2597,83 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                if (fileExtension == "pdf" || fileExtension == "PDF") {
+                if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
                     totalPayableAmount = parseFloat($("#payable_fumigation").val()) || 0;
                 }
 
-                if (totalContainerValue != totalPayableAmount) {
-                    toastr.clear();
-                    toastr.error("Total Container Value should be equal to Total Payable Amount");
-                    return false;
-                }
+                // if (totalContainerValue != totalPayableAmount) {
+                //     toastr.clear();
+                //     toastr.error(total_error);
+                //     return false;
+                // }
 
-                var isValid = true;
-                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
+                var isValid1 = true,
+                    isValid2 = true,
+                    isValid3 = true,
+                    isValid4 = true,
+                    isValid5 = true,
+                    isValid6 = true,
+                    isValid7 = true;
+                if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfFumigation').is(':visible')) {
 
                     if ($("#invoice_number_fumigation").val().length == 0) {
                         $("#error-invoice_no_fumigation").show();
-                        isValid = false
+                        isValid1 = false;
                     } else {
                         $("#error-invoice_no_fumigation").hide();
-                        isValid = true;
+                        isValid1 = true;
                     }
 
                     if ($("#supplier_name_fumigation").val() == 0) {
                         $("#error-supplier_name_fumigation").show();
-                        isValid = false
+                        isValid2 = false;
                     } else {
                         $("#error-supplier_name_fumigation").hide();
-                        isValid = true;
+                        isValid2 = true;
                     }
 
                     if ($("#issued_date_fumigation").val().length == 0) {
                         $("#error-issued_date_fumigation").show();
-                        isValid = false
+                        isValid3 = false;
                     } else {
                         $("#error-issued_date_fumigation").hide();
-                        isValid = true;
+                        isValid3 = true;
                     }
 
                     if ($("#subtotal_fumigation").val().length == 0) {
                         $("#error-subtotal_fumigation").show();
-                        isValid = false
+                        isValid4 = false;
                     } else {
                         $("#error-subtotal_fumigation").hide();
-                        isValid = true;
+                        isValid4 = true;
                     }
 
                     if ($("#iva_fumigation").val().length == 0) {
                         $("#error-iva_fumigation").show();
-                        isValid = false
+                        isValid5 = false;
                     } else {
                         $("#error-iva_fumigation").hide();
-                        isValid = true;
+                        isValid5 = true;
                     }
 
                     if ($("#retefuente_fumigation").val().length == 0) {
                         $("#error-retefuente_fumigation").show();
-                        isValid = false
+                        isValid6 = false;
                     } else {
                         $("#error-retefuente_fumigation").hide();
-                        isValid = true;
+                        isValid6 = true;
                     }
 
                     if ($("#payable_fumigation").val().length == 0) {
                         $("#error-payable_fumigation").show();
-                        isValid = false
+                        isValid7 = false;
                     } else {
                         $("#error-payable_fumigation").hide();
-                        isValid = true;
+                        isValid7 = true;
                     }
                 }
 
-                if (isValid) {
+                if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
 
                     var fd = new FormData();
                     fd.append("exportId", $("#hdnExportId").val());
@@ -2547,6 +2706,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("csrf_cgrerp", $("#hdnCsrf").val());
                     fd.append("add_type", 4);
 
+                    $('#loading').show();
                     $.ajax({
                         url: base_url + "/save_export_documents",
                         type: 'post',
@@ -2560,8 +2720,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
-
-
+                                toastr.success(data_updated);
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -2606,77 +2765,83 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                if (fileExtension == "pdf" || fileExtension == "PDF") {
+                if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
                     totalPayableAmount = parseFloat($("#payable_coteros").val()) || 0;
                 }
 
-                if (totalContainerValue != totalPayableAmount) {
-                    toastr.clear();
-                    toastr.error("Total Container Value should be equal to Total Payable Amount");
-                    return false;
-                }
+                // if (totalContainerValue != totalPayableAmount) {
+                //     toastr.clear();
+                //     toastr.error(total_error);
+                //     return false;
+                // }
 
-                var isValid = true;
-                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
+                var isValid1 = true,
+                    isValid2 = true,
+                    isValid3 = true,
+                    isValid4 = true,
+                    isValid5 = true,
+                    isValid6 = true,
+                    isValid7 = true;
+                if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfCoteros').is(':visible')) {
 
                     if ($("#invoice_number_coteros").val().length == 0) {
                         $("#error-invoice_no_coteros").show();
-                        isValid = false
+                        isValid1 = false;
                     } else {
                         $("#error-invoice_no_coteros").hide();
-                        isValid = true;
+                        isValid1 = true;
                     }
 
                     if ($("#supplier_name_coteros").val() == 0) {
                         $("#error-supplier_name_coteros").show();
-                        isValid = false
+                        isValid2 = false;
                     } else {
                         $("#error-supplier_name_coteros").hide();
-                        isValid = true;
+                        isValid2 = true;
                     }
 
                     if ($("#issued_date_coteros").val().length == 0) {
                         $("#error-issued_date_coteros").show();
-                        isValid = false
+                        isValid3 = false;
                     } else {
                         $("#error-issued_date_coteros").hide();
-                        isValid = true;
+                        isValid3 = true;
                     }
 
                     if ($("#subtotal_coteros").val().length == 0) {
                         $("#error-subtotal_coteros").show();
-                        isValid = false
+                        isValid4 = false;
                     } else {
                         $("#error-subtotal_coteros").hide();
-                        isValid = true;
+                        isValid4 = true;
                     }
 
                     if ($("#iva_coteros").val().length == 0) {
                         $("#error-iva_coteros").show();
-                        isValid = false
+                        isValid5 = false;
                     } else {
                         $("#error-iva_coteros").hide();
-                        isValid = true;
+                        isValid5 = true;
                     }
 
                     if ($("#retefuente_coteros").val().length == 0) {
                         $("#error-retefuente_coteros").show();
-                        isValid = false
+                        isValid6 = false;
                     } else {
                         $("#error-retefuente_coteros").hide();
-                        isValid = true;
+                        isValid6 = true;
                     }
 
                     if ($("#payable_coteros").val().length == 0) {
                         $("#error-payable_coteros").show();
-                        isValid = false
+                        isValid7 = false;
                     } else {
                         $("#error-payable_coteros").hide();
-                        isValid = true;
+                        isValid7 = true;
                     }
                 }
 
-                if (isValid) {
+                if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
 
                     var fd = new FormData();
                     fd.append("exportId", $("#hdnExportId").val());
@@ -2708,6 +2873,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("csrf_cgrerp", $("#hdnCsrf").val());
                     fd.append("add_type", 6);
 
+                    $('#loading').show();
                     $.ajax({
                         url: base_url + "/save_export_documents",
                         type: 'post',
@@ -2721,8 +2887,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
-
-
+                                toastr.success(data_updated);
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -2767,77 +2932,83 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                if (fileExtension == "pdf" || fileExtension == "PDF") {
+                if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
                     totalPayableAmount = parseFloat($("#payable_phyto").val()) || 0;
                 }
 
-                if (totalContainerValue != totalPayableAmount) {
-                    toastr.clear();
-                    toastr.error("Total Container Value should be equal to Total Payable Amount");
-                    return false;
-                }
+                // if (totalContainerValue != totalPayableAmount) {
+                //     toastr.clear();
+                //     toastr.error(total_error);
+                //     return false;
+                // }
 
-                var isValid = true;
-                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
+                var isValid1 = true,
+                    isValid2 = true,
+                    isValid3 = true,
+                    isValid4 = true,
+                    isValid5 = true,
+                    isValid6 = true,
+                    isValid7 = true;
+                if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfPhyto').is(':visible')) {
 
                     if ($("#invoice_number_phyto").val().length == 0) {
                         $("#error-invoice_no_phyto").show();
-                        isValid = false
+                        isValid1 = false;
                     } else {
                         $("#error-invoice_no_phyto").hide();
-                        isValid = true;
+                        isValid1 = true;
                     }
 
                     if ($("#supplier_name_phyto").val() == 0) {
                         $("#error-supplier_name_phyto").show();
-                        isValid = false
+                        isValid2 = false;
                     } else {
                         $("#error-supplier_name_phyto").hide();
-                        isValid = true;
+                        isValid2 = true;
                     }
 
                     if ($("#issued_date_phyto").val().length == 0) {
                         $("#error-issued_date_phyto").show();
-                        isValid = false
+                        isValid3 = false;
                     } else {
                         $("#error-issued_date_phyto").hide();
-                        isValid = true;
+                        isValid3 = true;
                     }
 
                     if ($("#subtotal_phyto").val().length == 0) {
                         $("#error-subtotal_phyto").show();
-                        isValid = false
+                        isValid4 = false;
                     } else {
                         $("#error-subtotal_phyto").hide();
-                        isValid = true;
+                        isValid4 = true;
                     }
 
                     if ($("#iva_phyto").val().length == 0) {
                         $("#error-iva_phyto").show();
-                        isValid = false
+                        isValid5 = false;
                     } else {
                         $("#error-iva_phyto").hide();
-                        isValid = true;
+                        isValid5 = true;
                     }
 
                     if ($("#retefuente_phyto").val().length == 0) {
                         $("#error-retefuente_phyto").show();
-                        isValid = false
+                        isValid6 = false;
                     } else {
                         $("#error-retefuente_phyto").hide();
-                        isValid = true;
+                        isValid6 = true;
                     }
 
                     if ($("#payable_phyto").val().length == 0) {
                         $("#error-payable_phyto").show();
-                        isValid = false
+                        isValid7 = false;
                     } else {
                         $("#error-payable_phyto").hide();
-                        isValid = true;
+                        isValid7 = true;
                     }
                 }
 
-                if (isValid) {
+                if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
                     var fd = new FormData();
                     fd.append("exportId", $("#hdnExportId").val());
                     fd.append("originId", $("#hdnOriginId").val());
@@ -2867,8 +3038,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     }
 
                     fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                    fd.append("add_type", 6);
+                    fd.append("add_type", 5);
 
+                    $('#loading').show();
                     $.ajax({
                         url: base_url + "/save_export_documents",
                         type: 'post',
@@ -2882,8 +3054,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
-
-
+                                toastr.success(data_updated);
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -2928,77 +3099,83 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                if (fileExtension == "pdf" || fileExtension == "PDF") {
+                if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
                     totalPayableAmount = parseFloat($("#payable_incentives").val()) || 0;
                 }
 
-                if (totalContainerValue != totalPayableAmount) {
-                    toastr.clear();
-                    toastr.error("Total Container Value should be equal to Total Payable Amount");
-                    return false;
-                }
+                // if (totalContainerValue != totalPayableAmount) {
+                //     toastr.clear();
+                //     toastr.error(total_error);
+                //     return false;
+                // }
 
-                var isValid = true;
-                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
+                var isValid1 = true,
+                    isValid2 = true,
+                    isValid3 = true,
+                    isValid4 = true,
+                    isValid5 = true,
+                    isValid6 = true,
+                    isValid7 = true;
+                if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfIncentives').is(':visible')) {
 
                     if ($("#invoice_number_incentives").val().length == 0) {
                         $("#error-invoice_no_incentives").show();
-                        isValid = false
+                        isValid1 = false;
                     } else {
                         $("#error-invoice_no_incentives").hide();
-                        isValid = true;
+                        isValid1 = true;
                     }
 
                     if ($("#supplier_name_incentives").val() == 0) {
                         $("#error-supplier_name_incentives").show();
-                        isValid = false
+                        isValid2 = false;
                     } else {
                         $("#error-supplier_name_incentives").hide();
-                        isValid = true;
+                        isValid2 = true;
                     }
 
                     if ($("#issued_date_incentives").val().length == 0) {
                         $("#error-issued_date_incentives").show();
-                        isValid = false
+                        isValid3 = false;
                     } else {
                         $("#error-issued_date_incentives").hide();
-                        isValid = true;
+                        isValid3 = true;
                     }
 
                     if ($("#subtotal_incentives").val().length == 0) {
                         $("#error-subtotal_incentives").show();
-                        isValid = false
+                        isValid4 = false;
                     } else {
                         $("#error-subtotal_incentives").hide();
-                        isValid = true;
+                        isValid4 = true;
                     }
 
                     if ($("#iva_incentives").val().length == 0) {
                         $("#error-iva_incentives").show();
-                        isValid = false
+                        isValid5 = false;
                     } else {
                         $("#error-iva_incentives").hide();
-                        isValid = true;
+                        isValid5 = true;
                     }
 
                     if ($("#retefuente_incentives").val().length == 0) {
                         $("#error-retefuente_incentives").show();
-                        isValid = false
+                        isValid6 = false;
                     } else {
                         $("#error-retefuente_incentives").hide();
-                        isValid = true;
+                        isValid6 = true;
                     }
 
                     if ($("#payable_incentives").val().length == 0) {
                         $("#error-payable_incentives").show();
-                        isValid = false
+                        isValid7 = false;
                     } else {
                         $("#error-payable_incentives").hide();
-                        isValid = true;
+                        isValid7 = true;
                     }
                 }
 
-                if (isValid) {
+                if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
                     var fd = new FormData();
                     fd.append("exportId", $("#hdnExportId").val());
                     fd.append("originId", $("#hdnOriginId").val());
@@ -3028,8 +3205,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     }
 
                     fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                    fd.append("add_type", 6);
+                    fd.append("add_type", 7);
 
+                    $('#loading').show();
                     $.ajax({
                         url: base_url + "/save_export_documents",
                         type: 'post',
@@ -3043,8 +3221,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
-
-
+                                toastr.success(data_updated);
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -3089,77 +3266,83 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             if (arrUpdateContainerValue.length > 0) {
 
-                if (fileExtension == "pdf" || fileExtension == "PDF") {
+                if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
                     totalPayableAmount = parseFloat($("#payable_remobilization").val()) || 0;
                 }
 
-                if (totalContainerValue != totalPayableAmount) {
-                    toastr.clear();
-                    toastr.error("Total Container Value should be equal to Total Payable Amount");
-                    return false;
-                }
+                // if (totalContainerValue != totalPayableAmount) {
+                //     toastr.clear();
+                //     toastr.error(total_error);
+                //     return false;
+                // }
 
-                var isValid = true;
-                if (fileExtension != "xml" || fileExtension != "XML" || fileExtension != "") {
+                var isValid1 = true,
+                    isValid2 = true,
+                    isValid3 = true,
+                    isValid4 = true,
+                    isValid5 = true,
+                    isValid6 = true,
+                    isValid7 = true;
+                if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfRemobilization').is(':visible')) {
 
                     if ($("#invoice_number_remobilization").val().length == 0) {
                         $("#error-invoice_no_remobilization").show();
-                        isValid = false
+                        isValid1 = false;
                     } else {
                         $("#error-invoice_no_remobilization").hide();
-                        isValid = true;
+                        isValid1 = true;
                     }
 
                     if ($("#supplier_name_remobilization").val() == 0) {
                         $("#error-supplier_name_remobilization").show();
-                        isValid = false
+                        isValid2 = false;
                     } else {
                         $("#error-supplier_name_remobilization").hide();
-                        isValid = true;
+                        isValid2 = true;
                     }
 
                     if ($("#issued_date_remobilization").val().length == 0) {
                         $("#error-issued_date_remobilization").show();
-                        isValid = false
+                        isValid3 = false;
                     } else {
                         $("#error-issued_date_remobilization").hide();
-                        isValid = true;
+                        isValid3 = true;
                     }
 
                     if ($("#subtotal_remobilization").val().length == 0) {
                         $("#error-subtotal_remobilization").show();
-                        isValid = false
+                        isValid4 = false;
                     } else {
                         $("#error-subtotal_remobilization").hide();
-                        isValid = true;
+                        isValid4 = true;
                     }
 
                     if ($("#iva_remobilization").val().length == 0) {
                         $("#error-iva_remobilization").show();
-                        isValid = false
+                        isValid5 = false;
                     } else {
                         $("#error-iva_remobilization").hide();
-                        isValid = true;
+                        isValid5 = true;
                     }
 
                     if ($("#retefuente_remobilization").val().length == 0) {
                         $("#error-retefuente_remobilization").show();
-                        isValid = false
+                        isValid6 = false;
                     } else {
                         $("#error-retefuente_remobilization").hide();
-                        isValid = true;
+                        isValid6 = true;
                     }
 
                     if ($("#payable_remobilization").val().length == 0) {
                         $("#error-payable_remobilization").show();
-                        isValid = false
+                        isValid7 = false;
                     } else {
                         $("#error-payable_remobilization").hide();
-                        isValid = true;
+                        isValid7 = true;
                     }
                 }
 
-                if (isValid) {
+                if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
                     var fd = new FormData();
                     fd.append("exportId", $("#hdnExportId").val());
                     fd.append("originId", $("#hdnOriginId").val());
@@ -3189,8 +3372,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     }
 
                     fd.append("csrf_cgrerp", $("#hdnCsrf").val());
-                    fd.append("add_type", 6);
+                    fd.append("add_type", 8);
 
+                    $('#loading').show();
                     $.ajax({
                         url: base_url + "/save_export_documents",
                         type: 'post',
@@ -3204,8 +3388,175 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
+                                toastr.success(data_updated);
+                            } else if (jsonResult.error != '') {
+                                toastr.clear();
+                                toastr.error(jsonResult.error);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else if (jsonResult.warning != '') {
+                                toastr.clear();
+                                toastr.warning(jsonResult.warning);
+                                $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
+                            } else {
+                                toastr.clear();
+                            }
+                        }
+                    });
+                }
+            }
+        });
 
+        $("#btnSaveContainerCost").click(function() {
 
+            var arrUpdateContainerValue = [];
+            var containerData = <?php echo json_encode($containerDetails); ?>;
+
+            $.each(containerData, function(i, item) {
+
+                var mappingId = item.dispatch_id;
+                var containerNumber = item.container_number;
+                var isValid = true;
+
+                if (mappingId != null && mappingId != '' && mappingId != undefined && mappingId > 0) {
+
+                    var updatedContainerCostValue = parseFloat($('input[name="containercost_container_value[' + mappingId + ']"]').val()) || 0;
+                    var updatedContainerCostTrmValue = parseFloat($('input[name="containercosttrm_container_value[' + mappingId + ']"]').val()) || 0;
+                    arrUpdateContainerValue.push({
+                        mappingid: mappingId,
+                        containerNumber: containerNumber,
+                        updatedContainerCostValue: updatedContainerCostValue,
+                        updatedContainerCostTrmValue: updatedContainerCostTrmValue
+                    });
+
+                }
+            });
+
+            if (arrUpdateContainerValue.length > 0) {
+
+                // if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
+                //     totalPayableAmount = parseFloat($("#payable_fumigation").val()) || 0;
+                // }
+
+                // if (totalContainerValue != totalPayableAmount) {
+                //     toastr.clear();
+                //     toastr.error(total_error);
+                //     return false;
+                // }
+
+                var isValid1 = true,
+                    isValid2 = true,
+                    isValid3 = true,
+                    isValid4 = true,
+                    isValid5 = true,
+                    isValid6 = true,
+                    isValid7 = true;
+                // if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfFumigation').is(':visible')) {
+
+                //     if ($("#invoice_number_fumigation").val().length == 0) {
+                //         $("#error-invoice_no_fumigation").show();
+                //         isValid1 = false;
+                //     } else {
+                //         $("#error-invoice_no_fumigation").hide();
+                //         isValid1 = true;
+                //     }
+
+                //     if ($("#supplier_name_fumigation").val() == 0) {
+                //         $("#error-supplier_name_fumigation").show();
+                //         isValid2 = false;
+                //     } else {
+                //         $("#error-supplier_name_fumigation").hide();
+                //         isValid2 = true;
+                //     }
+
+                //     if ($("#issued_date_fumigation").val().length == 0) {
+                //         $("#error-issued_date_fumigation").show();
+                //         isValid3 = false;
+                //     } else {
+                //         $("#error-issued_date_fumigation").hide();
+                //         isValid3 = true;
+                //     }
+
+                //     if ($("#subtotal_fumigation").val().length == 0) {
+                //         $("#error-subtotal_fumigation").show();
+                //         isValid4 = false;
+                //     } else {
+                //         $("#error-subtotal_fumigation").hide();
+                //         isValid4 = true;
+                //     }
+
+                //     if ($("#iva_fumigation").val().length == 0) {
+                //         $("#error-iva_fumigation").show();
+                //         isValid5 = false;
+                //     } else {
+                //         $("#error-iva_fumigation").hide();
+                //         isValid5 = true;
+                //     }
+
+                //     if ($("#retefuente_fumigation").val().length == 0) {
+                //         $("#error-retefuente_fumigation").show();
+                //         isValid6 = false;
+                //     } else {
+                //         $("#error-retefuente_fumigation").hide();
+                //         isValid6 = true;
+                //     }
+
+                //     if ($("#payable_fumigation").val().length == 0) {
+                //         $("#error-payable_fumigation").show();
+                //         isValid7 = false;
+                //     } else {
+                //         $("#error-payable_fumigation").hide();
+                //         isValid7 = true;
+                //     }
+                // }
+
+                if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
+
+                    var fd = new FormData();
+                    fd.append("exportId", $("#hdnExportId").val());
+                    fd.append("originId", $("#hdnOriginId").val());
+                    fd.append('saNumber', $("#hdnSaNumber").val());
+                    //fd.append("fileExtension", fileExtension);
+                    fd.append("updateContainerValueData_ContainerCost", JSON.stringify(arrUpdateContainerValue));
+                    //fd.append("uploadPdfFileFumigation", uploadPdfFileCustomAgency);
+
+                    // if (fileExtension == "xml" || fileExtension == "XML") {
+
+                    //     fd.append('invoiceNo_Fumigation', $("#lblInvoiceNoFumigation").text());
+                    //     fd.append('supplierName_Fumigation', supplierId);
+                    //     fd.append('formattedDate_Fumigation', $("#lblIssuedDateFumigation").text());
+                    //     fd.append('subTotal_Fumigation', subTotalCustoms);
+                    //     fd.append('iva_Fumigation', ivaCustoms);
+                    //     fd.append('retefuente_Fumigation', retefuenteCustoms);
+                    //     fd.append('payable_Fumigation', payableCustoms);
+                    // } else {
+
+                    //     fd.append('invoiceNo_Fumigation', $("#invoice_number_fumigation").val());
+                    //     fd.append('supplierName_Fumigation', $("#supplier_name_fumigation").val());
+                    //     fd.append('formattedDate_Fumigation', $("#formatted_date_fumigation").val());
+                    //     fd.append('subTotal_Fumigation', $("#subtotal_fumigation").val());
+                    //     fd.append('iva_Fumigation', $("#iva_fumigation").val());
+                    //     fd.append('retefuente_Fumigation', $("#retefuente_fumigation").val());
+                    //     fd.append('payable_Fumigation', $("#payable_fumigation").val());
+                    // }
+
+                    fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                    fd.append("add_type", 10);
+
+                    $('#loading').show();
+                    $.ajax({
+                        url: base_url + "/save_export_documents",
+                        type: 'post',
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function(jsonResult) {
+                            $('#loading').hide();
+
+                            if (jsonResult.redirect == true) {
+                                window.location.replace(login_url);
+                            } else if (jsonResult.result != '') {
+                                toastr.clear();
+                                toastr.success(data_updated);
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -3791,7 +4142,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             fd.append('exportId', $("#hdnExportId").val());
             fd.append('originId', $("#hdnOriginId").val());
             fd.append('saNumber', $("#hdnSaNumber").val());
-            fd.append('exportType', 6);
+            fd.append('exportType', 5);
             fd.append('csrf_cgrerp', $("#hdnCsrf").val());
 
             $.ajax({
@@ -3876,7 +4227,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             fd.append('exportId', $("#hdnExportId").val());
             fd.append('originId', $("#hdnOriginId").val());
             fd.append('saNumber', $("#hdnSaNumber").val());
-            fd.append('exportType', 6);
+            fd.append('exportType', 7);
             fd.append('csrf_cgrerp', $("#hdnCsrf").val());
 
             $.ajax({
@@ -3961,7 +4312,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             fd.append('exportId', $("#hdnExportId").val());
             fd.append('originId', $("#hdnOriginId").val());
             fd.append('saNumber', $("#hdnSaNumber").val());
-            fd.append('exportType', 6);
+            fd.append('exportType', 8);
             fd.append('csrf_cgrerp', $("#hdnCsrf").val());
 
             $.ajax({
@@ -4033,6 +4384,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 </script>
 
 <script>
+    //CUSTOMS
     document.getElementById("issued_date_custom").addEventListener("change", function() {
         let inputDate = this.value;
 
@@ -4053,11 +4405,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
         document.getElementById("formatted_date_custom").value = formattedDate;
     });
 
-    // Optional: Open datetime picker when clicking formatted input
-    document.getElementById("formatted_date_itr").addEventListener("click", function() {
-        document.getElementById("issued_date_itr").click();
+    document.getElementById("formatted_date_custom").addEventListener("click", function() {
+        document.getElementById("issued_date_custom").click();
     });
 
+    //ITR
     document.getElementById("issued_date_itr").addEventListener("change", function() {
         let inputDate = this.value;
 
@@ -4075,14 +4427,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
         let formattedDate = `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
 
-        document.getElementById("formatted_date_custom").value = formattedDate;
+        document.getElementById("formatted_date_itr").value = formattedDate;
     });
 
-    // Optional: Open datetime picker when clicking formatted input
     document.getElementById("formatted_date_itr").addEventListener("click", function() {
         document.getElementById("issued_date_itr").click();
     });
 
+    //PORT
     document.getElementById("issued_date_port").addEventListener("change", function() {
         let inputDate = this.value;
 
@@ -4103,15 +4455,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
         document.getElementById("formatted_date_port").value = formattedDate;
     });
 
-    // Optional: Open datetime picker when clicking formatted input
     document.getElementById("formatted_date_port").addEventListener("click", function() {
         document.getElementById("issued_date_port").click();
     });
 
-    document.getElementById("formatted_date_shipping").addEventListener("click", function() {
-        document.getElementById("issued_date_shipping").click();
-    });
-
+    //SHIPPING
     document.getElementById("issued_date_shipping").addEventListener("change", function() {
         let inputDate = this.value;
 
@@ -4132,11 +4480,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
         document.getElementById("formatted_date_shipping").value = formattedDate;
     });
 
-    // Optional: Open datetime picker when clicking formatted input
     document.getElementById("formatted_date_shipping").addEventListener("click", function() {
         document.getElementById("issued_date_shipping").click();
     });
 
+    //FUMIGATION
     document.getElementById("issued_date_fumigation").addEventListener("change", function() {
         let inputDate = this.value;
 
@@ -4157,8 +4505,107 @@ defined('BASEPATH') or exit('No direct script access allowed');
         document.getElementById("formatted_date_fumigation").value = formattedDate;
     });
 
-    // Optional: Open datetime picker when clicking formatted input
     document.getElementById("formatted_date_fumigation").addEventListener("click", function() {
         document.getElementById("issued_date_fumigation").click();
+    });
+
+    //PHYTO
+    document.getElementById("issued_date_phyto").addEventListener("change", function() {
+        let inputDate = this.value;
+
+        if (!inputDate) return;
+
+        let dateObj = new Date(inputDate);
+        let day = String(dateObj.getDate()).padStart(2, '0');
+        let month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        let year = dateObj.getFullYear();
+
+        let hours = dateObj.getHours();
+        let minutes = String(dateObj.getMinutes()).padStart(2, '0');
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12; // Convert 24-hour format to 12-hour format
+
+        let formattedDate = `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+
+        document.getElementById("formatted_date_phyto").value = formattedDate;
+    });
+
+    document.getElementById("formatted_date_phyto").addEventListener("click", function() {
+        document.getElementById("issued_date_phyto").click();
+    });
+
+    //COTEROS
+    document.getElementById("issued_date_coteros").addEventListener("change", function() {
+        let inputDate = this.value;
+
+        if (!inputDate) return;
+
+        let dateObj = new Date(inputDate);
+        let day = String(dateObj.getDate()).padStart(2, '0');
+        let month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        let year = dateObj.getFullYear();
+
+        let hours = dateObj.getHours();
+        let minutes = String(dateObj.getMinutes()).padStart(2, '0');
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12; // Convert 24-hour format to 12-hour format
+
+        let formattedDate = `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+
+        document.getElementById("formatted_date_coteros").value = formattedDate;
+    });
+
+    document.getElementById("formatted_date_coteros").addEventListener("click", function() {
+        document.getElementById("issued_date_coteros").click();
+    });
+
+    //INCENTIVES
+    document.getElementById("issued_date_incentives").addEventListener("change", function() {
+        let inputDate = this.value;
+
+        if (!inputDate) return;
+
+        let dateObj = new Date(inputDate);
+        let day = String(dateObj.getDate()).padStart(2, '0');
+        let month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        let year = dateObj.getFullYear();
+
+        let hours = dateObj.getHours();
+        let minutes = String(dateObj.getMinutes()).padStart(2, '0');
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12; // Convert 24-hour format to 12-hour format
+
+        let formattedDate = `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+
+        document.getElementById("formatted_date_incentives").value = formattedDate;
+    });
+
+    document.getElementById("formatted_date_incentives").addEventListener("click", function() {
+        document.getElementById("issued_date_incentives").click();
+    });
+
+    //REMOBOLIZATION
+    document.getElementById("issued_date_remobilization").addEventListener("change", function() {
+        let inputDate = this.value;
+
+        if (!inputDate) return;
+
+        let dateObj = new Date(inputDate);
+        let day = String(dateObj.getDate()).padStart(2, '0');
+        let month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        let year = dateObj.getFullYear();
+
+        let hours = dateObj.getHours();
+        let minutes = String(dateObj.getMinutes()).padStart(2, '0');
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12; // Convert 24-hour format to 12-hour format
+
+        let formattedDate = `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+
+        document.getElementById("formatted_date_remobilization").value = formattedDate;
+    });
+
+    document.getElementById("formatted_date_remobilization").addEventListener("click", function() {
+        document.getElementById("issued_date_remobilization").click();
     });
 </script>

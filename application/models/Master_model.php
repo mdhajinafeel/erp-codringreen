@@ -174,7 +174,7 @@ class Master_model extends CI_Model
 				A.reteica_provider_value,
 				getsupplierproducts_id_web(id) as products,
 				CASE WHEN getsupplierbank_id_web(id) IS NULL THEN '' ELSE getsupplierbank_id_web(id) END as banks, 
-				A.isactive, getapplicableorigins_byid(A.origin_id) as origin, A.origin_id
+				A.isactive, getapplicableorigins_byid(A.origin_id) as origin, A.origin_id, A.is_saw_mill 
 				FROM tbl_suppliers A 
 				INNER JOIN tbl_user_registration B ON B.userid = A.updatedby WHERE A.id = $id");
 		return $query->result();
@@ -1157,7 +1157,7 @@ class Master_model extends CI_Model
 				FROM tbl_master_sellers WHERE is_active = 1 AND id = $sellerid");
 		return $query->result();
 	}
-
+	
 	//EXPORT SUPPLIERS
 
 	public function fetch_export_suppliers($origin_id, $documenttype) {

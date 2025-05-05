@@ -91,7 +91,7 @@ class Farms extends MY_Controller
                 $r->contract_code,
                 $product,
                 $r->purchase_date,
-                ($r->total_volume + 0),
+                sprintf("%0.3f", ($r->total_volume + 0)),
                 $r->origin,
                 ucwords(strtolower($r->uploaded_by)),
             );
@@ -186,6 +186,12 @@ class Farms extends MY_Controller
                 $adjustArr = explode(',', $getFarmDetails[0]->adjust_taxes);
                 $getProviders = $this->Farm_model->fetch_payto_providers($getFarmDetails[0]->origin_id, $getFarmDetails[0]->supplier_id);
                 $getSupplierTaxes = $this->Master_model->get_supplier_taxes_by_origin($getFarmDetails[0]->origin_id);
+                
+                $formSubmit = 'farms/add';
+                if($getFarmDetails[0]->existing_price_condition == 1) {
+                    $formSubmit = 'farms/add_existing';
+                }
+                
                 $data = array(
                     'pageheading' => $this->lang->line('farm_details'),
                     'pagetype' => 'update',
@@ -196,7 +202,7 @@ class Farms extends MY_Controller
                     'farm_providers' => $getProviders,
                     'supplier_taxes' => $getSupplierTaxes,
                     'adjustTax' => $adjustArr,
-                    'farm_submit' => 'farms/add'
+                    'farm_submit' => $formSubmit
                 );
                 $this->load->view('farms/dialog_view_farms', $data);
             } else if ($this->input->get('type') == "deletefarmconfirmation") {
@@ -534,7 +540,7 @@ class Farms extends MY_Controller
         }
     }
 
-    public function add1()
+    public function add_existing()
     {
         $Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
         $session = $this->session->userdata('fullname');
@@ -565,6 +571,7 @@ class Farms extends MY_Controller
                     $shippingline = $this->input->post('shippingline');
                     $sealnumber = $this->input->post('sealnumber');
                     $roundingfactor = $this->input->post('roundingfactor');
+                    $processType = $this->input->post('processType');
                     
                     if($originid == 4) {
                         $circumferenceallowance = $this->input->post('circumference_allowance');
@@ -650,7 +657,7 @@ class Farms extends MY_Controller
                                         "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
                                         "exchange_rate" => $conversionrate, "is_adjust_rf" => $adjustrf,
                                         "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
-                                        "origin_id" => $originid, "metric_ton" => $metricTon,
+                                        "origin_id" => $originid, "metric_ton" => $metricTon, "process_type" => $processType,
                                     );
 
                                     $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -1047,7 +1054,7 @@ class Farms extends MY_Controller
                                     "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
                                     "exchange_rate" => $conversionrate, "is_adjust_rf" => $adjustrf,
                                     "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
-                                    "origin_id" => $originid,
+                                    "origin_id" => $originid, "process_type" => $processType,
                                 );
 
                                 $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -1399,7 +1406,7 @@ class Farms extends MY_Controller
                                     "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
                                     "exchange_rate" => $conversionrate, "is_adjust_rf" => $adjustrf,
                                     "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
-                                    "origin_id" => $originid,
+                                    "origin_id" => $originid, "process_type" => $processType,
                                 );
 
                                 $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -1976,7 +1983,7 @@ class Farms extends MY_Controller
                                     "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                     "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                     "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr), 
-                                    "circ_allowance" => $circumferenceallowance, "length_allowance" => $lengthallowance, "rounding_factor" => $roundingfactor
+                                    "circ_allowance" => $circumferenceallowance, "length_allowance" => $lengthallowance, "rounding_factor" => $roundingfactor, "process_type" => $processType,
                                 );
 
                                 $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -2344,6 +2351,7 @@ class Farms extends MY_Controller
                     $logisticpayto = $this->input->post('logisticpayto');
                     $farmadjustment = $this->input->post('farmadjustment');
                     $adjustrf = $this->input->post('adjustrf');
+                    $processType = $this->input->post('processType');
 
                     if ($input_inventory_order == $inventory_order) {
 
@@ -2393,7 +2401,93 @@ class Farms extends MY_Controller
                         if ($productTypeId == 1 || $productTypeId == 3) {
                         } else if ($productTypeId == 2 || $productTypeId == 4) {
 
-                            $woodValue = $getFarmDetail[0]->wood_value;
+                            // $woodValue = $getFarmDetail[0]->wood_value;
+                            // if ($currency_id == 1) {
+                            //     if ($input_conversion_rate > 0) {
+                            //         $woodValue = $woodValue * $input_conversion_rate;
+                            //     }
+                            // }
+                            
+                            $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 1);
+                            $farmDataSemi = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 2);
+                            $farmDataLongs = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 3);
+
+                            $fetchContractPrice = $this->Farm_model->fetch_contract_prices_for_farm($contract_id);
+                            $finalArray = [];
+
+                            foreach ($farmDataShorts as $shorts) {
+                                $circumference = $shorts->circumference;
+                                $length = $shorts->length;
+                                $netVolume = $shorts->volume;
+                                $totalVolume = $totalVolume + $netVolume;
+                                $price = 0;
+
+                                foreach ($fetchContractPrice as $range) {
+                                    if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
+                                        $price = $range->pricerange_grade3;
+                                        break;
+                                    }
+                                }
+
+                                $finalArray[] = [
+                                    'circumference' => $circumference,
+                                    'length' => $length,
+                                    'price' => $price,
+                                    'volume' => $netVolume,
+                                    'value' => round($price * $netVolume, 3)
+                                ];
+                            }
+
+                            foreach ($farmDataSemi as $semi) {
+                                $circumference = $semi->circumference;
+                                $length = $semi->length;
+                                $netVolume = $semi->volume;
+                                $totalVolume = $totalVolume + $netVolume;
+                                $price = 0;
+
+                                foreach ($fetchContractPrice as $range) {
+                                    if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
+                                        $price = $range->pricerange_grade3;
+                                        break;
+                                    }
+                                }
+
+                                $finalArray[] = [
+                                    'circumference' => $circumference,
+                                    'length' => $length,
+                                    'price' => $price,
+                                    'volume' => $netVolume,
+                                    'value' => round($price * $netVolume, 3)
+                                ];
+                            }
+
+                            foreach ($farmDataLongs as $longs) {
+                                $circumference = $longs->circumference;
+                                $length = $longs->length;
+                                $netVolume = $longs->volume;
+                                $totalVolume = $totalVolume + $netVolume;
+                                $price = 0;
+
+                                foreach ($fetchContractPrice as $range) {
+                                    if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
+                                        $price = $range->pricerange_grade3;
+                                        break;
+                                    }
+                                }
+
+                                $finalArray[] = [
+                                    'circumference' => $circumference,
+                                    'length' => $length,
+                                    'price' => $price,
+                                    'volume' => $netVolume,
+                                    'value' => round($price * $netVolume, 3)
+                                ];
+                            }
+                            
+                            foreach ($finalArray as $item) {
+                                $woodValue = $woodValue + $item['value'];
+                            }
+                            
                             if ($currency_id == 1) {
                                 if ($input_conversion_rate > 0) {
                                     $woodValue = $woodValue * $input_conversion_rate;
@@ -2736,6 +2830,7 @@ class Farms extends MY_Controller
                                 "inventory_order" => $input_inventory_order, "plate_number" => $input_truck_plate_number,
                                 "purchase_date" => $purchase_date, "service_cost" => $servicecost,
                                 "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
+                                "wood_value" => $woodValue, "total_value" => $totalValue,
                                 "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
                                 "exchange_rate" => $input_conversion_rate, "updated_by" => $session['user_id'], "is_active" => 1,
                                 "origin_id" => $originid, "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
@@ -2747,6 +2842,7 @@ class Farms extends MY_Controller
                                 "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                 "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                 "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                "process_type" => $processType,
                             );
 
                             $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
@@ -3201,6 +3297,7 @@ class Farms extends MY_Controller
                                     "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                     "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                     "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                    "process_type" => $processType,
                                 );
 
                                 $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
@@ -3312,6 +3409,7 @@ class Farms extends MY_Controller
                     $shippingline = $this->input->post('shippingline');
                     $sealnumber = $this->input->post('sealnumber');
                     $roundingfactor = $this->input->post('roundingfactor');
+                    $processType = $this->input->post('processType');
                     date_default_timezone_set($session['default_timezone']);
 
                     if ($originid == 4) {
@@ -3409,7 +3507,7 @@ class Farms extends MY_Controller
                                         "updated_by" => $session['user_id'],
                                         "is_active" => 1,
                                         "origin_id" => $originid,
-                                        "metric_ton" => $metricTon,
+                                        "metric_ton" => $metricTon, "process_type" => $processType,
                                     );
 
                                     $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -3849,7 +3947,7 @@ class Farms extends MY_Controller
                                     "created_by" => $session['user_id'],
                                     "updated_by" => $session['user_id'],
                                     "is_active" => 1,
-                                    "origin_id" => $originid,
+                                    "origin_id" => $originid, "process_type" => $processType,
                                 );
 
                                 $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -4244,7 +4342,7 @@ class Farms extends MY_Controller
                                     "created_by" => $session['user_id'],
                                     "updated_by" => $session['user_id'],
                                     "is_active" => 1,
-                                    "origin_id" => $originid,
+                                    "origin_id" => $originid, "process_type" => $processType,
                                 );
 
                                 $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -4877,7 +4975,7 @@ class Farms extends MY_Controller
                                     "total_pieces" => $totalPieces,
                                     "is_closed" => 1,
                                     "closed_by" => $session['user_id'],
-                                    "closed_date" => $closedDate,
+                                    "closed_date" => $closedDate, "process_type" => $processType,
                                 );
 
                                 $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -5281,6 +5379,7 @@ class Farms extends MY_Controller
                     $logisticpayto = $this->input->post('logisticpayto');
                     $farmadjustment = $this->input->post('farmadjustment');
                     $adjustrf = $this->input->post('adjustrf');
+                    $processType = $this->input->post('processType');
 
                     if ($input_inventory_order == $inventory_order) {
 
@@ -5777,6 +5876,7 @@ class Farms extends MY_Controller
                                 "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                 "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                 "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                "process_type" => $processType,
                             );
 
                             $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
@@ -6343,6 +6443,7 @@ class Farms extends MY_Controller
                                     "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
                                     "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                     "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                    "process_type" => $processType,
                                 );
 
                                 $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
@@ -8836,7 +8937,7 @@ class Farms extends MY_Controller
                     $objSheet->SetCellValue('A5', $this->lang->line('product'));
                     $objSheet->SetCellValue('A6', $this->lang->line('purchase_date'));
                     $objSheet->SetCellValue('A7', $this->lang->line('origin'));
-                    $objSheet->SetCellValue('A8', $this->lang->line('truck_plate_number'));
+                    $objSheet->SetCellValue('A8', $this->lang->line('truck_number_name'));
                     $objSheet->SetCellValue('C2', $this->lang->line('total_no_of_pieces'));
                     if ($getFarmDetails[0]->unit_of_purchase == 1) {
                         $objSheet->SetCellValue('C3', $this->lang->line('total_pie'));
@@ -8859,7 +8960,14 @@ class Farms extends MY_Controller
                     $objSheet->SetCellValue('B5', $getFarmDetails[0]->product_name . ' - ' . $this->lang->line($getFarmDetails[0]->product_type_name));
                     $objSheet->SetCellValue('B6', $getFarmDetails[0]->purchase_date);
                     $objSheet->SetCellValue('B7', $getFarmDetails[0]->origin);
-                    $objSheet->SetCellValue('B8', $getFarmDetails[0]->plate_number);
+                    
+                    if($getFarmDetails[0]->driver_name != null && $getFarmDetails[0]->driver_name != "") {
+                        $objSheet->SetCellValue('B8', $getFarmDetails[0]->plate_number . " / " . $getFarmDetails[0]->driver_name);
+                    } else {
+                        $objSheet->SetCellValue('B8', $getFarmDetails[0]->plate_number);
+                    }
+                    
+                    
                     $objSheet->SetCellValue('D4', $this->lang->line($getFarmDetails[0]->purchase_unit));
 
                     $rowCount = 5;
@@ -9829,13 +9937,12 @@ class Farms extends MY_Controller
                                 //}
 
                                 if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
-                                    $objSheet->SetCellValue("M$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,M10)");
-                                    $objSheet->SetCellValue("N$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,N10)");
-                                    $objSheet->SetCellValue("O$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,O10)");
+                                    $objSheet->SetCellValue("I$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary)");
 
-                                    $objSheet->SetCellValue("L$rowCountDataSummary", "=(I$rowCountDataSummary*M$rowCountDataSummary)+(J$rowCountDataSummary*N$rowCountDataSummary)+(K$rowCountDataSummary*O$rowCountDataSummary)");
+                                    $objSheet->SetCellValue("K$rowCountDataSummary", "=(I$rowCountDataSummary*J$rowCountDataSummary)");
 
-                                    $objSheet->getStyle("I$rowCountDataSummary:L$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                                    $objSheet->getStyle("J$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                                    $objSheet->getStyle("K$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
                                 } else {
 
                                     $objSheet->SetCellValue("M$rowCountDataSummary", "=SUMIFS(" . '$D$' . "$farmDataFirstRow" . ':$D$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,M10)");
@@ -9845,6 +9952,7 @@ class Farms extends MY_Controller
                                     $objSheet->SetCellValue("L$rowCountDataSummary", "=(I$rowCountDataSummary*M$rowCountDataSummary)+(J$rowCountDataSummary*N$rowCountDataSummary)+(K$rowCountDataSummary*O$rowCountDataSummary)");
 
                                     $objSheet->getStyle("I$rowCountDataSummary:L$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                                    $objSheet->getStyle("M$rowCountDataSummary:O$rowCountDataSummary")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
                                 }
                             }
 
@@ -10445,7 +10553,7 @@ class Farms extends MY_Controller
                     $objSheet->SetCellValue('A5', $this->lang->line('product'));
                     $objSheet->SetCellValue('A6', $this->lang->line('purchase_date'));
                     $objSheet->SetCellValue('A7', $this->lang->line('origin'));
-                    $objSheet->SetCellValue('A8', $this->lang->line('truck_plate_number'));
+                    $objSheet->SetCellValue('A8', $this->lang->line('truck_number_name'));
                     $objSheet->SetCellValue('C2', $this->lang->line('total_no_of_pieces'));
                     if ($getFarmDetails[0]->unit_of_purchase == 1) {
                         $objSheet->SetCellValue('C3', $this->lang->line('total_pie'));
@@ -10461,7 +10569,13 @@ class Farms extends MY_Controller
                     $objSheet->SetCellValue('B5', $getFarmDetails[0]->product_name . ' - ' . $this->lang->line($getFarmDetails[0]->product_type_name));
                     $objSheet->SetCellValue('B6', $getFarmDetails[0]->purchase_date);
                     $objSheet->SetCellValue('B7', $getFarmDetails[0]->origin);
-                    $objSheet->SetCellValue('B8', $getFarmDetails[0]->plate_number);
+                    
+                    if($getFarmDetails[0]->driver_name != null && $getFarmDetails[0]->driver_name != "") {
+                        $objSheet->SetCellValue('B8', $getFarmDetails[0]->plate_number . " / " . $getFarmDetails[0]->driver_name);
+                    } else {
+                        $objSheet->SetCellValue('B8', $getFarmDetails[0]->plate_number);
+                    }
+                    
                     $objSheet->SetCellValue('D4', $this->lang->line($getFarmDetails[0]->purchase_unit));
 
                     $rowCount = 5;
@@ -12331,18 +12445,13 @@ class Farms extends MY_Controller
                         $objSheet->SetCellValue('A5', $this->lang->line('exchange_rate'));
                         $objSheet->SetCellValue('B5', $getFarmDetails[0]->exchange_rate);
                         $objSheet->getStyle("B5")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-
-                        $objSheet->getStyle("A3:A5")->getFont()->setBold(true);
-                        $objSheet->getStyle('A3:B5')->applyFromArray($styleArray);
-                    } else {
-                        $objSheet->getStyle("A3:A4")->getFont()->setBold(true);
-                        $objSheet->getStyle('A3:B4')->applyFromArray($styleArray);
                     }
 
                     $objSheet->SetCellValue('B3', $getFarmDetails[0]->inventory_order);
                     $objSheet->SetCellValue('B4', $getFarmDetails[0]->supplier_name);
 
-                    
+                    $objSheet->getStyle("A3:A5")->getFont()->setBold(true);
+                    $objSheet->getStyle('A3:B5')->applyFromArray($styleArray);
 
                     $getSupplierTaxes = $this->Master_model->get_supplier_taxes_by_origin_report($getFarmDetails[0]->origin_id);
 
@@ -12531,7 +12640,6 @@ class Farms extends MY_Controller
                             $netVolume = $shorts->volume;
                             $totalNetVolume = $totalNetVolume + $netVolume;
                             $price = 0;
-                            $pieces = 0;
 
                             foreach ($fetchContractPrice as $range) {
                                 if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
@@ -12676,8 +12784,8 @@ class Farms extends MY_Controller
                                      $objSheet->SetCellValue("C$rowCountDataSummary", "=IF(" . '$D$' . "$summaryHeaderLastRow" . ">=F$rowCountDataSummary,IF(" . '$D$' . "$summaryHeaderLastRow" . "<=G$rowCountDataSummary," . '$D$' . "3,0),0)");
                                 } else {
                                      $objSheet->SetCellValue("C$rowCountDataSummary", $farmdatasummary->pieces_farm);
-
-                                     if($getFarmDetails[0]->exchange_rate > 0) {
+                                     
+                                    if($getFarmDetails[0]->exchange_rate > 0) {
                                         if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
                                             $objSheet->SetCellValue("E$rowCountDataSummary", "=$totalPiecesPrice*B5");
                                         } else {
@@ -12691,7 +12799,7 @@ class Farms extends MY_Controller
                                         }
                                     }
 
-                                     $objSheet->SetCellValue("D$rowCountDataSummary", "=IFERROR(E$rowCountDataSummary/C$rowCountDataSummary,0)");
+                                    $objSheet->SetCellValue("D$rowCountDataSummary", "=IFERROR(E$rowCountDataSummary/C$rowCountDataSummary,0)");
                                 }
 
                                 $objSheet->getStyle("D$rowCountDataSummary:E$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);

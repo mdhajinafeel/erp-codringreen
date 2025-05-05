@@ -1031,7 +1031,7 @@ class Costsummaryreport extends MY_Controller
         }
     }
 
-    public function generate_cost_summaryreport($originid, $containerdata)
+    public function generate_cost_summaryreport1($originid, $containerdata)
     {
         try {
 
@@ -1349,6 +1349,288 @@ class Costsummaryreport extends MY_Controller
                     $objSheet->getColumnDimension("AG")->setWidth("15");
                     $objSheet->getColumnDimension("AH")->setAutoSize(false);
                     $objSheet->getColumnDimension("AH")->setWidth("15");
+
+                    $objSheet->getSheetView()->setZoomScale(95);
+
+                    unset($styleArray);
+                    $six_digit_random_number = mt_rand(100000, 999999);
+                    $month_name = ucfirst(date("dmY"));
+
+                    $filename =  "ContainerReport_" . $month_name . "_" . $six_digit_random_number . ".xlsx";
+
+                    header('Content-Type: application/vnd.ms-excel');
+                    header('Content-Disposition: attachment;filename="' . $filename . '"');
+                    header('Cache-Control: max-age=0');
+
+                    $objWriter = new PHPExcel_Writer_Excel2007($this->excel);
+                    $objWriter->save("./reports/CostSummaryReports/" . $filename);
+                    $objWriter->setPreCalculateFormulas(true);
+                    $Return['error'] = '';
+                    $Return['result'] = site_url() . "reports/CostSummaryReports/" . $filename;
+                    $Return['successmessage'] = $this->lang->line('report_downloaded');
+                    if ($Return['result'] != '') {
+                        $this->output($Return);
+                    }
+                } else {
+                    $Return["error"] = $this->lang->line("no_data_reports");
+                    $Return["result"] = "";
+                    $Return["redirect"] = false;
+                    $Return["csrf_hash"] = $this->security->get_csrf_hash();
+                    $this->output($Return);
+                    exit;
+                }
+            } else {
+                $Return["error"] = "";
+                $Return["result"] = "";
+                $Return["redirect"] = true;
+                $Return["csrf_hash"] = $this->security->get_csrf_hash();
+                $this->output($Return);
+                exit;
+            }
+        } catch (Exception $e) {
+            $Return["error"] = $this->lang->line("error_reports");
+            $Return["result"] = "";
+            $Return["redirect"] = false;
+            $Return["csrf_hash"] = $this->security->get_csrf_hash();
+            $this->output($Return);
+            exit;
+        }
+    }
+    
+    public function generate_cost_summaryreport($originid, $containerdata)
+    {
+        try {
+
+            $session = $this->session->userdata('fullname');
+
+            $Return = array(
+                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
+                'successmessage' => ''
+            );
+
+            if (!empty($session)) {
+
+                $Return["csrf_hash"] = $this->security->get_csrf_hash();
+
+                if (count($containerdata) > 0) {
+
+                    $getcurrencycode = $this->Financemaster_model->get_currency_code($originid);
+
+                    //START EXCEL
+
+                    $this->excel->setActiveSheetIndex(0);
+                    $objSheet = $this->excel->getActiveSheet();
+                    $objSheet->setTitle($this->lang->line("costsummaryreport_title"));
+                    $objSheet->getParent()->getDefaultStyle()->getFont()->setName("Calibri")->setSize(11);
+
+                    $styleArray = array(
+                        'borders' => array(
+                            'allborders' => array(
+                                'style' => PHPExcel_Style_Border::BORDER_THIN
+                            )
+                        )
+                    );
+
+                    //HEADING
+
+                    $objSheet->SetCellValue("A3", $this->lang->line("REFERENCE SA"));
+                    $objSheet->SetCellValue("B3", $this->lang->line("CONTAINER #"));
+                    $objSheet->SetCellValue("C3", strtoupper($this->lang->line("total_no_of_pieces")));
+                    $objSheet->SetCellValue("D3", $this->lang->line("VOLUMEN"));
+                    $objSheet->SetCellValue("E3", strtoupper($this->lang->line("text_cft")));
+                    $objSheet->SetCellValue("F3", $this->lang->line("FRA AGENCIA DE ADUANAS"));
+                    $objSheet->SetCellValue("G3", $this->lang->line("CUSTOMS AGENCY"));
+                    $objSheet->SetCellValue("H3", $this->lang->line("FRA TRANSPORTE"));
+                    $objSheet->SetCellValue("I3", $this->lang->line("TRANSPORTTE / ITR"));
+                    $objSheet->SetCellValue("J3", $this->lang->line("FACTURA PUERTO"));
+                    $objSheet->SetCellValue("K3", $this->lang->line("PUERTO"));
+                    $objSheet->SetCellValue("L3", $this->lang->line("FACTURA PHYTO"));
+                    $objSheet->SetCellValue("M3", $this->lang->line("PHYTO"));
+                    $objSheet->SetCellValue("N3", $this->lang->line("FACTURA DE FUMIGACION"));
+                    $objSheet->SetCellValue("O3", $this->lang->line("FUMIGACION"));
+                    $objSheet->SetCellValue("P3", $this->lang->line("FACTURA NAVIERA"));
+                    $objSheet->SetCellValue("Q3", $this->lang->line("NAVIERA"));
+                    $objSheet->SetCellValue("R3", $this->lang->line("FACTURA COTEROS"));
+                    $objSheet->SetCellValue("S3", $this->lang->line("COTEROS"));
+                    $objSheet->SetCellValue("T3", $this->lang->line("INCENTIVO"));
+                    $objSheet->SetCellValue("U3", $this->lang->line("REMOVILIZACION"));
+                    $objSheet->SetCellValue("V3", $this->lang->line("TOTAL DE EXPORTACION POR CONTENEDOR"));
+                    $objSheet->SetCellValue("W3", $this->lang->line("COSTO DE MATERIAL"));
+                    $objSheet->SetCellValue("X3", $this->lang->line("TOTAL DE LOS COSTOS"));
+                    $objSheet->SetCellValue("Y3", $this->lang->line("VR VENTA UNT"));
+                    $objSheet->SetCellValue("Z3", $this->lang->line("VR VENTA CONT TOTAL"));
+                    $objSheet->SetCellValue("AA3", $this->lang->line("TRM"));
+                    $objSheet->SetCellValue("AB3", $this->lang->line("VR PESOS INGRESO"));
+                    $objSheet->SetCellValue("AC3", $this->lang->line("PERDIDA / GANANCIA"));
+                    $objSheet->SetCellValue("AD3", $this->lang->line("MES"));
+
+                    $objSheet->getStyle("A3:AD3")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    $objSheet->getStyle("A3:AD3")->getAlignment()->setWrapText(true);
+                    $objSheet->getStyle("A3:AD3")->getFont()->setBold(true);
+                    $objSheet->getStyle("A3:AD3")->applyFromArray($styleArray);
+
+                    //END HEADING
+
+                    //DATA FEED
+
+                    $rowDataCount = 4;
+
+                    foreach ($containerdata as $cdata) {
+
+                        $exportId = $cdata->export_id;
+                        $dispatchId = $cdata->dispatch_id;
+
+                        $fetchContainerCost = $this->Financemaster_model->get_container_cost($exportId, $dispatchId);
+
+                        $objSheet->SetCellValue("A$rowDataCount", $cdata->sa_number);
+                        $objSheet->SetCellValue("B$rowDataCount", $cdata->container_number);
+                        $objSheet->SetCellValue("C$rowDataCount", $cdata->total_pieces);
+                        $objSheet->SetCellValue("D$rowDataCount", $cdata->net_volume);
+                        $objSheet->SetCellValue("E$rowDataCount", $cdata->cft_value);
+                        $objSheet->SetCellValue("F$rowDataCount", $cdata->custom_invoice);
+                        $objSheet->SetCellValue("G$rowDataCount", $cdata->custom_value);
+                        $objSheet->SetCellValue("H$rowDataCount", $cdata->itr_invoice);
+                        $objSheet->SetCellValue("I$rowDataCount", $cdata->itr_value);
+                        $objSheet->SetCellValue("J$rowDataCount", $cdata->port_invoice);
+                        $objSheet->SetCellValue("K$rowDataCount", $cdata->port_value);
+                        $objSheet->SetCellValue("L$rowDataCount", $cdata->phyto_invoice);
+                        $objSheet->SetCellValue("M$rowDataCount", $cdata->phyto_value);
+                        $objSheet->SetCellValue("N$rowDataCount", $cdata->fumigation_invoice);
+                        $objSheet->SetCellValue("O$rowDataCount", $cdata->fumigation_value);
+                        $objSheet->SetCellValue("P$rowDataCount", $cdata->shipping_invoice);
+                        $objSheet->SetCellValue("Q$rowDataCount", $cdata->shipping_value);
+                        $objSheet->SetCellValue("R$rowDataCount", $cdata->coteros_invoice);
+                        $objSheet->SetCellValue("S$rowDataCount", $cdata->coteros_value);
+                        $objSheet->SetCellValue("T$rowDataCount", $cdata->incentive_value);
+                        $objSheet->SetCellValue("U$rowDataCount", $cdata->remobilization_value);
+                        $objSheet->SetCellValue("V$rowDataCount", "=G$rowDataCount+I$rowDataCount+K$rowDataCount+M$rowDataCount+O$rowDataCount+Q$rowDataCount+S$rowDataCount+T$rowDataCount+U$rowDataCount");
+                        $objSheet->SetCellValue("W$rowDataCount", "$cdata->material_cost");
+                        $objSheet->SetCellValue("X$rowDataCount", "=V$rowDataCount+W$rowDataCount");
+                        $objSheet->SetCellValue("Y$rowDataCount", $fetchContainerCost[0]->unit_price + 0);
+                        $objSheet->SetCellValue("Z$rowDataCount", "=Y$rowDataCount*D$rowDataCount");
+                        $objSheet->SetCellValue("AA$rowDataCount", $fetchContainerCost[0]->exchange_rate + 0);
+                        $objSheet->SetCellValue("AB$rowDataCount", "=Z$rowDataCount*AA$rowDataCount");
+                        $objSheet->SetCellValue("AC$rowDataCount", "=AB$rowDataCount-X$rowDataCount");
+                        $objSheet->SetCellValue("AD$rowDataCount", strtoupper($cdata->shipped_date));
+
+                        $rowDataCount++;
+                    }
+
+                    //END DATA FEED
+
+                    $rowDataCount = $rowDataCount - 1;
+
+                    $objSheet->getStyle("A4:AF$rowDataCount")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_BOTTOM)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+                    $objSheet->getStyle("D4:E$rowDataCount")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
+                    $objSheet->getStyle("G4:G$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("I4:I$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("K4:K$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("M4:M$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("O4:O$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("Q4:Q$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("S4:U$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("V4:AC$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+
+                    $objSheet->getStyle("A4:AD$rowDataCount")->applyFromArray($styleArray);
+
+                    //CALC DATA
+
+                    // $objSheet->SetCellValue("A2", "=+G2+I2+K2+L2+Q2+T2");
+                    // $objSheet->getStyle("A2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    // $objSheet->getStyle("A2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("C2", "=SUBTOTAL(9, C4:C$rowDataCount)");
+                    $objSheet->getStyle("C2")->getNumberFormat()->setFormatCode('_(* #,##0_);_(* (#,##0);_(* "-"_);_(@_)');
+                    $objSheet->getStyle("C2")->applyFromArray($styleArray);
+                    
+                    $objSheet->SetCellValue("D2", "=SUBTOTAL(9, D4:D$rowDataCount)");
+                    $objSheet->getStyle("D2")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
+                    $objSheet->getStyle("D2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("G2", "=SUBTOTAL(9, G4:G$rowDataCount)");
+                    $objSheet->getStyle("G2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("G2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("I2", "=SUBTOTAL(9, I4:I$rowDataCount)");
+                    $objSheet->getStyle("I2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("I2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("K2", "=SUBTOTAL(9, K4:K$rowDataCount)");
+                    $objSheet->getStyle("K2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("K2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("M2", "=SUBTOTAL(9, M4:M$rowDataCount)");
+                    $objSheet->getStyle("M2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("M2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("O2", "=SUBTOTAL(9, O4:O$rowDataCount)");
+                    $objSheet->getStyle("O2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("O2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("Q2", "=SUBTOTAL(9, Q4:Q$rowDataCount)");
+                    $objSheet->getStyle("Q2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("Q2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("S2", "=SUBTOTAL(9, S4:S$rowDataCount)");
+                    $objSheet->getStyle("S2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("S2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("Q2", "=SUBTOTAL(9, Q4:Q$rowDataCount)");
+                    $objSheet->getStyle("Q2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("Q2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("T2", "=SUBTOTAL(9, T4:T$rowDataCount)");
+                    $objSheet->SetCellValue("U2", "=SUBTOTAL(9, U4:U$rowDataCount)");
+                    $objSheet->SetCellValue("V2", "=SUBTOTAL(9, V4:V$rowDataCount)");
+                    $objSheet->SetCellValue("W2", "=SUBTOTAL(9, W4:W$rowDataCount)");
+                    $objSheet->SetCellValue("X2", "=SUBTOTAL(9, X4:X$rowDataCount)");
+                    $objSheet->getStyle("S2:X2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("S2:X2")->applyFromArray($styleArray);
+
+                    $objSheet->SetCellValue("Z2", "=SUBTOTAL(9, Z4:Z$rowDataCount)");
+                    $objSheet->SetCellValue("AB2", "=SUBTOTAL(9, AB4:AB$rowDataCount)");
+                    $objSheet->getStyle("Z2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("Z2")->applyFromArray($styleArray);
+                    $objSheet->getStyle("AB2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("AB2")->applyFromArray($styleArray);
+
+                    //END CALC DATA
+
+                    $objSheet->getColumnDimension("A")->setAutoSize(true);
+                    $objSheet->getColumnDimension("B")->setAutoSize(true);
+                    $objSheet->getColumnDimension("C")->setAutoSize(true);
+                    $objSheet->getColumnDimension("D")->setAutoSize(true);
+                    $objSheet->getColumnDimension("E")->setAutoSize(true);
+                    $objSheet->getColumnDimension("F")->setAutoSize(false);
+                    $objSheet->getColumnDimension("F")->setWidth(20);
+                    $objSheet->getColumnDimension("G")->setAutoSize(true);
+                    $objSheet->getColumnDimension("H")->setAutoSize(false);
+                    $objSheet->getColumnDimension("H")->setWidth(20);
+                    $objSheet->getColumnDimension("I")->setAutoSize(true);
+                    $objSheet->getColumnDimension("J")->setAutoSize(true);
+                    $objSheet->getColumnDimension("K")->setAutoSize(true);
+                    $objSheet->getColumnDimension("L")->setAutoSize(true);
+                    $objSheet->getColumnDimension("M")->setAutoSize(true);
+                    $objSheet->getColumnDimension("N")->setAutoSize(false);
+                    $objSheet->getColumnDimension("N")->setWidth(20);
+                    $objSheet->getColumnDimension("O")->setAutoSize(true);
+                    $objSheet->getColumnDimension("P")->setAutoSize(true);
+                    $objSheet->getColumnDimension("Q")->setAutoSize(true);
+                    $objSheet->getColumnDimension("R")->setAutoSize(true);
+                    $objSheet->getColumnDimension("S")->setAutoSize(true);
+                    $objSheet->getColumnDimension("T")->setAutoSize(true);
+                    $objSheet->getColumnDimension("U")->setAutoSize(true);
+                    $objSheet->getColumnDimension("V")->setAutoSize(false);
+                    $objSheet->getColumnDimension("V")->setWidth(25);
+                    $objSheet->getColumnDimension("W")->setAutoSize(true);
+                    $objSheet->getColumnDimension("X")->setAutoSize(true);
+                    $objSheet->getColumnDimension("Y")->setAutoSize(true);
+                    $objSheet->getColumnDimension("Z")->setAutoSize(true);
+                    $objSheet->getColumnDimension("AA")->setAutoSize(true);
+                    $objSheet->getColumnDimension("AB")->setAutoSize(true);
+                    $objSheet->getColumnDimension("AC")->setAutoSize(true);
+                    $objSheet->getColumnDimension("AD")->setAutoSize(true);
 
                     $objSheet->getSheetView()->setZoomScale(95);
 

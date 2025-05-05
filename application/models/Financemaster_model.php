@@ -161,13 +161,16 @@ class Financemaster_model extends CI_Model
 	{
 		$query = $this->db->query("SELECT B.contract_id, B.contract_code, SUM(A.total_volume) AS total_volume, 
 					C.supplier_name AS fullname, D.product_name, E.product_type_name, 
-					C.id as sid, getapplicableorigins_byid(B.origin_id) AS origin, B.origin_id FROM tbl_contract_inventory_mapping A 
+					C.id as sid, getapplicableorigins_byid(B.origin_id) AS origin, B.origin_id, B.existing_price_condition, 
+					CASE WHEN (B.description IS NULL OR B.description = '') THEN '---' ELSE B.description END AS description, F.purchase_unit    
+					FROM tbl_contract_inventory_mapping A 
 					INNER JOIN tbl_supplier_purchase_contract B ON B.contract_id = A.contract_id AND B.supplier_id = A.supplier_id 
 					INNER JOIN tbl_suppliers C ON C.id = A.supplier_id 
 					INNER JOIN tbl_product_master D ON D.product_id = B.product 
 					INNER JOIN tbl_product_types E ON E.type_id = B.product_type 
+					INNER JOIN tbl_purchase_unit F ON F.id = B.unit_of_purchase 
 					WHERE A.is_active = 1 AND B.is_active = 1 
-					AND B.contract_type = 1 AND B.origin_id = $originid GROUP BY A.contract_id");
+					AND B.contract_type = 1 AND B.origin_id = $originid GROUP BY A.contract_id ORDER BY A.contract_id");
 		return $query->result();
 	}
 
@@ -175,11 +178,14 @@ class Financemaster_model extends CI_Model
 	{
 		$query = $this->db->query("SELECT B.contract_id, B.contract_code, SUM(A.total_volume) AS total_volume, 
 					D.product_name, E.product_type_name, C.fullname, C.userid as sid, 
-					getapplicableorigins_byid(B.origin_id) AS origin, B.origin_id FROM tbl_contract_inventory_mapping A 
+					getapplicableorigins_byid(B.origin_id) AS origin, B.origin_id, 
+					CASE WHEN (B.description IS NULL OR B.description = '') THEN '---' ELSE B.description END AS description, F.purchase_unit    
+					FROM tbl_contract_inventory_mapping A 
 					INNER JOIN tbl_supplier_purchase_contract B ON B.contract_id = A.contract_id 
 					INNER JOIN tbl_user_registration C ON C.userid = B.supplier_id 
 					INNER JOIN tbl_product_master D ON D.product_id = B.product 
-					INNER JOIN tbl_product_types E ON E.type_id = B.product_type
+					INNER JOIN tbl_product_types E ON E.type_id = B.product_type 
+					INNER JOIN tbl_purchase_unit F ON F.id = B.unit_of_purchase 
 					WHERE A.is_active = 1 AND B.is_active = 1 
 					AND B.contract_type = 2 AND B.origin_id = $originid GROUP BY A.contract_id");
 		return $query->result();
@@ -232,7 +238,7 @@ class Financemaster_model extends CI_Model
 
 	public function fetch_inventory_report_warehouse($contractid, $contractcode, $supplierid, $originid)
 	{
-		if($supplierid == 0) {
+		if ($supplierid == 0) {
 			$query = $this->db->query("SELECT B.contract_code, A.inventory_order, B.product, B.product_type, 
 				B.supplier_id, B.unit_of_purchase,
 				purchase_allowance, purchase_allowance_length, B.existing_price_condition FROM tbl_contract_inventory_mapping A
@@ -247,7 +253,7 @@ class Financemaster_model extends CI_Model
 				WHERE A.contract_id = $contractid AND A.supplier_id = $supplierid AND B.origin_id = $originid 
 				AND B.contract_code = '$contractcode' AND A.is_active = 1");
 		}
-		
+
 		return $query->result();
 	}
 
@@ -267,11 +273,11 @@ class Financemaster_model extends CI_Model
 	public function get_farm_detail($contractid, $supplierid, $originid, $inventoryorder, $langcode)
 	{
 		$this->db->query("SET lc_time_names='$langcode'");
-		if($supplierid == 0) {
+		if ($supplierid == 0) {
 			$query = $this->db->query("SELECT A.farm_id, DATE_FORMAT(A.purchase_date, '%d %M %Y') AS purchase_date, A.inventory_order, 
 						A.plate_number, B.supplier_name, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, 
 						A.logistic_cost, A.service_cost, A.adjustment, A.purchase_unit_id, A.exchange_rate, 
-						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length    
+						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length, A.driver_name     
 						FROM tbl_farm A 
 						INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
 						INNER JOIN tbl_contract_inventory_mapping C ON C.contract_id = A.contract_id AND C.supplier_id = A.supplier_id 
@@ -283,7 +289,7 @@ class Financemaster_model extends CI_Model
 			$query = $this->db->query("SELECT A.farm_id, DATE_FORMAT(A.purchase_date, '%d %M %Y') AS purchase_date, A.inventory_order, 
 						A.plate_number, B.supplier_name, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, 
 						A.logistic_cost, A.service_cost, A.adjustment, A.purchase_unit_id, A.exchange_rate, 
-						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length    
+						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length, A.driver_name     
 						FROM tbl_farm A 
 						INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
 						INNER JOIN tbl_contract_inventory_mapping C ON C.contract_id = A.contract_id AND C.supplier_id = A.supplier_id 
@@ -321,26 +327,26 @@ class Financemaster_model extends CI_Model
 				GROUP BY A.circumference_bought, A.length_bought");
 		return $query->result();
 	}
-	
-// 	public function get_farm_data_square($supplierid, $inventoryorder, $originid)
-// 	{
-// 		$query = $this->db->query("SELECT A.width_bought, A.length_bought, A.thickness_bought,
-// 				SUM(CASE WHEN A.type = 2 THEN A.noofpieces ELSE 0 END) AS farm, 
-// 				SUM(CASE WHEN A.type = 1 THEN A.noofpieces ELSE 0 END) as reception, inventory_order FROM (SELECT inventory_order, width_bought, length_bought, thickness_bought, type, noofpieces FROM 
-// 				(SELECT B.salvoconducto AS inventory_order, width_bought, length_bought, thickness_bought, reception_data_id AS data_id, B.reception_id AS id, 1 AS type, getnoofpieces_reception_square(B.salvoconducto, B.reception_id, width_bought, length_bought, thickness_bought) AS noofpieces FROM tbl_reception_data A 
-// 				INNER JOIN tbl_reception B ON B.reception_id = A.reception_id 
-// 				WHERE B.salvoconducto = '$inventoryorder' AND B.origin_id = $originid AND B.supplier_id = $supplierid
-// 				UNION ALL 
-// 				SELECT B.inventory_order AS inventory_order, A.width AS width_bought, A.length AS length, A.thickness AS thickness_bought, A.farm_data_id AS data_id, A.farm_id AS id, 2 AS type, getnoofpieces_farm_square(B.inventory_order, A.farm_id, width, length, thickness) AS noofpieces
-// 				FROM tbl_farm_data A 
-// 				INNER JOIN tbl_farm B ON B.farm_id = A.farm_id
-// 				AND B.inventory_order = '$inventoryorder' AND B.origin_id = $originid AND B.supplier_id = $supplierid) X) A 
-// 				GROUP BY inventory_order, A.width_bought, A.length_bought, A.thickness_bought 
-// 				ORDER BY A.length_bought");
-// 		return $query->result();
-// 	}
 
-    public function get_farm_data_square($supplierid, $inventoryorder, $originid)
+	// 	public function get_farm_data_square($supplierid, $inventoryorder, $originid)
+	// 	{
+	// 		$query = $this->db->query("SELECT A.width_bought, A.length_bought, A.thickness_bought,
+	// 				SUM(CASE WHEN A.type = 2 THEN A.noofpieces ELSE 0 END) AS farm, 
+	// 				SUM(CASE WHEN A.type = 1 THEN A.noofpieces ELSE 0 END) as reception, inventory_order FROM (SELECT inventory_order, width_bought, length_bought, thickness_bought, type, noofpieces FROM 
+	// 				(SELECT B.salvoconducto AS inventory_order, width_bought, length_bought, thickness_bought, reception_data_id AS data_id, B.reception_id AS id, 1 AS type, getnoofpieces_reception_square(B.salvoconducto, B.reception_id, width_bought, length_bought, thickness_bought) AS noofpieces FROM tbl_reception_data A 
+	// 				INNER JOIN tbl_reception B ON B.reception_id = A.reception_id 
+	// 				WHERE B.salvoconducto = '$inventoryorder' AND B.origin_id = $originid AND B.supplier_id = $supplierid
+	// 				UNION ALL 
+	// 				SELECT B.inventory_order AS inventory_order, A.width AS width_bought, A.length AS length, A.thickness AS thickness_bought, A.farm_data_id AS data_id, A.farm_id AS id, 2 AS type, getnoofpieces_farm_square(B.inventory_order, A.farm_id, width, length, thickness) AS noofpieces
+	// 				FROM tbl_farm_data A 
+	// 				INNER JOIN tbl_farm B ON B.farm_id = A.farm_id
+	// 				AND B.inventory_order = '$inventoryorder' AND B.origin_id = $originid AND B.supplier_id = $supplierid) X) A 
+	// 				GROUP BY inventory_order, A.width_bought, A.length_bought, A.thickness_bought 
+	// 				ORDER BY A.length_bought");
+	// 		return $query->result();
+	// 	}
+
+	public function get_farm_data_square($supplierid, $inventoryorder, $originid)
 	{
 		$query = $this->db->query("SELECT A.width_bought, A.length_bought, A.thickness_bought,
 				SUM(CASE WHEN A.type = 2 THEN A.noofpieces ELSE 0 END) AS farm, 
@@ -396,7 +402,7 @@ class Financemaster_model extends CI_Model
 
 	public function get_contract_price_data($contractid, $inventoryorder)
 	{
-		$query = $this->db->query("SELECT minrange_grade1, maxrange_grade2, pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs 
+		$query = $this->db->query("SELECT minrange_grade1, maxrange_grade2, pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs  
 				FROM tbl_supplier_contract_inventory_price WHERE contract_id = $contractid
 				AND inventory_number = '$inventoryorder' AND is_active = 1");
 		return $query->result();
@@ -454,171 +460,375 @@ class Financemaster_model extends CI_Model
 	// 	return $query->result();
 	// }
 
-// 	public function fetch_export_containers($originid, $producttypeid, $startdate, $enddate, $langcode)
-// 	{
-// 		$this->db->query("SET lc_time_names='$langcode'");
-// 		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, 
-// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-// 				get_material_cost_by_dispatch_id(B.dispatch_id) AS material_cost, 
-// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-// 				D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
-// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
-// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
-// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1
-// 				AND C.isduplicatedispatched = 0
-// 				WHERE A.isactive = 1 AND B.isactive = 1 
-// 				AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
-// 				BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid");
-// 		return $query->result();
-// 	}
+	// 	public function fetch_export_containers($originid, $producttypeid, $startdate, $enddate, $langcode)
+	// 	{
+	// 		$this->db->query("SET lc_time_names='$langcode'");
+	// 		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, 
+	// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+	// 				get_material_cost_by_dispatch_id(B.dispatch_id) AS material_cost, 
+	// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+	// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+	// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+	// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+	// 				D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+	// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+	// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+	// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1
+	// 				AND C.isduplicatedispatched = 0
+	// 				WHERE A.isactive = 1 AND B.isactive = 1 
+	// 				AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
+	// 				BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid");
+	// 		return $query->result();
+	// 	}
 
-// 	public function fetch_export_containers_by_exportid($originid, $exportid, $langcode)
-// 	{
-// 		$this->db->query("SET lc_time_names='$langcode'");
-// 		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, 
-// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-// 				get_material_cost_by_dispatch_id(B.dispatch_id) AS material_cost, 
-// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-// 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
-// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
-// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
-// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1
-// 				AND C.isduplicatedispatched = 0
-// 				WHERE A.isactive = 1 AND B.isactive = 1 
-// 				AND A.id = $exportid AND A.origin_id = $originid");
-// 		return $query->result();
-// 	}
+	// 	public function fetch_export_containers_by_exportid($originid, $exportid, $langcode)
+	// 	{
+	// 		$this->db->query("SET lc_time_names='$langcode'");
+	// 		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, 
+	// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+	// 				get_material_cost_by_dispatch_id(B.dispatch_id) AS material_cost, 
+	// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+	// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+	// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+	// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+	// 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+	// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+	// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+	// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1
+	// 				AND C.isduplicatedispatched = 0
+	// 				WHERE A.isactive = 1 AND B.isactive = 1 
+	// 				AND A.id = $exportid AND A.origin_id = $originid");
+	// 		return $query->result();
+	// 	}
 
-    public function fetch_export_containers($originid, $producttypeid, $startdate, $enddate, $langcode)
+	public function fetch_export_containers1($originid, $producttypeid, $startdate, $enddate, $langcode)
 	{
 		$this->db->query("SET lc_time_names='$langcode'");
-// 		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
-// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-// 				CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
-// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-// 				D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
-// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
-// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
-// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
-// 				AND C.isduplicatedispatched = 0
-// 				WHERE A.isactive = 1 AND B.isactive = 1 
-// 				AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
-// 				BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id");
-				
-				if($originid == 1) {
-				    $query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
-        				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-        				CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
-        				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-        				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-        				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-        				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-        				D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
-        				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
-        				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
-        				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
-        				AND C.isduplicatedispatched = 0
-        				WHERE A.isactive = 1 AND B.isactive = 1 
-        				AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
-        				BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id ORDER BY A.sa_number ASC");
-				} else {
-				    		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
-            				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-            				CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
-            				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-            				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-            				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-            				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-            				D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
-            				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
-            				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
-            				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
-            				AND C.isduplicatedispatched = 0
-            				WHERE A.isactive = 1 AND B.isactive = 1 
-            				AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
-            				BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id ORDER BY A.sa_number ASC");
-				}
-				
-		
+		// 		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+		// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+		// 				CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
+		// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+		// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+		// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+		// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+		// 				D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+		// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+		// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+		// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+		// 				AND C.isduplicatedispatched = 0
+		// 				WHERE A.isactive = 1 AND B.isactive = 1 
+		// 				AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
+		// 				BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id");
+
+		if ($originid == 1) {
+			$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+					B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+					CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
+					D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+					D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+					D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+					D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+					D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+					INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+					INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+					LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+					AND C.isduplicatedispatched = 0
+					WHERE A.isactive = 1 AND B.isactive = 1 
+					AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
+					BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id ORDER BY A.sa_number ASC");
+		} else {
+			$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+						B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+						CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
+						D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+						D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+						D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+						D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+						D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+						INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+						INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+						LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+						AND C.isduplicatedispatched = 0
+						WHERE A.isactive = 1 AND B.isactive = 1 
+						AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
+						BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id ORDER BY A.sa_number ASC");
+		}
+
+
+		return $query->result();
+	}
+
+	public function fetch_export_containers($originid, $producttypeid, $startdate, $enddate, $langcode)
+	{
+		$this->db->query("SET lc_time_names='$langcode'");
+		// 		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+		// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+		// 				CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
+		// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+		// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+		// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+		// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+		// 				D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+		// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+		// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+		// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+		// 				AND C.isduplicatedispatched = 0
+		// 				WHERE A.isactive = 1 AND B.isactive = 1 
+		// 				AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
+		// 				BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id");
+
+		if ($originid == 1) {
+			// $query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+			// 	B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+			// 	CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
+			// 	D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+			// 	D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+			// 	D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+			// 	D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+			// 	D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+			// 	INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+			// 	INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+			// 	LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+			// 	AND C.isduplicatedispatched = 0
+			// 	WHERE A.isactive = 1 AND B.isactive = 1 
+			// 	AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
+			// 	BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id ORDER BY A.sa_number ASC");
+
+			$query = $this->db->query("SELECT A.id AS export_id, A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+					B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+					UPPER(D1.invoice_no) AS custom_invoice, D.container_value AS custom_value, 
+					UPPER(E1.invoice_no) AS itr_invoice, E.container_value AS itr_value, 
+					UPPER(F1.invoice_no) AS port_invoice, F.container_value AS port_value, 
+					UPPER(G1.invoice_no) AS shipping_invoice, G.container_value AS shipping_value, 
+					UPPER(H1.invoice_no) AS fumigation_invoice, H.container_value AS fumigation_value, 
+					UPPER(I1.invoice_no) AS phyto_invoice, I.container_value AS phyto_value, 
+					UPPER(J1.invoice_no) AS coteros_invoice, J.container_value AS coteros_value, 
+					UPPER(K1.invoice_no) AS incentive_invoice, K.container_value AS incentive_value,
+					UPPER(L1.invoice_no) AS remobilization_invoice, L.container_value AS remobilization_value, 
+					CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
+					C.dispatch_id
+					FROM tbl_export_container_details A
+					INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+					INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+					LEFT JOIN tbl_export_document_container D ON D.dispatch_id = C.dispatch_id AND D.export_type = 1 AND D.is_active = 1 
+					LEFT JOIN tbl_export_documents D1 ON D1.export_id = A.id AND D1.export_type = 1 AND D1.is_active = 1  
+					LEFT JOIN tbl_export_document_container E ON E.dispatch_id = C.dispatch_id AND E.export_type = 2 AND E.is_active = 1  
+					LEFT JOIN tbl_export_documents E1 ON E1.export_id = A.id AND E1.export_type = 2 AND E1.is_active = 1 
+					LEFT JOIN tbl_export_document_container F ON F.dispatch_id = C.dispatch_id AND F.export_type = 3 AND F.is_active = 1 
+					LEFT JOIN tbl_export_documents F1 ON F1.export_id = A.id AND F1.export_type = 3 AND F1.is_active = 1 
+					LEFT JOIN tbl_export_document_container G ON G.dispatch_id = C.dispatch_id AND G.export_type = 9 AND G.is_active = 1 
+					LEFT JOIN tbl_export_documents G1 ON G1.export_id = A.id AND G1.export_type = 9 AND G1.is_active = 1 
+					LEFT JOIN tbl_export_document_container H ON H.dispatch_id = C.dispatch_id AND H.export_type = 4 AND H.is_active = 1 
+					LEFT JOIN tbl_export_documents H1 ON H1.export_id = A.id AND H1.export_type = 4 AND H1.is_active = 1 
+					LEFT JOIN tbl_export_document_container I ON I.dispatch_id = C.dispatch_id AND I.export_type = 5 AND I.is_active = 1 
+					LEFT JOIN tbl_export_documents I1 ON I1.export_id = A.id AND I1.export_type = 5 AND I1.is_active = 1 
+					LEFT JOIN tbl_export_document_container J ON J.dispatch_id = C.dispatch_id AND J.export_type = 6 AND J.is_active = 1 
+					LEFT JOIN tbl_export_documents J1 ON J1.export_id = A.id AND J1.export_type = 6 AND J1.is_active = 1 
+					LEFT JOIN tbl_export_document_container K ON K.dispatch_id = C.dispatch_id AND K.export_type = 7 AND K.is_active = 1 
+					LEFT JOIN tbl_export_documents K1 ON K1.export_id = A.id AND K1.export_type = 7 AND K1.is_active = 1  
+					LEFT JOIN tbl_export_document_container L ON L.dispatch_id = C.dispatch_id AND L.export_type = 8 AND L.is_active = 1 
+					LEFT JOIN tbl_export_documents L1 ON L1.export_id = A.id AND L1.export_type = 8 AND L1.is_active = 1 
+					AND C.isduplicatedispatched = 0
+					WHERE A.isactive = 1 AND B.isactive = 1 
+					AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
+					BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id ORDER BY A.sa_number ASC");
+		} else {
+			$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+						B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+						CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
+						D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+						D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+						D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+						D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+						D.exchange_rate, D.entry_weight_cost, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+						INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+						INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+						LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+						AND C.isduplicatedispatched = 0
+						WHERE A.isactive = 1 AND B.isactive = 1 
+						AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
+						BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id ORDER BY A.sa_number ASC");
+		}
+
+
+		return $query->result();
+	}
+
+	public function fetch_export_containers_by_exportid1($originid, $exportid, $langcode)
+	{
+		$this->db->query("SET lc_time_names='$langcode'");
+		// 		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
+		// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+		// 				CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
+		// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+		// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+		// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+		// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+		// 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+		// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+		// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+		// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+		// 				AND C.isduplicatedispatched = 0
+		// 				WHERE A.isactive = 1 AND B.isactive = 1 
+		// 				AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
+
+		if ($originid == 1) {
+			//   $query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
+			// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+			// 				CASE WHEN A.id >= 282 THEN (A.unit_price * B.total_pieces) ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
+			// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+			// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+			// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+			// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+			// 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+			// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+			// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+			// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+			// 				AND C.isduplicatedispatched = 0
+			// 				WHERE A.isactive = 1 AND B.isactive = 1 
+			// 				AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
+
+			$query = $this->db->query("SELECT A.id AS export_id, A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
+				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+				CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
+				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+				D.exchange_rate, D.loss_profit, D.document_number, D.observation, get_average_length_by_container(B.dispatch_id) AS avg_length 
+				FROM tbl_export_container_details A
+				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+				AND C.isduplicatedispatched = 0
+				WHERE A.isactive = 1 AND B.isactive = 1 
+				AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
+		} else {
+			$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
+					B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+					CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
+					D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+					D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+					D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+					D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+					D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+					INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+					INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+					LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+					AND C.isduplicatedispatched = 0
+					WHERE A.isactive = 1 AND B.isactive = 1 
+					AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
+		}
+
+
 		return $query->result();
 	}
 
 	public function fetch_export_containers_by_exportid($originid, $exportid, $langcode)
 	{
 		$this->db->query("SET lc_time_names='$langcode'");
-// 		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
-// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-// 				CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
-// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-// 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
-// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
-// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
-// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
-// 				AND C.isduplicatedispatched = 0
-// 				WHERE A.isactive = 1 AND B.isactive = 1 
-// 				AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
-			
-			if($originid == 1) {
-			 //   $query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
-    // 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-    // 				CASE WHEN A.id >= 282 THEN (A.unit_price * B.total_pieces) ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
-    // 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-    // 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-    // 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-    // 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-    // 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
-    // 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
-    // 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
-    // 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
-    // 				AND C.isduplicatedispatched = 0
-    // 				WHERE A.isactive = 1 AND B.isactive = 1 
-    // 				AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
-    				
-    				$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
-    				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-    				CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
-    				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-    				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-    				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-    				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-    				D.exchange_rate, D.loss_profit, D.document_number, D.observation, get_average_length_by_container(B.dispatch_id) AS avg_length 
-                    FROM tbl_export_container_details A
-    				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
-    				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
-    				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
-    				AND C.isduplicatedispatched = 0
-    				WHERE A.isactive = 1 AND B.isactive = 1 
-    				AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
-			} else {
-			    $query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
-        				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-        				CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
-        				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-        				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-        				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-        				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-        				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
-        				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
-        				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
-        				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
-        				AND C.isduplicatedispatched = 0
-        				WHERE A.isactive = 1 AND B.isactive = 1 
-        				AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
-			}
-				
-		
+		// 		$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
+		// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+		// 				CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
+		// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+		// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+		// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+		// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+		// 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+		// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+		// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+		// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+		// 				AND C.isduplicatedispatched = 0
+		// 				WHERE A.isactive = 1 AND B.isactive = 1 
+		// 				AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
+
+		if ($originid == 1) {
+			//   $query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
+			// 				B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+			// 				CASE WHEN A.id >= 282 THEN (A.unit_price * B.total_pieces) ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
+			// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+			// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+			// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+			// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+			// 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+			// 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+			// 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+			// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+			// 				AND C.isduplicatedispatched = 0
+			// 				WHERE A.isactive = 1 AND B.isactive = 1 
+			// 				AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
+
+			// $query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
+			// B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+			// CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
+			// D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+			// D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+			// D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+			// D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+			// D.exchange_rate, D.loss_profit, D.document_number, D.observation, get_average_length_by_container(B.dispatch_id) AS avg_length 
+			// FROM tbl_export_container_details A
+			// INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+			// INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+			// LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+			// AND C.isduplicatedispatched = 0
+			// WHERE A.isactive = 1 AND B.isactive = 1 
+			// AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
+
+			$query = $this->db->query("SELECT A.id AS export_id, A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+					B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+					UPPER(D1.invoice_no) AS custom_invoice, D.container_value AS custom_value, 
+					UPPER(E1.invoice_no) AS itr_invoice, E.container_value AS itr_value, 
+					UPPER(F1.invoice_no) AS port_invoice, F.container_value AS port_value, 
+					UPPER(G1.invoice_no) AS shipping_invoice, G.container_value AS shipping_value, 
+					UPPER(H1.invoice_no) AS fumigation_invoice, H.container_value AS fumigation_value, 
+					UPPER(I1.invoice_no) AS phyto_invoice, I.container_value AS phyto_value, 
+					UPPER(J1.invoice_no) AS coteros_invoice, J.container_value AS coteros_value, 
+					UPPER(K1.invoice_no) AS incentive_invoice, K.container_value AS incentive_value,
+					UPPER(L1.invoice_no) AS remobilization_invoice, L.container_value AS remobilization_value, 
+					CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
+					C.dispatch_id 
+					FROM tbl_export_container_details A
+					INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+					INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+					LEFT JOIN tbl_export_document_container D ON D.dispatch_id = C.dispatch_id AND D.export_type = 1 AND D.is_active = 1 
+					LEFT JOIN tbl_export_documents D1 ON D1.export_id = A.id AND D1.export_type = 1 AND D1.is_active = 1  
+					LEFT JOIN tbl_export_document_container E ON E.dispatch_id = C.dispatch_id AND E.export_type = 2 AND E.is_active = 1  
+					LEFT JOIN tbl_export_documents E1 ON E1.export_id = A.id AND E1.export_type = 2 AND E1.is_active = 1 
+					LEFT JOIN tbl_export_document_container F ON F.dispatch_id = C.dispatch_id AND F.export_type = 3 AND F.is_active = 1 
+					LEFT JOIN tbl_export_documents F1 ON F1.export_id = A.id AND F1.export_type = 3 AND F1.is_active = 1 
+					LEFT JOIN tbl_export_document_container G ON G.dispatch_id = C.dispatch_id AND G.export_type = 9 AND G.is_active = 1 
+					LEFT JOIN tbl_export_documents G1 ON G1.export_id = A.id AND G1.export_type = 9 AND G1.is_active = 1 
+					LEFT JOIN tbl_export_document_container H ON H.dispatch_id = C.dispatch_id AND H.export_type = 4 AND H.is_active = 1 
+					LEFT JOIN tbl_export_documents H1 ON H1.export_id = A.id AND H1.export_type = 4 AND H1.is_active = 1 
+					LEFT JOIN tbl_export_document_container I ON I.dispatch_id = C.dispatch_id AND I.export_type = 5 AND I.is_active = 1 
+					LEFT JOIN tbl_export_documents I1 ON I1.export_id = A.id AND I1.export_type = 5 AND I1.is_active = 1 
+					LEFT JOIN tbl_export_document_container J ON J.dispatch_id = C.dispatch_id AND J.export_type = 6 AND J.is_active = 1 
+					LEFT JOIN tbl_export_documents J1 ON J1.export_id = A.id AND J1.export_type = 6 AND J1.is_active = 1 
+					LEFT JOIN tbl_export_document_container K ON K.dispatch_id = C.dispatch_id AND K.export_type = 7 AND K.is_active = 1 
+					LEFT JOIN tbl_export_documents K1 ON K1.export_id = A.id AND K1.export_type = 7 AND K1.is_active = 1  
+					LEFT JOIN tbl_export_document_container L ON L.dispatch_id = C.dispatch_id AND L.export_type = 8 AND L.is_active = 1 
+					LEFT JOIN tbl_export_documents L1 ON L1.export_id = A.id AND L1.export_type = 8 AND L1.is_active = 1 
+					AND C.isduplicatedispatched = 0
+					WHERE A.isactive = 1 AND B.isactive = 1 
+					AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
+		} else {
+			$query = $this->db->query("SELECT A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces,  
+					B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+					CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END AS material_cost, 
+					D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+					D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+					D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+					D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+					D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_export_container_details A
+					INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+					INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+					LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = B.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+					AND C.isduplicatedispatched = 0
+					WHERE A.isactive = 1 AND B.isactive = 1 
+					AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
+		}
+
+
 		return $query->result();
 	}
 
@@ -697,7 +907,8 @@ class Financemaster_model extends CI_Model
 		return $query->result();
 	}
 
-	public function get_count_containers($containernumber, $dispatchid, $sanumber) {
+	public function get_count_containers($containernumber, $dispatchid, $sanumber)
+	{
 		$query = $this->db->query("SELECT COUNT(B.dispatch_id) AS cnt FROM tbl_export_container_details A 
 				INNER JOIN tbl_export_container B ON B.container_details_id = A.id AND B.isactive = 1
 				INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
@@ -705,21 +916,22 @@ class Financemaster_model extends CI_Model
 		return $query->result();
 	}
 
-	public function check_exist_dispatch_cost($containernumber, $dispatchid, $sanumber) {
+	public function check_exist_dispatch_cost($containernumber, $dispatchid, $sanumber)
+	{
 		$query = $this->db->query("SELECT COUNT(dispatch_id) AS cnt FROM tbl_dispatch_cost_details
 				WHERE is_active = 1 AND container_number = '$containernumber' AND dispatch_id = $dispatchid AND sa_number = '$sanumber'");
 		return $query->result();
 	}
 
 	public function add_dispatch_cost_details($data)
-    {
-        $this->db->insert_batch('tbl_dispatch_cost_details', $data);
-        if ($this->db->affected_rows() > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+	{
+		$this->db->insert_batch('tbl_dispatch_cost_details', $data);
+		if ($this->db->affected_rows() > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	public function update_dispatch_cost_details($dispatchid, $containernumber, $sanumber, $data)
 	{
@@ -830,7 +1042,7 @@ class Financemaster_model extends CI_Model
 	public function get_inventory_ledger_contract_purchase_manager($contractid, $supplierid, $langcode)
 	{
 		$this->db->query("SET lc_time_names='$langcode'");
-		if($supplierid == 0) {
+		if ($supplierid == 0) {
 			$query = $this->db->query("SELECT DATE_FORMAT(A.purchase_date, '%d %M %Y') AS expense_date, 'Total Wood Value' AS type_name, A.inventory_order, A.total_value as amount, C.supplier_name, '1' as type  
 					FROM tbl_farm A 
 					INNER JOIN tbl_suppliers C ON C.id = A.supplier_id 
@@ -861,11 +1073,12 @@ class Financemaster_model extends CI_Model
 					WHERE contract_id = $contractid AND A.supplier_id = $supplierid
 					AND A.is_active = 1 AND pm_ledger_type = 2 AND user_type = 2 AND A.expense_type IN (0,1,2,3)");
 		}
-		
+
 		return $query->result();
 	}
-	
-	public function get_all_supplier_ledger_by_origin($originid) {
+
+	public function get_all_supplier_ledger_by_origin($originid)
+	{
 		$query = $this->db->query("SELECT A.supplier_id, supplier_name, supplier_code,
 					CASE WHEN getsupplierledgeramount_type(A.supplier_id, 1) IS NULL THEN 0 ELSE 
 					getsupplierledgeramount_type(A.supplier_id, 1) END as creditamount, 
@@ -878,8 +1091,9 @@ class Financemaster_model extends CI_Model
 					ORDER BY B.id");
 		return $query->result();
 	}
-	
-	public function get_supplier_credit_transactions($supplierid) {
+
+	public function get_supplier_credit_transactions($supplierid)
+	{
 		$query = $this->db->query("SELECT A.id, C.supplier_name, A.amount,
 				DATE_FORMAT(STR_TO_DATE(A.expense_date, '%Y-%m-%d'), '%d %M %Y') as expense_date 
 				FROM tbl_inventory_ledger A 
@@ -890,7 +1104,8 @@ class Financemaster_model extends CI_Model
 		return $query->result();
 	}
 
-	public function get_supplier_debit_transactions($supplierid) {
+	public function get_supplier_debit_transactions($supplierid)
+	{
 		$query = $this->db->query("SELECT A.id, inventory_order, B.type_name, D.supplier_name, A.amount,
 				DATE_FORMAT(STR_TO_DATE(A.expense_date, '%Y-%m-%d'), '%d %M %Y') as expense_date, 
 				C.contract_type, A.contract_id, A.supplier_id, A.expense_type FROM tbl_inventory_ledger A
@@ -902,32 +1117,34 @@ class Financemaster_model extends CI_Model
 		return $query->result();
 	}
 
-	public function get_total_volume_by_supplier($supplierid) {
+	public function get_total_volume_by_supplier($supplierid)
+	{
 		$query = $this->db->query("SELECT SUM(total_volume) as total_volume
 				FROM tbl_contract_inventory_mapping WHERE supplier_id = $supplierid");
 		return $query->result();
 	}
 
-	public function get_supplier_name_ledger($supplierid) {
+	public function get_supplier_name_ledger($supplierid)
+	{
 		$query = $this->db->query("SELECT DISTINCT C.id, C.supplier_name, C.supplier_id FROM tbl_inventory_ledger A 
 				INNER JOIN tbl_supplier_purchase_contract B ON B.contract_id = A.contract_id 
 				INNER JOIN tbl_suppliers C ON C.id = A.supplier_id
 				WHERE A.supplier_id IN ($supplierid) AND A.ledger_type = 2 AND A.is_active = 1");
 		return $query->result();
 	}
-	
+
 	public function fetch_inventory_report_warehouse_bulk($supplierId, $fromDate, $toDate, $originId, $farmId)
 	{
 		if ($supplierId == 0) {
 			$query = "SELECT B.contract_code, A.inventory_order, B.product, B.product_type, 
 				B.supplier_id, B.unit_of_purchase,
-				purchase_allowance, purchase_allowance_length, A.purchase_date FROM tbl_farm A
+				purchase_allowance, purchase_allowance_length, A.purchase_date, B.existing_price_condition FROM tbl_farm A
 				INNER JOIN tbl_supplier_purchase_contract B ON B.contract_id = A.contract_id 
 				WHERE B.origin_id = $originId AND A.is_active = 1 AND A.purchase_date BETWEEN '$fromDate' AND '$toDate'";
 		} else {
 			$query = "SELECT B.contract_code, A.inventory_order, B.product, B.product_type, 
 				B.supplier_id, B.unit_of_purchase,
-				purchase_allowance, purchase_allowance_length, A.purchase_date FROM tbl_farm A
+				purchase_allowance, purchase_allowance_length, A.purchase_date, B.existing_price_condition FROM tbl_farm A
 				INNER JOIN tbl_supplier_purchase_contract B ON B.contract_id = A.contract_id 
 				WHERE B.origin_id = $originId AND B.supplier_id = $supplierId
 				AND A.is_active = 1 AND A.purchase_date BETWEEN '$fromDate' AND '$toDate'";
@@ -936,7 +1153,7 @@ class Financemaster_model extends CI_Model
 		if ($farmId != "") {
 			$query = $query . " AND A.farm_id IN ($farmId)";
 		}
-		
+
 		$query = $query . " ORDER BY A.farm_id, STR_TO_DATE(A.purchase_date,'%Y-%m-%d')";
 
 		$query = $this->db->query($query);
@@ -984,7 +1201,7 @@ class Financemaster_model extends CI_Model
 	public function get_farm_detail_bulk($supplierId, $fromDate, $toDate, $originid, $inventoryOrder, $langcode)
 	{
 		$this->db->query("SET lc_time_names='$langcode'");
-		if($supplierId == 0) {
+		if ($supplierId == 0) {
 			$query = $this->db->query("SELECT A.supplier_id, A.contract_id, A.farm_id, DATE_FORMAT(A.purchase_date, '%d %M %Y') AS purchase_date, A.inventory_order, 
 						A.plate_number, B.supplier_name, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, 
 						A.logistic_cost, A.service_cost, A.adjustment, A.purchase_unit_id, A.exchange_rate, 
@@ -1013,17 +1230,18 @@ class Financemaster_model extends CI_Model
 		}
 		return $query->result();
 	}
-	
+
 	public function get_inventory_by_supplierid($supplierid)
 	{
 		$query = $this->db->query("SELECT farm_id, inventory_order FROM tbl_farm WHERE supplier_id = $supplierid AND is_active = 1");
 		return $query->result();
 	}
-	
+
 	public function delete_credits($transactionid, $supplierid, $contractid, $userid)
 	{
 		$updateData = array(
-			"is_active" => 0, "updated_by" => $userid,
+			"is_active" => 0,
+			"updated_by" => $userid,
 		);
 		$multiClause = array('id' => $transactionid, 'contract_id' => $contractid, 'supplier_id' => $supplierid);
 		$this->db->where($multiClause);
@@ -1034,8 +1252,8 @@ class Financemaster_model extends CI_Model
 			return false;
 		}
 	}
-	
-	public function fetch_closed_container_data($originid, $dispatchids, $langcode)
+
+	public function fetch_closed_container_data1($originid, $dispatchids, $langcode)
 	{
 		$this->db->query("SET lc_time_names='$langcode'");
 		$query = $this->db->query("SELECT '---' AS sa_number, '' AS shipped_date, C.total_pieces, 
@@ -1050,39 +1268,99 @@ class Financemaster_model extends CI_Model
 				AND C.isduplicatedispatched = 0
 				WHERE C.isactive = 1
 				AND C.dispatch_id IN ($dispatchids) AND C.origin_id = $originid GROUP BY C.dispatch_id");
-				
-				// $query = $this->db->query("SELECT '---' AS sa_number, '' AS shipped_date, C.total_pieces, 
-				// C.total_volume AS net_volume, C.dispatch_id, C.container_number, 0 AS cft_value, 
-				// CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(C.dispatch_id) END AS material_cost, 
-				// D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-				// D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-				// D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-				// D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-				// D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_dispatch_container C 
-				// LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = C.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
-				// AND C.isduplicatedispatched = 0
-				// WHERE C.isactive = 1
-				// AND C.dispatch_id IN ($dispatchids) AND C.origin_id = $originid GROUP BY C.dispatch_id");
-				
-// 		$query = $this->db->query("SELECT '---' AS sa_number, '' AS shipped_date, C.total_pieces, 
-// 				C.total_volume AS net_volume, C.dispatch_id, C.container_number, 0 AS cft_value, 
-// 				(A.unit_price * C.total_pieces) AS material_cost, 
-// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
-// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
-// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
-// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
-// 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_dispatch_container C 
-// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = C.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
-// 				AND C.isduplicatedispatched = 0
-// 				WHERE C.isactive = 1
-// 				AND C.dispatch_id IN ($dispatchids) AND C.origin_id = $originid GROUP BY C.dispatch_id");
+
+		// $query = $this->db->query("SELECT '---' AS sa_number, '' AS shipped_date, C.total_pieces, 
+		// C.total_volume AS net_volume, C.dispatch_id, C.container_number, 0 AS cft_value, 
+		// CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(C.dispatch_id) END AS material_cost, 
+		// D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+		// D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+		// D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+		// D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+		// D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_dispatch_container C 
+		// LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = C.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+		// AND C.isduplicatedispatched = 0
+		// WHERE C.isactive = 1
+		// AND C.dispatch_id IN ($dispatchids) AND C.origin_id = $originid GROUP BY C.dispatch_id");
+
+		// 		$query = $this->db->query("SELECT '---' AS sa_number, '' AS shipped_date, C.total_pieces, 
+		// 				C.total_volume AS net_volume, C.dispatch_id, C.container_number, 0 AS cft_value, 
+		// 				(A.unit_price * C.total_pieces) AS material_cost, 
+		// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+		// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+		// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+		// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+		// 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_dispatch_container C 
+		// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = C.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+		// 				AND C.isduplicatedispatched = 0
+		// 				WHERE C.isactive = 1
+		// 				AND C.dispatch_id IN ($dispatchids) AND C.origin_id = $originid GROUP BY C.dispatch_id");
 		return $query->result();
 	}
-	
+
+	public function fetch_closed_container_data($originid, $dispatchids, $langcode)
+	{
+		$this->db->query("SET lc_time_names='$langcode'");
+		// $query = $this->db->query("SELECT '---' AS sa_number, '' AS shipped_date, C.total_pieces, 
+		// 		C.total_volume AS net_volume, C.dispatch_id, C.container_number, 0 AS cft_value, 
+		// 		get_material_cost_by_dispatch_id_export(C.dispatch_id) AS material_cost, 
+		// 		D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+		// 		D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+		// 		D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+		// 		D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+		// 		D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_dispatch_container C 
+		// 		LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = C.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+		// 		AND C.isduplicatedispatched = 0
+		// 		WHERE C.isactive = 1
+		// 		AND C.dispatch_id IN ($dispatchids) AND C.origin_id = $originid GROUP BY C.dispatch_id");
+
+		$query = $this->db->query("SELECT '---' AS sa_number, '' AS shipped_date, C.total_pieces, 
+        				C.total_volume AS net_volume, C.dispatch_id, C.container_number, 0 AS cft_value, 
+                        '' AS custom_invoice, 0 AS custom_value, 
+                        '' AS itr_invoice, 0 AS itr_value, 
+                        '' AS port_invoice, 0 AS port_value, 
+                        '' AS shipping_invoice, 0 AS shipping_value, 
+                        '' AS fumigation_invoice, 0 AS fumigation_value, 
+                        '' AS phyto_invoice, 0 AS phyto_value, 
+                        '' AS coteros_invoice, 0 AS coteros_value, 
+                        '' AS incentive_invoice, 0 AS incentive_value,
+                        '' AS remobilization_invoice, 0 AS remobilization_value, 
+						get_material_cost_by_dispatch_id_export(C.dispatch_id) AS material_cost
+                        FROM tbl_dispatch_container C 
+        				WHERE C.isduplicatedispatched = 0 AND C.isactive = 1 
+						AND C.dispatch_id IN ($dispatchids) AND C.origin_id = $originid GROUP BY C.dispatch_id");
+
+		// $query = $this->db->query("SELECT '---' AS sa_number, '' AS shipped_date, C.total_pieces, 
+		// C.total_volume AS net_volume, C.dispatch_id, C.container_number, 0 AS cft_value, 
+		// CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(C.dispatch_id) END AS material_cost, 
+		// D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+		// D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+		// D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+		// D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+		// D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_dispatch_container C 
+		// LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = C.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+		// AND C.isduplicatedispatched = 0
+		// WHERE C.isactive = 1
+		// AND C.dispatch_id IN ($dispatchids) AND C.origin_id = $originid GROUP BY C.dispatch_id");
+
+		// 		$query = $this->db->query("SELECT '---' AS sa_number, '' AS shipped_date, C.total_pieces, 
+		// 				C.total_volume AS net_volume, C.dispatch_id, C.container_number, 0 AS cft_value, 
+		// 				(A.unit_price * C.total_pieces) AS material_cost, 
+		// 				D.custom_agency_invoice_number, D.custom_agency_cost, D.transport_invoice_number, 
+		// 				D.transport_cost, D.port_invoice_number, D.port_cost, D.phyto_cost, D.fumigation_invoice_number, 
+		// 				D.fumigation_cost, D.dhl_invoice_number, D.dhl_cost, D.coteros_cost, D.provistional_stamp_cost, 
+		// 				D.incentive, D.mobilization_cost, D.shipping_invoice_number, D.warehouse_port_cost, D.freight_cost, D.sales_cost, 
+		// 				D.exchange_rate, D.loss_profit, D.document_number, D.observation FROM tbl_dispatch_container C 
+		// 				LEFT JOIN tbl_dispatch_cost_details D ON D.dispatch_id = C.dispatch_id AND D.container_number = C.container_number AND D.is_active = 1 
+		// 				AND C.isduplicatedispatched = 0
+		// 				WHERE C.isactive = 1
+		// 				AND C.dispatch_id IN ($dispatchids) AND C.origin_id = $originid GROUP BY C.dispatch_id");
+		return $query->result();
+	}
+
 	public function get_ledger_details_by_buyer($buyerid, $originid)
 	{
-	    if ($originid > 0) {
-	        $query = $this->db->query("SELECT COUNT(X.sa_number) AS total_shipments, SUM(X.total_advance_cost) AS total_advance_cost, 
+		if ($originid > 0) {
+			$query = $this->db->query("SELECT COUNT(X.sa_number) AS total_shipments, SUM(X.total_advance_cost) AS total_advance_cost, 
 				SUM(X.total_service_cost) AS total_service_cost, SUM(X.total_claim_amount) AS total_claim_amount, 
 				SUM(X.total_invoice_value) AS total_invoice_value, SUM(X.total_containers) AS total_containers, 
 				SUM(X.total_weight) AS total_weight, SUM(X.total_volume) AS total_volume, SUM(X.total_pieces) AS total_pieces, 
@@ -1097,8 +1375,8 @@ class Financemaster_model extends CI_Model
 				INNER JOIN tbl_export_container_details B ON B.id = A.export_id 
 				WHERE A.is_active = 1 AND A.buyer_id = $buyerid AND B.origin_id = $originid AND A.ledger_type = 2
 				GROUP BY A.export_id) X");
-	    } else {
-	        $query = $this->db->query("SELECT COUNT(X.sa_number) AS total_shipments, SUM(X.total_advance_cost) AS total_advance_cost, 
+		} else {
+			$query = $this->db->query("SELECT COUNT(X.sa_number) AS total_shipments, SUM(X.total_advance_cost) AS total_advance_cost, 
 				SUM(X.total_service_cost) AS total_service_cost, SUM(X.total_claim_amount) AS total_claim_amount, 
 				SUM(X.total_invoice_value) AS total_invoice_value, SUM(X.total_containers) AS total_containers, 
 				SUM(X.total_weight) AS total_weight, SUM(X.total_volume) AS total_volume, SUM(X.total_pieces) AS total_pieces, 
@@ -1113,15 +1391,15 @@ class Financemaster_model extends CI_Model
 				INNER JOIN tbl_export_container_details B ON B.id = A.export_id 
 				WHERE A.is_active = 1 AND A.buyer_id = $buyerid AND A.ledger_type = 2
 				GROUP BY A.export_id) X");
-	    }
-		
+		}
+
 		return $query->result();
 	}
 
 	public function get_ledger_transaction_details_by_buyer($buyerid, $originid)
 	{
-	    if($originid > 0) {
-	        $query = $this->db->query("SELECT B.sa_number, SUM(A.total_advance_cost) AS total_advance_cost, 
+		if ($originid > 0) {
+			$query = $this->db->query("SELECT B.sa_number, SUM(A.total_advance_cost) AS total_advance_cost, 
 				SUM(A.total_service_cost) AS total_service_cost, SUM(A.claim_amount) AS total_claim_amount, 
 				SUM(A.total_invoice_value) AS total_invoice_value, SUM(A.total_containers) AS total_containers, 
 				CASE WHEN B.origin_id = 3 THEN SUM(A.total_volume) ELSE 0 END AS total_weight, 
@@ -1132,8 +1410,8 @@ class Financemaster_model extends CI_Model
 				WHERE A.is_active = 1 AND A.buyer_id = $buyerid AND B.origin_id = $originid AND A.ledger_type = 2
 				GROUP BY A.export_id 
                 ORDER BY B.origin_id ASC, B.id DESC");
-	    } else {
-	        $query = $this->db->query("SELECT B.sa_number, SUM(A.total_advance_cost) AS total_advance_cost, 
+		} else {
+			$query = $this->db->query("SELECT B.sa_number, SUM(A.total_advance_cost) AS total_advance_cost, 
 				SUM(A.total_service_cost) AS total_service_cost, SUM(A.claim_amount) AS total_claim_amount, 
 				SUM(A.total_invoice_value) AS total_invoice_value, SUM(A.total_containers) AS total_containers, 
 				CASE WHEN B.origin_id = 3 THEN SUM(A.total_volume) ELSE 0 END AS total_weight, 
@@ -1144,11 +1422,11 @@ class Financemaster_model extends CI_Model
 				WHERE A.is_active = 1 AND A.buyer_id = $buyerid AND A.ledger_type = 2
 				GROUP BY A.export_id 
                 ORDER BY B.origin_id ASC, B.id DESC");
-	    }
-		
+		}
+
 		return $query->result();
 	}
-	
+
 	public function get_gc_report_data($originid, $buyerid)
 	{
 		try {
@@ -1312,4 +1590,12 @@ class Financemaster_model extends CI_Model
 			echo $e->getMessage();
 		}
 	}
+
+	public function get_container_cost($exportid, $dispatchid)
+    {
+        $strQuery = "SELECT dispatch_id, unit_price, exchange_rate FROM tbl_export_document_container_cost 
+            WHERE is_active = 1 AND export_id = $exportid AND dispatch_id = $dispatchid";
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
 }
