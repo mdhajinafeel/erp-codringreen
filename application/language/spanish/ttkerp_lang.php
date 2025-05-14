@@ -896,9 +896,9 @@ $lang["Removilization"] = "Removilización";
 $lang["Shipping"] = "Naviera";
 
 $lang["export_suppliers"] = "Proveedores de Exportación";
-$lang["export_subtotal"] = "Valor de la factura antes de Impuesto";
+$lang["export_subtotal"] = "Valor antes de Impuesto";
 $lang["export_iva"] = "Valor Impuesto";
-$lang["export_retefuente"] = "Retencion en la fuente a aplicar";
+$lang["export_retefuente"] = "Impuesto de retención";
 $lang["export_total_payable"] = "Total a pagar";
 $lang["container_value"] = "Valor del contenedor";
 
@@ -917,3 +917,37 @@ $lang["container_trm"] = "TRM";
 $lang["process"] = "Proceso";
 $lang["sawmill"] = "Aserradero";
 $lang["local_sales"] = "Ventas locales";
+
+//POD
+$lang["pod_name"] = "Nombre del POD";
+$lang["pod"] = "POD";
+$lang["export_pod"] = "Exportar POD";
+$lang["country_name"] = "Nombre del país";
+$lang["latitude"] = "Latitud";
+$lang["longitude"] = "Longitud";
+$lang["color_code"] = "Código de colores";
+$lang["add_pod"] = "Agregar POD";
+$lang["edit_pod"] = "Editar POD";
+$lang["error_pod_name"] = "Por favor ingrese el nombre del POD";
+$lang["error_country_name"] = "Por favor seleccione el nombre del país";
+$lang["error_latitude"] = "Por favor, ingrese el latitud";
+$lang["error_longitude"] = "Por favor, ingrese el longitud";
+$lang["error_color_code"] = "Por favor seleccione el código de color";
+
+//POL
+$lang["pol_name"] = "POL Name";
+$lang["pol_short_name"] = "Nombre corto de POL";
+$lang["pol"] = "POL";
+$lang["export_pol"] = "Exportar POL";
+$lang["latitude"] = "Latitud";
+$lang["longitude"] = "Longitud";
+$lang["add_pol"] = "Agregar POL";
+$lang["edit_pol"] = "Editar POL";
+$lang["error_pol_name"] = "Por favor ingrese el nombre del POL";
+$lang["error_pol_short_name"] = "Por favor ingrese el nombre corto del POL";
+
+$lang["merge_invoice"] = "Fusionar factura";
+$lang["error_select_invoice"] = "Por favor seleccione la factura a fusionar";
+$lang["total_container_value"] = "Valor total del contenedor";
+$lang["invoice_list"] = "Listas de facturas";
+$lang["invoice_no"] = "Factura #";

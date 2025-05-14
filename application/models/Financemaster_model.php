@@ -594,17 +594,56 @@ class Financemaster_model extends CI_Model
 			// 	AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
 			// 	BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id ORDER BY A.sa_number ASC");
 
-			$query = $this->db->query("SELECT A.id AS export_id, A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+			// $query = $this->db->query("SELECT A.id AS export_id, A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+			// 		B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+			// 		UPPER(D1.invoice_no) AS custom_invoice, D.container_value AS custom_value, 
+			// 		UPPER(E1.invoice_no) AS itr_invoice, E.container_value AS itr_value, 
+			// 		UPPER(F1.invoice_no) AS port_invoice, F.container_value AS port_value, 
+			// 		UPPER(G1.invoice_no) AS shipping_invoice, G.container_value AS shipping_value, 
+			// 		UPPER(H1.invoice_no) AS fumigation_invoice, H.container_value AS fumigation_value, 
+			// 		UPPER(I1.invoice_no) AS phyto_invoice, I.container_value AS phyto_value, 
+			// 		UPPER(J1.invoice_no) AS coteros_invoice, J.container_value AS coteros_value, 
+			// 		UPPER(K1.invoice_no) AS incentive_invoice, K.container_value AS incentive_value,
+			// 		UPPER(L1.invoice_no) AS remobilization_invoice, L.container_value AS remobilization_value, 
+			// 		CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
+			// 		C.dispatch_id
+			// 		FROM tbl_export_container_details A
+			// 		INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+			// 		INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+			// 		LEFT JOIN tbl_export_document_container D ON D.dispatch_id = C.dispatch_id AND D.export_type = 1 AND D.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents D1 ON D1.export_id = A.id AND D1.export_type = 1 AND D1.is_active = 1  
+			// 		LEFT JOIN tbl_export_document_container E ON E.dispatch_id = C.dispatch_id AND E.export_type = 2 AND E.is_active = 1  
+			// 		LEFT JOIN tbl_export_documents E1 ON E1.export_id = A.id AND E1.export_type = 2 AND E1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container F ON F.dispatch_id = C.dispatch_id AND F.export_type = 3 AND F.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents F1 ON F1.export_id = A.id AND F1.export_type = 3 AND F1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container G ON G.dispatch_id = C.dispatch_id AND G.export_type = 9 AND G.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents G1 ON G1.export_id = A.id AND G1.export_type = 9 AND G1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container H ON H.dispatch_id = C.dispatch_id AND H.export_type = 4 AND H.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents H1 ON H1.export_id = A.id AND H1.export_type = 4 AND H1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container I ON I.dispatch_id = C.dispatch_id AND I.export_type = 5 AND I.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents I1 ON I1.export_id = A.id AND I1.export_type = 5 AND I1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container J ON J.dispatch_id = C.dispatch_id AND J.export_type = 6 AND J.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents J1 ON J1.export_id = A.id AND J1.export_type = 6 AND J1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container K ON K.dispatch_id = C.dispatch_id AND K.export_type = 7 AND K.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents K1 ON K1.export_id = A.id AND K1.export_type = 7 AND K1.is_active = 1  
+			// 		LEFT JOIN tbl_export_document_container L ON L.dispatch_id = C.dispatch_id AND L.export_type = 8 AND L.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents L1 ON L1.export_id = A.id AND L1.export_type = 8 AND L1.is_active = 1 
+			// 		AND C.isduplicatedispatched = 0
+			// 		WHERE A.isactive = 1 AND B.isactive = 1 
+			// 		AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
+			// 		BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id ORDER BY A.sa_number ASC");
+
+		$query = $this->db->query("SELECT A.id AS export_id, A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
 					B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-					UPPER(D1.invoice_no) AS custom_invoice, D.container_value AS custom_value, 
-					UPPER(E1.invoice_no) AS itr_invoice, E.container_value AS itr_value, 
-					UPPER(F1.invoice_no) AS port_invoice, F.container_value AS port_value, 
-					UPPER(G1.invoice_no) AS shipping_invoice, G.container_value AS shipping_value, 
-					UPPER(H1.invoice_no) AS fumigation_invoice, H.container_value AS fumigation_value, 
-					UPPER(I1.invoice_no) AS phyto_invoice, I.container_value AS phyto_value, 
-					UPPER(J1.invoice_no) AS coteros_invoice, J.container_value AS coteros_value, 
-					UPPER(K1.invoice_no) AS incentive_invoice, K.container_value AS incentive_value,
-					UPPER(L1.invoice_no) AS remobilization_invoice, L.container_value AS remobilization_value, 
+					UPPER(GROUP_CONCAT(DISTINCT D1.invoice_no SEPARATOR ', ')) AS custom_invoice, SUM(DISTINCT D.container_value) AS custom_value, 
+					UPPER(GROUP_CONCAT(DISTINCT E1.invoice_no SEPARATOR ', ')) AS itr_invoice, SUM(DISTINCT E.container_value) AS itr_value, 
+					UPPER(GROUP_CONCAT(DISTINCT F1.invoice_no SEPARATOR ', ')) AS port_invoice, SUM(DISTINCT F.container_value) AS port_value, 
+					UPPER(GROUP_CONCAT(DISTINCT G1.invoice_no SEPARATOR ', ')) AS shipping_invoice, SUM(DISTINCT G.container_value) AS shipping_value, 
+					UPPER(GROUP_CONCAT(DISTINCT H1.invoice_no SEPARATOR ', ')) AS fumigation_invoice, SUM(DISTINCT H.container_value) AS fumigation_value, 
+					UPPER(GROUP_CONCAT(DISTINCT I1.invoice_no SEPARATOR ', ')) AS phyto_invoice, SUM(DISTINCT I.container_value) AS phyto_value, 
+					UPPER(GROUP_CONCAT(DISTINCT J1.invoice_no SEPARATOR ', ')) AS coteros_invoice, SUM(DISTINCT J.container_value) AS coteros_value, 
+					UPPER(GROUP_CONCAT(DISTINCT K1.invoice_no SEPARATOR ', ')) AS incentive_invoice, SUM(DISTINCT K.container_value) AS incentive_value,
+					UPPER(GROUP_CONCAT(DISTINCT L1.invoice_no SEPARATOR ', ')) AS remobilization_invoice, SUM(DISTINCT L.container_value) AS remobilization_value, 
 					CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
 					C.dispatch_id
 					FROM tbl_export_container_details A
@@ -774,17 +813,55 @@ class Financemaster_model extends CI_Model
 			// WHERE A.isactive = 1 AND B.isactive = 1 
 			// AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
 
+			// $query = $this->db->query("SELECT A.id AS export_id, A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+			// 		B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
+			// 		UPPER(D1.invoice_no) AS custom_invoice, D.container_value AS custom_value, 
+			// 		UPPER(E1.invoice_no) AS itr_invoice, E.container_value AS itr_value, 
+			// 		UPPER(F1.invoice_no) AS port_invoice, F.container_value AS port_value, 
+			// 		UPPER(G1.invoice_no) AS shipping_invoice, G.container_value AS shipping_value, 
+			// 		UPPER(H1.invoice_no) AS fumigation_invoice, H.container_value AS fumigation_value, 
+			// 		UPPER(I1.invoice_no) AS phyto_invoice, I.container_value AS phyto_value, 
+			// 		UPPER(J1.invoice_no) AS coteros_invoice, J.container_value AS coteros_value, 
+			// 		UPPER(K1.invoice_no) AS incentive_invoice, K.container_value AS incentive_value,
+			// 		UPPER(L1.invoice_no) AS remobilization_invoice, L.container_value AS remobilization_value, 
+			// 		CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
+			// 		C.dispatch_id 
+			// 		FROM tbl_export_container_details A
+			// 		INNER JOIN tbl_export_container B ON B.container_details_id = A.id
+			// 		INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
+			// 		LEFT JOIN tbl_export_document_container D ON D.dispatch_id = C.dispatch_id AND D.export_type = 1 AND D.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents D1 ON D1.export_id = A.id AND D1.export_type = 1 AND D1.is_active = 1  
+			// 		LEFT JOIN tbl_export_document_container E ON E.dispatch_id = C.dispatch_id AND E.export_type = 2 AND E.is_active = 1  
+			// 		LEFT JOIN tbl_export_documents E1 ON E1.export_id = A.id AND E1.export_type = 2 AND E1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container F ON F.dispatch_id = C.dispatch_id AND F.export_type = 3 AND F.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents F1 ON F1.export_id = A.id AND F1.export_type = 3 AND F1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container G ON G.dispatch_id = C.dispatch_id AND G.export_type = 9 AND G.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents G1 ON G1.export_id = A.id AND G1.export_type = 9 AND G1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container H ON H.dispatch_id = C.dispatch_id AND H.export_type = 4 AND H.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents H1 ON H1.export_id = A.id AND H1.export_type = 4 AND H1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container I ON I.dispatch_id = C.dispatch_id AND I.export_type = 5 AND I.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents I1 ON I1.export_id = A.id AND I1.export_type = 5 AND I1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container J ON J.dispatch_id = C.dispatch_id AND J.export_type = 6 AND J.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents J1 ON J1.export_id = A.id AND J1.export_type = 6 AND J1.is_active = 1 
+			// 		LEFT JOIN tbl_export_document_container K ON K.dispatch_id = C.dispatch_id AND K.export_type = 7 AND K.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents K1 ON K1.export_id = A.id AND K1.export_type = 7 AND K1.is_active = 1  
+			// 		LEFT JOIN tbl_export_document_container L ON L.dispatch_id = C.dispatch_id AND L.export_type = 8 AND L.is_active = 1 
+			// 		LEFT JOIN tbl_export_documents L1 ON L1.export_id = A.id AND L1.export_type = 8 AND L1.is_active = 1 
+			// 		AND C.isduplicatedispatched = 0
+			// 		WHERE A.isactive = 1 AND B.isactive = 1 
+			// 		AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
+
 			$query = $this->db->query("SELECT A.id AS export_id, A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
 					B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
-					UPPER(D1.invoice_no) AS custom_invoice, D.container_value AS custom_value, 
-					UPPER(E1.invoice_no) AS itr_invoice, E.container_value AS itr_value, 
-					UPPER(F1.invoice_no) AS port_invoice, F.container_value AS port_value, 
-					UPPER(G1.invoice_no) AS shipping_invoice, G.container_value AS shipping_value, 
-					UPPER(H1.invoice_no) AS fumigation_invoice, H.container_value AS fumigation_value, 
-					UPPER(I1.invoice_no) AS phyto_invoice, I.container_value AS phyto_value, 
-					UPPER(J1.invoice_no) AS coteros_invoice, J.container_value AS coteros_value, 
-					UPPER(K1.invoice_no) AS incentive_invoice, K.container_value AS incentive_value,
-					UPPER(L1.invoice_no) AS remobilization_invoice, L.container_value AS remobilization_value, 
+					UPPER(GROUP_CONCAT(DISTINCT D1.invoice_no SEPARATOR ', ')) AS custom_invoice, SUM(DISTINCT D.container_value) AS custom_value, 
+					UPPER(GROUP_CONCAT(DISTINCT E1.invoice_no SEPARATOR ', ')) AS itr_invoice, SUM(DISTINCT E.container_value) AS itr_value, 
+					UPPER(GROUP_CONCAT(DISTINCT F1.invoice_no SEPARATOR ', ')) AS port_invoice, SUM(DISTINCT F.container_value) AS port_value, 
+					UPPER(GROUP_CONCAT(DISTINCT G1.invoice_no SEPARATOR ', ')) AS shipping_invoice, SUM(DISTINCT G.container_value) AS shipping_value, 
+					UPPER(GROUP_CONCAT(DISTINCT H1.invoice_no SEPARATOR ', ')) AS fumigation_invoice, SUM(DISTINCT H.container_value) AS fumigation_value, 
+					UPPER(GROUP_CONCAT(DISTINCT I1.invoice_no SEPARATOR ', ')) AS phyto_invoice, SUM(DISTINCT I.container_value) AS phyto_value, 
+					UPPER(GROUP_CONCAT(DISTINCT J1.invoice_no SEPARATOR ', ')) AS coteros_invoice, SUM(DISTINCT J.container_value) AS coteros_value, 
+					UPPER(GROUP_CONCAT(DISTINCT K1.invoice_no SEPARATOR ', ')) AS incentive_invoice, SUM(DISTINCT K.container_value) AS incentive_value,
+					UPPER(GROUP_CONCAT(DISTINCT L1.invoice_no SEPARATOR ', ')) AS remobilization_invoice, SUM(DISTINCT L.container_value) AS remobilization_value, 
 					CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
 					C.dispatch_id 
 					FROM tbl_export_container_details A

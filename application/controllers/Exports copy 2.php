@@ -1,7 +1,7 @@
 <?php
 
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
-ini_set('display_errors', '0');
+// error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
+// ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -127,50 +127,6 @@ class Exports extends MY_Controller
                     "csrfhash" => $this->security->get_csrf_hash(),
                 );
                 $this->load->view("export/dialog_view_export", $data);
-            } else if ($this->input->get('type') == "deleteinvoiceconfirmation") {
-                $Return["redirect"] = false;
-                $Return["result"] = "";
-                $Return["selectedInvoiceId"] = $this->input->get('id');
-                $Return["selectedExportId"] = $this->input->get('export_id');
-                $Return["selectedExportType"] = $this->input->get('export_type');
-                $Return["pageheading"] = $this->lang->line("confirmation");
-                $Return["pagemessage"] = $this->lang->line("delete_message");
-                $Return["messagetype"] = "info";
-                $Return["csrf_hash"] = $this->security->get_csrf_hash();
-                $this->output($Return);
-                exit;
-            } else if ($this->input->get('type') == "deleteexportinvoice") {
-
-                $invoiceId = $this->input->get('inputid');
-                $exportId = $this->input->get('inputid1');
-                $exportType = $this->input->get('inputid2');
-
-                $data = array(
-                    'is_active' => 0,
-                );
-
-                $invoiceDelete = $this->Export_model->update_invoice_data($exportId, $invoiceId, $data);
-
-                $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, $exportType));
-                if ($invoiceDelete) {
-
-                    $Return['result'] = $this->lang->line('data_deleted');
-                    $Return['redirect'] = false;
-                    $Return['type'] = $exportType;
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                } else {
-                    $Return['error'] = $this->lang->line('error_deleting');
-                    $Return['result'] = "";
-                    $Return['redirect'] = false;
-                    $Return['type'] = $exportType;
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                }
             } else if ($this->input->post("type") == "viewexportdocuments") {
                 $exportId = $this->input->post("eid");
                 $saNumber = $this->input->post("sn");
@@ -180,65 +136,110 @@ class Exports extends MY_Controller
 
                 //CUSTOMS
                 $getExportDocumentsCustoms = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 1);
-                $getExportDocumentsCustomsInvoiceLists = [];
-                if (count($getExportDocumentsCustoms) > 0) {
-                    $getExportDocumentsCustomsInvoiceLists = $this->Export_model->fetch_export_document_details($getExportDocumentsCustoms[0]->export_id, 1);
+                if (!empty($getExportDocumentsCustoms[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsCustoms[0]->invoice_date);
+                    $getExportDocumentsCustoms[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsCustomsContainers = array();
+                if (count($getExportDocumentsCustoms) == 1) {
+                    $getExportDocumentsCustomsContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsCustoms[0]->export_id, 1, $getExportDocumentsCustoms[0]->id);
                 }
 
                 //TRANSPORT
                 $getExportDocumentsTransport = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 2);
-                $getExportDocumentsITRInvoiceLists = [];
-                if (count($getExportDocumentsTransport) > 0) {
-                    $getExportDocumentsITRInvoiceLists = $this->Export_model->fetch_export_document_details($getExportDocumentsTransport[0]->export_id, 2);
+                if (!empty($getExportDocumentsTransport[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsTransport[0]->invoice_date);
+                    $getExportDocumentsTransport[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsTransportContainers = array();
+                if (count($getExportDocumentsTransport) == 1) {
+                    $getExportDocumentsTransportContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsTransport[0]->export_id, 2, $getExportDocumentsTransport[0]->id);
                 }
 
                 //PORT
                 $getExportDocumentsPort = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 3);
-                $getExportDocumentsPortInvoiceLists = [];
-                if (count($getExportDocumentsPort) > 0) {
-                    $getExportDocumentsPortInvoiceLists = $this->Export_model->fetch_export_document_details($getExportDocumentsPort[0]->export_id, 3);
+                if (!empty($getExportDocumentsPort[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsPort[0]->invoice_date);
+                    $getExportDocumentsPort[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsPortContainers = array();
+                if (count($getExportDocumentsPort) == 1) {
+                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsPort[0]->export_id, 3, $getExportDocumentsPort[0]->id);
                 }
 
                 //FUMIGATION
                 $getExportDocumentsFumigation = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 4);
-                $getExportDocumentsFumigationInvoiceLists = [];
-                if (count($getExportDocumentsFumigation) > 0) {
-                    $getExportDocumentsFumigationInvoiceLists = $this->Export_model->fetch_export_document_details($getExportDocumentsFumigation[0]->export_id, 4);
+                if (!empty($getExportDocumentsFumigation[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsFumigation[0]->invoice_date);
+                    $getExportDocumentsFumigation[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsFumigationContainers = array();
+                if (count($getExportDocumentsFumigation) == 1) {
+                    $getExportDocumentsFumigationContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsFumigation[0]->export_id, 4, $getExportDocumentsFumigation[0]->id);
                 }
 
                 //PHYTO
                 $getExportDocumentsPhyto = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 5);
-                $getExportDocumentsPhytoInvoiceLists = [];
-                if (count($getExportDocumentsPhyto) > 0) {
-                    $getExportDocumentsPhytoInvoiceLists = $this->Export_model->fetch_export_document_details($getExportDocumentsPhyto[0]->export_id, 5);
+                if (!empty($getExportDocumentsPhyto[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsPhyto[0]->invoice_date);
+                    $getExportDocumentsPhyto[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsPhytoContainers = array();
+                if (count($getExportDocumentsPhyto) == 1) {
+                    $getExportDocumentsPhytoContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsPhyto[0]->export_id, 5, $getExportDocumentsPhyto[0]->id);
                 }
 
                 //COTEROS
                 $getExportDocumentsCoteros = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 6);
-                $getExportDocumentsCoterosInvoiceLists = [];
-                if (count($getExportDocumentsCoteros) > 0) {
-                    $getExportDocumentsCoterosInvoiceLists = $this->Export_model->fetch_export_document_details($getExportDocumentsCoteros[0]->export_id, 6);
+                if (!empty($getExportDocumentsCoteros[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsCoteros[0]->invoice_date);
+                    $getExportDocumentsCoteros[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsCoterosContainers = array();
+                if (count($getExportDocumentsCoteros) == 1) {
+                    $getExportDocumentsCoterosContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsCoteros[0]->export_id, 6, $getExportDocumentsCoteros[0]->id);
                 }
 
                 //INCENTIVES
                 $getExportDocumentsIncentives = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 7);
-                $getExportDocumentsIncentivesInvoiceLists = [];
-                if (count($getExportDocumentsIncentives) > 0) {
-                    $getExportDocumentsIncentivesInvoiceLists = $this->Export_model->fetch_export_document_details($getExportDocumentsIncentives[0]->export_id, 7);
+                if (!empty($getExportDocumentsIncentives[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsIncentives[0]->invoice_date);
+                    $getExportDocumentsIncentives[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsIncentivesContainers = array();
+                if (count($getExportDocumentsIncentives) == 1) {
+                    $getExportDocumentsIncentivesContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsIncentives[0]->export_id, 7, $getExportDocumentsIncentives[0]->id);
                 }
 
                 //REMOBILIZATION
                 $getExportDocumentsRemobilization = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 8);
-                $getExportDocumentsRemobilizationInvoiceLists = [];
-                if (count($getExportDocumentsRemobilization) > 0) {
-                    $getExportDocumentsRemobilizationInvoiceLists = $this->Export_model->fetch_export_document_details($getExportDocumentsRemobilization[0]->export_id, 8);
+                if (!empty($getExportDocumentsRemobilization[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsRemobilization[0]->invoice_date);
+                    $getExportDocumentsRemobilization[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsRemobilizationContainers = array();
+                if (count($getExportDocumentsRemobilization) == 1) {
+                    $getExportDocumentsRemobilizationContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsRemobilization[0]->export_id, 8, $getExportDocumentsRemobilization[0]->id);
                 }
 
                 //SHIPPING
                 $getExportDocumentsShipping = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 9);
-                $getExportDocumentsShippingInvoiceLists = [];
-                if (count($getExportDocumentsShipping) > 0) {
-                    $getExportDocumentsShippingInvoiceLists = $this->Export_model->fetch_export_document_details($getExportDocumentsShipping[0]->export_id, 9);
+                if (!empty($getExportDocumentsShipping[0]->invoice_date)) {
+                    $date = new DateTime($getExportDocumentsShipping[0]->invoice_date);
+                    $getExportDocumentsShipping[0]->invoice_date = $date->format('Y-m-d\TH:i');
+                }
+
+                $getExportDocumentsShippingContainers = array();
+                if (count($getExportDocumentsShipping) == 1) {
+                    $getExportDocumentsShippingContainers = $this->Export_model->fetch_export_container_documents($getExportDocumentsShipping[0]->export_id, 9, $getExportDocumentsShipping[0]->id);
                 }
 
                 //CONTAINER COSTS
@@ -267,33 +268,24 @@ class Exports extends MY_Controller
                     'exportSuppliersRemobilization' => $this->Master_model->fetch_export_suppliers($getExportDetails[0]->origin_id, 8),
                     'containerDetails' => $this->Export_model->fetch_container_details_bydispatchids($getExportDetails[0]->dispatchids),
                     'exportDocumentsCustoms' => $getExportDocumentsCustoms,
+                    'exportDocumentsCustomsContainers' => $getExportDocumentsCustomsContainers,
                     'exportDocumentsTransport' => $getExportDocumentsTransport,
+                    'exportDocumentsTransportContainers' => $getExportDocumentsTransportContainers,
                     'exportDocumentsPort' => $getExportDocumentsPort,
+                    'exportDocumentsPortContainers' => $getExportDocumentsPortContainers,
                     'exportDocumentsFumigation' => $getExportDocumentsFumigation,
+                    'exportDocumentsFumigationContainers' => $getExportDocumentsFumigationContainers,
                     'exportDocumentsPhyto' => $getExportDocumentsPhyto,
+                    'exportDocumentsPhytoContainers' => $getExportDocumentsPhytoContainers,
                     'exportDocumentsCoteros' => $getExportDocumentsCoteros,
+                    'exportDocumentsCoterosContainers' => $getExportDocumentsCoterosContainers,
                     'exportDocumentsIncentives' => $getExportDocumentsIncentives,
+                    'exportDocumentsIncentivesContainers' => $getExportDocumentsIncentivesContainers,
                     'exportDocumentsRemobilization' => $getExportDocumentsRemobilization,
+                    'exportDocumentsRemobilizationContainers' => $getExportDocumentsRemobilizationContainers,
                     'exportDocumentsShipping' => $getExportDocumentsShipping,
+                    'exportDocumentsShippingContainers' => $getExportDocumentsShippingContainers,
                     'exportContainerCosts' => $getExportContainerCosts,
-                    "exportDocumentsPortInvoiceLists" => json_encode($getExportDocumentsPortInvoiceLists),
-                    "exportDocumentsPortInvoiceListsCount" => count($getExportDocumentsPortInvoiceLists),
-                    "exportDocumentsCustomsInvoiceLists" => json_encode($getExportDocumentsCustomsInvoiceLists),
-                    "exportDocumentsCustomsInvoiceListsCount" => count($getExportDocumentsCustomsInvoiceLists),
-                    "exportDocumentsITRInvoiceLists" => json_encode($getExportDocumentsITRInvoiceLists),
-                    "exportDocumentsITRInvoiceListsCount" => count($getExportDocumentsITRInvoiceLists),
-                    "exportDocumentsFumigationInvoiceLists" => json_encode($getExportDocumentsFumigationInvoiceLists),
-                    "exportDocumentsFumigationInvoiceListsCount" => count($getExportDocumentsFumigationInvoiceLists),
-                    "exportDocumentsCoterosInvoiceLists" => json_encode($getExportDocumentsCoterosInvoiceLists),
-                    "exportDocumentsCoterosInvoiceListsCount" => count($getExportDocumentsCoterosInvoiceLists),
-                    "exportDocumentsPhytoInvoiceLists" => json_encode($getExportDocumentsPhytoInvoiceLists),
-                    "exportDocumentsPhytoInvoiceListsCount" => count($getExportDocumentsPhytoInvoiceLists),
-                    "exportDocumentsIncentivesInvoiceLists" => json_encode($getExportDocumentsIncentivesInvoiceLists),
-                    "exportDocumentsIncentivesInvoiceListsCount" => count($getExportDocumentsIncentivesInvoiceLists),
-                    "exportDocumentsRemobilizationInvoiceLists" => json_encode($getExportDocumentsRemobilizationInvoiceLists),
-                    "exportDocumentsRemobilizationInvoiceListsCount" => count($getExportDocumentsRemobilizationInvoiceLists),
-                    "exportDocumentsShippingInvoiceLists" => json_encode($getExportDocumentsShippingInvoiceLists),
-                    "exportDocumentsShippingInvoiceListsCount" => count($getExportDocumentsShippingInvoiceLists),
                     "csrfhash" => $this->security->get_csrf_hash(),
                 );
                 $this->load->view("export/dialog_view_export_documents", $data);
@@ -325,393 +317,6 @@ class Exports extends MY_Controller
                     exit;
                 } else {
                     $Return['error'] = $this->lang->line('error_deleting');
-                    $Return['result'] = "";
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                }
-            } else if ($this->input->get('type') == "editcustoms_invoice") {
-
-                $invoiceId = $this->input->get('id');
-                $exportId = $this->input->get('export_id');
-
-                $getExportDocumentsCustomsInvoice = $this->Export_model->fetch_export_document_details_withid($exportId, 1, $invoiceId);
-                if (count($getExportDocumentsCustomsInvoice) == 1) {
-
-                    $date = new DateTime($getExportDocumentsCustomsInvoice[0]->invoice_date);
-                    $formattedDate = $date->format('Y-m-d\TH:i');
-
-                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($exportId, 1, $invoiceId);
-
-                    $data = array(
-                        "invoice_number" => $getExportDocumentsCustomsInvoice[0]->invoice_no,
-                        "supplier_id" => $getExportDocumentsCustomsInvoice[0]->supplier_id,
-                        "invoice_date" => $formattedDate,
-                        "original_invoice_date" => $getExportDocumentsCustomsInvoice[0]->invoice_date,
-                        "sub_total" => $getExportDocumentsCustomsInvoice[0]->sub_total + 0,
-                        "tax_total" => $getExportDocumentsCustomsInvoice[0]->tax_total + 0,
-                        "allowance_total" => $getExportDocumentsCustomsInvoice[0]->allowance_total + 0,
-                        "payable_total" => $getExportDocumentsCustomsInvoice[0]->payable_total + 0,
-                        "container_value_total" => $getExportDocumentsCustomsInvoice[0]->container_value_total + 0,
-                        "container_data" => json_encode($getExportDocumentsPortContainers),
-                        "invoice_id" => $invoiceId,
-                        "export_id" => $exportId,
-                        "csrfhash" => $this->security->get_csrf_hash(),
-                    );
-
-                    $Return['result'] = $data;
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $Return['error'] = "";
-                    $this->output($Return);
-                    exit;
-                } else {
-                    $Return['error'] = $this->lang->line('common_error');
-                    $Return['result'] = "";
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                }
-            } else if ($this->input->get('type') == "edititr_invoice") {
-
-                $invoiceId = $this->input->get('id');
-                $exportId = $this->input->get('export_id');
-
-                $getExportDocumentsCustomsInvoice = $this->Export_model->fetch_export_document_details_withid($exportId, 2, $invoiceId);
-                if (count($getExportDocumentsCustomsInvoice) == 1) {
-
-                    $date = new DateTime($getExportDocumentsCustomsInvoice[0]->invoice_date);
-                    $formattedDate = $date->format('Y-m-d\TH:i');
-
-                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($exportId, 2, $invoiceId);
-
-                    $data = array(
-                        "invoice_number" => $getExportDocumentsCustomsInvoice[0]->invoice_no,
-                        "supplier_id" => $getExportDocumentsCustomsInvoice[0]->supplier_id,
-                        "invoice_date" => $formattedDate,
-                        "original_invoice_date" => $getExportDocumentsCustomsInvoice[0]->invoice_date,
-                        "sub_total" => $getExportDocumentsCustomsInvoice[0]->sub_total + 0,
-                        "tax_total" => $getExportDocumentsCustomsInvoice[0]->tax_total + 0,
-                        "allowance_total" => $getExportDocumentsCustomsInvoice[0]->allowance_total + 0,
-                        "payable_total" => $getExportDocumentsCustomsInvoice[0]->payable_total + 0,
-                        "container_value_total" => $getExportDocumentsCustomsInvoice[0]->container_value_total + 0,
-                        "container_data" => json_encode($getExportDocumentsPortContainers),
-                        "invoice_id" => $invoiceId,
-                        "export_id" => $exportId,
-                        "csrfhash" => $this->security->get_csrf_hash(),
-                    );
-
-                    $Return['result'] = $data;
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $Return['error'] = "";
-                    $this->output($Return);
-                    exit;
-                } else {
-                    $Return['error'] = $this->lang->line('common_error');
-                    $Return['result'] = "";
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                }
-            } else if ($this->input->get('type') == "editport_invoice") {
-
-                $invoiceId = $this->input->get('id');
-                $exportId = $this->input->get('export_id');
-
-                $getExportDocumentsPortInvoice = $this->Export_model->fetch_export_document_details_withid($exportId, 3, $invoiceId);
-                if (count($getExportDocumentsPortInvoice) == 1) {
-
-                    $date = new DateTime($getExportDocumentsPortInvoice[0]->invoice_date);
-                    $formattedDate = $date->format('Y-m-d\TH:i');
-
-                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($exportId, 3, $invoiceId);
-
-                    $data = array(
-                        "invoice_number" => $getExportDocumentsPortInvoice[0]->invoice_no,
-                        "supplier_id" => $getExportDocumentsPortInvoice[0]->supplier_id,
-                        "invoice_date" => $formattedDate,
-                        "original_invoice_date" => $getExportDocumentsPortInvoice[0]->invoice_date,
-                        "sub_total" => $getExportDocumentsPortInvoice[0]->sub_total + 0,
-                        "tax_total" => $getExportDocumentsPortInvoice[0]->tax_total + 0,
-                        "allowance_total" => $getExportDocumentsPortInvoice[0]->allowance_total + 0,
-                        "payable_total" => $getExportDocumentsPortInvoice[0]->payable_total + 0,
-                        "container_value_total" => $getExportDocumentsPortInvoice[0]->container_value_total + 0,
-                        "container_data" => json_encode($getExportDocumentsPortContainers),
-                        "invoice_id" => $invoiceId,
-                        "export_id" => $exportId,
-                        "csrfhash" => $this->security->get_csrf_hash(),
-                    );
-
-                    $Return['result'] = $data;
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $Return['error'] = "";
-                    $this->output($Return);
-                    exit;
-                } else {
-                    $Return['error'] = $this->lang->line('common_error');
-                    $Return['result'] = "";
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                }
-            } else if ($this->input->get('type') == "editshipping_invoice") {
-
-                $invoiceId = $this->input->get('id');
-                $exportId = $this->input->get('export_id');
-
-                $getExportDocumentsPortInvoice = $this->Export_model->fetch_export_document_details_withid($exportId, 9, $invoiceId);
-                if (count($getExportDocumentsPortInvoice) == 1) {
-
-                    $date = new DateTime($getExportDocumentsPortInvoice[0]->invoice_date);
-                    $formattedDate = $date->format('Y-m-d\TH:i');
-
-                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($exportId, 9, $invoiceId);
-
-                    $data = array(
-                        "invoice_number" => $getExportDocumentsPortInvoice[0]->invoice_no,
-                        "supplier_id" => $getExportDocumentsPortInvoice[0]->supplier_id,
-                        "invoice_date" => $formattedDate,
-                        "original_invoice_date" => $getExportDocumentsPortInvoice[0]->invoice_date,
-                        "sub_total" => $getExportDocumentsPortInvoice[0]->sub_total + 0,
-                        "tax_total" => $getExportDocumentsPortInvoice[0]->tax_total + 0,
-                        "allowance_total" => $getExportDocumentsPortInvoice[0]->allowance_total + 0,
-                        "payable_total" => $getExportDocumentsPortInvoice[0]->payable_total + 0,
-                        "container_value_total" => $getExportDocumentsPortInvoice[0]->container_value_total + 0,
-                        "container_data" => json_encode($getExportDocumentsPortContainers),
-                        "invoice_id" => $invoiceId,
-                        "export_id" => $exportId,
-                        "csrfhash" => $this->security->get_csrf_hash(),
-                    );
-
-                    $Return['result'] = $data;
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $Return['error'] = "";
-                    $this->output($Return);
-                    exit;
-                } else {
-                    $Return['error'] = $this->lang->line('common_error');
-                    $Return['result'] = "";
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                }
-            } else if ($this->input->get('type') == "editfumigation_invoice") {
-
-                $invoiceId = $this->input->get('id');
-                $exportId = $this->input->get('export_id');
-
-                $getExportDocumentsPortInvoice = $this->Export_model->fetch_export_document_details_withid($exportId, 4, $invoiceId);
-                if (count($getExportDocumentsPortInvoice) == 1) {
-
-                    $date = new DateTime($getExportDocumentsPortInvoice[0]->invoice_date);
-                    $formattedDate = $date->format('Y-m-d\TH:i');
-
-                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($exportId, 4, $invoiceId);
-
-                    $data = array(
-                        "invoice_number" => $getExportDocumentsPortInvoice[0]->invoice_no,
-                        "supplier_id" => $getExportDocumentsPortInvoice[0]->supplier_id,
-                        "invoice_date" => $formattedDate,
-                        "original_invoice_date" => $getExportDocumentsPortInvoice[0]->invoice_date,
-                        "sub_total" => $getExportDocumentsPortInvoice[0]->sub_total + 0,
-                        "tax_total" => $getExportDocumentsPortInvoice[0]->tax_total + 0,
-                        "allowance_total" => $getExportDocumentsPortInvoice[0]->allowance_total + 0,
-                        "payable_total" => $getExportDocumentsPortInvoice[0]->payable_total + 0,
-                        "container_value_total" => $getExportDocumentsPortInvoice[0]->container_value_total + 0,
-                        "container_data" => json_encode($getExportDocumentsPortContainers),
-                        "invoice_id" => $invoiceId,
-                        "export_id" => $exportId,
-                        "csrfhash" => $this->security->get_csrf_hash(),
-                    );
-
-                    $Return['result'] = $data;
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $Return['error'] = "";
-                    $this->output($Return);
-                    exit;
-                } else {
-                    $Return['error'] = $this->lang->line('common_error');
-                    $Return['result'] = "";
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                }
-            } else if ($this->input->get('type') == "editcoteros_invoice") {
-
-                $invoiceId = $this->input->get('id');
-                $exportId = $this->input->get('export_id');
-
-                $getExportDocumentsPortInvoice = $this->Export_model->fetch_export_document_details_withid($exportId, 6, $invoiceId);
-                if (count($getExportDocumentsPortInvoice) == 1) {
-
-                    $date = new DateTime($getExportDocumentsPortInvoice[0]->invoice_date);
-                    $formattedDate = $date->format('Y-m-d\TH:i');
-
-                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($exportId, 6, $invoiceId);
-
-                    $data = array(
-                        "invoice_number" => $getExportDocumentsPortInvoice[0]->invoice_no,
-                        "supplier_id" => $getExportDocumentsPortInvoice[0]->supplier_id,
-                        "invoice_date" => $formattedDate,
-                        "original_invoice_date" => $getExportDocumentsPortInvoice[0]->invoice_date,
-                        "sub_total" => $getExportDocumentsPortInvoice[0]->sub_total + 0,
-                        "tax_total" => $getExportDocumentsPortInvoice[0]->tax_total + 0,
-                        "allowance_total" => $getExportDocumentsPortInvoice[0]->allowance_total + 0,
-                        "payable_total" => $getExportDocumentsPortInvoice[0]->payable_total + 0,
-                        "container_value_total" => $getExportDocumentsPortInvoice[0]->container_value_total + 0,
-                        "container_data" => json_encode($getExportDocumentsPortContainers),
-                        "invoice_id" => $invoiceId,
-                        "export_id" => $exportId,
-                        "csrfhash" => $this->security->get_csrf_hash(),
-                    );
-
-                    $Return['result'] = $data;
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $Return['error'] = "";
-                    $this->output($Return);
-                    exit;
-                } else {
-                    $Return['error'] = $this->lang->line('common_error');
-                    $Return['result'] = "";
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                }
-            } else if ($this->input->get('type') == "editphyto_invoice") {
-
-                $invoiceId = $this->input->get('id');
-                $exportId = $this->input->get('export_id');
-
-                $getExportDocumentsPortInvoice = $this->Export_model->fetch_export_document_details_withid($exportId, 5, $invoiceId);
-                if (count($getExportDocumentsPortInvoice) == 1) {
-
-                    $date = new DateTime($getExportDocumentsPortInvoice[0]->invoice_date);
-                    $formattedDate = $date->format('Y-m-d\TH:i');
-
-                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($exportId, 5, $invoiceId);
-
-                    $data = array(
-                        "invoice_number" => $getExportDocumentsPortInvoice[0]->invoice_no,
-                        "supplier_id" => $getExportDocumentsPortInvoice[0]->supplier_id,
-                        "invoice_date" => $formattedDate,
-                        "original_invoice_date" => $getExportDocumentsPortInvoice[0]->invoice_date,
-                        "sub_total" => $getExportDocumentsPortInvoice[0]->sub_total + 0,
-                        "tax_total" => $getExportDocumentsPortInvoice[0]->tax_total + 0,
-                        "allowance_total" => $getExportDocumentsPortInvoice[0]->allowance_total + 0,
-                        "payable_total" => $getExportDocumentsPortInvoice[0]->payable_total + 0,
-                        "container_value_total" => $getExportDocumentsPortInvoice[0]->container_value_total + 0,
-                        "container_data" => json_encode($getExportDocumentsPortContainers),
-                        "invoice_id" => $invoiceId,
-                        "export_id" => $exportId,
-                        "csrfhash" => $this->security->get_csrf_hash(),
-                    );
-
-                    $Return['result'] = $data;
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $Return['error'] = "";
-                    $this->output($Return);
-                    exit;
-                } else {
-                    $Return['error'] = $this->lang->line('common_error');
-                    $Return['result'] = "";
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                }
-            } else if ($this->input->get('type') == "editincentives_invoice") {
-
-                $invoiceId = $this->input->get('id');
-                $exportId = $this->input->get('export_id');
-
-                $getExportDocumentsPortInvoice = $this->Export_model->fetch_export_document_details_withid($exportId, 7, $invoiceId);
-                if (count($getExportDocumentsPortInvoice) == 1) {
-
-                    $date = new DateTime($getExportDocumentsPortInvoice[0]->invoice_date);
-                    $formattedDate = $date->format('Y-m-d\TH:i');
-
-                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($exportId, 7, $invoiceId);
-
-                    $data = array(
-                        "invoice_number" => $getExportDocumentsPortInvoice[0]->invoice_no,
-                        "supplier_id" => $getExportDocumentsPortInvoice[0]->supplier_id,
-                        "invoice_date" => $formattedDate,
-                        "original_invoice_date" => $getExportDocumentsPortInvoice[0]->invoice_date,
-                        "sub_total" => $getExportDocumentsPortInvoice[0]->sub_total + 0,
-                        "tax_total" => $getExportDocumentsPortInvoice[0]->tax_total + 0,
-                        "allowance_total" => $getExportDocumentsPortInvoice[0]->allowance_total + 0,
-                        "payable_total" => $getExportDocumentsPortInvoice[0]->payable_total + 0,
-                        "container_value_total" => $getExportDocumentsPortInvoice[0]->container_value_total + 0,
-                        "container_data" => json_encode($getExportDocumentsPortContainers),
-                        "invoice_id" => $invoiceId,
-                        "export_id" => $exportId,
-                        "csrfhash" => $this->security->get_csrf_hash(),
-                    );
-
-                    $Return['result'] = $data;
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $Return['error'] = "";
-                    $this->output($Return);
-                    exit;
-                } else {
-                    $Return['error'] = $this->lang->line('common_error');
-                    $Return['result'] = "";
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                    exit;
-                }
-            } else if ($this->input->get('type') == "editremobilization_invoice") {
-
-                $invoiceId = $this->input->get('id');
-                $exportId = $this->input->get('export_id');
-
-                $getExportDocumentsPortInvoice = $this->Export_model->fetch_export_document_details_withid($exportId, 8, $invoiceId);
-                if (count($getExportDocumentsPortInvoice) == 1) {
-
-                    $date = new DateTime($getExportDocumentsPortInvoice[0]->invoice_date);
-                    $formattedDate = $date->format('Y-m-d\TH:i');
-
-                    $getExportDocumentsPortContainers = $this->Export_model->fetch_export_container_documents($exportId, 8, $invoiceId);
-
-                    $data = array(
-                        "invoice_number" => $getExportDocumentsPortInvoice[0]->invoice_no,
-                        "supplier_id" => $getExportDocumentsPortInvoice[0]->supplier_id,
-                        "invoice_date" => $formattedDate,
-                        "original_invoice_date" => $getExportDocumentsPortInvoice[0]->invoice_date,
-                        "sub_total" => $getExportDocumentsPortInvoice[0]->sub_total + 0,
-                        "tax_total" => $getExportDocumentsPortInvoice[0]->tax_total + 0,
-                        "allowance_total" => $getExportDocumentsPortInvoice[0]->allowance_total + 0,
-                        "payable_total" => $getExportDocumentsPortInvoice[0]->payable_total + 0,
-                        "container_value_total" => $getExportDocumentsPortInvoice[0]->container_value_total + 0,
-                        "container_data" => json_encode($getExportDocumentsPortContainers),
-                        "invoice_id" => $invoiceId,
-                        "export_id" => $exportId,
-                        "csrfhash" => $this->security->get_csrf_hash(),
-                    );
-
-                    $Return['result'] = $data;
-                    $Return['redirect'] = false;
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $Return['error'] = "";
-                    $this->output($Return);
-                    exit;
-                } else {
-                    $Return['error'] = $this->lang->line('common_error');
                     $Return['result'] = "";
                     $Return['redirect'] = false;
                     $Return['csrf_hash'] = $this->security->get_csrf_hash();
@@ -1374,12 +979,12 @@ class Exports extends MY_Controller
                                 $docXml = preg_replace('/[\x00-\x1F\x7F]/', '', $docXml);
                                 $docXml = mb_convert_encoding($docXml, 'UTF-8', 'auto');
 
-                                // if (strpos(trim($docXml), '<?xml') !== 0) {
-                                //     $Return['error'] = $this->lang->line('error_xml');
-                                //     $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                //     $this->output($Return);
-                                //     exit;
-                                // }
+                                if (strpos(trim($docXml), '<?xml') !== 0) {
+                                    $Return['error'] = $this->lang->line('error_xml');
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                }
 
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
                                 if ($xmlResponse != null && $xmlResponse != null) {
@@ -2128,61 +1733,26 @@ class Exports extends MY_Controller
                         $embeddedXpath->registerNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
 
                         // Extract `TaxExclusiveAmount` from the embedded XML
-                        // $taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
-                        // $taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
-                        // $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
-                        // $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
-
-                        // $taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
-                        // $taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
-                        // $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
-                        // $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
-
-                        // if ($taxExclusiveAmountNode->length > 0) {
-                        //     $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
-                        // }
-
-                        // if ($taxInclusiveAmountNode->length > 0) {
-                        //     $taxInclusiveAmount = $taxInclusiveAmountNode->item(0)->nodeValue + 0;
-                        // }
-
-                        // $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
-
-                        // if($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
-                        //     $taxExclusiveAmount = $taxInclusiveAmount + 0;
-                        //     $taxInclusiveAmount = 0;
-                        //     $taxAmount = 0;
-                        // }
-
-                        // if ($allowanceTotalAmountNode->length > 0) {
-                        //     $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
-                        // }
-
-                        // if ($payableAmountNode->length > 0) {
-                        //     $payableAmount = $payableAmountNode->item(0)->nodeValue + 0;
-                        // }
-
                         $taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
-                        $taxInclusiveAmountNode = $embeddedXpath->query("//cbc:TaxAmount");
+                        $taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
                         $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
                         $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
 
-                        // if ($taxExclusiveAmountNode->length > 0) {
-                        //     $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
-                        // }
+                        if ($taxExclusiveAmountNode->length > 0) {
+                            $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
+                        }
 
                         if ($taxInclusiveAmountNode->length > 0) {
                             $taxInclusiveAmount = $taxInclusiveAmountNode->item(0)->nodeValue + 0;
                         }
 
-                        $taxAmount = $taxInclusiveAmount; //- $taxExclusiveAmount;
+                        $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
 
-
-                        // if($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
-                        //     $taxExclusiveAmount = $taxInclusiveAmount + 0;
-                        //     $taxInclusiveAmount = 0;
-                        //     $taxAmount = 0;
-                        // }
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
 
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
@@ -2191,8 +1761,6 @@ class Exports extends MY_Controller
                         if ($payableAmountNode->length > 0) {
                             $payableAmount = $payableAmountNode->item(0)->nodeValue + 0;
                         }
-
-                        $taxExclusiveAmount = $payableAmount - $taxAmount;
                     }
                 }
             }
@@ -2465,26 +2033,25 @@ class Exports extends MY_Controller
 
                         // Extract `TaxExclusiveAmount` from the embedded XML
                         $taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
-                        $taxInclusiveAmountNode = $embeddedXpath->query("//cbc:TaxAmount");
+                        $taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
                         $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
                         $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
 
-                        // if ($taxExclusiveAmountNode->length > 0) {
-                        //     $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
-                        // }
+                        if ($taxExclusiveAmountNode->length > 0) {
+                            $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
+                        }
 
                         if ($taxInclusiveAmountNode->length > 0) {
                             $taxInclusiveAmount = $taxInclusiveAmountNode->item(0)->nodeValue + 0;
                         }
 
-                        $taxAmount = $taxInclusiveAmount; //- $taxExclusiveAmount;
+                        $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
 
-
-                        // if($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
-                        //     $taxExclusiveAmount = $taxInclusiveAmount + 0;
-                        //     $taxInclusiveAmount = 0;
-                        //     $taxAmount = 0;
-                        // }
+                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                            $taxInclusiveAmount = 0;
+                            $taxAmount = 0;
+                        }
 
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
@@ -2493,8 +2060,6 @@ class Exports extends MY_Controller
                         if ($payableAmountNode->length > 0) {
                             $payableAmount = $payableAmountNode->item(0)->nodeValue + 0;
                         }
-
-                        $taxExclusiveAmount = $payableAmount - $taxAmount;
                     }
                 }
             }
@@ -3462,8 +3027,6 @@ class Exports extends MY_Controller
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-                $selectedInvoiceId = $this->input->post('selectedInvoiceId');
-                $selectedExportId = $this->input->post('selectedExportId');
                 $exportId = $this->input->post('exportId');
                 $fileExtension = $this->input->post('fileExtension');
                 $updateContainerValueData_Custom = $this->input->post('updateContainerValueData_Custom');
@@ -3479,104 +3042,69 @@ class Exports extends MY_Controller
 
                 //DELETE EXISTING
 
-                // $updateExportDoc = array(
-                //     "updated_by" => $session['user_id'],
-                //     "is_active" => 0,
-                // );
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
 
-                // $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 1);
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 1);
 
-                if ($selectedInvoiceId > 0 && $selectedExportId > 0) {
-                    $updateExportDoc = array(
-                        "invoice_no" => $invoiceNo_Custom,
-                        "supplier_id" => $supplierName_Custom,
-                        "invoice_date " => $formattedDate_Custom,
-                        "sub_total " => $subTotal_Custom,
-                        "tax_total" => $iva_Custom,
-                        "allowance_total" => $retefuente_Custom,
-                        "payable_total" => $payable_Custom,
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFileCustomAgency,
+                    "invoice_no" => $invoiceNo_Custom,
+                    "supplier_id" => $supplierName_Custom,
+                    "invoice_date " => $formattedDate_Custom,
+                    "sub_total " => $subTotal_Custom,
+                    "tax_total" => $iva_Custom,
+                    "allowance_total" => $retefuente_Custom,
+                    "payable_total" => $payable_Custom,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
 
-                    $this->Export_model->update_invoice_data($selectedExportId, $selectedInvoiceId, $updateExportDoc);
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
 
+                if ($insertExportDocuments > 0) {
                     if (count($updateContainerValueJson) > 0) {
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 1);
+
                         foreach ($updateContainerValueJson as $containerdata) {
-                            $updateExportContainer = array(
-                                "container_value" => $containerdata["updatedContainerValue"] + 0,
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 1,
+                                "dispatch_id" => $containerdata["mappingid"],
+                                "container_value" => $containerdata["updatedContainerValue"],
+                                "created_by" => $session['user_id'],
                                 "updated_by" => $session['user_id'],
                                 "is_active" => 1
                             );
 
-                            $insertExportContainerValue = $this->Export_model->update_exportcontainerdoc_dispatch_invoice($updateExportContainer, $selectedExportId, $selectedInvoiceId, $containerdata["mappingid"]);
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
                         }
                     }
+                }
 
-                    $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($selectedExportId, 1));
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
+
+
+                if ($insertExportDocuments > 0) {
                     $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
-
-                    //INSERT
-                    $dataExportDocuments = array(
-                        "export_id " => $exportId,
-                        "export_type " => $this->input->post('add_type'),
-                        "file_extension " => $fileExtension,
-                        "file_url" => $uploadPdfFileCustomAgency,
-                        "invoice_no" => $invoiceNo_Custom,
-                        "supplier_id" => $supplierName_Custom,
-                        "invoice_date " => $formattedDate_Custom,
-                        "sub_total " => $subTotal_Custom,
-                        "tax_total" => $iva_Custom,
-                        "allowance_total" => $retefuente_Custom,
-                        "payable_total" => $payable_Custom,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
-
-                    $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
-
-                    if ($insertExportDocuments > 0) {
-                        if (count($updateContainerValueJson) > 0) {
-                            // $updateExportDocContainer = array(
-                            //     "updated_by" => $session['user_id'],
-                            //     "is_active" => 0,
-                            // );
-
-                            // $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 1);
-
-                            foreach ($updateContainerValueJson as $containerdata) {
-                                $dataExportContainer = array(
-                                    "export_doc_id" => $insertExportDocuments,
-                                    "export_id" => $exportId,
-                                    "export_type" => 1,
-                                    "dispatch_id" => $containerdata["mappingid"],
-                                    "container_value" => $containerdata["updatedContainerValue"],
-                                    "created_by" => $session['user_id'],
-                                    "updated_by" => $session['user_id'],
-                                    "is_active" => 1
-                                );
-
-                                $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
-                            }
-                        }
-                    }
-
-                    if ($insertExportDocuments > 0) {
-                        $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, 1));
-                        $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                        $Return['result'] = $this->lang->line('data_added');
-                        $this->output($Return);
-                        exit;
-                    } else {
-                        $Return['error'] = $this->lang->line('error_adding');
-                        $this->output($Return);
-                        exit;
-                    }
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
                 }
             } else {
                 $Return['error'] = "";
@@ -3592,8 +3120,6 @@ class Exports extends MY_Controller
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-                $selectedInvoiceId = $this->input->post('selectedInvoiceId');
-                $selectedExportId = $this->input->post('selectedExportId');
                 $exportId = $this->input->post('exportId');
                 $fileExtension = $this->input->post('fileExtension');
                 $updateContainerValueData_ITR = $this->input->post('updateContainerValueData_ITR');
@@ -3609,105 +3135,68 @@ class Exports extends MY_Controller
 
                 //DELETE EXISTING
 
-                // $updateExportDoc = array(
-                //     "updated_by" => $session['user_id'],
-                //     "is_active" => 0,
-                // );
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
 
-                // $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 2);
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 2);
 
-                if ($selectedInvoiceId > 0 && $selectedExportId > 0) {
-                    $updateExportDoc = array(
-                        "invoice_no" => $invoiceNo_ITR,
-                        "supplier_id" => $supplierName_ITR,
-                        "invoice_date " => $formattedDate_ITR,
-                        "sub_total " => $subTotal_ITR,
-                        "tax_total" => $iva_ITR,
-                        "allowance_total" => $retefuente_ITR,
-                        "payable_total" => $payable_ITR,
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFileITR,
+                    "invoice_no" => $invoiceNo_ITR,
+                    "supplier_id" => $supplierName_ITR,
+                    "invoice_date " => $formattedDate_ITR,
+                    "sub_total " => $subTotal_ITR,
+                    "tax_total" => $iva_ITR,
+                    "allowance_total" => $retefuente_ITR,
+                    "payable_total" => $payable_ITR,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
 
-                    $this->Export_model->update_invoice_data($selectedExportId, $selectedInvoiceId, $updateExportDoc);
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
 
+                if ($insertExportDocuments > 0) {
                     if (count($updateContainerValueJson) > 0) {
+
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 2);
+
                         foreach ($updateContainerValueJson as $containerdata) {
-                            $updateExportContainer = array(
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 2,
+                                "dispatch_id" => $containerdata["mappingid"],
                                 "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
                                 "updated_by" => $session['user_id'],
                                 "is_active" => 1
                             );
 
-                            $insertExportContainerValue = $this->Export_model->update_exportcontainerdoc_dispatch_invoice($updateExportContainer, $selectedExportId, $selectedInvoiceId, $containerdata["mappingid"]);
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
                         }
                     }
+                }
 
-                    $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($selectedExportId, 2));
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
+                if ($insertExportDocuments > 0) {
                     $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
-
-                    //INSERT
-                    $dataExportDocuments = array(
-                        "export_id " => $exportId,
-                        "export_type " => $this->input->post('add_type'),
-                        "file_extension " => $fileExtension,
-                        "file_url" => $uploadPdfFileITR,
-                        "invoice_no" => $invoiceNo_ITR,
-                        "supplier_id" => $supplierName_ITR,
-                        "invoice_date " => $formattedDate_ITR,
-                        "sub_total " => $subTotal_ITR,
-                        "tax_total" => $iva_ITR,
-                        "allowance_total" => $retefuente_ITR,
-                        "payable_total" => $payable_ITR,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
-
-                    $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
-
-                    if ($insertExportDocuments > 0) {
-                        if (count($updateContainerValueJson) > 0) {
-
-                            // $updateExportDocContainer = array(
-                            //     "updated_by" => $session['user_id'],
-                            //     "is_active" => 0,
-                            // );
-
-                            // $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 2);
-
-                            foreach ($updateContainerValueJson as $containerdata) {
-                                $dataExportContainer = array(
-                                    "export_doc_id" => $insertExportDocuments,
-                                    "export_id" => $exportId,
-                                    "export_type" => 2,
-                                    "dispatch_id" => $containerdata["mappingid"],
-                                    "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                    "created_by" => $session['user_id'],
-                                    "updated_by" => $session['user_id'],
-                                    "is_active" => 1
-                                );
-
-                                $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
-                            }
-                        }
-                    }
-
-                    if ($insertExportDocuments > 0) {
-                        $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, 2));
-                        $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                        $Return['result'] = $this->lang->line('data_added');
-                        $this->output($Return);
-                        exit;
-                    } else {
-                        $Return['error'] = $this->lang->line('error_adding');
-                        $this->output($Return);
-                        exit;
-                    }
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
                 }
             } else {
                 $Return['error'] = "";
@@ -3723,8 +3212,6 @@ class Exports extends MY_Controller
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-                $selectedInvoiceId = $this->input->post('selectedInvoiceId');
-                $selectedExportId = $this->input->post('selectedExportId');
                 $exportId = $this->input->post('exportId');
                 $fileExtension = $this->input->post('fileExtension');
                 $updateContainerValueData_Port = $this->input->post('updateContainerValueData_Port');
@@ -3740,105 +3227,68 @@ class Exports extends MY_Controller
 
                 //DELETE EXISTING
 
-                // $updateExportDoc = array(
-                //     "updated_by" => $session['user_id'],
-                //     "is_active" => 0,
-                // );
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
 
-                //$this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 3);
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 3);
 
-                if ($selectedInvoiceId > 0 && $selectedExportId > 0) {
-                    $updateExportDoc = array(
-                        "invoice_no" => $invoiceNo_Port,
-                        "supplier_id" => $supplierName_Port,
-                        "invoice_date " => $formattedDate_Port,
-                        "sub_total " => $subTotal_Port,
-                        "tax_total" => $iva_Port,
-                        "allowance_total" => $retefuente_Port,
-                        "payable_total" => $payable_Port,
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFilePort,
+                    "invoice_no" => $invoiceNo_Port,
+                    "supplier_id" => $supplierName_Port,
+                    "invoice_date " => $formattedDate_Port,
+                    "sub_total " => $subTotal_Port,
+                    "tax_total" => $iva_Port,
+                    "allowance_total" => $retefuente_Port,
+                    "payable_total" => $payable_Port,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
 
-                    $this->Export_model->update_invoice_data($selectedExportId, $selectedInvoiceId, $updateExportDoc);
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
 
+                if ($insertExportDocuments > 0) {
                     if (count($updateContainerValueJson) > 0) {
+
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 3);
+
                         foreach ($updateContainerValueJson as $containerdata) {
-                            $updateExportContainer = array(
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 3,
+                                "dispatch_id" => $containerdata["mappingid"],
                                 "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
                                 "updated_by" => $session['user_id'],
                                 "is_active" => 1
                             );
 
-                            $insertExportContainerValue = $this->Export_model->update_exportcontainerdoc_dispatch_invoice($updateExportContainer, $selectedExportId, $selectedInvoiceId, $containerdata["mappingid"]);
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
                         }
                     }
+                }
 
-                    $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($selectedExportId, 3));
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
+                if ($insertExportDocuments > 0) {
                     $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
-
-                    //INSERT
-                    $dataExportDocuments = array(
-                        "export_id " => $exportId,
-                        "export_type " => $this->input->post('add_type'),
-                        "file_extension " => $fileExtension,
-                        "file_url" => $uploadPdfFilePort,
-                        "invoice_no" => $invoiceNo_Port,
-                        "supplier_id" => $supplierName_Port,
-                        "invoice_date " => $formattedDate_Port,
-                        "sub_total " => $subTotal_Port,
-                        "tax_total" => $iva_Port,
-                        "allowance_total" => $retefuente_Port,
-                        "payable_total" => $payable_Port,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
-
-                    $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
-
-                    if ($insertExportDocuments > 0) {
-                        if (count($updateContainerValueJson) > 0) {
-
-                            // $updateExportDocContainer = array(
-                            //     "updated_by" => $session['user_id'],
-                            //     "is_active" => 0,
-                            // );
-
-                            // $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 3);
-
-                            foreach ($updateContainerValueJson as $containerdata) {
-                                $dataExportContainer = array(
-                                    "export_doc_id" => $insertExportDocuments,
-                                    "export_id" => $exportId,
-                                    "export_type" => 3,
-                                    "dispatch_id" => $containerdata["mappingid"],
-                                    "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                    "created_by" => $session['user_id'],
-                                    "updated_by" => $session['user_id'],
-                                    "is_active" => 1
-                                );
-
-                                $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
-                            }
-                        }
-                    }
-
-                    if ($insertExportDocuments > 0) {
-                        $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, 3));
-                        $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                        $Return['result'] = $this->lang->line('data_added');
-                        $this->output($Return);
-                        exit;
-                    } else {
-                        $Return['error'] = $this->lang->line('error_adding');
-                        $this->output($Return);
-                        exit;
-                    }
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
                 }
             } else {
                 $Return['error'] = "";
@@ -3854,8 +3304,6 @@ class Exports extends MY_Controller
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-                $selectedInvoiceId = $this->input->post('selectedInvoiceId');
-                $selectedExportId = $this->input->post('selectedExportId');
                 $exportId = $this->input->post('exportId');
                 $fileExtension = $this->input->post('fileExtension');
                 $updateContainerValueData_Shipping = $this->input->post('updateContainerValueData_Shipping');
@@ -3871,105 +3319,68 @@ class Exports extends MY_Controller
 
                 //DELETE EXISTING
 
-                // $updateExportDoc = array(
-                //     "updated_by" => $session['user_id'],
-                //     "is_active" => 0,
-                // );
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
 
-                // $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 9);
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 9);
 
-                if ($selectedInvoiceId > 0 && $selectedExportId > 0) {
-                    $updateExportDoc = array(
-                        "invoice_no" => $invoiceNo_Shipping,
-                        "supplier_id" => $supplierName_Shipping,
-                        "invoice_date " => $formattedDate_Shipping,
-                        "sub_total " => $subTotal_Shipping,
-                        "tax_total" => $iva_Shipping,
-                        "allowance_total" => $retefuente_Shipping,
-                        "payable_total" => $payable_Shipping,
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFileShipping,
+                    "invoice_no" => $invoiceNo_Shipping,
+                    "supplier_id" => $supplierName_Shipping,
+                    "invoice_date " => $formattedDate_Shipping,
+                    "sub_total " => $subTotal_Shipping,
+                    "tax_total" => $iva_Shipping,
+                    "allowance_total" => $retefuente_Shipping,
+                    "payable_total" => $payable_Shipping,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
 
-                    $this->Export_model->update_invoice_data($selectedExportId, $selectedInvoiceId, $updateExportDoc);
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
 
+                if ($insertExportDocuments > 0) {
                     if (count($updateContainerValueJson) > 0) {
+
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 9);
+
                         foreach ($updateContainerValueJson as $containerdata) {
-                            $updateExportContainer = array(
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 9,
+                                "dispatch_id" => $containerdata["mappingid"],
                                 "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
                                 "updated_by" => $session['user_id'],
                                 "is_active" => 1
                             );
 
-                            $insertExportContainerValue = $this->Export_model->update_exportcontainerdoc_dispatch_invoice($updateExportContainer, $selectedExportId, $selectedInvoiceId, $containerdata["mappingid"]);
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
                         }
                     }
+                }
 
-                    $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($selectedExportId, 9));
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
+                if ($insertExportDocuments > 0) {
                     $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
-
-                    //INSERT
-                    $dataExportDocuments = array(
-                        "export_id " => $exportId,
-                        "export_type " => $this->input->post('add_type'),
-                        "file_extension " => $fileExtension,
-                        "file_url" => $uploadPdfFileShipping,
-                        "invoice_no" => $invoiceNo_Shipping,
-                        "supplier_id" => $supplierName_Shipping,
-                        "invoice_date " => $formattedDate_Shipping,
-                        "sub_total " => $subTotal_Shipping,
-                        "tax_total" => $iva_Shipping,
-                        "allowance_total" => $retefuente_Shipping,
-                        "payable_total" => $payable_Shipping,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
-
-                    $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
-
-                    if ($insertExportDocuments > 0) {
-                        if (count($updateContainerValueJson) > 0) {
-
-                            // $updateExportDocContainer = array(
-                            //     "updated_by" => $session['user_id'],
-                            //     "is_active" => 0,
-                            // );
-
-                            // $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 9);
-
-                            foreach ($updateContainerValueJson as $containerdata) {
-                                $dataExportContainer = array(
-                                    "export_doc_id" => $insertExportDocuments,
-                                    "export_id" => $exportId,
-                                    "export_type" => 9,
-                                    "dispatch_id" => $containerdata["mappingid"],
-                                    "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                    "created_by" => $session['user_id'],
-                                    "updated_by" => $session['user_id'],
-                                    "is_active" => 1
-                                );
-
-                                $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
-                            }
-                        }
-                    }
-
-                    if ($insertExportDocuments > 0) {
-                        $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, 9));
-                        $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                        $Return['result'] = $this->lang->line('data_added');
-                        $this->output($Return);
-                        exit;
-                    } else {
-                        $Return['error'] = $this->lang->line('error_adding');
-                        $this->output($Return);
-                        exit;
-                    }
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
                 }
             } else {
                 $Return['error'] = "";
@@ -3985,8 +3396,6 @@ class Exports extends MY_Controller
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-                $selectedInvoiceId = $this->input->post('selectedInvoiceId');
-                $selectedExportId = $this->input->post('selectedExportId');
                 $exportId = $this->input->post('exportId');
                 $fileExtension = $this->input->post('fileExtension');
                 $updateContainerValueData_Fumigation = $this->input->post('updateContainerValueData_Fumigation');
@@ -4002,105 +3411,68 @@ class Exports extends MY_Controller
 
                 //DELETE EXISTING
 
-                // $updateExportDoc = array(
-                //     "updated_by" => $session['user_id'],
-                //     "is_active" => 0,
-                // );
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
 
-                // $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 4);
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 4);
 
-                if ($selectedInvoiceId > 0 && $selectedExportId > 0) {
-                    $updateExportDoc = array(
-                        "invoice_no" => $invoiceNo_Fumigation,
-                        "supplier_id" => $supplierName_Fumigation,
-                        "invoice_date " => $formattedDate_Fumigation,
-                        "sub_total " => $subTotal_Fumigation,
-                        "tax_total" => $iva_Fumigation,
-                        "allowance_total" => $retefuente_Fumigation,
-                        "payable_total" => $payable_Fumigation,
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFileFumigation,
+                    "invoice_no" => $invoiceNo_Fumigation,
+                    "supplier_id" => $supplierName_Fumigation,
+                    "invoice_date " => $formattedDate_Fumigation,
+                    "sub_total " => $subTotal_Fumigation,
+                    "tax_total" => $iva_Fumigation,
+                    "allowance_total" => $retefuente_Fumigation,
+                    "payable_total" => $payable_Fumigation,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
 
-                    $this->Export_model->update_invoice_data($selectedExportId, $selectedInvoiceId, $updateExportDoc);
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
 
+                if ($insertExportDocuments > 0) {
                     if (count($updateContainerValueJson) > 0) {
+
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 4);
+
                         foreach ($updateContainerValueJson as $containerdata) {
-                            $updateExportContainer = array(
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 4,
+                                "dispatch_id" => $containerdata["mappingid"],
                                 "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
                                 "updated_by" => $session['user_id'],
                                 "is_active" => 1
                             );
 
-                            $insertExportContainerValue = $this->Export_model->update_exportcontainerdoc_dispatch_invoice($updateExportContainer, $selectedExportId, $selectedInvoiceId, $containerdata["mappingid"]);
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
                         }
                     }
+                }
 
-                    $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($selectedExportId, 4));
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
+                if ($insertExportDocuments > 0) {
                     $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
-
-                    //INSERT
-                    $dataExportDocuments = array(
-                        "export_id " => $exportId,
-                        "export_type " => $this->input->post('add_type'),
-                        "file_extension " => $fileExtension,
-                        "file_url" => $uploadPdfFileFumigation,
-                        "invoice_no" => $invoiceNo_Fumigation,
-                        "supplier_id" => $supplierName_Fumigation,
-                        "invoice_date " => $formattedDate_Fumigation,
-                        "sub_total " => $subTotal_Fumigation,
-                        "tax_total" => $iva_Fumigation,
-                        "allowance_total" => $retefuente_Fumigation,
-                        "payable_total" => $payable_Fumigation,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
-
-                    $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
-
-                    if ($insertExportDocuments > 0) {
-                        if (count($updateContainerValueJson) > 0) {
-
-                            // $updateExportDocContainer = array(
-                            //     "updated_by" => $session['user_id'],
-                            //     "is_active" => 0,
-                            // );
-
-                            // $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 4);
-
-                            foreach ($updateContainerValueJson as $containerdata) {
-                                $dataExportContainer = array(
-                                    "export_doc_id" => $insertExportDocuments,
-                                    "export_id" => $exportId,
-                                    "export_type" => 4,
-                                    "dispatch_id" => $containerdata["mappingid"],
-                                    "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                    "created_by" => $session['user_id'],
-                                    "updated_by" => $session['user_id'],
-                                    "is_active" => 1
-                                );
-
-                                $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
-                            }
-                        }
-                    }
-
-                    if ($insertExportDocuments > 0) {
-                        $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, 4));
-                        $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                        $Return['result'] = $this->lang->line('data_added');
-                        $this->output($Return);
-                        exit;
-                    } else {
-                        $Return['error'] = $this->lang->line('error_adding');
-                        $this->output($Return);
-                        exit;
-                    }
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
                 }
             } else {
                 $Return['error'] = "";
@@ -4116,8 +3488,6 @@ class Exports extends MY_Controller
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-                $selectedInvoiceId = $this->input->post('selectedInvoiceId');
-                $selectedExportId = $this->input->post('selectedExportId');
                 $exportId = $this->input->post('exportId');
                 $fileExtension = $this->input->post('fileExtension');
                 $updateContainerValueData_Coteros = $this->input->post('updateContainerValueData_Coteros');
@@ -4133,105 +3503,68 @@ class Exports extends MY_Controller
 
                 //DELETE EXISTING
 
-                // $updateExportDoc = array(
-                //     "updated_by" => $session['user_id'],
-                //     "is_active" => 0,
-                // );
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
 
-                // $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 6);
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 6);
 
-                if ($selectedInvoiceId > 0 && $selectedExportId > 0) {
-                    $updateExportDoc = array(
-                        "invoice_no" => $invoiceNo_Coteros,
-                        "supplier_id" => $supplierName_Coteros,
-                        "invoice_date " => $formattedDate_Coteros,
-                        "sub_total " => $subTotal_Coteros,
-                        "tax_total" => $iva_Coteros,
-                        "allowance_total" => $retefuente_Coteros,
-                        "payable_total" => $payable_Coteros,
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFileCoteros,
+                    "invoice_no" => $invoiceNo_Coteros,
+                    "supplier_id" => $supplierName_Coteros,
+                    "invoice_date " => $formattedDate_Coteros,
+                    "sub_total " => $subTotal_Coteros,
+                    "tax_total" => $iva_Coteros,
+                    "allowance_total" => $retefuente_Coteros,
+                    "payable_total" => $payable_Coteros,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
 
-                    $this->Export_model->update_invoice_data($selectedExportId, $selectedInvoiceId, $updateExportDoc);
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
 
+                if ($insertExportDocuments > 0) {
                     if (count($updateContainerValueJson) > 0) {
+
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 6);
+
                         foreach ($updateContainerValueJson as $containerdata) {
-                            $updateExportContainer = array(
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 6,
+                                "dispatch_id" => $containerdata["mappingid"],
                                 "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
                                 "updated_by" => $session['user_id'],
                                 "is_active" => 1
                             );
 
-                            $insertExportContainerValue = $this->Export_model->update_exportcontainerdoc_dispatch_invoice($updateExportContainer, $selectedExportId, $selectedInvoiceId, $containerdata["mappingid"]);
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
                         }
                     }
+                }
 
-                    $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($selectedExportId, 6));
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
+                if ($insertExportDocuments > 0) {
                     $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
-
-                    //INSERT
-                    $dataExportDocuments = array(
-                        "export_id " => $exportId,
-                        "export_type " => $this->input->post('add_type'),
-                        "file_extension " => $fileExtension,
-                        "file_url" => $uploadPdfFileCoteros,
-                        "invoice_no" => $invoiceNo_Coteros,
-                        "supplier_id" => $supplierName_Coteros,
-                        "invoice_date " => $formattedDate_Coteros,
-                        "sub_total " => $subTotal_Coteros,
-                        "tax_total" => $iva_Coteros,
-                        "allowance_total" => $retefuente_Coteros,
-                        "payable_total" => $payable_Coteros,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
-
-                    $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
-
-                    if ($insertExportDocuments > 0) {
-                        if (count($updateContainerValueJson) > 0) {
-
-                            // $updateExportDocContainer = array(
-                            //     "updated_by" => $session['user_id'],
-                            //     "is_active" => 0,
-                            // );
-
-                            // $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 6);
-
-                            foreach ($updateContainerValueJson as $containerdata) {
-                                $dataExportContainer = array(
-                                    "export_doc_id" => $insertExportDocuments,
-                                    "export_id" => $exportId,
-                                    "export_type" => 6,
-                                    "dispatch_id" => $containerdata["mappingid"],
-                                    "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                    "created_by" => $session['user_id'],
-                                    "updated_by" => $session['user_id'],
-                                    "is_active" => 1
-                                );
-
-                                $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
-                            }
-                        }
-                    }
-
-                    if ($insertExportDocuments > 0) {
-                        $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, 6));
-                        $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                        $Return['result'] = $this->lang->line('data_added');
-                        $this->output($Return);
-                        exit;
-                    } else {
-                        $Return['error'] = $this->lang->line('error_adding');
-                        $this->output($Return);
-                        exit;
-                    }
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
                 }
             } else {
                 $Return['error'] = "";
@@ -4247,8 +3580,6 @@ class Exports extends MY_Controller
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-                $selectedInvoiceId = $this->input->post('selectedInvoiceId');
-                $selectedExportId = $this->input->post('selectedExportId');
                 $exportId = $this->input->post('exportId');
                 $fileExtension = $this->input->post('fileExtension');
                 $updateContainerValueData_Phyto = $this->input->post('updateContainerValueData_Phyto');
@@ -4264,105 +3595,68 @@ class Exports extends MY_Controller
 
                 //DELETE EXISTING
 
-                // $updateExportDoc = array(
-                //     "updated_by" => $session['user_id'],
-                //     "is_active" => 0,
-                // );
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
 
-                // $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 5);
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 5);
 
-                if ($selectedInvoiceId > 0 && $selectedExportId > 0) {
-                    $updateExportDoc = array(
-                        "invoice_no" => $invoiceNo_Phyto,
-                        "supplier_id" => $supplierName_Phyto,
-                        "invoice_date " => $formattedDate_Phyto,
-                        "sub_total " => $subTotal_Phyto,
-                        "tax_total" => $iva_Phyto,
-                        "allowance_total" => $retefuente_Phyto,
-                        "payable_total" => $payable_Phyto,
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFilePhyto,
+                    "invoice_no" => $invoiceNo_Phyto,
+                    "supplier_id" => $supplierName_Phyto,
+                    "invoice_date " => $formattedDate_Phyto,
+                    "sub_total " => $subTotal_Phyto,
+                    "tax_total" => $iva_Phyto,
+                    "allowance_total" => $retefuente_Phyto,
+                    "payable_total" => $payable_Phyto,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
 
-                    $this->Export_model->update_invoice_data($selectedExportId, $selectedInvoiceId, $updateExportDoc);
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
 
+                if ($insertExportDocuments > 0) {
                     if (count($updateContainerValueJson) > 0) {
+
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 5);
+
                         foreach ($updateContainerValueJson as $containerdata) {
-                            $updateExportContainer = array(
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 5,
+                                "dispatch_id" => $containerdata["mappingid"],
                                 "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
                                 "updated_by" => $session['user_id'],
                                 "is_active" => 1
                             );
 
-                            $insertExportContainerValue = $this->Export_model->update_exportcontainerdoc_dispatch_invoice($updateExportContainer, $selectedExportId, $selectedInvoiceId, $containerdata["mappingid"]);
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
                         }
                     }
+                }
 
-                    $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($selectedExportId, 5));
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
+                if ($insertExportDocuments > 0) {
                     $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
-
-                    //INSERT
-                    $dataExportDocuments = array(
-                        "export_id " => $exportId,
-                        "export_type " => $this->input->post('add_type'),
-                        "file_extension " => $fileExtension,
-                        "file_url" => $uploadPdfFilePhyto,
-                        "invoice_no" => $invoiceNo_Phyto,
-                        "supplier_id" => $supplierName_Phyto,
-                        "invoice_date " => $formattedDate_Phyto,
-                        "sub_total " => $subTotal_Phyto,
-                        "tax_total" => $iva_Phyto,
-                        "allowance_total" => $retefuente_Phyto,
-                        "payable_total" => $payable_Phyto,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
-
-                    $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
-
-                    if ($insertExportDocuments > 0) {
-                        if (count($updateContainerValueJson) > 0) {
-
-                            // $updateExportDocContainer = array(
-                            //     "updated_by" => $session['user_id'],
-                            //     "is_active" => 0,
-                            // );
-
-                            // $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 5);
-
-                            foreach ($updateContainerValueJson as $containerdata) {
-                                $dataExportContainer = array(
-                                    "export_doc_id" => $insertExportDocuments,
-                                    "export_id" => $exportId,
-                                    "export_type" => 5,
-                                    "dispatch_id" => $containerdata["mappingid"],
-                                    "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                    "created_by" => $session['user_id'],
-                                    "updated_by" => $session['user_id'],
-                                    "is_active" => 1
-                                );
-
-                                $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
-                            }
-                        }
-                    }
-
-                    if ($insertExportDocuments > 0) {
-                        $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, 5));
-                        $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                        $Return['result'] = $this->lang->line('data_added');
-                        $this->output($Return);
-                        exit;
-                    } else {
-                        $Return['error'] = $this->lang->line('error_adding');
-                        $this->output($Return);
-                        exit;
-                    }
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
                 }
             } else {
                 $Return['error'] = "";
@@ -4378,8 +3672,6 @@ class Exports extends MY_Controller
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-                $selectedInvoiceId = $this->input->post('selectedInvoiceId');
-                $selectedExportId = $this->input->post('selectedExportId');
                 $exportId = $this->input->post('exportId');
                 $fileExtension = $this->input->post('fileExtension');
                 $updateContainerValueData_Incentives = $this->input->post('updateContainerValueData_Incentives');
@@ -4395,105 +3687,68 @@ class Exports extends MY_Controller
 
                 //DELETE EXISTING
 
-                // $updateExportDoc = array(
-                //     "updated_by" => $session['user_id'],
-                //     "is_active" => 0,
-                // );
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
 
-                // $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 7);
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 7);
 
-                if ($selectedInvoiceId > 0 && $selectedExportId > 0) {
-                    $updateExportDoc = array(
-                        "invoice_no" => $invoiceNo_Incentives,
-                        "supplier_id" => $supplierName_Incentives,
-                        "invoice_date " => $formattedDate_Incentives,
-                        "sub_total " => $subTotal_Incentives,
-                        "tax_total" => $iva_Incentives,
-                        "allowance_total" => $retefuente_Incentives,
-                        "payable_total" => $payable_Incentives,
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFileIncentives,
+                    "invoice_no" => $invoiceNo_Incentives,
+                    "supplier_id" => $supplierName_Incentives,
+                    "invoice_date " => $formattedDate_Incentives,
+                    "sub_total " => $subTotal_Incentives,
+                    "tax_total" => $iva_Incentives,
+                    "allowance_total" => $retefuente_Incentives,
+                    "payable_total" => $payable_Incentives,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
 
-                    $this->Export_model->update_invoice_data($selectedExportId, $selectedInvoiceId, $updateExportDoc);
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
 
+                if ($insertExportDocuments > 0) {
                     if (count($updateContainerValueJson) > 0) {
+
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 7);
+
                         foreach ($updateContainerValueJson as $containerdata) {
-                            $updateExportContainer = array(
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 7,
+                                "dispatch_id" => $containerdata["mappingid"],
                                 "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
                                 "updated_by" => $session['user_id'],
                                 "is_active" => 1
                             );
 
-                            $insertExportContainerValue = $this->Export_model->update_exportcontainerdoc_dispatch_invoice($updateExportContainer, $selectedExportId, $selectedInvoiceId, $containerdata["mappingid"]);
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
                         }
                     }
+                }
 
-                    $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($selectedExportId, 7));
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
+                if ($insertExportDocuments > 0) {
                     $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
-
-                    //INSERT
-                    $dataExportDocuments = array(
-                        "export_id " => $exportId,
-                        "export_type " => $this->input->post('add_type'),
-                        "file_extension " => $fileExtension,
-                        "file_url" => $uploadPdfFileIncentives,
-                        "invoice_no" => $invoiceNo_Incentives,
-                        "supplier_id" => $supplierName_Incentives,
-                        "invoice_date " => $formattedDate_Incentives,
-                        "sub_total " => $subTotal_Incentives,
-                        "tax_total" => $iva_Incentives,
-                        "allowance_total" => $retefuente_Incentives,
-                        "payable_total" => $payable_Incentives,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
-
-                    $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
-
-                    if ($insertExportDocuments > 0) {
-                        if (count($updateContainerValueJson) > 0) {
-
-                            // $updateExportDocContainer = array(
-                            //     "updated_by" => $session['user_id'],
-                            //     "is_active" => 0,
-                            // );
-
-                            // $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 7);
-
-                            foreach ($updateContainerValueJson as $containerdata) {
-                                $dataExportContainer = array(
-                                    "export_doc_id" => $insertExportDocuments,
-                                    "export_id" => $exportId,
-                                    "export_type" => 7,
-                                    "dispatch_id" => $containerdata["mappingid"],
-                                    "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                    "created_by" => $session['user_id'],
-                                    "updated_by" => $session['user_id'],
-                                    "is_active" => 1
-                                );
-
-                                $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
-                            }
-                        }
-                    }
-
-                    if ($insertExportDocuments > 0) {
-                        $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, 7));
-                        $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                        $Return['result'] = $this->lang->line('data_added');
-                        $this->output($Return);
-                        exit;
-                    } else {
-                        $Return['error'] = $this->lang->line('error_adding');
-                        $this->output($Return);
-                        exit;
-                    }
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
                 }
             } else {
                 $Return['error'] = "";
@@ -4509,8 +3764,6 @@ class Exports extends MY_Controller
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-                $selectedInvoiceId = $this->input->post('selectedInvoiceId');
-                $selectedExportId = $this->input->post('selectedExportId');
                 $exportId = $this->input->post('exportId');
                 $fileExtension = $this->input->post('fileExtension');
                 $updateContainerValueData_Remobilization = $this->input->post('updateContainerValueData_Remobilization');
@@ -4526,105 +3779,68 @@ class Exports extends MY_Controller
 
                 //DELETE EXISTING
 
-                // $updateExportDoc = array(
-                //     "updated_by" => $session['user_id'],
-                //     "is_active" => 0,
-                // );
+                $updateExportDoc = array(
+                    "updated_by" => $session['user_id'],
+                    "is_active" => 0,
+                );
 
-                // $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 8);
+                $this->Export_model->update_exportdocuments($updateExportDoc, $exportId, 8);
 
-                if ($selectedInvoiceId > 0 && $selectedExportId > 0) {
-                    $updateExportDoc = array(
-                        "invoice_no" => $invoiceNo_Remobilization,
-                        "supplier_id" => $supplierName_Remobilization,
-                        "invoice_date " => $formattedDate_Remobilization,
-                        "sub_total " => $subTotal_Remobilization,
-                        "tax_total" => $iva_Remobilization,
-                        "allowance_total" => $retefuente_Remobilization,
-                        "payable_total" => $payable_Remobilization,
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
+                //INSERT
+                $dataExportDocuments = array(
+                    "export_id " => $exportId,
+                    "export_type " => $this->input->post('add_type'),
+                    "file_extension " => $fileExtension,
+                    "file_url" => $uploadPdfFileRemobilization,
+                    "invoice_no" => $invoiceNo_Remobilization,
+                    "supplier_id" => $supplierName_Remobilization,
+                    "invoice_date " => $formattedDate_Remobilization,
+                    "sub_total " => $subTotal_Remobilization,
+                    "tax_total" => $iva_Remobilization,
+                    "allowance_total" => $retefuente_Remobilization,
+                    "payable_total" => $payable_Remobilization,
+                    "created_by" => $session['user_id'],
+                    "updated_by" => $session['user_id'],
+                    'is_active' => 1,
+                );
 
-                    $this->Export_model->update_invoice_data($selectedExportId, $selectedInvoiceId, $updateExportDoc);
+                $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
 
+                if ($insertExportDocuments > 0) {
                     if (count($updateContainerValueJson) > 0) {
+
+                        $updateExportDocContainer = array(
+                            "updated_by" => $session['user_id'],
+                            "is_active" => 0,
+                        );
+
+                        $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 8);
+
                         foreach ($updateContainerValueJson as $containerdata) {
-                            $updateExportContainer = array(
+                            $dataExportContainer = array(
+                                "export_doc_id" => $insertExportDocuments,
+                                "export_id" => $exportId,
+                                "export_type" => 8,
+                                "dispatch_id" => $containerdata["mappingid"],
                                 "container_value" => $containerdata["updatedContainerValue"] + 0,
+                                "created_by" => $session['user_id'],
                                 "updated_by" => $session['user_id'],
                                 "is_active" => 1
                             );
 
-                            $insertExportContainerValue = $this->Export_model->update_exportcontainerdoc_dispatch_invoice($updateExportContainer, $selectedExportId, $selectedInvoiceId, $containerdata["mappingid"]);
+                            $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
                         }
                     }
+                }
 
-                    $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($selectedExportId, 8));
-                    $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
+                if ($insertExportDocuments > 0) {
                     $Return['result'] = $this->lang->line('data_updated');
                     $this->output($Return);
                     exit;
                 } else {
-
-                    //INSERT
-                    $dataExportDocuments = array(
-                        "export_id " => $exportId,
-                        "export_type " => $this->input->post('add_type'),
-                        "file_extension " => $fileExtension,
-                        "file_url" => $uploadPdfFileRemobilization,
-                        "invoice_no" => $invoiceNo_Remobilization,
-                        "supplier_id" => $supplierName_Remobilization,
-                        "invoice_date " => $formattedDate_Remobilization,
-                        "sub_total " => $subTotal_Remobilization,
-                        "tax_total" => $iva_Remobilization,
-                        "allowance_total" => $retefuente_Remobilization,
-                        "payable_total" => $payable_Remobilization,
-                        "created_by" => $session['user_id'],
-                        "updated_by" => $session['user_id'],
-                        'is_active' => 1,
-                    );
-
-                    $insertExportDocuments = $this->Export_model->add_exportdocuments($dataExportDocuments);
-
-                    if ($insertExportDocuments > 0) {
-                        if (count($updateContainerValueJson) > 0) {
-
-                            // $updateExportDocContainer = array(
-                            //     "updated_by" => $session['user_id'],
-                            //     "is_active" => 0,
-                            // );
-
-                            // $this->Export_model->update_exportcontainerdoc($updateExportDocContainer, $exportId, 8);
-
-                            foreach ($updateContainerValueJson as $containerdata) {
-                                $dataExportContainer = array(
-                                    "export_doc_id" => $insertExportDocuments,
-                                    "export_id" => $exportId,
-                                    "export_type" => 8,
-                                    "dispatch_id" => $containerdata["mappingid"],
-                                    "container_value" => $containerdata["updatedContainerValue"] + 0,
-                                    "created_by" => $session['user_id'],
-                                    "updated_by" => $session['user_id'],
-                                    "is_active" => 1
-                                );
-
-                                $insertExportContainerValue = $this->Export_model->add_exportcontainerdoc($dataExportContainer);
-                            }
-                        }
-                    }
-
-                    if ($insertExportDocuments > 0) {
-                        $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, 8));
-                        $Return['updatedlist'] = $getExportDocumentsPortInvoiceLists;
-                        $Return['result'] = $this->lang->line('data_added');
-                        $this->output($Return);
-                        exit;
-                    } else {
-                        $Return['error'] = $this->lang->line('error_adding');
-                        $this->output($Return);
-                        exit;
-                    }
+                    $Return['error'] = $this->lang->line('error_adding');
+                    $this->output($Return);
+                    exit;
                 }
             } else {
                 $Return['error'] = "";

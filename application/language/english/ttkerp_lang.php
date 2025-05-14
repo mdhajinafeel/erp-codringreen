@@ -896,9 +896,9 @@ $lang["Removilization"] = "Remobilization";
 $lang["Shipping"] = "Shipping Company";
 
 $lang["export_suppliers"] = "Export Suppliers";
-$lang["export_subtotal"] = "Invoice value before tax";
+$lang["export_subtotal"] = "Value before tax";
 $lang["export_iva"] = "Tax Value";
-$lang["export_retefuente"] = "Withholding tax to be applied";
+$lang["export_retefuente"] = "Withholding tax";
 $lang["export_total_payable"] = "Total Payable";
 $lang["container_value"] = "Container Value";
 
@@ -917,3 +917,37 @@ $lang["container_trm"] = "TRM";
 $lang["process"] = "Process";
 $lang["sawmill"] = "Saw Mill";
 $lang["local_sales"] = "Local Sales";
+
+//POD
+$lang["pod_name"] = "POD Name";
+$lang["pod"] = "POD";
+$lang["export_pod"] = "Export POD";
+$lang["country_name"] = "Country Name";
+$lang["latitude"] = "Latitude";
+$lang["longitude"] = "Longitude";
+$lang["color_code"] = "Color Code";
+$lang["add_pod"] = "Add POD";
+$lang["edit_pod"] = "Edit POD";
+$lang["error_pod_name"] = "Please enter the POD name";
+$lang["error_country_name"] = "Please select the country name";
+$lang["error_latitude"] = "Please enter the latitude";
+$lang["error_longitude"] = "Please enter the longitude";
+$lang["error_color_code"] = "Please select the color code";
+
+//POL
+$lang["pol_name"] = "POL Name";
+$lang["pol_short_name"] = "POL Short Name";
+$lang["pol"] = "POL";
+$lang["export_pol"] = "Export POL";
+$lang["latitude"] = "Latitude";
+$lang["longitude"] = "Longitude";
+$lang["add_pol"] = "Add POL";
+$lang["edit_pol"] = "Edit POL";
+$lang["error_pol_name"] = "Please enter the POL name";
+$lang["error_pol_short_name"] = "Please enter the POL short name";
+
+$lang["merge_invoice"] = "Merge Invoice";
+$lang["error_select_invoice"] = "Please select the invoice to merge";
+$lang["total_container_value"] = "Total Container Value";
+$lang["invoice_list"] = "Invoice Lists";
+$lang["invoice_no"] = "Invoice #";

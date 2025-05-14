@@ -1,7 +1,7 @@
 <?php
 
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
-ini_set('display_errors', '0');
+// error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
+// ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -5958,7 +5958,7 @@ class Farms extends MY_Controller
 
                         if ($getInventoryOrderCount[0]->cnt == 0) {
 
-                            $getFarmDetail = $this->Farm_model->get_farm_details($farm_id, $contract_id, $input_inventory_order);
+                            $getFarmDetail = $this->Farm_model->get_farm_details($farm_id, $contract_id, $inventory_order);
                             $productTypeId = $getFarmDetail[0]->product_type_id;
                             $supplierid = $getFarmDetail[0]->supplier_id;
 

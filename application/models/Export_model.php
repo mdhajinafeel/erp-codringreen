@@ -957,8 +957,9 @@ class Export_model extends CI_Model
 
     public function fetch_export_documents($exportid, $exporttype)
     {
-        $strQuery = "SELECT id, export_id, invoice_no, supplier_id, REPLACE(invoice_date, '/', '-') AS invoice_date, sub_total, tax_total, allowance_total, payable_total 
-            FROM tbl_export_documents WHERE is_active = 1 AND export_type = $exporttype AND export_id = $exportid";
+        $strQuery = "SELECT id, export_id, invoice_no, supplier_id, REPLACE(invoice_date, '/', '-') AS invoice_date, sub_total, tax_total, allowance_total, payable_total, 
+            getcontainervalue_by_export_document(export_id, export_type) AS container_value_total 
+            FROM tbl_export_documents WHERE is_active = 1 AND export_type = $exporttype AND export_id = $exportid ORDER BY id DESC";
         $query = $this->db->query($strQuery);
         return $query->result();
     }
@@ -1004,7 +1005,7 @@ class Export_model extends CI_Model
         return $query->result();
     }
 
-    public function fetch_merge_invoice_history_invoice() {
+    public function fetch_merge_invoice_history_invoice($invoiceids) {
         $strQuery = "SELECT A.id, A.invoice_date, A.total_containers, A.circ_allowance, A.length_allowance, 
             A.circ_adjustment, A.measurement_system, A.service_enabled, A.service_sales_percentage, A.total_service_cost, 
             A.advance_enabled, A.advance_cost, A.total_advance_cost, A.accounting_invoice, A.claim_id, A.claim_amount, 
@@ -1016,13 +1017,13 @@ class Export_model extends CI_Model
             INNER JOIN tbl_master_buyers C ON C.id = A.buyer_id 
             INNER JOIN tbl_master_invoice_banks D ON D.id = A.bank_id 
             INNER JOIN tbl_master_sellers E ON E.id = A.seller_id 
-            WHERE A.is_active = 1 AND A.id IN (219, 221, 222) ORDER BY A.id DESC";
+            WHERE A.is_active = 1 AND A.id IN ($invoiceids) ORDER BY A.id DESC";
 
         $query = $this->db->query($strQuery);
         return $query->result();
     }
 
-    public function get_export_data_by_export_id_merge($originid, $circallowance, $lengthallowance, $circadjust, $measurementsystem)
+    public function get_export_data_by_export_id_merge($circallowance, $lengthallowance, $circadjust, $measurementsystem, $exportids)
     {
         if($measurementsystem == 2 || $measurementsystem == 5) {
             $strQuery = "SELECT Y.dispatch_id, LEFT(REPLACE(TRIM(Y.container_number), ' ', ''), 11) AS container_number, Y.total_pieces, Y.gross_volume, Y.net_volume, Y.gross_cft, Y.net_cft, Y.avg_circumference, Y.avg_length, 
@@ -1038,7 +1039,7 @@ class Export_model extends CI_Model
             INNER JOIN tbl_dispatch_container E ON E.dispatch_id = B.dispatch_id 
             INNER JOIN tbl_dispatch_data C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
             INNER JOIN tbl_reception_data D ON D.reception_data_id = C.reception_data_id AND D.isactive = 1
-            WHERE A.isactive = 1 AND A.id IN (622, 623, 624) AND A.origin_id = $originid AND B.isactive = 1 
+            WHERE A.isactive = 1 AND A.id IN ($exportids) AND B.isactive = 1 
             GROUP BY E.container_number, D.circumference_bought, D.length_bought) X 
             GROUP BY X.container_number) Y
             ORDER BY Y.dispatch_id ASC ";
@@ -1056,7 +1057,7 @@ class Export_model extends CI_Model
             INNER JOIN tbl_dispatch_container E ON E.dispatch_id = B.dispatch_id 
             INNER JOIN tbl_dispatch_data C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
             INNER JOIN tbl_reception_data D ON D.reception_data_id = C.reception_data_id AND D.isactive = 1
-            WHERE A.isactive = 1 AND A.id IN (622, 623, 624) AND A.origin_id = $originid AND B.isactive = 1 
+            WHERE A.isactive = 1 AND A.id IN ($exportids) AND B.isactive = 1 
             GROUP BY E.container_number, D.circumference_bought, D.length_bought) X 
             GROUP BY X.container_number) Y
             ORDER BY Y.dispatch_id ASC ";
@@ -1074,7 +1075,7 @@ class Export_model extends CI_Model
             INNER JOIN tbl_dispatch_container E ON E.dispatch_id = B.dispatch_id 
             INNER JOIN tbl_dispatch_data C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
             INNER JOIN tbl_reception_data D ON D.reception_data_id = C.reception_data_id AND D.isactive = 1
-            WHERE A.isactive = 1 A.id IN (622, 623, 624) AND A.origin_id = $originid AND B.isactive = 1 
+            WHERE A.isactive = 1 AND A.id IN ($exportids) AND B.isactive = 1 
             GROUP BY E.container_number, D.circumference_bought, D.length_bought) X 
             GROUP BY X.container_number) Y
             ORDER BY Y.dispatch_id ASC ";
@@ -1083,4 +1084,100 @@ class Export_model extends CI_Model
         $query = $this->db->query($strQuery);
         return $query->result();
     }
+
+    public function fetch_merge_invoices_list($originid) {
+        $strQuery = "SELECT A.export_id, A.sa_number, A.invoice_id, B1.seller_name, C1.buyer_name, A.total_volume, A.total_invoice_value, 
+                A.total_service_cost, A.total_advance_cost, A.total_containers, A.total_sales_value 
+                FROM (SELECT A.export_id, B.sa_number, MAX(A.id) AS invoice_id, A.seller_id, A.buyer_id, A.total_volume, A.total_invoice_value, 
+                A.total_service_cost, A.total_advance_cost, A.total_containers, A.total_sales_value 
+                FROM tbl_export_invoice_history A
+                INNER JOIN tbl_export_container_details B ON B.id = A.export_id
+                WHERE A.is_active = 1 AND B.origin_id = $originid 
+                GROUP BY A.export_id) A
+                INNER JOIN tbl_master_sellers B1 ON B1.id = A.seller_id 
+                INNER JOIN tbl_master_buyers C1 ON C1.id = A.buyer_id 
+                ORDER BY A.export_id DESC";
+
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function fetch_exportids_byinvoiceids($invoiceids) {
+        $strQuery = "SELECT GROUP_CONCAT(export_id SEPARATOR ', ') AS exportids FROM tbl_export_invoice_history WHERE id IN ($invoiceids)";
+
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function fetch_export_invoice_number($exportids) {
+        $strQuery = "SELECT CONCAT(
+                    'SA',
+                    GROUP_CONCAT(
+                        DISTINCT
+                        LPAD(
+                            REPLACE(REPLACE(SUBSTRING_INDEX(sa_number, '/', 1), 'SA', ''), 'A', ''),
+                            3,
+                            '0'
+                        )
+                        ORDER BY sa_number
+                        SEPARATOR '-'
+                    ),
+                    '-',
+                    SUBSTRING_INDEX(sa_number, '/', -1)
+                ) AS result
+                FROM tbl_export_container_details WHERE id IN ($exportids)";
+
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function fetch_export_document_details($exportid, $exporttype)
+    {
+        $strQuery = "SELECT A.id, A.export_id, A.invoice_no, A.supplier_id, REPLACE(A.invoice_date, '/', '-') AS invoice_date, 
+                    A.sub_total, A.tax_total, A.allowance_total, A.payable_total, getcontainervalue_by_export_document_doc_id(A.export_id, A.export_type, A.id) AS container_value_total, 
+                    B.supplier_name
+                    FROM tbl_export_documents A 
+                    INNER JOIN tbl_export_suppliers B ON B.id = A.supplier_id 
+                    WHERE A.is_active = 1 AND A.export_type = $exporttype AND A.export_id = $exportid 
+                    ORDER BY A.id DESC";
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function fetch_export_document_details_withid($exportid, $exporttype, $invoiceid)
+    {
+        $strQuery = "SELECT A.id, A.export_id, A.invoice_no, A.supplier_id, REPLACE(A.invoice_date, '/', '-') AS invoice_date, A.invoice_date AS original_invoice_date,
+                    A.sub_total, A.tax_total, A.allowance_total, A.payable_total, getcontainervalue_by_export_document_doc_id(A.export_id, A.export_type, A.id) AS container_value_total, 
+                    B.supplier_name
+                    FROM tbl_export_documents A 
+                    INNER JOIN tbl_export_suppliers B ON B.id = A.supplier_id 
+                    WHERE A.is_active = 1 AND A.export_type = $exporttype AND A.export_id = $exportid AND A.id = $invoiceid
+                    ORDER BY A.id DESC";
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function update_invoice_data($exportid, $invoiceid, $data)
+    {
+        $multiClause = array('export_id' => $exportid, 'id' => $invoiceid);
+        $this->db->where($multiClause);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        if ($this->db->update('tbl_export_documents', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function update_exportcontainerdoc_dispatch_invoice($data, $exportid, $invoiceid, $dispatchid)
+	{
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$multiClause = array('export_doc_id' => $invoiceid, 'export_id' => $exportid, 'dispatch_id' => $dispatchid);
+		$this->db->where($multiClause);
+		if ($this->db->update('tbl_export_document_container', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

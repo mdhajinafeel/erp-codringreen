@@ -35,6 +35,10 @@ $applicable_origins = $session["applicable_origins"];
             <div class="col-auto align-self-center">
                 <h3> <?php echo $this->lang->line("exportorder_title"); ?> </h3>
             </div>
+            <div class="col-auto ms-auto">
+                <button class="btn btn-success btn-md" type="button" id="btn_merge_invoice">
+                    <span class="fas fa-file-excel"></span><span class="ms-1"><?php echo $this->lang->line('merge_invoice'); ?></span></button>
+            </div>
         </div>
     </div>
     <div class="card-body pt-0">
@@ -97,4 +101,43 @@ $applicable_origins = $session["applicable_origins"];
 <script src="<?php echo base_url() . "assets/js/jquery.dataTables.min.js"; ?>"></script>
 <script src="<?php echo base_url() . "assets/js/dataTables.bootstrap.min.js"; ?>"></script>
 <link rel="stylesheet" href="<?php echo base_url() . "assets/css/jquery-ui.css"; ?>">
-    <script src="<?php echo base_url() . "assets/js/jquery-ui.js"; ?>"></script>
+<script src="<?php echo base_url() . "assets/js/jquery-ui.js"; ?>"></script>
+
+<script>
+    $(document).ready(function() {
+
+        $("#origin_export_order").change(function() {
+            if ($("#origin_export_order").val() != 1) {
+                $("#btn_merge_invoice").hide();
+            } else {
+                $("#btn_merge_invoice").show();
+            }
+        });
+
+        $("#btn_merge_invoice").click(function() {
+            $("#loading").show();
+
+            var fd = new FormData();
+            fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+            fd.append("origin_id", $("#origin_export_order").val());
+
+            $.ajax({
+                url: base_url + "/dialog_merge_invoice",
+                type: "POST",
+                data: fd,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    $("#loading").hide();
+                    if (response.redirect == true) {
+                        window.location.replace(login_url);
+                    } else {
+                        toastr.clear();
+                        $("#ajax_modal_bd").html(response);
+                        $("#add-modal-data-bd").modal('show');
+                    }
+                }
+            });
+        });
+    });
+</script>

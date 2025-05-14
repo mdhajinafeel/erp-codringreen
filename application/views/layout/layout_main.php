@@ -164,7 +164,8 @@ endif;
 																		$this->router->fetch_class() == "products" || $this->router->fetch_class() == "warehouses"
 																		|| $this->router->fetch_class() == "shippinglines" || $this->router->fetch_class() == "measurementsystems"
 																		|| $this->router->fetch_class() == "inputparameters" || $this->router->fetch_class() == "qrcodegenerator"
-																		|| $this->router->fetch_class() == "inputparametersettings"
+																		|| $this->router->fetch_class() == "inputparametersettings" || $this->router->fetch_class() == "exportpod" 
+																		|| $this->router->fetch_class() == "exportpol"
 																	) {
 																		echo 'show';
 																	} else {
@@ -237,6 +238,26 @@ endif;
 																			'';
 																		} ?>" href="<?php echo site_url('qrcodegenerator'); ?>" aria-expanded="false">
 														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('qrcode_title'); ?></span></span>
+														</div>
+													</a>
+												</li>
+												<li class="nav-item">
+													<a class="nav-link <?php if ($this->router->fetch_class() == "exportpol") {
+																			echo 'active';
+																		} else {
+																			'';
+																		} ?>" href="<?php echo site_url('exportpol'); ?>" aria-expanded="false">
+														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('export_pol'); ?></span></span>
+														</div>
+													</a>
+												</li>
+												<li class="nav-item">
+													<a class="nav-link <?php if ($this->router->fetch_class() == "exportpod") {
+																			echo 'active';
+																		} else {
+																			'';
+																		} ?>" href="<?php echo site_url('exportpod'); ?>" aria-expanded="false">
+														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('export_pod'); ?></span></span>
 														</div>
 													</a>
 												</li>
@@ -890,11 +911,11 @@ endif;
 		$(document).ready(function() {
 
 			//ZOOM LEVEL
-			if (window.matchMedia("(max-width: 767px)").matches) {
-				//DO NOTHING
-			} else {
-				document.body.style.zoom = "80%";
-			}
+			// if (window.matchMedia("(max-width: 767px)").matches) {
+			// 	//DO NOTHING
+			// } else {
+			// 	document.body.style.zoom = "80%";
+			// }
 
 			toastr.options.closeButton = true;
 			toastr.options.progressBar = true;

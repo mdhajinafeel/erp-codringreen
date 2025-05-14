@@ -3,26 +3,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 ?>
 <?php $site_lang = $this->load->helper('language'); ?>
 <?php $wz_lang = $site_lang->session->userdata('site_lang'); ?>
-<div class="modal fadeInRight animated" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" id="alert-dialog-info" role="dialog" aria-labelledby="alert-dialog-info" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="titlehead"></h4>
-                <?php echo form_button(array('aria-label' => 'Close', 'data-bs-dismiss' => 'modal', 'type' => 'button', 'class' => 'close', 'content' => '<span aria-hidden="true">×</span>')); ?>
-
-            </div>
-            <?php echo form_open(); ?>
-            <div class="modal-body farm-modal">
-                <h5 class="text-center modal-message" id="infomessage"></h5>
-            </div>
-            <div class="modal-footer">
-                <?php echo form_button(array('data-bs-dismiss' => 'modal', 'type' => 'button', 'class' => 'btn btn-secondary', 'content' => $this->lang->line('close'))); ?>
-                <?php echo form_button(array('id' => 'deletebutton', 'type' => 'button', 'class' => 'btn btn-danger', 'content' => $this->lang->line('ok'))); ?>
-            </div>
-            <?php echo form_close(); ?>
-        </div>
-    </div>
-</div>
 <div class="modal-header">
     <h4 class="modal-title" id="add-modal-data"><?php echo $pageheading; ?></h4>
     <?php echo form_button(array('aria-label' => 'Close', 'data-bs-dismiss' => 'modal', 'type' => 'button', 'class' => 'close', 'content' => '<span aria-hidden="true">×</span>')); ?>
@@ -235,36 +215,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalAmountCustoms"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalAmountCustoms" name="lblTotalAmountCustoms" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalTaxAmountCustoms"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalTaxAmountCustoms" name="lblTotalTaxAmountCustoms" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblAllowanceAmountCustoms"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblAllowanceAmountCustoms" name="lblAllowanceAmountCustoms" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblPayableAmountCustoms"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblPayableAmountCustoms" name="lblPayableAmountCustoms" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        </div>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="total_container_value"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
@@ -278,7 +254,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="invoice_number_custom"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_custom" name="invoice_number_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_custom" name="invoice_number_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->invoice_no) ? $exportDocumentsCustoms[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_custom" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -287,7 +263,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_custom" id="supplier_name_custom" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersCustoms as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsCustoms[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_custom" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
@@ -295,7 +271,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                                     <div class="col-md-3">
                                         <label for="issued_date_custom"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_custom" name="issued_date_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_custom" name="issued_date_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->invoice_date) ? $exportDocumentsCustoms[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_custom" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_custom" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -304,32 +280,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_custom" name="subtotal_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        <input type="number" step="any" id="subtotal_custom" name="subtotal_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->sub_total) ? $exportDocumentsCustoms[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
                                         <label id="error-subtotal_custom" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_custom" name="iva_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        <input type="number" step="any" id="iva_custom" name="iva_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->tax_total) ? $exportDocumentsCustoms[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
                                         <label id="error-iva_custom" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_custom" name="retefuente_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        <input type="number" step="any" id="retefuente_custom" name="retefuente_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->allowance_total) ? $exportDocumentsCustoms[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
                                         <label id="error-retefuente_custom" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_custom" name="payable_custom" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        <input type="number" step="any" id="payable_custom" name="payable_custom" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCustoms[0]->payable_total) ? $exportDocumentsCustoms[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
                                         <label id="error-payable_custom" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="container_value_custom"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
-                                            <label class="control-label" id="container_value_custom">0</label>
+                                            <label class="control-label" id="container_value_custom"><?php echo isset($exportDocumentsCustoms[0]->container_value_total) ? $exportDocumentsCustoms[0]->container_value_total + 0 : '0'; ?></label>
                                         </div>
                                     </div>
                                 </div>
@@ -363,8 +339,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerCustomValue = 0; foreach($exportDocumentsCustomsContainers as $customcontainers) { ?>
+                                            <?php if($customcontainers->dispatch_id == $containerdetail->dispatch_id) { $containerCustomValue = $customcontainers->container_value + 0; break;  } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="<?php echo 0; ?>" class="form-control text-uppercase" id="custom_container_value" name="custom_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerCustomValue + 0; ?>" class="form-control text-uppercase" id="custom_container_value" name="custom_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
@@ -372,31 +352,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div class="row mb-3 mt-4">
                                 <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-danger col-md-2" style="margin-right: 5px;" id="btnResetCustoms" name="btnResetCustoms"><?php echo $this->lang->line('reset'); ?></button>
-                                    <button type="button" class="btn btn-primary col-md-2" id="btnSaveCustoms" name="btnSaveCustoms"><?php echo $this->lang->line('save'); ?></button>
-                                </div>
-                            </div>
-
-                            <div id="divInvoiceListCustoms">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><?php echo $this->lang->line("invoice_list"); ?></h5>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table class="datatables-demo table table-striped table-bordered" id="xin_table_invoice_customs" style="width: 100% !important;">
-                                        <thead>
-                                            <tr>
-                                                <th><?php echo $this->lang->line("action"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_no"); ?></th>
-                                                <th><?php echo $this->lang->line("supplier_name"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_date"); ?></th>
-                                                <th><?php echo $this->lang->line("export_subtotal"); ?></th>
-                                                <th><?php echo $this->lang->line("export_iva"); ?></th>
-                                                <th><?php echo $this->lang->line("export_retefuente"); ?></th>
-                                                <th><?php echo $this->lang->line("export_total_payable"); ?></th>
-                                                <th><?php echo $this->lang->line("container_value"); ?></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveCustoms" name="btnSaveCustoms"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -441,36 +397,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalAmountITR"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalAmountITR" name="lblTotalAmountITR" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalTaxAmountITR"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalTaxAmountITR" name="lblTotalTaxAmountITR" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblAllowanceAmountITR"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblAllowanceAmountITR" name="lblAllowanceAmountITR" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblPayableAmountITR"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblPayableAmountITR" name="lblPayableAmountITR" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        </div>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="total_container_value"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
@@ -484,7 +436,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="invoice_number_itr"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_itr" name="invoice_number_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_itr" name="invoice_number_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->invoice_no) ? $exportDocumentsTransport[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_itr" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -493,7 +445,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_itr" id="supplier_name_itr" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersItr as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsTransport[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_itr" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
@@ -501,7 +453,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                                     <div class="col-md-3">
                                         <label for="issued_date_itr"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_itr" name="issued_date_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_itr" name="issued_date_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->invoice_date) ? $exportDocumentsTransport[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_itr" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_itr" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -510,32 +462,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_itr" name="subtotal_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        <input type="number" step="any" id="subtotal_itr" name="subtotal_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->sub_total) ? $exportDocumentsTransport[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
                                         <label id="error-subtotal_itr" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_itr" name="iva_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        <input type="number" step="any" id="iva_itr" name="iva_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->tax_total) ? $exportDocumentsTransport[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
                                         <label id="error-iva_itr" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_itr" name="retefuente_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        <input type="number" step="any" id="retefuente_itr" name="retefuente_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->allowance_total) ? $exportDocumentsTransport[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
                                         <label id="error-retefuente_itr" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_itr" name="payable_itr" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        <input type="number" step="any" id="payable_itr" name="payable_itr" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsTransport[0]->payable_total) ? $exportDocumentsTransport[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
                                         <label id="error-payable_itr" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="container_value_itr"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
-                                            <label class="control-label" id="container_value_itr">0</label>
+                                            <label class="control-label" id="container_value_itr"><?php echo isset($exportDocumentsTransport[0]->container_value_total) ? $exportDocumentsTransport[0]->container_value_total + 0 : '0'; ?></label>
                                         </div>
                                     </div>
                                 </div>
@@ -568,8 +520,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerTransportValue = 0; foreach($exportDocumentsTransportContainers as $transportcontainers) { ?>
+                                            <?php if($transportcontainers->dispatch_id == $containerdetail->dispatch_id) { $containerTransportValue = $transportcontainers->container_value + 0; break;  } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="<?php echo 0; ?>" class="form-control text-uppercase" id="itr_container_value" name="itr_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerTransportValue + 0; ?>" class="form-control text-uppercase" id="itr_container_value" name="itr_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
@@ -577,31 +533,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div class="row mb-3 mt-4">
                                 <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-danger col-md-2" style="margin-right: 5px;" id="btnResetITR" name="btnResetITR"><?php echo $this->lang->line('reset'); ?></button>
-                                    <button type="button" class="btn btn-primary col-md-2" id="btnSaveITR" name="btnSaveITR"><?php echo $this->lang->line('save'); ?></button>
-                                </div>
-                            </div>
-
-                            <div id="divInvoiceListITR">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><?php echo $this->lang->line("invoice_list"); ?></h5>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table class="datatables-demo table table-striped table-bordered" id="xin_table_invoice_itr" style="width: 100% !important;">
-                                        <thead>
-                                            <tr>
-                                                <th><?php echo $this->lang->line("action"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_no"); ?></th>
-                                                <th><?php echo $this->lang->line("supplier_name"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_date"); ?></th>
-                                                <th><?php echo $this->lang->line("export_subtotal"); ?></th>
-                                                <th><?php echo $this->lang->line("export_iva"); ?></th>
-                                                <th><?php echo $this->lang->line("export_retefuente"); ?></th>
-                                                <th><?php echo $this->lang->line("export_total_payable"); ?></th>
-                                                <th><?php echo $this->lang->line("container_value"); ?></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveITR" name="btnSaveITR"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -645,36 +577,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalAmountPort"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalAmountPort" name="lblTotalAmountPort" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalTaxAmountPort"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalTaxAmountPort" name="lblTotalTaxAmountPort" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblAllowanceAmountPort"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblAllowanceAmountPort" name="lblAllowanceAmountPort" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblPayableAmountPort"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblPayableAmountPort" name="lblPayableAmountPort" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        </div>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="total_container_value"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
@@ -688,7 +616,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-3">
                                         <label for="invoice_number_port"><?php echo $this->lang->line("invoice_number"); ?></label>
-                                        <input type="text" id="invoice_number_port" name="invoice_number_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
+                                        <input type="text" id="invoice_number_port" name="invoice_number_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->invoice_no) ? $exportDocumentsPort[0]->invoice_no : ''; ?>" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-invoice_no_port" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
 
@@ -697,7 +625,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_port" id="supplier_name_port" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersPort as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsPort[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_port" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
@@ -705,7 +633,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                                     <div class="col-md-3">
                                         <label for="issued_date_port"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_port" name="issued_date_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_port" name="issued_date_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->invoice_date) ? $exportDocumentsPort[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_port" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_port" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -714,32 +642,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_port" name="subtotal_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        <input type="number" step="any" id="subtotal_port" name="subtotal_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->sub_total) ? $exportDocumentsPort[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
                                         <label id="error-subtotal_port" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_port" name="iva_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        <input type="number" step="any" id="iva_port" name="iva_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->tax_total) ? $exportDocumentsPort[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
                                         <label id="error-iva_port" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_port" name="retefuente_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        <input type="number" step="any" id="retefuente_port" name="retefuente_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->allowance_total) ? $exportDocumentsPort[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
                                         <label id="error-retefuente_port" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_port" name="payable_port" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        <input type="number" step="any" id="payable_port" name="payable_port" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPort[0]->payable_total) ? $exportDocumentsPort[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
                                         <label id="error-payable_port" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="container_value_port"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
-                                            <label class="control-label" id="container_value_port"><?php echo 0; ?></label>
+                                            <label class="control-label" id="container_value_port"><?php echo isset($exportDocumentsPort[0]->container_value_total) ? $exportDocumentsPort[0]->container_value_total + 0 : '0'; ?></label>
                                         </div>
                                     </div>
                                 </div>
@@ -773,8 +701,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerPortValue = 0; foreach($exportDocumentsPortContainers as $portcontainers) { ?>
+                                            <?php if($portcontainers->dispatch_id == $containerdetail->dispatch_id) { $containerPortValue = $portcontainers->container_value + 0; break;  } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="<?php echo 0; ?>" class="form-control text-uppercase" id="port_container_value" name="port_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerPortValue + 0; ?>" class="form-control text-uppercase" id="port_container_value" name="port_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
@@ -782,31 +714,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div class="row mb-3 mt-4">
                                 <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-danger col-md-2" style="margin-right: 5px;" id="btnResetPort" name="btnResetPort"><?php echo $this->lang->line('reset'); ?></button>
-                                    <button type="button" class="btn btn-primary col-md-2" id="btnSavePort" name="btnSavePort"><?php echo $this->lang->line('save'); ?></button>
-                                </div>
-                            </div>
-
-                            <div id="divInvoiceListPort">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><?php echo $this->lang->line("invoice_list"); ?></h5>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table class="datatables-demo table table-striped table-bordered" id="xin_table_invoice_port" style="width: 100% !important;">
-                                        <thead>
-                                            <tr>
-                                                <th><?php echo $this->lang->line("action"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_no"); ?></th>
-                                                <th><?php echo $this->lang->line("supplier_name"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_date"); ?></th>
-                                                <th><?php echo $this->lang->line("export_subtotal"); ?></th>
-                                                <th><?php echo $this->lang->line("export_iva"); ?></th>
-                                                <th><?php echo $this->lang->line("export_retefuente"); ?></th>
-                                                <th><?php echo $this->lang->line("export_total_payable"); ?></th>
-                                                <th><?php echo $this->lang->line("container_value"); ?></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSavePort" name="btnSavePort"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -851,36 +759,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalAmountShipping"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalAmountShipping" name="lblTotalAmountShipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalTaxAmountShipping"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalTaxAmountShipping" name="lblTotalTaxAmountShipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblAllowanceAmountShipping"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblAllowanceAmountShipping" name="lblAllowanceAmountShipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblPayableAmountShipping"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblPayableAmountShipping" name="lblPayableAmountShipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        </div>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="total_container_value"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
@@ -903,7 +807,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_shipping" id="supplier_name_shipping" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersShipping as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsShipping[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_shipping" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
@@ -911,7 +815,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                                     <div class="col-md-3">
                                         <label for="issued_date_shipping"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_shipping" name="issued_date_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_shipping" name="issued_date_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->invoice_date) ? $exportDocumentsShipping[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_shipping" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_shipping" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -920,32 +824,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_shipping" name="subtotal_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exshipping_subtotal"); ?>" />
+                                        <input type="number" step="any" id="subtotal_shipping" name="subtotal_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->sub_total) ? $exportDocumentsShipping[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exshipping_subtotal"); ?>" />
                                         <label id="error-subtotal_shipping" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_shipping" name="iva_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exshipping_iva"); ?>" />
+                                        <input type="number" step="any" id="iva_shipping" name="iva_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->tax_total) ? $exportDocumentsShipping[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exshipping_iva"); ?>" />
                                         <label id="error-iva_shipping" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_shipping" name="retefuente_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exshipping_retefuente"); ?>" />
+                                        <input type="number" step="any" id="retefuente_shipping" name="retefuente_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->allowance_total) ? $exportDocumentsShipping[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exshipping_retefuente"); ?>" />
                                         <label id="error-retefuente_shipping" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_shipping" name="payable_shipping" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exshipping_total_payable"); ?>" />
+                                        <input type="number" step="any" id="payable_shipping" name="payable_shipping" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsShipping[0]->payable_total) ? $exportDocumentsShipping[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exshipping_total_payable"); ?>" />
                                         <label id="error-payable_shipping" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="container_value_shipping"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
-                                            <label class="control-label" id="container_value_shipping">0</label>
+                                            <label class="control-label" id="container_value_shipping"><?php echo isset($exportDocumentsShipping[0]->container_value_total) ? $exportDocumentsShipping[0]->container_value_total + 0 : '0'; ?></label>
                                         </div>
                                     </div>
                                 </div>
@@ -979,44 +883,25 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerShippingValue = 0; foreach($exportDocumentsShippingContainers as $shippingcontainer) { ?>
+                                            <?php if($shippingcontainer->dispatch_id == $containerdetail->dispatch_id) { $containerShippingValue = $shippingcontainer->container_value + 0; break;  } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="<?php echo 0; ?>" class="form-control text-uppercase" id="shipping_container_value" name="shipping_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerShippingValue + 0; ?>" class="form-control text-uppercase" id="shipping_container_value" name="shipping_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
 
-
+                                
                             </div>
 
                             <div class="row mb-3 mt-4">
-                                <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-danger col-md-2" style="margin-right: 5px;" id="btnResetShipping" name="btnResetShipping"><?php echo $this->lang->line('reset'); ?></button>
-                                    <button type="button" class="btn btn-primary col-md-2" id="btnSaveShipping" name="btnSaveShipping"><?php echo $this->lang->line('save'); ?></button>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveShipping" name="btnSaveShipping"><?php echo $this->lang->line('save'); ?></button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div id="divInvoiceListShipping">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><?php echo $this->lang->line("invoice_list"); ?></h5>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table class="datatables-demo table table-striped table-bordered" id="xin_table_invoice_shipping" style="width: 100% !important;">
-                                        <thead>
-                                            <tr>
-                                                <th><?php echo $this->lang->line("action"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_no"); ?></th>
-                                                <th><?php echo $this->lang->line("supplier_name"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_date"); ?></th>
-                                                <th><?php echo $this->lang->line("export_subtotal"); ?></th>
-                                                <th><?php echo $this->lang->line("export_iva"); ?></th>
-                                                <th><?php echo $this->lang->line("export_retefuente"); ?></th>
-                                                <th><?php echo $this->lang->line("export_total_payable"); ?></th>
-                                                <th><?php echo $this->lang->line("container_value"); ?></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="tab-pane fade" id="nav-fumigation" role="tabpanel" aria-labelledby="nav-fumigation-tab">
@@ -1058,36 +943,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalAmountFumigation"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalAmountFumigation" name="lblTotalAmountFumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalTaxAmountFumigation"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalTaxAmountFumigation" name="lblTotalTaxAmountFumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblAllowanceAmountFumigation"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblAllowanceAmountFumigation" name="lblAllowanceAmountFumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblPayableAmountFumigation"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblPayableAmountFumigation" name="lblPayableAmountFumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        </div>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="total_container_value"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
@@ -1110,7 +991,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_fumigation" id="supplier_name_fumigation" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersFumigation as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsFumigation[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_fumigation" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
@@ -1118,7 +999,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                                     <div class="col-md-3">
                                         <label for="issued_date_fumigation"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_fumigation" name="issued_date_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_fumigation" name="issued_date_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->invoice_date) ? $exportDocumentsFumigation[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_fumigation" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_fumigation" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -1127,32 +1008,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_fumigation" name="subtotal_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exfumigation_subtotal"); ?>" />
+                                        <input type="number" step="any" id="subtotal_fumigation" name="subtotal_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->sub_total) ? $exportDocumentsFumigation[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exfumigation_subtotal"); ?>" />
                                         <label id="error-subtotal_fumigation" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_fumigation" name="iva_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exfumigation_iva"); ?>" />
+                                        <input type="number" step="any" id="iva_fumigation" name="iva_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->tax_total) ? $exportDocumentsFumigation[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exfumigation_iva"); ?>" />
                                         <label id="error-iva_fumigation" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_fumigation" name="retefuente_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exfumigation_retefuente"); ?>" />
+                                        <input type="number" step="any" id="retefuente_fumigation" name="retefuente_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->allowance_total) ? $exportDocumentsFumigation[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exfumigation_retefuente"); ?>" />
                                         <label id="error-retefuente_fumigation" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_fumigation" name="payable_fumigation" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exfumigation_total_payable"); ?>" />
+                                        <input type="number" step="any" id="payable_fumigation" name="payable_fumigation" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsFumigation[0]->payable_total) ? $exportDocumentsFumigation[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exfumigation_total_payable"); ?>" />
                                         <label id="error-payable_fumigation" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="container_value_fumigation"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
-                                            <label class="control-label" id="container_value_fumigation">0</label>
+                                            <label class="control-label" id="container_value_fumigation"><?php echo isset($exportDocumentsFumigation[0]->container_value_total) ? $exportDocumentsFumigation[0]->container_value_total + 0 : '0'; ?></label>
                                         </div>
                                     </div>
                                 </div>
@@ -1186,42 +1067,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerFumigationValue = 0; foreach($exportDocumentsFumigationContainers as $fumigationcontainers) { ?>
+                                            <?php if($fumigationcontainers->dispatch_id == $containerdetail->dispatch_id) { $containerFumigationValue = $fumigationcontainers->container_value + 0; break;  } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="<?php echo 0; ?>" class="form-control text-uppercase" id="fumigation_container_value" name="fumigation_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerFumigationValue + 0; ?>" class="form-control text-uppercase" id="fumigation_container_value" name="fumigation_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
                             </div>
 
                             <div class="row mb-3 mt-4">
-                                <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-danger col-md-2" style="margin-right: 5px;" id="btnResetFumigation" name="btnResetFumigation"><?php echo $this->lang->line('reset'); ?></button>
-                                    <button type="button" class="btn btn-primary col-md-2" id="btnSaveFumigation" name="btnSaveFumigation"><?php echo $this->lang->line('save'); ?></button>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveFumigation" name="btnSaveFumigation"><?php echo $this->lang->line('save'); ?></button>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div id="divInvoiceListFumigation">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><?php echo $this->lang->line("invoice_list"); ?></h5>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table class="datatables-demo table table-striped table-bordered" id="xin_table_invoice_fumigation" style="width: 100% !important;">
-                                        <thead>
-                                            <tr>
-                                                <th><?php echo $this->lang->line("action"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_no"); ?></th>
-                                                <th><?php echo $this->lang->line("supplier_name"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_date"); ?></th>
-                                                <th><?php echo $this->lang->line("export_subtotal"); ?></th>
-                                                <th><?php echo $this->lang->line("export_iva"); ?></th>
-                                                <th><?php echo $this->lang->line("export_retefuente"); ?></th>
-                                                <th><?php echo $this->lang->line("export_total_payable"); ?></th>
-                                                <th><?php echo $this->lang->line("container_value"); ?></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="tab-pane fade" id="nav-coteros" role="tabpanel" aria-labelledby="nav-coteros-tab">
@@ -1263,36 +1124,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalAmountCoteros"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalAmountCoteros" name="lblTotalAmountCoteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalTaxAmountCoteros"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalTaxAmountCoteros" name="lblTotalTaxAmountCoteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblAllowanceAmountCoteros"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblAllowanceAmountCoteros" name="lblAllowanceAmountCoteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblPayableAmountCoteros"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblPayableAmountCoteros" name="lblPayableAmountCoteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        </div>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="total_container_value"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
@@ -1315,7 +1172,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_coteros" id="supplier_name_coteros" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersCoteros as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsCoteros[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_coteros" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
@@ -1323,7 +1180,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                                     <div class="col-md-3">
                                         <label for="issued_date_coteros"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_coteros" name="issued_date_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_coteros" name="issued_date_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->invoice_date) ? $exportDocumentsCoteros[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_coteros" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_coteros" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -1332,32 +1189,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_coteros" name="subtotal_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_subtotal"); ?>" />
+                                        <input type="number" step="any" id="subtotal_coteros" name="subtotal_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->sub_total) ? $exportDocumentsCoteros[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("excoteros_subtotal"); ?>" />
                                         <label id="error-subtotal_coteros" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_coteros" name="iva_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_iva"); ?>" />
+                                        <input type="number" step="any" id="iva_coteros" name="iva_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->tax_total) ? $exportDocumentsCoteros[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("excoteros_iva"); ?>" />
                                         <label id="error-iva_coteros" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_coteros" name="retefuente_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_retefuente"); ?>" />
+                                        <input type="number" step="any" id="retefuente_coteros" name="retefuente_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->allowance_total) ? $exportDocumentsCoteros[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("excoteros_retefuente"); ?>" />
                                         <label id="error-retefuente_coteros" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_coteros" name="payable_coteros" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("excoteros_total_payable"); ?>" />
+                                        <input type="number" step="any" id="payable_coteros" name="payable_coteros" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsCoteros[0]->payable_total) ? $exportDocumentsCoteros[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("excoteros_total_payable"); ?>" />
                                         <label id="error-payable_coteros" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="container_value_coteros"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
-                                            <label class="control-label" id="container_value_coteros">0</label>
+                                            <label class="control-label" id="container_value_coteros"><?php echo isset($exportDocumentsCoteros[0]->container_value_total) ? $exportDocumentsCoteros[0]->container_value_total + 0 : '0'; ?></label>
                                         </div>
                                     </div>
                                 </div>
@@ -1391,42 +1248,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerCoterosValue = 0; foreach($exportDocumentsCoterosContainers as $coteroscontainers) { ?>
+                                            <?php if($coteroscontainers->dispatch_id == $containerdetail->dispatch_id) { $containerCoterosValue = $coteroscontainers->container_value + 0; break;  } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="<?php echo 0; ?>" class="form-control text-uppercase" id="coteros_container_value" name="coteros_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerCoterosValue + 0; ?>" class="form-control text-uppercase" id="coteros_container_value" name="coteros_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
                             </div>
 
                             <div class="row mb-3 mt-4">
-                                <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-danger col-md-2" style="margin-right: 5px;" id="btnResetCoteros" name="btnResetCoteros"><?php echo $this->lang->line('reset'); ?></button>
-                                    <button type="button" class="btn btn-primary col-md-2" id="btnSaveCoteros" name="btnSaveCoteros"><?php echo $this->lang->line('save'); ?></button>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveCoteros" name="btnSaveCoteros"><?php echo $this->lang->line('save'); ?></button>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div id="divInvoiceListCoteros">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><?php echo $this->lang->line("invoice_list"); ?></h5>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table class="datatables-demo table table-striped table-bordered" id="xin_table_invoice_coteros" style="width: 100% !important;">
-                                        <thead>
-                                            <tr>
-                                                <th><?php echo $this->lang->line("action"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_no"); ?></th>
-                                                <th><?php echo $this->lang->line("supplier_name"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_date"); ?></th>
-                                                <th><?php echo $this->lang->line("export_subtotal"); ?></th>
-                                                <th><?php echo $this->lang->line("export_iva"); ?></th>
-                                                <th><?php echo $this->lang->line("export_retefuente"); ?></th>
-                                                <th><?php echo $this->lang->line("export_total_payable"); ?></th>
-                                                <th><?php echo $this->lang->line("container_value"); ?></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="tab-pane fade" id="nav-phyto" role="tabpanel" aria-labelledby="nav-phyto-tab">
@@ -1468,36 +1305,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalAmountPhyto"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalAmountPhyto" name="lblTotalAmountPhyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalTaxAmountPhyto"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalTaxAmountPhyto" name="lblTotalTaxAmountPhyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblAllowanceAmountPhyto"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblAllowanceAmountPhyto" name="lblAllowanceAmountPhyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblPayableAmountPhyto"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblPayableAmountPhyto" name="lblPayableAmountPhyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        </div>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="total_container_value"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
@@ -1520,7 +1353,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_phyto" id="supplier_name_phyto" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersPhyto as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsPhyto[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_phyto" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
@@ -1528,7 +1361,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                                     <div class="col-md-3">
                                         <label for="issued_date_phyto"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_phyto" name="issued_date_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_phyto" name="issued_date_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->invoice_date) ? $exportDocumentsPhyto[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_phyto" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_phyto" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -1537,32 +1370,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_phyto" name="subtotal_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exphyto_subtotal"); ?>" />
+                                        <input type="number" step="any" id="subtotal_phyto" name="subtotal_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->sub_total) ? $exportDocumentsPhyto[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exphyto_subtotal"); ?>" />
                                         <label id="error-subtotal_phyto" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_phyto" name="iva_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exphyto_iva"); ?>" />
+                                        <input type="number" step="any" id="iva_phyto" name="iva_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->tax_total) ? $exportDocumentsPhyto[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exphyto_iva"); ?>" />
                                         <label id="error-iva_phyto" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_phyto" name="retefuente_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exphyto_retefuente"); ?>" />
+                                        <input type="number" step="any" id="retefuente_phyto" name="retefuente_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->allowance_total) ? $exportDocumentsPhyto[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exphyto_retefuente"); ?>" />
                                         <label id="error-retefuente_phyto" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_phyto" name="payable_phyto" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exphyto_total_payable"); ?>" />
+                                        <input type="number" step="any" id="payable_phyto" name="payable_phyto" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsPhyto[0]->payable_total) ? $exportDocumentsPhyto[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exphyto_total_payable"); ?>" />
                                         <label id="error-payable_phyto" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="container_value_phyto"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
-                                            <label class="control-label" id="container_value_phyto">0</label>
+                                            <label class="control-label" id="container_value_phyto"><?php echo isset($exportDocumentsPhyto[0]->container_value_total) ? $exportDocumentsPhyto[0]->container_value_total + 0 : '0'; ?></label>
                                         </div>
                                     </div>
                                 </div>
@@ -1596,42 +1429,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerPhytoValue = 0; foreach($exportDocumentsPhytoContainers as $phytocontainers) { ?>
+                                            <?php if($phytocontainers->dispatch_id == $containerdetail->dispatch_id) { $containerPhytoValue = $phytocontainers->container_value + 0; break;  } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="<?php echo 0; ?>" class="form-control text-uppercase" id="phyto_container_value" name="phyto_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerPhytoValue + 0; ?>" class="form-control text-uppercase" id="phyto_container_value" name="phyto_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
                             </div>
 
                             <div class="row mb-3 mt-4">
-                                <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-danger col-md-2" style="margin-right: 5px;" id="btnResetPhyto" name="btnResetPhyto"><?php echo $this->lang->line('reset'); ?></button>
-                                    <button type="button" class="btn btn-primary col-md-2" id="btnSavePhyto" name="btnSavePhyto"><?php echo $this->lang->line('save'); ?></button>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary col-md-4" id="btnSavePhyto" name="btnSavePhyto"><?php echo $this->lang->line('save'); ?></button>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div id="divInvoiceListPhyto">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><?php echo $this->lang->line("invoice_list"); ?></h5>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table class="datatables-demo table table-striped table-bordered" id="xin_table_invoice_phyto" style="width: 100% !important;">
-                                        <thead>
-                                            <tr>
-                                                <th><?php echo $this->lang->line("action"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_no"); ?></th>
-                                                <th><?php echo $this->lang->line("supplier_name"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_date"); ?></th>
-                                                <th><?php echo $this->lang->line("export_subtotal"); ?></th>
-                                                <th><?php echo $this->lang->line("export_iva"); ?></th>
-                                                <th><?php echo $this->lang->line("export_retefuente"); ?></th>
-                                                <th><?php echo $this->lang->line("export_total_payable"); ?></th>
-                                                <th><?php echo $this->lang->line("container_value"); ?></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="tab-pane fade" id="nav-incentives" role="tabpanel" aria-labelledby="nav-incentives-tab">
@@ -1673,36 +1486,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalAmountIncentives"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalAmountIncentives" name="lblTotalAmountIncentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalTaxAmountIncentives"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalTaxAmountIncentives" name="lblTotalTaxAmountIncentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblAllowanceAmountIncentives"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblAllowanceAmountIncentives" name="lblAllowanceAmountIncentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblPayableAmountIncentives"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblPayableAmountIncentives" name="lblPayableAmountIncentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        </div>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="total_container_value"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
@@ -1725,7 +1534,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_incentives" id="supplier_name_incentives" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersIncentives as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsIncentives[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_incentives" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
@@ -1733,7 +1542,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                                     <div class="col-md-3">
                                         <label for="issued_date_incentives"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_incentives" name="issued_date_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_incentives" name="issued_date_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->invoice_date) ? $exportDocumentsIncentives[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_incentives" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_incentives" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -1742,32 +1551,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_incentives" name="subtotal_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exincentives_subtotal"); ?>" />
+                                        <input type="number" step="any" id="subtotal_incentives" name="subtotal_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->sub_total) ? $exportDocumentsIncentives[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exincentives_subtotal"); ?>" />
                                         <label id="error-subtotal_incentives" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_incentives" name="iva_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exincentives_iva"); ?>" />
+                                        <input type="number" step="any" id="iva_incentives" name="iva_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->tax_total) ? $exportDocumentsIncentives[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exincentives_iva"); ?>" />
                                         <label id="error-iva_incentives" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_incentives" name="retefuente_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exincentives_retefuente"); ?>" />
+                                        <input type="number" step="any" id="retefuente_incentives" name="retefuente_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->allowance_total) ? $exportDocumentsIncentives[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exincentives_retefuente"); ?>" />
                                         <label id="error-retefuente_incentives" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_incentives" name="payable_incentives" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exincentives_total_payable"); ?>" />
+                                        <input type="number" step="any" id="payable_incentives" name="payable_incentives" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsIncentives[0]->payable_total) ? $exportDocumentsIncentives[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exincentives_total_payable"); ?>" />
                                         <label id="error-payable_incentives" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="container_value_incentives"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
-                                            <label class="control-label" id="container_value_incentives">0</label>
+                                            <label class="control-label" id="container_value_incentives"><?php echo isset($exportDocumentsIncentives[0]->container_value_total) ? $exportDocumentsIncentives[0]->container_value_total + 0 : '0'; ?></label>
                                         </div>
                                     </div>
                                 </div>
@@ -1801,42 +1610,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerIncentivesValue = 0; foreach($exportDocumentsIncentivesContainers as $incentivescontainers) { ?>
+                                            <?php if($incentivescontainers->dispatch_id == $containerdetail->dispatch_id) { $containerIncentivesValue = $incentivescontainers->container_value + 0; break;  } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="<?php echo 0; ?>" class="form-control text-uppercase" id="incentives_container_value" name="incentives_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerIncentivesValue + 0; ?>" class="form-control text-uppercase" id="incentives_container_value" name="incentives_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
                             </div>
 
                             <div class="row mb-3 mt-4">
-                                <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-danger col-md-2" style="margin-right: 5px;" id="btnResetIncentives" name="btnResetIncentives"><?php echo $this->lang->line('reset'); ?></button>
-                                    <button type="button" class="btn btn-primary col-md-2" id="btnSaveIncentives" name="btnSaveIncentives"><?php echo $this->lang->line('save'); ?></button>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary col-md-4" id="btnSaveIncentives" name="btnSaveIncentives"><?php echo $this->lang->line('save'); ?></button>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div id="divInvoiceListIncentives">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><?php echo $this->lang->line("invoice_list"); ?></h5>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table class="datatables-demo table table-striped table-bordered" id="xin_table_invoice_incentives" style="width: 100% !important;">
-                                        <thead>
-                                            <tr>
-                                                <th><?php echo $this->lang->line("action"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_no"); ?></th>
-                                                <th><?php echo $this->lang->line("supplier_name"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_date"); ?></th>
-                                                <th><?php echo $this->lang->line("export_subtotal"); ?></th>
-                                                <th><?php echo $this->lang->line("export_iva"); ?></th>
-                                                <th><?php echo $this->lang->line("export_retefuente"); ?></th>
-                                                <th><?php echo $this->lang->line("export_total_payable"); ?></th>
-                                                <th><?php echo $this->lang->line("container_value"); ?></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="tab-pane fade" id="nav-remobilization" role="tabpanel" aria-labelledby="nav-remobilization-tab">
@@ -1878,36 +1667,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalAmountRemobilization"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalAmountRemobilization" name="lblTotalAmountRemobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblTotalTaxAmountRemobilization"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblTotalTaxAmountRemobilization" name="lblTotalTaxAmountRemobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_iva"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblAllowanceAmountRemobilization"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblAllowanceAmountRemobilization" name="lblAllowanceAmountRemobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_retefuente"); ?>" />
+                                        </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <!-- <div class="input-group">
+                                        <div class="input-group">
                                             <label class="control-label" id="lblPayableAmountRemobilization"></label>
-                                        </div> -->
-                                        <input type="number" step="any" id="lblPayableAmountRemobilization" name="lblPayableAmountRemobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("export_total_payable"); ?>" />
+                                        </div>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="total_container_value"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
@@ -1930,7 +1715,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <select class="form-control" name="supplier_name_remobilization" id="supplier_name_remobilization" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
                                             <?php foreach ($exportSuppliersRemobilization as $supplier) { ?>
-                                                <option value="<?php echo $supplier->id; ?>"><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
+                                                <option value="<?php echo $supplier->id; ?>" <?php if ($exportDocumentsRemobilization[0]->supplier_id == $supplier->id) : ?> selected="selected" <?php endif; ?>><?php echo $supplier->supplier_name . " - " . $supplier->supplier_id; ?></option>
                                             <?php } ?>
                                         </select>
                                         <label id="error-supplier_name_remobilization" class="error-text"><?php echo $this->lang->line("error_supplier"); ?></label>
@@ -1938,7 +1723,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                                     <div class="col-md-3">
                                         <label for="issued_date_remobilization"><?php echo $this->lang->line("issued_date"); ?></label>
-                                        <input type="datetime-local" id="issued_date_remobilization" name="issued_date_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
+                                        <input type="datetime-local" id="issued_date_remobilization" name="issued_date_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->invoice_date) ? $exportDocumentsRemobilization[0]->invoice_date : ''; ?>" placeholder="<?php echo $this->lang->line("issued_date"); ?>" />
                                         <input type="text" id="formatted_date_remobilization" class="form-control text-uppercase" placeholder="DD/MM/YYYY HH:MM AM/PM" readonly style="display: none;" />
                                         <label id="error-issued_date_remobilization" class="error-text"><?php echo $this->lang->line("error_issued_date"); ?></label>
                                     </div>
@@ -1947,32 +1732,32 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="row mb-3">
                                     <div class="col-md-2">
                                         <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
-                                        <input type="number" step="any" id="subtotal_remobilization" name="subtotal_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exremobilization_subtotal"); ?>" />
+                                        <input type="number" step="any" id="subtotal_remobilization" name="subtotal_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->sub_total) ? $exportDocumentsRemobilization[0]->sub_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exremobilization_subtotal"); ?>" />
                                         <label id="error-subtotal_remobilization" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_iva"><?php echo $this->lang->line("export_iva"); ?></label>
-                                        <input type="number" step="any" id="iva_remobilization" name="iva_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exremobilization_iva"); ?>" />
+                                        <input type="number" step="any" id="iva_remobilization" name="iva_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->tax_total) ? $exportDocumentsRemobilization[0]->tax_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exremobilization_iva"); ?>" />
                                         <label id="error-iva_remobilization" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label for="export_retefuente"><?php echo $this->lang->line("export_retefuente"); ?></label>
-                                        <input type="number" step="any" id="retefuente_remobilization" name="retefuente_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exremobilization_retefuente"); ?>" />
+                                        <input type="number" step="any" id="retefuente_remobilization" name="retefuente_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->allowance_total) ? $exportDocumentsRemobilization[0]->allowance_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exremobilization_retefuente"); ?>" />
                                         <label id="error-retefuente_remobilization" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-3">
                                         <label for="export_total_payable"><?php echo $this->lang->line("export_total_payable"); ?></label>
-                                        <input type="number" step="any" id="payable_remobilization" name="payable_remobilization" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("exremobilization_total_payable"); ?>" />
+                                        <input type="number" step="any" id="payable_remobilization" name="payable_remobilization" class="form-control text-uppercase" value="<?php echo isset($exportDocumentsRemobilization[0]->payable_total) ? $exportDocumentsRemobilization[0]->payable_total + 0 : '0'; ?>" placeholder="<?php echo $this->lang->line("exremobilization_total_payable"); ?>" />
                                         <label id="error-payable_remobilization" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
-
+                                    
                                     <div class="col-md-3">
                                         <label for="container_value_remobilization"><?php echo $this->lang->line("total_container_value"); ?></label>
                                         <div class="input-group">
-                                            <label class="control-label" id="container_value_remobilization">0</label>
+                                            <label class="control-label" id="container_value_remobilization"><?php echo isset($exportDocumentsRemobilization[0]->container_value_total) ? $exportDocumentsRemobilization[0]->container_value_total + 0 : '0'; ?></label>
                                         </div>
                                     </div>
                                 </div>
@@ -2005,8 +1790,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <?php echo sprintf("%0.3f", $containerdetail->total_volume + 0); ?>
                                         </label>
 
+                                        <?php $containerRemobilizationValue = 0; foreach($exportDocumentsRemobilizationContainers as $remobilizationcontainers) { ?>
+                                            <?php if($remobilizationcontainers->dispatch_id == $containerdetail->dispatch_id) { $containerRemobilizationValue = $remobilizationcontainers->container_value + 0; break;  } ?>
+                                        <?php } ?>
+
                                         <div class="col-md-3">
-                                            <input type="number" step="any" value="<?php echo 0; ?>" class="form-control text-uppercase" id="remobilization_container_value" name="remobilization_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
+                                            <input type="number" step="any" value="<?php echo $containerRemobilizationValue + 0; ?>" class="form-control text-uppercase" id="remobilization_container_value" name="remobilization_container_value[<?php echo $containerdetail->dispatch_id; ?>]" />
                                         </div>
                                     </div>
                                 <?php } ?>
@@ -2014,35 +1803,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div class="row mb-3 mt-4">
                                 <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-danger col-md-2" style="margin-right: 5px;" id="btnResetRemobilization" name="btnResetRemobilization"><?php echo $this->lang->line('reset'); ?></button>
-                                    <button type="button" class="btn btn-primary col-md-2" id="btnSaveRemobilization" name="btnSaveRemobilization"><?php echo $this->lang->line('save'); ?></button>
-                                </div>
-                            </div>
-
-                            <div id="divInvoiceListRemobilization">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><?php echo $this->lang->line("invoice_list"); ?></h5>
-                                </div>
-                                <div style="overflow-x: auto;">
-                                    <table class="datatables-demo table table-striped table-bordered" id="xin_table_invoice_remobilization" style="width: 100% !important;">
-                                        <thead>
-                                            <tr>
-                                                <th><?php echo $this->lang->line("action"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_no"); ?></th>
-                                                <th><?php echo $this->lang->line("supplier_name"); ?></th>
-                                                <th><?php echo $this->lang->line("invoice_date"); ?></th>
-                                                <th><?php echo $this->lang->line("export_subtotal"); ?></th>
-                                                <th><?php echo $this->lang->line("export_iva"); ?></th>
-                                                <th><?php echo $this->lang->line("export_retefuente"); ?></th>
-                                                <th><?php echo $this->lang->line("export_total_payable"); ?></th>
-                                                <th><?php echo $this->lang->line("container_value"); ?></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveRemobilization" name="btnSaveRemobilization"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="tab-pane fade" id="nav-containercost" role="tabpanel" aria-labelledby="nav-containercost-tab">
                             <div id="divContainersContainer">
 
@@ -2095,7 +1860,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <div class="row mb-3 mt-4">
                                 <div class="d-flex justify-content-end">
-                                    <button type="button" class="btn btn-primary col-md-2" id="btnSaveContainerCost" name="btnSaveContainerCost"><?php echo $this->lang->line('save'); ?></button>
+                                    <button type="button" class="btn btn-primary col-md-4" id="btnSaveContainerCost" name="btnSaveContainerCost"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
                         </div>
@@ -2114,8 +1879,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
     var common_error = "<?php echo $this->lang->line("common_error"); ?>";
     var total_error = "<?php echo $this->lang->line("total_error"); ?>";
     var data_updated = "<?php echo $this->lang->line("data_updated"); ?>";
-    var text_save = "<?php echo $this->lang->line("save"); ?>";
-    var text_update = "<?php echo $this->lang->line("update"); ?>";
     var totalPayableAmount = 0;
     var uploadPdfFileCustomAgency = "";
     var fileExtension = "";
@@ -2137,7 +1900,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_custom").hide();
         $("#error-payable_custom").hide();
         $("#divXml").hide();
-        $("#btnResetCustoms").hide();
 
         $("#error-selectdocitr").hide();
         $("#error-invoice_no_itr").hide();
@@ -2149,7 +1911,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_itr").hide();
         $("#error-payable_itr").hide();
         $("#divXmlITR").hide();
-        $("#btnResetITR").hide();
 
         $("#error-selectdocport").hide();
         $("#error-invoice_no_port").hide();
@@ -2161,7 +1922,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_port").hide();
         $("#error-payable_port").hide();
         $("#divXmlPort").hide();
-        $("#btnResetPort").hide();
 
         $("#error-selectdocshipping").hide();
         $("#error-invoice_no_shipping").hide();
@@ -2173,7 +1933,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_shipping").hide();
         $("#error-payable_shipping").hide();
         $("#divXmlShipping").hide();
-        $("#btnResetShipping").hide();
 
         $("#error-selectdocfumigation").hide();
         $("#error-invoice_no_fumigation").hide();
@@ -2185,7 +1944,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_fumigation").hide();
         $("#error-payable_fumigation").hide();
         $("#divXmlFumigation").hide();
-        $("#btnResetFumigation").hide();
 
         $("#error-selectdoccoteros").hide();
         $("#error-invoice_no_coteros").hide();
@@ -2197,7 +1955,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_coteros").hide();
         $("#error-payable_coteros").hide();
         $("#divXmlCoteros").hide();
-        $("#btnResetCoteros").hide();
 
         $("#error-selectdocphyto").hide();
         $("#error-invoice_no_phyto").hide();
@@ -2209,7 +1966,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_phyto").hide();
         $("#error-payable_phyto").hide();
         $("#divXmlPhyto").hide();
-        $("#btnResetPhyto").hide();
 
         $("#error-selectdocincentives").hide();
         $("#error-invoice_no_incentives").hide();
@@ -2221,7 +1977,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_incentives").hide();
         $("#error-payable_incentives").hide();
         $("#divXmlIncentives").hide();
-        $("#btnResetIncentives").hide();
 
         $("#error-selectdocremobilization").hide();
         $("#error-invoice_no_remobilization").hide();
@@ -2233,11 +1988,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-retefuente_remobilization").hide();
         $("#error-payable_remobilization").hide();
         $("#divXmlRemobilization").hide();
-        $("#btnResetRemobilization").hide();
-
-        var selectedInvoiceId = 0;
-        var selectedExportId = 0;
-        var selectedExportType = 0;
 
         $("#btnSaveCustoms").click(function() {
 
@@ -2276,13 +2026,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 //     return false;
                 // }
 
-                var isValid1 = true,
-                    isValid2 = true,
-                    isValid3 = true,
-                    isValid4 = true,
-                    isValid5 = true,
-                    isValid6 = true,
-                    isValid7 = true;
+                var isValid1 = true, isValid2 = true, isValid3 = true, isValid4 = true, isValid5 = true, isValid6 = true, isValid7 = true;
                 if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdf').is(':visible')) {
 
                     if ($("#invoice_number_custom").val().length == 0) {
@@ -2347,8 +2091,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("exportId", $("#hdnExportId").val());
                     fd.append("originId", $("#hdnOriginId").val());
                     fd.append('saNumber', $("#hdnSaNumber").val());
-                    fd.append('selectedInvoiceId', selectedInvoiceId);
-                    fd.append('selectedExportId', selectedExportId);
                     fd.append("fileExtension", fileExtension);
                     fd.append("updateContainerValueData_Custom", JSON.stringify(arrUpdateContainerValue));
                     fd.append("uploadPdfFileCustomAgency", uploadPdfFileCustomAgency);
@@ -2357,14 +2099,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         fd.append('invoiceNo_Custom', $("#lblInvoiceNoCustoms").text());
                         fd.append('supplierName_Custom', supplierId);
                         fd.append('formattedDate_Custom', $("#lblIssuedDateCustoms").text());
-                        // fd.append('subTotal_Custom', subTotalCustoms);
-                        // fd.append('iva_Custom', ivaCustoms);
-                        // fd.append('retefuente_Custom', retefuenteCustoms);
-                        // fd.append('payable_Custom', payableCustoms);
-                        fd.append('subTotal_Custom', $("#lblTotalAmountCustoms").val());
-                        fd.append('iva_Custom', $("#lblTotalTaxAmountCustoms").val());
-                        fd.append('retefuente_Custom', $("#lblAllowanceAmountCustoms").val());
-                        fd.append('payable_Custom', $("#lblPayableAmountCustoms").val());
+                        fd.append('subTotal_Custom', subTotalCustoms);
+                        fd.append('iva_Custom', ivaCustoms);
+                        fd.append('retefuente_Custom', retefuenteCustoms);
+                        fd.append('payable_Custom', payableCustoms);
                     } else {
 
                         fd.append('invoiceNo_Custom', $("#invoice_number_custom").val());
@@ -2389,89 +2127,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         success: function(jsonResult) {
                             $('#loading').hide();
 
-                            selectedInvoiceId = 0;
-                            selectedExportId = 0;
-                            selectedExportType = 0;
-
                             if (jsonResult.redirect == true) {
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
                                 toastr.success(data_updated);
-
-                                resetForm();
-                                $('#btnResetCustoms').hide();
-                                $('#btnSaveCustoms').text(text_save);
-                                $("#divInvoiceListCustoms").show();
-
-                                $("#xin_table_invoice_customs").DataTable({
-                                    data: JSON.parse(jsonResult.updatedlist),
-                                    columns: [{
-                                            data: "id",
-                                            render: function(data, type, row) {
-                                                return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editcustoms_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletecustoms_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                                            }
-                                        },
-                                        {
-                                            data: "invoice_no"
-                                        },
-                                        {
-                                            data: "supplier_name"
-                                        },
-                                        {
-                                            data: "invoice_date"
-                                        },
-                                        {
-                                            data: "sub_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "tax_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "allowance_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "payable_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "container_value_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        }
-                                    ],
-                                    scrollX: true, // ✅ Enables horizontal scrolling
-                                    autoWidth: true, // ✅ Enables automatic column sizing
-                                    scrollCollapse: true,
-                                    responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                                    bDestroy: true,
-                                    paging: false,
-                                    searching: false,
-                                    sorting: false,
-                                    language: {
-                                        url: datatable_language
-                                    }
-                                });
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -2528,14 +2188,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 //     return false;
                 // }
 
-                var isValid1 = true,
-                    isValid2 = true,
-                    isValid3 = true,
-                    isValid4 = true,
-                    isValid5 = true,
-                    isValid6 = true,
-                    isValid7 = true;
-                if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfITR').is(':visible')) {
+                var isValid1 = true, isValid2 = true, isValid3 = true, isValid4 = true, isValid5 = true, isValid6 = true, isValid7 = true;
+                 if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfITR').is(':visible')) {
 
                     if ($("#invoice_number_itr").val().length == 0) {
                         $("#error-invoice_no_itr").show();
@@ -2599,8 +2253,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("exportId", $("#hdnExportId").val());
                     fd.append("originId", $("#hdnOriginId").val());
                     fd.append('saNumber', $("#hdnSaNumber").val());
-                    fd.append('selectedInvoiceId', selectedInvoiceId);
-                    fd.append('selectedExportId', selectedExportId);
                     fd.append("fileExtension", fileExtension);
                     fd.append("updateContainerValueData_ITR", JSON.stringify(arrUpdateContainerValue));
                     fd.append("uploadPdfFileITR", uploadPdfFileCustomAgency);
@@ -2610,14 +2262,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         fd.append('invoiceNo_ITR', $("#lblInvoiceNoITR").text());
                         fd.append('supplierName_ITR', supplierId);
                         fd.append('formattedDate_ITR', $("#lblIssuedDateITR").text());
-                        // fd.append('subTotal_ITR', subTotalCustoms);
-                        // fd.append('iva_ITR', ivaCustoms);
-                        // fd.append('retefuente_ITR', retefuenteCustoms);
-                        // fd.append('payable_ITR', payableCustoms);
-                        fd.append('subTotal_ITR', $("#lblTotalAmountITR").val());
-                        fd.append('iva_ITR', $("#lblTotalTaxAmountITR").val());
-                        fd.append('retefuente_ITR', $("#lblAllowanceAmountITR").val());
-                        fd.append('payable_ITR', $("#lblPayableAmountITR").val());
+                        fd.append('subTotal_ITR', subTotalCustoms);
+                        fd.append('iva_ITR', ivaCustoms);
+                        fd.append('retefuente_ITR', retefuenteCustoms);
+                        fd.append('payable_ITR', payableCustoms);
                     } else {
 
                         fd.append('invoiceNo_ITR', $("#invoice_number_itr").val());
@@ -2642,90 +2290,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         success: function(jsonResult) {
                             $('#loading').hide();
 
-                            selectedInvoiceId = 0;
-                            selectedExportId = 0;
-                            selectedExportType = 0;
-
                             if (jsonResult.redirect == true) {
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
                                 toastr.success(data_updated);
-
-                                resetForm();
-                                $('#btnResetITR').hide();
-                                $('#btnSaveITR').text(text_save);
-                                $("#divInvoiceListITR").show();
-
-                                $("#xin_table_invoice_itr").DataTable({
-                                    data: JSON.parse(jsonResult.updatedlist),
-                                    columns: [{
-                                            data: "id",
-                                            render: function(data, type, row) {
-                                                return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="edititr_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteitr_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                                            }
-                                        },
-                                        {
-                                            data: "invoice_no"
-                                        },
-                                        {
-                                            data: "supplier_name"
-                                        },
-                                        {
-                                            data: "invoice_date"
-                                        },
-                                        {
-                                            data: "sub_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "tax_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "allowance_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "payable_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "container_value_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        }
-                                    ],
-                                    scrollX: true, // ✅ Enables horizontal scrolling
-                                    autoWidth: true, // ✅ Enables automatic column sizing
-                                    scrollCollapse: true,
-                                    responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                                    bDestroy: true,
-                                    paging: false,
-                                    searching: false,
-                                    sorting: false,
-                                    language: {
-                                        url: datatable_language
-                                    }
-                                });
-
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -2780,13 +2349,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 //     return false;
                 // }
 
-                var isValid1 = true,
-                    isValid2 = true,
-                    isValid3 = true,
-                    isValid4 = true,
-                    isValid5 = true,
-                    isValid6 = true,
-                    isValid7 = true;
+                var isValid1 = true, isValid2 = true, isValid3 = true, isValid4 = true, isValid5 = true, isValid6 = true, isValid7 = true;
                 if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfPort').is(':visible')) {
 
                     if ($("#invoice_number_port").val().length == 0) {
@@ -2852,8 +2415,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("exportId", $("#hdnExportId").val());
                     fd.append("originId", $("#hdnOriginId").val());
                     fd.append('saNumber', $("#hdnSaNumber").val());
-                    fd.append('selectedInvoiceId', selectedInvoiceId);
-                    fd.append('selectedExportId', selectedExportId);
                     fd.append("fileExtension", fileExtension);
                     fd.append("updateContainerValueData_Port", JSON.stringify(arrUpdateContainerValue));
                     fd.append("uploadPdfFilePort", uploadPdfFileCustomAgency);
@@ -2863,14 +2424,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         fd.append('invoiceNo_Port', $("#lblInvoiceNoPort").text());
                         fd.append('supplierName_Port', supplierId);
                         fd.append('formattedDate_Port', $("#lblIssuedDatePort").text());
-                        // fd.append('subTotal_Port', subTotalCustoms);
-                        // fd.append('iva_Port', ivaCustoms);
-                        // fd.append('retefuente_Port', retefuenteCustoms);
-                        // fd.append('payable_Port', payableCustoms);
-                        fd.append('subTotal_Port', $("#lblTotalAmountPort").val());
-                        fd.append('iva_Port', $("#lblTotalTaxAmountPort").val());
-                        fd.append('retefuente_Port', $("#lblAllowanceAmountPort").val());
-                        fd.append('payable_Port', $("#lblPayableAmountPort").val());
+                        fd.append('subTotal_Port', subTotalCustoms);
+                        fd.append('iva_Port', ivaCustoms);
+                        fd.append('retefuente_Port', retefuenteCustoms);
+                        fd.append('payable_Port', payableCustoms);
                     } else {
 
                         fd.append('invoiceNo_Port', $("#invoice_number_port").val());
@@ -2895,89 +2452,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         success: function(jsonResult) {
                             $('#loading').hide();
 
-                            selectedInvoiceId = 0;
-                            selectedExportId = 0;
-                            selectedExportType = 0;
-
                             if (jsonResult.redirect == true) {
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
                                 toastr.success(data_updated);
-
-                                resetForm();
-                                $('#btnResetPort').hide();
-                                $('#btnSavePort').text(text_save);
-                                $("#divInvoiceListPort").show();
-
-                                $("#xin_table_invoice_port").DataTable({
-                                    data: JSON.parse(jsonResult.updatedlist),
-                                    columns: [{
-                                            data: "id",
-                                            render: function(data, type, row) {
-                                                return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editport_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteport_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                                            }
-                                        },
-                                        {
-                                            data: "invoice_no"
-                                        },
-                                        {
-                                            data: "supplier_name"
-                                        },
-                                        {
-                                            data: "invoice_date"
-                                        },
-                                        {
-                                            data: "sub_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "tax_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "allowance_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "payable_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "container_value_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        }
-                                    ],
-                                    scrollX: true, // ✅ Enables horizontal scrolling
-                                    autoWidth: true, // ✅ Enables automatic column sizing
-                                    scrollCollapse: true,
-                                    responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                                    bDestroy: true,
-                                    paging: false,
-                                    searching: false,
-                                    sorting: false,
-                                    language: {
-                                        url: datatable_language
-                                    }
-                                });
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -3032,13 +2511,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 //     return false;
                 // }
 
-                var isValid1 = true,
-                    isValid2 = true,
-                    isValid3 = true,
-                    isValid4 = true,
-                    isValid5 = true,
-                    isValid6 = true,
-                    isValid7 = true;
+                var isValid1 = true, isValid2 = true, isValid3 = true, isValid4 = true, isValid5 = true, isValid6 = true, isValid7 = true;
                 if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfShipping').is(':visible')) {
 
                     if ($("#invoice_number_shipping").val().length == 0) {
@@ -3104,8 +2577,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("exportId", $("#hdnExportId").val());
                     fd.append("originId", $("#hdnOriginId").val());
                     fd.append('saNumber', $("#hdnSaNumber").val());
-                    fd.append('selectedInvoiceId', selectedInvoiceId);
-                    fd.append('selectedExportId', selectedExportId);
                     fd.append("fileExtension", fileExtension);
                     fd.append("updateContainerValueData_Shipping", JSON.stringify(arrUpdateContainerValue));
                     fd.append("uploadPdfFileShipping", uploadPdfFileCustomAgency);
@@ -3115,14 +2586,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         fd.append('invoiceNo_Shipping', $("#lblInvoiceNoShipping").text());
                         fd.append('supplierName_Shipping', supplierId);
                         fd.append('formattedDate_Shipping', $("#lblIssuedDateShipping").text());
-                        // fd.append('subTotal_Shipping', subTotalCustoms);
-                        // fd.append('iva_Shipping', ivaCustoms);
-                        // fd.append('retefuente_Shipping', retefuenteCustoms);
-                        // fd.append('payable_Shipping', payableCustoms);
-                        fd.append('subTotal_Shipping', $("#lblTotalAmountShipping").val());
-                        fd.append('iva_Shipping', $("#lblTotalTaxAmountShipping").val());
-                        fd.append('retefuente_Shipping', $("#lblAllowanceAmountShipping").val());
-                        fd.append('payable_Shipping', $("#lblPayableAmountShipping").val());
+                        fd.append('subTotal_Shipping', subTotalCustoms);
+                        fd.append('iva_Shipping', ivaCustoms);
+                        fd.append('retefuente_Shipping', retefuenteCustoms);
+                        fd.append('payable_Shipping', payableCustoms);
                     } else {
 
                         fd.append('invoiceNo_Shipping', $("#invoice_number_shipping").val());
@@ -3147,89 +2614,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         success: function(jsonResult) {
                             $('#loading').hide();
 
-                            selectedInvoiceId = 0;
-                            selectedExportId = 0;
-                            selectedExportType = 0;
-
                             if (jsonResult.redirect == true) {
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
                                 toastr.success(data_updated);
-
-                                resetForm();
-                                $('#btnResetShipping').hide();
-                                $('#btnSaveShipping').text(text_save);
-                                $("#divInvoiceListShipping").show();
-
-                                $("#xin_table_invoice_shipping").DataTable({
-                                    data: JSON.parse(jsonResult.updatedlist),
-                                    columns: [{
-                                            data: "id",
-                                            render: function(data, type, row) {
-                                                return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editshipping_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteshipping_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                                            }
-                                        },
-                                        {
-                                            data: "invoice_no"
-                                        },
-                                        {
-                                            data: "supplier_name"
-                                        },
-                                        {
-                                            data: "invoice_date"
-                                        },
-                                        {
-                                            data: "sub_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "tax_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "allowance_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "payable_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "container_value_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        }
-                                    ],
-                                    scrollX: true, // ✅ Enables horizontal scrolling
-                                    autoWidth: true, // ✅ Enables automatic column sizing
-                                    scrollCollapse: true,
-                                    responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                                    bDestroy: true,
-                                    paging: false,
-                                    searching: false,
-                                    sorting: false,
-                                    language: {
-                                        url: datatable_language
-                                    }
-                                });
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -3284,13 +2673,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 //     return false;
                 // }
 
-                var isValid1 = true,
-                    isValid2 = true,
-                    isValid3 = true,
-                    isValid4 = true,
-                    isValid5 = true,
-                    isValid6 = true,
-                    isValid7 = true;
+                var isValid1 = true, isValid2 = true, isValid3 = true, isValid4 = true, isValid5 = true, isValid6 = true, isValid7 = true;
                 if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfFumigation').is(':visible')) {
 
                     if ($("#invoice_number_fumigation").val().length == 0) {
@@ -3356,8 +2739,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     fd.append("exportId", $("#hdnExportId").val());
                     fd.append("originId", $("#hdnOriginId").val());
                     fd.append('saNumber', $("#hdnSaNumber").val());
-                    fd.append('selectedInvoiceId', selectedInvoiceId);
-                    fd.append('selectedExportId', selectedExportId);
                     fd.append("fileExtension", fileExtension);
                     fd.append("updateContainerValueData_Fumigation", JSON.stringify(arrUpdateContainerValue));
                     fd.append("uploadPdfFileFumigation", uploadPdfFileCustomAgency);
@@ -3367,14 +2748,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         fd.append('invoiceNo_Fumigation', $("#lblInvoiceNoFumigation").text());
                         fd.append('supplierName_Fumigation', supplierId);
                         fd.append('formattedDate_Fumigation', $("#lblIssuedDateFumigation").text());
-                        // fd.append('subTotal_Fumigation', subTotalCustoms);
-                        // fd.append('iva_Fumigation', ivaCustoms);
-                        // fd.append('retefuente_Fumigation', retefuenteCustoms);
-                        // fd.append('payable_Fumigation', payableCustoms);
-                        fd.append('subTotal_Fumigation', $("#lblTotalAmountFumigation").val());
-                        fd.append('iva_Fumigation', $("#lblTotalTaxAmountFumigation").val());
-                        fd.append('retefuente_Fumigation', $("#lblAllowanceAmountFumigation").val());
-                        fd.append('payable_Fumigation', $("#lblPayableAmountFumigation").val());
+                        fd.append('subTotal_Fumigation', subTotalCustoms);
+                        fd.append('iva_Fumigation', ivaCustoms);
+                        fd.append('retefuente_Fumigation', retefuenteCustoms);
+                        fd.append('payable_Fumigation', payableCustoms);
                     } else {
 
                         fd.append('invoiceNo_Fumigation', $("#invoice_number_fumigation").val());
@@ -3399,90 +2776,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         success: function(jsonResult) {
                             $('#loading').hide();
 
-                            selectedInvoiceId = 0;
-                            selectedExportId = 0;
-                            selectedExportType = 0;
-
                             if (jsonResult.redirect == true) {
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
                                 toastr.success(data_updated);
-
-                                resetForm();
-                                $('#btnResetFumigation').hide();
-                                $('#btnSaveFumigation').text(text_save);
-                                $("#divInvoiceListFumigation").show();
-
-                                $("#xin_table_invoice_fumigation").DataTable({
-                                    data: JSON.parse(jsonResult.updatedlist),
-                                    columns: [{
-                                            data: "id",
-                                            render: function(data, type, row) {
-                                                return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editfumigation_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletefumigation_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                                            }
-                                        },
-                                        {
-                                            data: "invoice_no"
-                                        },
-                                        {
-                                            data: "supplier_name"
-                                        },
-                                        {
-                                            data: "invoice_date"
-                                        },
-                                        {
-                                            data: "sub_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "tax_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "allowance_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "payable_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "container_value_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        }
-                                    ],
-                                    scrollX: true, // ✅ Enables horizontal scrolling
-                                    autoWidth: true, // ✅ Enables automatic column sizing
-                                    scrollCollapse: true,
-                                    responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                                    bDestroy: true,
-                                    paging: false,
-                                    searching: false,
-                                    sorting: false,
-                                    language: {
-                                        url: datatable_language
-                                    }
-                                });
-
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -3526,7 +2824,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             });
 
             if (arrUpdateContainerValue.length > 0) {
-
+                
                 if (fileExtension == "pdf" || fileExtension == "PDF" || fileExtension == "") {
                     totalPayableAmount = parseFloat($("#payable_coteros").val()) || 0;
                 }
@@ -3537,15 +2835,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 //     return false;
                 // }
 
-                var isValid1 = true,
-                    isValid2 = true,
-                    isValid3 = true,
-                    isValid4 = true,
-                    isValid5 = true,
-                    isValid6 = true,
-                    isValid7 = true;
+                var isValid1 = true, isValid2 = true, isValid3 = true, isValid4 = true, isValid5 = true, isValid6 = true, isValid7 = true;
                 if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfCoteros').is(':visible')) {
-
+                    
                     if ($("#invoice_number_coteros").val().length == 0) {
                         $("#error-invoice_no_coteros").show();
                         isValid1 = false;
@@ -3618,14 +2910,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         fd.append('invoiceNo_Coteros', $("#lblInvoiceNoCoteros").text());
                         fd.append('supplierName_Coteros', supplierId);
                         fd.append('formattedDate_Coteros', $("#lblIssuedDateCoteros").text());
-                        // fd.append('subTotal_Coteros', subTotalCustoms);
-                        // fd.append('iva_Coteros', ivaCustoms);
-                        // fd.append('retefuente_Coteros', retefuenteCustoms);
-                        // fd.append('payable_Coteros', payableCustoms);
-                        fd.append('subTotal_Coteros', $("#lblTotalAmountCoteros").val());
-                        fd.append('iva_Coteros', $("#lblTotalTaxAmountCoteros").val());
-                        fd.append('retefuente_Coteros', $("#lblAllowanceAmountCoteros").val());
-                        fd.append('payable_Coteros', $("#lblPayableAmountCoteros").val());
+                        fd.append('subTotal_Coteros', subTotalCustoms);
+                        fd.append('iva_Coteros', ivaCustoms);
+                        fd.append('retefuente_Coteros', retefuenteCustoms);
+                        fd.append('payable_Coteros', payableCustoms);
                     } else {
                         fd.append('invoiceNo_Coteros', $("#invoice_number_coteros").val());
                         fd.append('supplierName_Coteros', $("#supplier_name_coteros").val());
@@ -3649,89 +2937,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         success: function(jsonResult) {
                             $('#loading').hide();
 
-                            selectedInvoiceId = 0;
-                            selectedExportId = 0;
-                            selectedExportType = 0;
-
                             if (jsonResult.redirect == true) {
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
-                                toastr.success(data_updated);
-
-                                resetForm();
-                                $('#btnResetCoteros').hide();
-                                $('#btnSaveCoteros').text(text_save);
-                                $("#divInvoiceListCoteros").show();
-
-                                $("#xin_table_invoice_coteros").DataTable({
-                                    data: JSON.parse(jsonResult.updatedlist),
-                                    columns: [{
-                                            data: "id",
-                                            render: function(data, type, row) {
-                                                return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editcoteros_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletecoteros_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                                            }
-                                        },
-                                        {
-                                            data: "invoice_no"
-                                        },
-                                        {
-                                            data: "supplier_name"
-                                        },
-                                        {
-                                            data: "invoice_date"
-                                        },
-                                        {
-                                            data: "sub_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "tax_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "allowance_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "payable_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "container_value_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        }
-                                    ],
-                                    scrollX: true, // ✅ Enables horizontal scrolling
-                                    autoWidth: true, // ✅ Enables automatic column sizing
-                                    scrollCollapse: true,
-                                    responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                                    bDestroy: true,
-                                    paging: false,
-                                    searching: false,
-                                    sorting: false,
-                                    language: {
-                                        url: datatable_language
-                                    }
-                                });
+                                toastr.success(data_updated);       
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -3786,13 +2996,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 //     return false;
                 // }
 
-                var isValid1 = true,
-                    isValid2 = true,
-                    isValid3 = true,
-                    isValid4 = true,
-                    isValid5 = true,
-                    isValid6 = true,
-                    isValid7 = true;
+                var isValid1 = true, isValid2 = true, isValid3 = true, isValid4 = true, isValid5 = true, isValid6 = true, isValid7 = true;
                 if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfPhyto').is(':visible')) {
 
                     if ($("#invoice_number_phyto").val().length == 0) {
@@ -3866,14 +3070,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         fd.append('invoiceNo_Phyto', $("#lblInvoiceNoPhyto").text());
                         fd.append('supplierName_Phyto', supplierId);
                         fd.append('formattedDate_Phyto', $("#lblIssuedDatePhyto").text());
-                        // fd.append('subTotal_Phyto', subTotalCustoms);
-                        // fd.append('iva_Phyto', ivaCustoms);
-                        // fd.append('retefuente_Phyto', retefuenteCustoms);
-                        // fd.append('payable_Phyto', payableCustoms);
-                        fd.append('subTotal_Phyto', $("#lblTotalAmountPhyto").val());
-                        fd.append('iva_Phyto', $("#lblTotalTaxAmountPhyto").val());
-                        fd.append('retefuente_Phyto', $("#lblAllowanceAmountPhyto").val());
-                        fd.append('payable_Phyto', $("#lblPayableAmountPhyto").val());
+                        fd.append('subTotal_Phyto', subTotalCustoms);
+                        fd.append('iva_Phyto', ivaCustoms);
+                        fd.append('retefuente_Phyto', retefuenteCustoms);
+                        fd.append('payable_Phyto', payableCustoms);
                     } else {
 
                         fd.append('invoiceNo_Phyto', $("#invoice_number_phyto").val());
@@ -3898,89 +3098,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         success: function(jsonResult) {
                             $('#loading').hide();
 
-                            selectedInvoiceId = 0;
-                            selectedExportId = 0;
-                            selectedExportType = 0;
-
                             if (jsonResult.redirect == true) {
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
                                 toastr.success(data_updated);
-
-                                resetForm();
-                                $('#btnResetPhyto').hide();
-                                $('#btnSavePhyto').text(text_save);
-                                $("#divInvoiceListPhyto").show();
-
-                                $("#xin_table_invoice_phyto").DataTable({
-                                    data: JSON.parse(jsonResult.updatedlist),
-                                    columns: [{
-                                            data: "id",
-                                            render: function(data, type, row) {
-                                                return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editphyto_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletephyto_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                                            }
-                                        },
-                                        {
-                                            data: "invoice_no"
-                                        },
-                                        {
-                                            data: "supplier_name"
-                                        },
-                                        {
-                                            data: "invoice_date"
-                                        },
-                                        {
-                                            data: "sub_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "tax_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "allowance_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "payable_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "container_value_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        }
-                                    ],
-                                    scrollX: true, // ✅ Enables horizontal scrolling
-                                    autoWidth: true, // ✅ Enables automatic column sizing
-                                    scrollCollapse: true,
-                                    responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                                    bDestroy: true,
-                                    paging: false,
-                                    searching: false,
-                                    sorting: false,
-                                    language: {
-                                        url: datatable_language
-                                    }
-                                });
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -4035,13 +3157,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 //     return false;
                 // }
 
-                var isValid1 = true,
-                    isValid2 = true,
-                    isValid3 = true,
-                    isValid4 = true,
-                    isValid5 = true,
-                    isValid6 = true,
-                    isValid7 = true;
+                var isValid1 = true, isValid2 = true, isValid3 = true, isValid4 = true, isValid5 = true, isValid6 = true, isValid7 = true;
                 if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfIncentives').is(':visible')) {
 
                     if ($("#invoice_number_incentives").val().length == 0) {
@@ -4115,14 +3231,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         fd.append('invoiceNo_Incentives', $("#lblInvoiceNoIncentives").text());
                         fd.append('supplierName_Incentives', supplierId);
                         fd.append('formattedDate_Incentives', $("#lblIssuedDateIncentives").text());
-                        // fd.append('subTotal_Incentives', subTotalCustoms);
-                        // fd.append('iva_Incentives', ivaCustoms);
-                        // fd.append('retefuente_Incentives', retefuenteCustoms);
-                        // fd.append('payable_Incentives', payableCustoms);
-                        fd.append('subTotal_Incentives', $("#lblTotalAmountIncentives").val());
-                        fd.append('iva_Incentives', $("#lblTotalTaxAmountIncentives").val());
-                        fd.append('retefuente_Incentives', $("#lblAllowanceAmountIncentives").val());
-                        fd.append('payable_Incentives', $("#lblPayableAmountIncentives").val());
+                        fd.append('subTotal_Incentives', subTotalCustoms);
+                        fd.append('iva_Incentives', ivaCustoms);
+                        fd.append('retefuente_Incentives', retefuenteCustoms);
+                        fd.append('payable_Incentives', payableCustoms);
                     } else {
 
                         fd.append('invoiceNo_Incentives', $("#invoice_number_incentives").val());
@@ -4147,89 +3259,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         success: function(jsonResult) {
                             $('#loading').hide();
 
-                            selectedInvoiceId = 0;
-                            selectedExportId = 0;
-                            selectedExportType = 0;
-
                             if (jsonResult.redirect == true) {
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
                                 toastr.success(data_updated);
-
-                                resetForm();
-                                $('#btnResetIncentives').hide();
-                                $('#btnSaveIncentives').text(text_save);
-                                $("#divInvoiceListIncentives").show();
-
-                                $("#xin_table_invoice_incentives").DataTable({
-                                    data: JSON.parse(jsonResult.updatedlist),
-                                    columns: [{
-                                            data: "id",
-                                            render: function(data, type, row) {
-                                                return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editincentives_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteincentives_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                                            }
-                                        },
-                                        {
-                                            data: "invoice_no"
-                                        },
-                                        {
-                                            data: "supplier_name"
-                                        },
-                                        {
-                                            data: "invoice_date"
-                                        },
-                                        {
-                                            data: "sub_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "tax_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "allowance_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "payable_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "container_value_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        }
-                                    ],
-                                    scrollX: true, // ✅ Enables horizontal scrolling
-                                    autoWidth: true, // ✅ Enables automatic column sizing
-                                    scrollCollapse: true,
-                                    responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                                    bDestroy: true,
-                                    paging: false,
-                                    searching: false,
-                                    sorting: false,
-                                    language: {
-                                        url: datatable_language
-                                    }
-                                });
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -4284,13 +3318,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 //     return false;
                 // }
 
-                var isValid1 = true,
-                    isValid2 = true,
-                    isValid3 = true,
-                    isValid4 = true,
-                    isValid5 = true,
-                    isValid6 = true,
-                    isValid7 = true;
+                var isValid1 = true, isValid2 = true, isValid3 = true, isValid4 = true, isValid5 = true, isValid6 = true, isValid7 = true;
                 if ((fileExtension != "xml" || fileExtension != "XML" || fileExtension == "") && $('#divPdfRemobilization').is(':visible')) {
 
                     if ($("#invoice_number_remobilization").val().length == 0) {
@@ -4364,14 +3392,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         fd.append('invoiceNo_Remobilization', $("#lblInvoiceNoRemobilization").text());
                         fd.append('supplierName_Remobilization', supplierId);
                         fd.append('formattedDate_Remobilization', $("#lblIssuedDateRemobilization").text());
-                        // fd.append('subTotal_Remobilization', subTotalCustoms);
-                        // fd.append('iva_Remobilization', ivaCustoms);
-                        // fd.append('retefuente_Remobilization', retefuenteCustoms);
-                        // fd.append('payable_Remobilization', payableCustoms);
-                        fd.append('subTotal_Remobilization', $("#lblTotalAmountRemobilization").val());
-                        fd.append('iva_Remobilization', $("#lblTotalTaxAmountRemobilization").val());
-                        fd.append('retefuente_Remobilization', $("#lblAllowanceAmountRemobilization").val());
-                        fd.append('payable_Remobilization', $("#lblPayableAmountRemobilization").val());
+                        fd.append('subTotal_Remobilization', subTotalCustoms);
+                        fd.append('iva_Remobilization', ivaCustoms);
+                        fd.append('retefuente_Remobilization', retefuenteCustoms);
+                        fd.append('payable_Remobilization', payableCustoms);
                     } else {
 
                         fd.append('invoiceNo_Remobilization', $("#invoice_number_remobilization").val());
@@ -4396,89 +3420,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         success: function(jsonResult) {
                             $('#loading').hide();
 
-                            selectedInvoiceId = 0;
-                            selectedExportId = 0;
-                            selectedExportType = 0;
-
                             if (jsonResult.redirect == true) {
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
                                 toastr.clear();
                                 toastr.success(data_updated);
-
-                                resetForm();
-                                $('#btnResetRemobilization').hide();
-                                $('#btnSaveRemobilization').text(text_save);
-                                $("#divInvoiceListRemobilization").show();
-
-                                $("#xin_table_invoice_remobilization").DataTable({
-                                    data: JSON.parse(jsonResult.updatedlist),
-                                    columns: [{
-                                            data: "id",
-                                            render: function(data, type, row) {
-                                                return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editremobilization_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteremobilization_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                                            }
-                                        },
-                                        {
-                                            data: "invoice_no"
-                                        },
-                                        {
-                                            data: "supplier_name"
-                                        },
-                                        {
-                                            data: "invoice_date"
-                                        },
-                                        {
-                                            data: "sub_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "tax_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "allowance_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "payable_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        },
-                                        {
-                                            data: "container_value_total",
-                                            render: function(data) {
-                                                return parseFloat(data).toFixed(2);
-                                            }
-                                        }
-                                    ],
-                                    scrollX: true, // ✅ Enables horizontal scrolling
-                                    autoWidth: true, // ✅ Enables automatic column sizing
-                                    scrollCollapse: true,
-                                    responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                                    bDestroy: true,
-                                    paging: false,
-                                    searching: false,
-                                    sorting: false,
-                                    language: {
-                                        url: datatable_language
-                                    }
-                                });
                             } else if (jsonResult.error != '') {
                                 toastr.clear();
                                 toastr.error(jsonResult.error);
@@ -4495,7 +3441,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 }
             }
         });
-
+        
         $("#btnSaveContainerCost").click(function() {
 
             var arrUpdateContainerValue = [];
@@ -4642,10 +3588,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         success: function(jsonResult) {
                             $('#loading').hide();
 
-                            selectedInvoiceId = 0;
-                            selectedExportId = 0;
-                            selectedExportType = 0;
-
                             if (jsonResult.redirect == true) {
                                 window.location.replace(login_url);
                             } else if (jsonResult.result != '') {
@@ -4667,2426 +3609,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 }
             }
         });
-
-        //INVOICE LISTS
-
-        //CUSTOMS
-
-        var exportDocumentsCustomsInvoiceLists = [];
-        var invoiceCustomsCount = <?php echo $exportDocumentsCustomsInvoiceListsCount; ?>;
-        if (invoiceCustomsCount > 0) {
-            exportDocumentsCustomsInvoiceLists = <?php echo $exportDocumentsCustomsInvoiceLists; ?>;
-        }
-        $("#xin_table_invoice_customs").DataTable({
-            data: exportDocumentsCustomsInvoiceLists,
-            columns: [{
-                    data: "id",
-                    render: function(data, type, row) {
-                        return `
-                            <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editcustoms_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                <span class="fas fa-pencil"></span>
-                            </button>
-                            
-                            <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletecustoms_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                <span class="fas fa-trash"></span>
-                            </button>
-                        `;
-                    }
-                },
-                {
-                    data: "invoice_no"
-                },
-                {
-                    data: "supplier_name"
-                },
-                {
-                    data: "invoice_date"
-                },
-                {
-                    data: "sub_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "tax_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "allowance_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "payable_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "container_value_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                }
-            ],
-            scrollX: true, // ✅ Enables horizontal scrolling
-            autoWidth: true, // ✅ Enables automatic column sizing
-            scrollCollapse: true,
-            responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-            bDestroy: true,
-            paging: false,
-            searching: false,
-            sorting: false,
-            language: {
-                url: datatable_language
-            }
-        });
-
-        $(document).on('click', 'button[data-role=editcustoms_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=editcustoms_invoice&id=' + invoice_id + "&export_id=" + export_id,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else if (response.error != '') {
-                        toastr.clear();
-                        toastr.error(response.error);
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListbtnSaveCustoms").show();
-                        $("#btnResetCustoms").hide();
-                    } else {
-                        $("#invoice_number_custom").val(response.result.invoice_number);
-                        $("#supplier_name_custom").val(response.result.supplier_id).trigger("change");
-                        $("#issued_date_custom").val(response.result.invoice_date);
-                        $("#formatted_date_custom").val(response.result.original_invoice_date);
-                        $("#subtotal_custom").val(response.result.sub_total);
-                        $("#iva_custom").val(response.result.tax_total);
-                        $("#retefuente_custom").val(response.result.allowance_total);
-                        $("#payable_custom").val(response.result.payable_total);
-                        $("#container_value_custom").text(response.result.container_value_total);
-                        selectedExportId = response.result.export_id;
-                        selectedInvoiceId = response.result.invoice_id;
-
-                        var containerData = JSON.parse(response.result.container_data);
-                        containerData.forEach(function(container) {
-                            var dispatchId = container.dispatch_id;
-                            var containerValue = container.container_value;
-
-                            // Find the input with name matching the dispatch ID
-                            var input = $("input[name='custom_container_value[" + dispatchId + "]']");
-                            if (input.length > 0) {
-                                input.val(parseFloat(containerValue));
-                            }
-                        });
-
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListCustoms").hide();
-                        $("#btnResetCustoms").show();
-                        $("#btnSaveCustoms").text(text_update);
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', 'button[data-role=deletecustoms_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            var export_type = 1;
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=deleteinvoiceconfirmation&id=' + invoice_id + "&export_id=" + export_id + "&export_type=" + export_type,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else {
-                        $("#titlehead").text(response.pageheading);
-                        $("#infomessage").text(response.pagemessage);
-                        selectedInvoiceId = response.selectedInvoiceId;
-                        selectedExportId = response.selectedExportId;
-                        selectedExportType = response.selectedExportType;
-                        $("#alert-dialog-info").modal('show');
-                    }
-                }
-            });
-        });
-
-        //END CUSTOMS
-
-        //ITR
-
-        var exportDocumentsITRInvoiceLists = [];
-        var invoiceITRCount = <?php echo $exportDocumentsITRInvoiceListsCount; ?>;
-        if (invoiceITRCount > 0) {
-            exportDocumentsITRInvoiceLists = <?php echo $exportDocumentsITRInvoiceLists; ?>;
-        }
-        $("#xin_table_invoice_itr").DataTable({
-            data: exportDocumentsITRInvoiceLists,
-            columns: [{
-                    data: "id",
-                    render: function(data, type, row) {
-                        return `
-                            <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="edititr_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                <span class="fas fa-pencil"></span>
-                            </button>
-                            
-                            <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteitr_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                <span class="fas fa-trash"></span>
-                            </button>
-                        `;
-                    }
-                },
-                {
-                    data: "invoice_no"
-                },
-                {
-                    data: "supplier_name"
-                },
-                {
-                    data: "invoice_date"
-                },
-                {
-                    data: "sub_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "tax_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "allowance_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "payable_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "container_value_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                }
-            ],
-            scrollX: true, // ✅ Enables horizontal scrolling
-            autoWidth: true, // ✅ Enables automatic column sizing
-            scrollCollapse: true,
-            responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-            bDestroy: true,
-            paging: false,
-            searching: false,
-            sorting: false,
-            language: {
-                url: datatable_language
-            }
-        });
-
-        $(document).on('click', 'button[data-role=edititr_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=edititr_invoice&id=' + invoice_id + "&export_id=" + export_id,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else if (response.error != '') {
-                        toastr.clear();
-                        toastr.error(response.error);
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListITR").show();
-                        $("#btnResetITR").hide();
-                    } else {
-                        $("#invoice_number_itr").val(response.result.invoice_number);
-                        $("#supplier_name_itr").val(response.result.supplier_id).trigger("change");
-                        $("#issued_date_itr").val(response.result.invoice_date);
-                        $("#formatted_date_itr").val(response.result.original_invoice_date);
-                        $("#subtotal_itr").val(response.result.sub_total);
-                        $("#iva_itr").val(response.result.tax_total);
-                        $("#retefuente_itr").val(response.result.allowance_total);
-                        $("#payable_itr").val(response.result.payable_total);
-                        $("#container_value_itr").text(response.result.container_value_total);
-                        selectedExportId = response.result.export_id;
-                        selectedInvoiceId = response.result.invoice_id;
-
-                        var containerData = JSON.parse(response.result.container_data);
-                        containerData.forEach(function(container) {
-                            var dispatchId = container.dispatch_id;
-                            var containerValue = container.container_value;
-
-                            // Find the input with name matching the dispatch ID
-                            var input = $("input[name='itr_container_value[" + dispatchId + "]']");
-                            if (input.length > 0) {
-                                input.val(parseFloat(containerValue));
-                            }
-                        });
-
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListITR").hide();
-                        $("#btnResetITR").show();
-                        $("#btnSaveITR").text(text_update);
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', 'button[data-role=deleteitr_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            var export_type = 2;
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=deleteinvoiceconfirmation&id=' + invoice_id + "&export_id=" + export_id + "&export_type=" + export_type,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else {
-                        $("#titlehead").text(response.pageheading);
-                        $("#infomessage").text(response.pagemessage);
-                        selectedInvoiceId = response.selectedInvoiceId;
-                        selectedExportId = response.selectedExportId;
-                        selectedExportType = response.selectedExportType;
-                        $("#alert-dialog-info").modal('show');
-                    }
-                }
-            });
-        });
-
-        //END ITR
-
-        //PORT
-
-        var exportDocumentsPortInvoiceLists = [];
-        var invoicePortCount = <?php echo $exportDocumentsPortInvoiceListsCount; ?>;
-        if (invoicePortCount > 0) {
-            exportDocumentsPortInvoiceLists = <?php echo $exportDocumentsPortInvoiceLists; ?>;
-        }
-        $("#xin_table_invoice_port").DataTable({
-            data: exportDocumentsPortInvoiceLists,
-            columns: [{
-                    data: "id",
-                    render: function(data, type, row) {
-                        return `
-                            <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editport_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                <span class="fas fa-pencil"></span>
-                            </button>
-                            
-                            <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteport_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                <span class="fas fa-trash"></span>
-                            </button>
-                        `;
-                    }
-                },
-                {
-                    data: "invoice_no"
-                },
-                {
-                    data: "supplier_name"
-                },
-                {
-                    data: "invoice_date"
-                },
-                {
-                    data: "sub_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "tax_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "allowance_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "payable_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "container_value_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                }
-            ],
-            scrollX: true, // ✅ Enables horizontal scrolling
-            autoWidth: true, // ✅ Enables automatic column sizing
-            scrollCollapse: true,
-            responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-            bDestroy: true,
-            paging: false,
-            searching: false,
-            sorting: false,
-            language: {
-                url: datatable_language
-            }
-        });
-
-        $(document).on('click', 'button[data-role=editport_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=editport_invoice&id=' + invoice_id + "&export_id=" + export_id,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else if (response.error != '') {
-                        toastr.clear();
-                        toastr.error(response.error);
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListPort").show();
-                        $("#btnResetPort").hide();
-                    } else {
-                        $("#invoice_number_port").val(response.result.invoice_number);
-                        $("#supplier_name_port").val(response.result.supplier_id).trigger("change");
-                        $("#issued_date_port").val(response.result.invoice_date);
-                        $("#formatted_date_port").val(response.result.original_invoice_date);
-                        $("#subtotal_port").val(response.result.sub_total);
-                        $("#iva_port").val(response.result.tax_total);
-                        $("#retefuente_port").val(response.result.allowance_total);
-                        $("#payable_port").val(response.result.payable_total);
-                        $("#container_value_port").text(response.result.container_value_total);
-                        selectedExportId = response.result.export_id;
-                        selectedInvoiceId = response.result.invoice_id;
-
-                        var containerData = JSON.parse(response.result.container_data);
-                        containerData.forEach(function(container) {
-                            var dispatchId = container.dispatch_id;
-                            var containerValue = container.container_value;
-
-                            // Find the input with name matching the dispatch ID
-                            var input = $("input[name='port_container_value[" + dispatchId + "]']");
-                            if (input.length > 0) {
-                                input.val(parseFloat(containerValue));
-                            }
-                        });
-
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListPort").hide();
-                        $("#btnResetPort").show();
-                        $("#btnSavePort").text(text_update);
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', 'button[data-role=deleteport_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            var export_type = 3;
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=deleteinvoiceconfirmation&id=' + invoice_id + "&export_id=" + export_id + "&export_type=" + export_type,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else {
-                        $("#titlehead").text(response.pageheading);
-                        $("#infomessage").text(response.pagemessage);
-                        selectedInvoiceId = response.selectedInvoiceId;
-                        selectedExportId = response.selectedExportId;
-                        selectedExportType = response.selectedExportType;
-                        $("#alert-dialog-info").modal('show');
-                    }
-                }
-            });
-        });
-
-        //END PORT
-
-        //SHIPPING
-
-        var exportDocumentsShippingInvoiceLists = [];
-        var invoiceShippingCount = <?php echo $exportDocumentsShippingInvoiceListsCount; ?>;
-        if (invoiceShippingCount > 0) {
-            exportDocumentsShippingInvoiceLists = <?php echo $exportDocumentsShippingInvoiceLists; ?>;
-        }
-        $("#xin_table_invoice_shipping").DataTable({
-            data: exportDocumentsShippingInvoiceLists,
-            columns: [{
-                    data: "id",
-                    render: function(data, type, row) {
-                        return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editshipping_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteshipping_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                    }
-                },
-                {
-                    data: "invoice_no"
-                },
-                {
-                    data: "supplier_name"
-                },
-                {
-                    data: "invoice_date"
-                },
-                {
-                    data: "sub_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "tax_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "allowance_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "payable_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "container_value_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                }
-            ],
-            scrollX: true, // ✅ Enables horizontal scrolling
-            autoWidth: true, // ✅ Enables automatic column sizing
-            scrollCollapse: true,
-            responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-            bDestroy: true,
-            paging: false,
-            searching: false,
-            sorting: false,
-            language: {
-                url: datatable_language
-            }
-        });
-
-        $(document).on('click', 'button[data-role=editshipping_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=editshipping_invoice&id=' + invoice_id + "&export_id=" + export_id,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else if (response.error != '') {
-                        toastr.clear();
-                        toastr.error(response.error);
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListbtnSaveShipping").show();
-                        $("#btnResetShipping").hide();
-                    } else {
-                        $("#invoice_number_shipping").val(response.result.invoice_number);
-                        $("#supplier_name_shipping").val(response.result.supplier_id).trigger("change");
-                        $("#issued_date_shipping").val(response.result.invoice_date);
-                        $("#formatted_date_shipping").val(response.result.original_invoice_date);
-                        $("#subtotal_shipping").val(response.result.sub_total);
-                        $("#iva_shipping").val(response.result.tax_total);
-                        $("#retefuente_shipping").val(response.result.allowance_total);
-                        $("#payable_shipping").val(response.result.payable_total);
-                        $("#container_value_shipping").text(response.result.container_value_total);
-                        selectedExportId = response.result.export_id;
-                        selectedInvoiceId = response.result.invoice_id;
-
-                        var containerData = JSON.parse(response.result.container_data);
-                        containerData.forEach(function(container) {
-                            var dispatchId = container.dispatch_id;
-                            var containerValue = container.container_value;
-
-                            // Find the input with name matching the dispatch ID
-                            var input = $("input[name='shipping_container_value[" + dispatchId + "]']");
-                            if (input.length > 0) {
-                                input.val(parseFloat(containerValue));
-                            }
-                        });
-
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListShipping").hide();
-                        $("#btnResetShipping").show();
-                        $("#btnSaveShipping").text(text_update);
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', 'button[data-role=deleteshipping_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            var export_type = 9;
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=deleteinvoiceconfirmation&id=' + invoice_id + "&export_id=" + export_id + "&export_type=" + export_type,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else {
-                        $("#titlehead").text(response.pageheading);
-                        $("#infomessage").text(response.pagemessage);
-                        selectedInvoiceId = response.selectedInvoiceId;
-                        selectedExportId = response.selectedExportId;
-                        selectedExportType = response.selectedExportType;
-                        $("#alert-dialog-info").modal('show');
-                    }
-                }
-            });
-        });
-
-        //END SHIPPING
-
-        //FUMIGATION
-
-        var exportDocumentsFumigationInvoiceLists = [];
-        var invoiceFumigationCount = <?php echo $exportDocumentsFumigationInvoiceListsCount; ?>;
-        if (invoiceFumigationCount > 0) {
-            exportDocumentsFumigationInvoiceLists = <?php echo $exportDocumentsFumigationInvoiceLists; ?>;
-        }
-        $("#xin_table_invoice_fumigation").DataTable({
-            data: exportDocumentsFumigationInvoiceLists,
-            columns: [{
-                    data: "id",
-                    render: function(data, type, row) {
-                        return `
-                            <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editfumigation_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                <span class="fas fa-pencil"></span>
-                            </button>
-                            
-                            <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletefumigation_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                <span class="fas fa-trash"></span>
-                            </button>
-                        `;
-                    }
-                },
-                {
-                    data: "invoice_no"
-                },
-                {
-                    data: "supplier_name"
-                },
-                {
-                    data: "invoice_date"
-                },
-                {
-                    data: "sub_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "tax_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "allowance_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "payable_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "container_value_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                }
-            ],
-            scrollX: true, // ✅ Enables horizontal scrolling
-            autoWidth: true, // ✅ Enables automatic column sizing
-            scrollCollapse: true,
-            responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-            bDestroy: true,
-            paging: false,
-            searching: false,
-            sorting: false,
-            language: {
-                url: datatable_language
-            }
-        });
-
-        $(document).on('click', 'button[data-role=editfumigation_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=editfumigation_invoice&id=' + invoice_id + "&export_id=" + export_id,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else if (response.error != '') {
-                        toastr.clear();
-                        toastr.error(response.error);
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListFumigation").show();
-                        $("#btnResetFumigation").hide();
-                    } else {
-                        $("#invoice_number_fumigation").val(response.result.invoice_number);
-                        $("#supplier_name_fumigation").val(response.result.supplier_id).trigger("change");
-                        $("#issued_date_fumigation").val(response.result.invoice_date);
-                        $("#formatted_date_fumigation").val(response.result.original_invoice_date);
-                        $("#subtotal_fumigation").val(response.result.sub_total);
-                        $("#iva_fumigation").val(response.result.tax_total);
-                        $("#retefuente_fumigation").val(response.result.allowance_total);
-                        $("#payable_fumigation").val(response.result.payable_total);
-                        $("#container_value_fumigation").text(response.result.container_value_total);
-                        selectedExportId = response.result.export_id;
-                        selectedInvoiceId = response.result.invoice_id;
-
-                        var containerData = JSON.parse(response.result.container_data);
-                        containerData.forEach(function(container) {
-                            var dispatchId = container.dispatch_id;
-                            var containerValue = container.container_value;
-
-                            // Find the input with name matching the dispatch ID
-                            var input = $("input[name='fumigation_container_value[" + dispatchId + "]']");
-                            if (input.length > 0) {
-                                input.val(parseFloat(containerValue));
-                            }
-                        });
-
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListFumigation").hide();
-                        $("#btnResetFumigation").show();
-                        $("#btnSaveFumigation").text(text_update);
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', 'button[data-role=deletefumigation_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            var export_type = 4;
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=deleteinvoiceconfirmation&id=' + invoice_id + "&export_id=" + export_id + "&export_type=" + export_type,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else {
-                        $("#titlehead").text(response.pageheading);
-                        $("#infomessage").text(response.pagemessage);
-                        selectedInvoiceId = response.selectedInvoiceId;
-                        selectedExportId = response.selectedExportId;
-                        selectedExportType = response.selectedExportType;
-                        $("#alert-dialog-info").modal('show');
-                    }
-                }
-            });
-        });
-
-        //END FUMIGATION 
-
-        //PHYTO
-
-        var exportDocumentsPhytoInvoiceLists = [];
-        var invoicePhytoCount = <?php echo $exportDocumentsPhytoInvoiceListsCount; ?>;
-        if (invoicePhytoCount > 0) {
-            exportDocumentsPhytoInvoiceLists = <?php echo $exportDocumentsPhytoInvoiceLists; ?>;
-        }
-        $("#xin_table_invoice_phyto").DataTable({
-            data: exportDocumentsPhytoInvoiceLists,
-            columns: [{
-                    data: "id",
-                    render: function(data, type, row) {
-                        return `
-                            <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editphyto_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                <span class="fas fa-pencil"></span>
-                            </button>
-                            
-                            <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletephyto_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                <span class="fas fa-trash"></span>
-                            </button>
-                        `;
-                    }
-                },
-                {
-                    data: "invoice_no"
-                },
-                {
-                    data: "supplier_name"
-                },
-                {
-                    data: "invoice_date"
-                },
-                {
-                    data: "sub_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "tax_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "allowance_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "payable_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "container_value_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                }
-            ],
-            scrollX: true, // ✅ Enables horizontal scrolling
-            autoWidth: true, // ✅ Enables automatic column sizing
-            scrollCollapse: true,
-            responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-            bDestroy: true,
-            paging: false,
-            searching: false,
-            sorting: false,
-            language: {
-                url: datatable_language
-            }
-        });
-
-        $(document).on('click', 'button[data-role=editphyto_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=editphyto_invoice&id=' + invoice_id + "&export_id=" + export_id,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else if (response.error != '') {
-                        toastr.clear();
-                        toastr.error(response.error);
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListPhyto").show();
-                        $("#btnResetPhyto").hide();
-                    } else {
-                        $("#invoice_number_phyto").val(response.result.invoice_number);
-                        $("#supplier_name_phyto").val(response.result.supplier_id).trigger("change");
-                        $("#issued_date_phyto").val(response.result.invoice_date);
-                        $("#formatted_date_phyto").val(response.result.original_invoice_date);
-                        $("#subtotal_phyto").val(response.result.sub_total);
-                        $("#iva_phyto").val(response.result.tax_total);
-                        $("#retefuente_phyto").val(response.result.allowance_total);
-                        $("#payable_phyto").val(response.result.payable_total);
-                        $("#container_value_phyto").text(response.result.container_value_total);
-                        selectedExportId = response.result.export_id;
-                        selectedInvoiceId = response.result.invoice_id;
-
-                        var containerData = JSON.parse(response.result.container_data);
-                        containerData.forEach(function(container) {
-                            var dispatchId = container.dispatch_id;
-                            var containerValue = container.container_value;
-
-                            // Find the input with name matching the dispatch ID
-                            var input = $("input[name='phyto_container_value[" + dispatchId + "]']");
-                            if (input.length > 0) {
-                                input.val(parseFloat(containerValue));
-                            }
-                        });
-
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListPhyto").hide();
-                        $("#btnResetPhyto").show();
-                        $("#btnSavePhyto").text(text_update);
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', 'button[data-role=deletephyto_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            var export_type = 5;
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=deleteinvoiceconfirmation&id=' + invoice_id + "&export_id=" + export_id + "&export_type=" + export_type,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else {
-                        $("#titlehead").text(response.pageheading);
-                        $("#infomessage").text(response.pagemessage);
-                        selectedInvoiceId = response.selectedInvoiceId;
-                        selectedExportId = response.selectedExportId;
-                        selectedExportType = response.selectedExportType;
-                        $("#alert-dialog-info").modal('show');
-                    }
-                }
-            });
-        });
-
-        //END PHYTO
-
-        //COTEROS
-
-        var exportDocumentsCoterosInvoiceLists = [];
-        var invoiceCoterosCount = <?php echo $exportDocumentsCoterosInvoiceListsCount; ?>;
-        if (invoiceCoterosCount > 0) {
-            exportDocumentsCoterosInvoiceLists = <?php echo $exportDocumentsCoterosInvoiceLists; ?>;
-        }
-        $("#xin_table_invoice_coteros").DataTable({
-            data: exportDocumentsCoterosInvoiceLists,
-            columns: [{
-                    data: "id",
-                    render: function(data, type, row) {
-                        return `
-                            <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editcoteros_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                <span class="fas fa-pencil"></span>
-                            </button>
-                            
-                            <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletecoteros_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                <span class="fas fa-trash"></span>
-                            </button>
-                        `;
-                    }
-                },
-                {
-                    data: "invoice_no"
-                },
-                {
-                    data: "supplier_name"
-                },
-                {
-                    data: "invoice_date"
-                },
-                {
-                    data: "sub_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "tax_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "allowance_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "payable_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "container_value_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                }
-            ],
-            scrollX: true, // ✅ Enables horizontal scrolling
-            autoWidth: true, // ✅ Enables automatic column sizing
-            scrollCollapse: true,
-            responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-            bDestroy: true,
-            paging: false,
-            searching: false,
-            sorting: false,
-            language: {
-                url: datatable_language
-            }
-        });
-
-        $(document).on('click', 'button[data-role=editcoteros_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=editcoteros_invoice&id=' + invoice_id + "&export_id=" + export_id,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else if (response.error != '') {
-                        toastr.clear();
-                        toastr.error(response.error);
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListCoteros").show();
-                        $("#btnResetCoteros").hide();
-                    } else {
-                        $("#invoice_number_coteros").val(response.result.invoice_number);
-                        $("#supplier_name_coteros").val(response.result.supplier_id).trigger("change");
-                        $("#issued_date_coteros").val(response.result.invoice_date);
-                        $("#formatted_date_coteros").val(response.result.original_invoice_date);
-                        $("#subtotal_coteros").val(response.result.sub_total);
-                        $("#iva_coteros").val(response.result.tax_total);
-                        $("#retefuente_coteros").val(response.result.allowance_total);
-                        $("#payable_coteros").val(response.result.payable_total);
-                        $("#container_value_coteros").text(response.result.container_value_total);
-                        selectedExportId = response.result.export_id;
-                        selectedInvoiceId = response.result.invoice_id;
-
-                        var containerData = JSON.parse(response.result.container_data);
-                        containerData.forEach(function(container) {
-                            var dispatchId = container.dispatch_id;
-                            var containerValue = container.container_value;
-
-                            // Find the input with name matching the dispatch ID
-                            var input = $("input[name='coteros_container_value[" + dispatchId + "]']");
-                            if (input.length > 0) {
-                                input.val(parseFloat(containerValue));
-                            }
-                        });
-
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListCoteros").hide();
-                        $("#btnResetCoteros").show();
-                        $("#btnSaveCoteros").text(text_update);
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', 'button[data-role=deletecoteros_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            var export_type = 6;
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=deleteinvoiceconfirmation&id=' + invoice_id + "&export_id=" + export_id + "&export_type=" + export_type,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else {
-                        $("#titlehead").text(response.pageheading);
-                        $("#infomessage").text(response.pagemessage);
-                        selectedInvoiceId = response.selectedInvoiceId;
-                        selectedExportId = response.selectedExportId;
-                        selectedExportType = response.selectedExportType;
-                        $("#alert-dialog-info").modal('show');
-                    }
-                }
-            });
-        });
-
-        //END COTEROS
-
-        //INCENTIVES
-
-        var exportDocumentsIncentivesInvoiceLists = [];
-        var invoiceIncentivesCount = <?php echo $exportDocumentsIncentivesInvoiceListsCount; ?>;
-        if (invoiceIncentivesCount > 0) {
-            exportDocumentsIncentivesInvoiceLists = <?php echo $exportDocumentsIncentivesInvoiceLists; ?>;
-        }
-        $("#xin_table_invoice_incentives").DataTable({
-            data: exportDocumentsIncentivesInvoiceLists,
-            columns: [{
-                    data: "id",
-                    render: function(data, type, row) {
-                        return `
-                            <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editincentives_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                <span class="fas fa-pencil"></span>
-                            </button>
-                            
-                            <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteincentives_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                <span class="fas fa-trash"></span>
-                            </button>
-                        `;
-                    }
-                },
-                {
-                    data: "invoice_no"
-                },
-                {
-                    data: "supplier_name"
-                },
-                {
-                    data: "invoice_date"
-                },
-                {
-                    data: "sub_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "tax_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "allowance_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "payable_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "container_value_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                }
-            ],
-            scrollX: true, // ✅ Enables horizontal scrolling
-            autoWidth: true, // ✅ Enables automatic column sizing
-            scrollCollapse: true,
-            responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-            bDestroy: true,
-            paging: false,
-            searching: false,
-            sorting: false,
-            language: {
-                url: datatable_language
-            }
-        });
-
-        $(document).on('click', 'button[data-role=editincentives_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=editincentives_invoice&id=' + invoice_id + "&export_id=" + export_id,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else if (response.error != '') {
-                        toastr.clear();
-                        toastr.error(response.error);
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListIncentives").show();
-                        $("#btnResetIncentives").hide();
-                    } else {
-                        $("#invoice_number_incentives").val(response.result.invoice_number);
-                        $("#supplier_name_incentives").val(response.result.supplier_id).trigger("change");
-                        $("#issued_date_incentives").val(response.result.invoice_date);
-                        $("#formatted_date_incentives").val(response.result.original_invoice_date);
-                        $("#subtotal_incentives").val(response.result.sub_total);
-                        $("#iva_incentives").val(response.result.tax_total);
-                        $("#retefuente_incentives").val(response.result.allowance_total);
-                        $("#payable_incentives").val(response.result.payable_total);
-                        $("#container_value_incentives").text(response.result.container_value_total);
-                        selectedExportId = response.result.export_id;
-                        selectedInvoiceId = response.result.invoice_id;
-
-                        var containerData = JSON.parse(response.result.container_data);
-                        containerData.forEach(function(container) {
-                            var dispatchId = container.dispatch_id;
-                            var containerValue = container.container_value;
-
-                            // Find the input with name matching the dispatch ID
-                            var input = $("input[name='incentives_container_value[" + dispatchId + "]']");
-                            if (input.length > 0) {
-                                input.val(parseFloat(containerValue));
-                            }
-                        });
-
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListIncentives").hide();
-                        $("#btnResetIncentives").show();
-                        $("#btnSaveIncentives").text(text_update);
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', 'button[data-role=deleteincentives_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            var export_type = 7;
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=deleteinvoiceconfirmation&id=' + invoice_id + "&export_id=" + export_id + "&export_type=" + export_type,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else {
-                        $("#titlehead").text(response.pageheading);
-                        $("#infomessage").text(response.pagemessage);
-                        selectedInvoiceId = response.selectedInvoiceId;
-                        selectedExportId = response.selectedExportId;
-                        selectedExportType = response.selectedExportType;
-                        $("#alert-dialog-info").modal('show');
-                    }
-                }
-            });
-        });
-
-        //END INCENTIVES
-
-        //REMOBILIZATION
-
-        var exportDocumentsRemobilizationInvoiceLists = [];
-        var invoiceRemobilizationCount = <?php echo $exportDocumentsRemobilizationInvoiceListsCount; ?>;
-        if (invoiceRemobilizationCount > 0) {
-            exportDocumentsRemobilizationInvoiceLists = <?php echo $exportDocumentsRemobilizationInvoiceLists; ?>;
-        }
-        $("#xin_table_invoice_remobilization").DataTable({
-            data: exportDocumentsRemobilizationInvoiceLists,
-            columns: [{
-                    data: "id",
-                    render: function(data, type, row) {
-                        return `
-                            <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editremobilization_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                <span class="fas fa-pencil"></span>
-                            </button>
-                            
-                            <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteremobilization_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                <span class="fas fa-trash"></span>
-                            </button>
-                        `;
-                    }
-                },
-                {
-                    data: "invoice_no"
-                },
-                {
-                    data: "supplier_name"
-                },
-                {
-                    data: "invoice_date"
-                },
-                {
-                    data: "sub_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "tax_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "allowance_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "payable_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                },
-                {
-                    data: "container_value_total",
-                    render: function(data) {
-                        return parseFloat(data).toFixed(2);
-                    }
-                }
-            ],
-            scrollX: true, // ✅ Enables horizontal scrolling
-            autoWidth: true, // ✅ Enables automatic column sizing
-            scrollCollapse: true,
-            responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-            bDestroy: true,
-            paging: false,
-            searching: false,
-            sorting: false,
-            language: {
-                url: datatable_language
-            }
-        });
-
-        $(document).on('click', 'button[data-role=editremobilization_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=editremobilization_invoice&id=' + invoice_id + "&export_id=" + export_id,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else if (response.error != '') {
-                        toastr.clear();
-                        toastr.error(response.error);
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListRemobilization").show();
-                        $("#btnResetRemobilization").hide();
-                    } else {
-                        $("#invoice_number_remobilization").val(response.result.invoice_number);
-                        $("#supplier_name_remobilization").val(response.result.supplier_id).trigger("change");
-                        $("#issued_date_remobilization").val(response.result.invoice_date);
-                        $("#formatted_date_remobilization").val(response.result.original_invoice_date);
-                        $("#subtotal_remobilization").val(response.result.sub_total);
-                        $("#iva_remobilization").val(response.result.tax_total);
-                        $("#retefuente_remobilization").val(response.result.allowance_total);
-                        $("#payable_remobilization").val(response.result.payable_total);
-                        $("#container_value_remobilization").text(response.result.container_value_total);
-                        selectedExportId = response.result.export_id;
-                        selectedInvoiceId = response.result.invoice_id;
-
-                        var containerData = JSON.parse(response.result.container_data);
-                        containerData.forEach(function(container) {
-                            var dispatchId = container.dispatch_id;
-                            var containerValue = container.container_value;
-
-                            // Find the input with name matching the dispatch ID
-                            var input = $("input[name='remobilization_container_value[" + dispatchId + "]']");
-                            if (input.length > 0) {
-                                input.val(parseFloat(containerValue));
-                            }
-                        });
-
-                        $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        $("#divInvoiceListRemobilization").hide();
-                        $("#btnResetRemobilization").show();
-                        $("#btnSaveRemobilization").text(text_update);
-                    }
-                }
-            });
-        });
-
-        $(document).on('click', 'button[data-role=deleteremobilization_invoice]', function() {
-            selectedInvoiceId = 0;
-            selectedExportId = 0;
-            selectedExportType = 0;
-            var invoice_id = $(this).data("id");
-            var export_id = $(this).data("export_id");
-            var export_type = 8;
-            $.ajax({
-                url: base_url + "/dialog_export_action",
-                type: "GET",
-                data: 'jd=1&is_ajax=3&mode=modal&type=deleteinvoiceconfirmation&id=' + invoice_id + "&export_id=" + export_id + "&export_type=" + export_type,
-                success: function(response) {
-                    if (response.redirect == true) {
-                        window.location.replace(login_url);
-                    } else {
-                        $("#titlehead").text(response.pageheading);
-                        $("#infomessage").text(response.pagemessage);
-                        selectedInvoiceId = response.selectedInvoiceId;
-                        selectedExportId = response.selectedExportId;
-                        selectedExportType = response.selectedExportType;
-                        $("#alert-dialog-info").modal('show');
-                    }
-                }
-            });
-        });
-
-        //END REMOBILIZATION
-
-        $("#btnResetCustoms").click(function() {
-            resetForm();
-        });
-
-        $("#btnResetITR").click(function() {
-            resetForm();
-        });
-
-        $("#btnResetPort").click(function() {
-            resetForm();
-        });
-
-        $("#btnResetShipping").click(function() {
-            resetForm();
-        });
-
-        $("#btnResetFumigation").click(function() {
-            resetForm();
-        });
-
-        $("#btnResetCoteros").click(function() {
-            resetForm();
-        });
-
-        $("#btnResetPhyto").click(function() {
-            resetForm();
-        });
-
-        $("#btnResetIncentives").click(function() {
-            resetForm();
-        });
-
-        $("#btnResetRemobilization").click(function() {
-            resetForm();
-        });
-
-        $("#deletebutton").click(function(e) {
-            if (selectedInvoiceId > 0 && selectedExportId > 0) {
-                $.ajax({
-                    type: "GET",
-                    url: base_url + "/dialog_export_action",
-                    data: 'jd=1&is_ajax=3&mode=modal&type=deleteexportinvoice&inputid=' + selectedInvoiceId + "&inputid1=" + selectedExportId + "&inputid2=" + selectedExportType,
-                    success: function(response) {
-                        $("#loading").hide();
-                        selectedInvoiceId = 0;
-                        selectedExportId = 0;
-                        selectedExportType = 0;
-                        if (response.redirect == true) {
-                            window.location.replace(login_url);
-                        } else if (response.error != '') {
-                            toastr.clear();
-                            toastr.error(response.error);
-                            $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                        } else {
-                            toastr.clear();
-                            toastr.success(response.result);
-                            $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
-                            $("#alert-dialog-info").modal('hide');
-                            reloadTables(response.type, response.updatedlist);
-                        }
-                    }
-                });
-            } else {
-                toastr.clear();
-                toastr.error(common_error);
-            }
-        });
     });
-
-    function resetForm() {
-
-        selectedInvoiceId = 0;
-        selectedExportId = 0;
-        selectedExportType = 0;
-
-        //CUSTOM
-        $("#invoice_number_custom").val("");
-        $("#supplier_name_custom").val(0).trigger("change");
-        $("#issued_date_custom").val("");
-        $("#formatted_date_custom").val("");
-        $("#subtotal_custom").val("");
-        $("#iva_custom").val("");
-        $("#retefuente_custom").val("");
-        $("#payable_custom").val("");
-        $("#container_value_custom").text("0");
-        $("#fileUploadDoc").val("");
-
-        $("input[name^='custom_container_value']").each(function() {
-            $(this).val("0");
-        });
-
-        $("#divInvoiceListCustoms").show();
-
-        $("#error-selectdoccustom").hide();
-        $("#error-invoice_no_custom").hide();
-        $("#error-supplier_name_custom").hide();
-        $("#error-supplier_id_custom").hide();
-        $("#error-issued_date_custom").hide();
-        $("#error-subtotal_custom").hide();
-        $("#error-iva_custom").hide();
-        $("#error-retefuente_custom").hide();
-        $("#error-payable_custom").hide();
-        $("#divXml").hide();
-        $("#divPdf").show();
-        $("#btnResetCustoms").hide();
-        $("#btnSaveCustoms").text(text_save);
-
-        //ITR
-        $("#invoice_number_itr").val("");
-        $("#supplier_name_itr").val(0).trigger("change");
-        $("#issued_date_itr").val("");
-        $("#formatted_date_itr").val("");
-        $("#subtotal_itr").val("");
-        $("#iva_itr").val("");
-        $("#retefuente_itr").val("");
-        $("#payable_itr").val("");
-        $("#container_value_itr").text("0");
-        $("#fileUploadDoc_ITR").val("");
-
-        $("input[name^='itr_container_value']").each(function() {
-            $(this).val("0");
-        });
-
-        $("#divInvoiceListITR").show();
-
-        $("#error-selectdocitr").hide();
-        $("#error-invoice_no_itr").hide();
-        $("#error-supplier_name_itr").hide();
-        $("#error-supplier_id_itr").hide();
-        $("#error-issued_date_itr").hide();
-        $("#error-subtotal_itr").hide();
-        $("#error-iva_itr").hide();
-        $("#error-retefuente_itr").hide();
-        $("#error-payable_itr").hide();
-        $("#divXmlITR").hide();
-        $("#divPdfITR").show();
-        $("#btnResetITR").hide();
-        $("#btnSaveITR").text(text_save);
-
-        //PORT
-        $("#invoice_number_port").val("");
-        $("#supplier_name_port").val(0).trigger("change");
-        $("#issued_date_port").val("");
-        $("#formatted_date_port").val("");
-        $("#subtotal_port").val("");
-        $("#iva_port").val("");
-        $("#retefuente_port").val("");
-        $("#payable_port").val("");
-        $("#container_value_port").text("0");
-        $("#fileUploadDoc_Port").val("");
-
-        $("input[name^='port_container_value']").each(function() {
-            $(this).val("0");
-        });
-
-        $("#divInvoiceListPort").show();
-
-        $("#error-selectdocport").hide();
-        $("#error-invoice_no_port").hide();
-        $("#error-supplier_name_port").hide();
-        $("#error-supplier_id_port").hide();
-        $("#error-issued_date_port").hide();
-        $("#error-subtotal_port").hide();
-        $("#error-iva_port").hide();
-        $("#error-retefuente_port").hide();
-        $("#error-payable_port").hide();
-        $("#divXmlPort").hide();
-        $("#divPdfPort").show();
-        $("#btnResetPort").hide();
-        $("#btnSavePort").text(text_save);
-
-        //SHIPPING
-        $("#invoice_number_shipping").val("");
-        $("#supplier_name_shipping").val(0).trigger("change");
-        $("#issued_date_shipping").val("");
-        $("#formatted_date_shipping").val("");
-        $("#subtotal_shipping").val("");
-        $("#iva_shipping").val("");
-        $("#retefuente_shipping").val("");
-        $("#payable_shipping").val("");
-        $("#container_value_shipping").text("0");
-        $("#fileUploadDoc_Shipping").val("");
-
-        $("input[name^='shipping_container_value']").each(function() {
-            $(this).val("0");
-        });
-
-        $("#divInvoiceListShipping").show();
-
-        $("#error-selectdocshipping").hide();
-        $("#error-invoice_no_shipping").hide();
-        $("#error-supplier_name_selectdocshipping").hide();
-        $("#error-supplier_id_selectdocshipping").hide();
-        $("#error-issued_date_selectdocshipping").hide();
-        $("#error-subtotal_selectdocshipping").hide();
-        $("#error-iva_selectdocshipping").hide();
-        $("#error-retefuente_selectdocshipping").hide();
-        $("#error-payable_selectdocshipping").hide();
-        $("#divXmlShipping").hide();
-        $("#divPdfShipping").show();
-        $("#btnResetShipping").hide();
-        $("#btnSaveShipping").text(text_save);
-
-        //FUMIGATION
-        $("#invoice_number_fumigation").val("");
-        $("#supplier_name_fumigation").val(0).trigger("change");
-        $("#issued_date_fumigation").val("");
-        $("#formatted_date_fumigation").val("");
-        $("#subtotal_fumigation").val("");
-        $("#iva_fumigation").val("");
-        $("#retefuente_fumigation").val("");
-        $("#payable_fumigation").val("");
-        $("#container_value_fumigation").text("0");
-        $("#fileUploadDoc_Fumigation").val("");
-
-        $("input[name^='fumigation_container_value']").each(function() {
-            $(this).val("0");
-        });
-
-        $("#divInvoiceListFumigation").show();
-
-        $("#error-selectdocfumigation").hide();
-        $("#error-invoice_no_fumigation").hide();
-        $("#error-supplier_name_fumigation").hide();
-        $("#error-supplier_id_fumigation").hide();
-        $("#error-issued_date_fumigation").hide();
-        $("#error-subtotal_fumigation").hide();
-        $("#error-iva_fumigation").hide();
-        $("#error-retefuente_fumigation").hide();
-        $("#error-payable_fumigation").hide();
-        $("#divXmlFumigation").hide();
-        $("#divPdfFumigation").show();
-        $("#btnResetFumigation").hide();
-        $("#btnSaveFumigation").text(text_save);
-
-        //COTEROS
-        $("#invoice_number_coteros").val("");
-        $("#supplier_name_coteros").val(0).trigger("change");
-        $("#issued_date_coteros").val("");
-        $("#formatted_date_coteros").val("");
-        $("#subtotal_coteros").val("");
-        $("#iva_coteros").val("");
-        $("#retefuente_coteros").val("");
-        $("#payable_coteros").val("");
-        $("#container_value_coteros").text("0");
-        $("#fileUploadDoc_Coteros").val("");
-
-        $("input[name^='coteros_container_value']").each(function() {
-            $(this).val("0");
-        });
-
-        $("#divInvoiceListCoteros").show();
-
-        $("#error-selectdoccoteros").hide();
-        $("#error-invoice_no_coteros").hide();
-        $("#error-supplier_name_coteros").hide();
-        $("#error-supplier_id_coteros").hide();
-        $("#error-issued_date_coteros").hide();
-        $("#error-subtotal_coteros").hide();
-        $("#error-iva_coteros").hide();
-        $("#error-retefuente_coteros").hide();
-        $("#error-payable_coteros").hide();
-        $("#divXmlCoteros").hide();
-        $("#divPdfCoteros").show();
-        $("#btnResetCoteros").hide();
-        $("#btnSaveCoteros").text(text_save);
-
-        //PHYTO
-        $("#invoice_number_phyto").val("");
-        $("#supplier_name_phyto").val(0).trigger("change");
-        $("#issued_date_phyto").val("");
-        $("#formatted_date_phyto").val("");
-        $("#subtotal_phyto").val("");
-        $("#iva_phyto").val("");
-        $("#retefuente_phyto").val("");
-        $("#payable_phyto").val("");
-        $("#container_value_phyto").text("0");
-        $("#fileUploadDoc_Phyto").val("");
-
-        $("input[name^='phyto_container_value']").each(function() {
-            $(this).val("0");
-        });
-
-        $("#divInvoiceListPhyto").show();
-
-        $("#error-selectdocphyto").hide();
-        $("#error-invoice_no_phyto").hide();
-        $("#error-supplier_name_phyto").hide();
-        $("#error-supplier_id_phyto").hide();
-        $("#error-issued_date_phyto").hide();
-        $("#error-subtotal_phyto").hide();
-        $("#error-iva_phyto").hide();
-        $("#error-retefuente_phyto").hide();
-        $("#error-payable_phyto").hide();
-        $("#divXmlPhyto").hide();
-        $("#divPdfPhyto").show();
-        $("#btnResetPhyto").hide();
-        $("#btnSavePhyto").text(text_save);
-
-        //INCENTIVES
-        $("#invoice_number_incentives").val("");
-        $("#supplier_name_incentives").val(0).trigger("change");
-        $("#issued_date_incentives").val("");
-        $("#formatted_date_incentives").val("");
-        $("#subtotal_incentives").val("");
-        $("#iva_incentives").val("");
-        $("#retefuente_incentives").val("");
-        $("#payable_incentives").val("");
-        $("#container_value_incentives").text("0");
-        $("#fileUploadDoc_Incentives").val("");
-
-        $("input[name^='incentives_container_value']").each(function() {
-            $(this).val("0");
-        });
-
-        $("#divInvoiceListIncentives").show();
-
-        $("#error-selectdocincentives").hide();
-        $("#error-invoice_no_incentives").hide();
-        $("#error-supplier_name_incentives").hide();
-        $("#error-supplier_id_incentives").hide();
-        $("#error-issued_date_incentives").hide();
-        $("#error-subtotal_incentives").hide();
-        $("#error-iva_incentives").hide();
-        $("#error-retefuente_incentives").hide();
-        $("#error-payable_incentives").hide();
-        $("#divXmlIncentives").hide();
-        $("#divPdfIncentives").show();
-        $("#btnResetIncentives").hide();
-        $("#btnSaveIncentives").text(text_save);
-
-        //REMOBILIZATION
-        $("#invoice_number_remobilization").val("");
-        $("#supplier_name_remobilization").val(0).trigger("change");
-        $("#issued_date_remobilization").val("");
-        $("#formatted_date_remobilization").val("");
-        $("#subtotal_remobilization").val("");
-        $("#iva_remobilization").val("");
-        $("#retefuente_remobilization").val("");
-        $("#payable_remobilization").val("");
-        $("#container_value_remobilization").text("0");
-        $("#fileUploadDoc_Remobilization").val("");
-
-        $("input[name^='remobilization_container_value']").each(function() {
-            $(this).val("0");
-        });
-
-        $("#divInvoiceListRemobilization").show();
-
-        $("#error-selectdocremobilization").hide();
-        $("#error-invoice_no_remobilization").hide();
-        $("#error-supplier_name_remobilization").hide();
-        $("#error-supplier_id_remobilization").hide();
-        $("#error-issued_date_remobilization").hide();
-        $("#error-subtotal_remobilization").hide();
-        $("#error-iva_remobilization").hide();
-        $("#error-retefuente_remobilization").hide();
-        $("#error-payable_remobilization").hide();
-        $("#divXmlRemobilization").hide();
-        $("#divPdfRemobilization").show();
-        $("#btnResetRemobilization").hide();
-        $("#btnSaveRemobilization").text(text_save);
-    }
-
-    function reloadTables(type, response) {
-
-        if (type == 1) {
-            $("#xin_table_invoice_customs").DataTable({
-                data: JSON.parse(response),
-                columns: [{
-                        data: "id",
-                        render: function(data, type, row) {
-                            return `
-                                                    <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editcustoms_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                        <span class="fas fa-pencil"></span>
-                                                    </button>
-                                                    
-                                                    <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletecustoms_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                        <span class="fas fa-trash"></span>
-                                                    </button>
-                                                `;
-                        }
-                    },
-                    {
-                        data: "invoice_no"
-                    },
-                    {
-                        data: "supplier_name"
-                    },
-                    {
-                        data: "invoice_date"
-                    },
-                    {
-                        data: "sub_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "tax_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "allowance_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "payable_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "container_value_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    }
-                ],
-                scrollX: true, // ✅ Enables horizontal scrolling
-                autoWidth: true, // ✅ Enables automatic column sizing
-                scrollCollapse: true,
-                responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                bDestroy: true,
-                paging: false,
-                searching: false,
-                sorting: false,
-                language: {
-                    url: datatable_language
-                }
-            });
-        } else if (type == 2) {
-
-            $("#xin_table_invoice_itr").DataTable({
-                data: JSON.parse(response),
-                columns: [{
-                        data: "id",
-                        render: function(data, type, row) {
-                            return `
-                                                    <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="edititr_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                        <span class="fas fa-pencil"></span>
-                                                    </button>
-                                                    
-                                                    <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteitr_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                        <span class="fas fa-trash"></span>
-                                                    </button>
-                                                `;
-                        }
-                    },
-                    {
-                        data: "invoice_no"
-                    },
-                    {
-                        data: "supplier_name"
-                    },
-                    {
-                        data: "invoice_date"
-                    },
-                    {
-                        data: "sub_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "tax_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "allowance_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "payable_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "container_value_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    }
-                ],
-                scrollX: true, // ✅ Enables horizontal scrolling
-                autoWidth: true, // ✅ Enables automatic column sizing
-                scrollCollapse: true,
-                responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                bDestroy: true,
-                paging: false,
-                searching: false,
-                sorting: false,
-                language: {
-                    url: datatable_language
-                }
-            });
-
-        } else if (type == 3) {
-
-            $("#xin_table_invoice_port").DataTable({
-                data: JSON.parse(response),
-                columns: [{
-                        data: "id",
-                        render: function(data, type, row) {
-                            return `
-                                                    <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editport_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                        <span class="fas fa-pencil"></span>
-                                                    </button>
-                                                    
-                                                    <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteport_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                        <span class="fas fa-trash"></span>
-                                                    </button>
-                                                `;
-                        }
-                    },
-                    {
-                        data: "invoice_no"
-                    },
-                    {
-                        data: "supplier_name"
-                    },
-                    {
-                        data: "invoice_date"
-                    },
-                    {
-                        data: "sub_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "tax_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "allowance_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "payable_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "container_value_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    }
-                ],
-                scrollX: true, // ✅ Enables horizontal scrolling
-                autoWidth: true, // ✅ Enables automatic column sizing
-                scrollCollapse: true,
-                responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                bDestroy: true,
-                paging: false,
-                searching: false,
-                sorting: false,
-                language: {
-                    url: datatable_language
-                }
-            });
-
-        } else if (type == 4) {
-
-            $("#xin_table_invoice_fumigation").DataTable({
-                data: JSON.parse(response),
-                columns: [{
-                        data: "id",
-                        render: function(data, type, row) {
-                            return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editfumigation_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletefumigation_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                        }
-                    },
-                    {
-                        data: "invoice_no"
-                    },
-                    {
-                        data: "supplier_name"
-                    },
-                    {
-                        data: "invoice_date"
-                    },
-                    {
-                        data: "sub_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "tax_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "allowance_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "payable_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "container_value_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    }
-                ],
-                scrollX: true, // ✅ Enables horizontal scrolling
-                autoWidth: true, // ✅ Enables automatic column sizing
-                scrollCollapse: true,
-                responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                bDestroy: true,
-                paging: false,
-                searching: false,
-                sorting: false,
-                language: {
-                    url: datatable_language
-                }
-            });
-
-        } else if (type == 5) {
-
-            $("#xin_table_invoice_phyto").DataTable({
-                data: JSON.parse(response),
-                columns: [{
-                        data: "id",
-                        render: function(data, type, row) {
-                            return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editphyto_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletephyto_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                        }
-                    },
-                    {
-                        data: "invoice_no"
-                    },
-                    {
-                        data: "supplier_name"
-                    },
-                    {
-                        data: "invoice_date"
-                    },
-                    {
-                        data: "sub_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "tax_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "allowance_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "payable_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "container_value_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    }
-                ],
-                scrollX: true, // ✅ Enables horizontal scrolling
-                autoWidth: true, // ✅ Enables automatic column sizing
-                scrollCollapse: true,
-                responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                bDestroy: true,
-                paging: false,
-                searching: false,
-                sorting: false,
-                language: {
-                    url: datatable_language
-                }
-            });
-
-        } else if (type == 6) {
-
-            $("#xin_table_invoice_coteros").DataTable({
-                data: JSON.parse(response),
-                columns: [{
-                        data: "id",
-                        render: function(data, type, row) {
-                            return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editcoteros_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deletecoteros_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                        }
-                    },
-                    {
-                        data: "invoice_no"
-                    },
-                    {
-                        data: "supplier_name"
-                    },
-                    {
-                        data: "invoice_date"
-                    },
-                    {
-                        data: "sub_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "tax_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "allowance_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "payable_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "container_value_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    }
-                ],
-                scrollX: true, // ✅ Enables horizontal scrolling
-                autoWidth: true, // ✅ Enables automatic column sizing
-                scrollCollapse: true,
-                responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                bDestroy: true,
-                paging: false,
-                searching: false,
-                sorting: false,
-                language: {
-                    url: datatable_language
-                }
-            });
-
-        } else if (type == 7) {
-
-            $("#xin_table_invoice_incentives").DataTable({
-                data: JSON.parse(response),
-                columns: [{
-                        data: "id",
-                        render: function(data, type, row) {
-                            return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editincentives_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteincentives_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                        }
-                    },
-                    {
-                        data: "invoice_no"
-                    },
-                    {
-                        data: "supplier_name"
-                    },
-                    {
-                        data: "invoice_date"
-                    },
-                    {
-                        data: "sub_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "tax_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "allowance_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "payable_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "container_value_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    }
-                ],
-                scrollX: true, // ✅ Enables horizontal scrolling
-                autoWidth: true, // ✅ Enables automatic column sizing
-                scrollCollapse: true,
-                responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                bDestroy: true,
-                paging: false,
-                searching: false,
-                sorting: false,
-                language: {
-                    url: datatable_language
-                }
-            });
-
-        } else if (type == 8) {
-
-            $("#xin_table_invoice_remobilization").DataTable({
-                data: JSON.parse(response),
-                columns: [{
-                        data: "id",
-                        render: function(data, type, row) {
-                            return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editremobilization_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteremobilization_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                        }
-                    },
-                    {
-                        data: "invoice_no"
-                    },
-                    {
-                        data: "supplier_name"
-                    },
-                    {
-                        data: "invoice_date"
-                    },
-                    {
-                        data: "sub_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "tax_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "allowance_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "payable_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "container_value_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    }
-                ],
-                scrollX: true, // ✅ Enables horizontal scrolling
-                autoWidth: true, // ✅ Enables automatic column sizing
-                scrollCollapse: true,
-                responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                bDestroy: true,
-                paging: false,
-                searching: false,
-                sorting: false,
-                language: {
-                    url: datatable_language
-                }
-            });
-
-        } else if (type == 9) {
-
-            $("#xin_table_invoice_shipping").DataTable({
-                data: JSON.parse(response),
-                columns: [{
-                        data: "id",
-                        render: function(data, type, row) {
-                            return `
-                                                        <button type="button" class="btn icon-btn btn-xs btn-success waves-effect waves-light" data-role="editshipping_invoice" data-export_id="${row.export_id}" data-id="${data}" title="<?php echo $this->lang->line("edit"); ?>">
-                                                            <span class="fas fa-pencil"></span>
-                                                        </button>
-                                                        
-                                                        <button type="button" style="margin-left:5px;" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-export_id="${row.export_id}" data-role="deleteshipping_invoice" data-id="${data}" title="<?php echo $this->lang->line("delete"); ?>">
-                                                            <span class="fas fa-trash"></span>
-                                                        </button>
-                                                    `;
-                        }
-                    },
-                    {
-                        data: "invoice_no"
-                    },
-                    {
-                        data: "supplier_name"
-                    },
-                    {
-                        data: "invoice_date"
-                    },
-                    {
-                        data: "sub_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "tax_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "allowance_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "payable_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        data: "container_value_total",
-                        render: function(data) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    }
-                ],
-                scrollX: true, // ✅ Enables horizontal scrolling
-                autoWidth: true, // ✅ Enables automatic column sizing
-                scrollCollapse: true,
-                responsive: false, // ✅ Keep this false with scrollX to avoid conflict
-                bDestroy: true,
-                paging: false,
-                searching: false,
-                sorting: false,
-                language: {
-                    url: datatable_language
-                }
-            });
-        }
-    }
 
     var loadFileCustom = function(event) {
         $("#error-selectdoc").hide();
@@ -7123,15 +3646,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoCustoms").text(jsonResult.result["documentId"]);
                         $("#lblSupplierNameCustoms").text(jsonResult.result["registrationName"] + " --- " + jsonResult.result["companyId"]);
                         $("#lblIssuedDateCustoms").text(jsonResult.result["issueDate"]);
-                        // $("#lblTotalAmountCustoms").text(jsonResult.result["taxExclusiveAmount"]);
-                        // $("#lblTotalTaxAmountCustoms").text(jsonResult.result["taxAmount"]);
-                        // $("#lblAllowanceAmountCustoms").text(jsonResult.result["allowanceTotalAmount"]);
-                        // $("#lblPayableAmountCustoms").text(jsonResult.result["payableAmount"]);
-                        
-                        $("#lblTotalAmountCustoms").val(jsonResult.result["taxExclusiveAmountValue"]);
-                        $("#lblTotalTaxAmountCustoms").val(jsonResult.result["taxAmountValue"]);
-                        $("#lblAllowanceAmountCustoms").val(jsonResult.result["allowanceTotalAmountValue"]);
-                        $("#lblPayableAmountCustoms").val(jsonResult.result["payableAmountValue"]);
+                        $("#lblTotalAmountCustoms").text(jsonResult.result["taxExclusiveAmount"]);
+                        $("#lblTotalTaxAmountCustoms").text(jsonResult.result["taxAmount"]);
+                        $("#lblAllowanceAmountCustoms").text(jsonResult.result["allowanceTotalAmount"]);
+                        $("#lblPayableAmountCustoms").text(jsonResult.result["payableAmount"]);
 
                         if (jsonResult.result["fileExtension"] == "xml" || jsonResult.result["fileExtension"] == "XML") {
                             $("#divXml").show();
@@ -7165,15 +3683,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoCustoms").text("");
                         $("#lblSupplierNameCustoms").text("");
                         $("#lblIssuedDateCustoms").text("");
-                        //$("#lblTotalAmountCustoms").text("");
-                        // $("#lblTotalTaxAmountCustoms").text("");
-                        // $("#lblAllowanceAmountCustoms").text("");
-                        // $("#lblPayableAmountCustoms").text("");
-
-                        $("#lblTotalAmountCustoms").val("0");
-                        $("#lblTotalTaxAmountCustoms").val("0");
-                        $("#lblAllowanceAmountCustoms").val("0");
-                        $("#lblPayableAmountCustoms").val("0");
+                        $("#lblTotalAmountCustoms").text("");
+                        $("#lblTotalTaxAmountCustoms").text("");
+                        $("#lblAllowanceAmountCustoms").text("");
+                        $("#lblPayableAmountCustoms").text("");
 
                         $("#divXml").hide();
                         $("#divPdf").show();
@@ -7202,15 +3715,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoCustoms").text("");
                         $("#lblSupplierNameCustoms").text("");
                         $("#lblIssuedDateCustoms").text("");
-                        //$("#lblTotalAmountCustoms").text("");
-                        // $("#lblTotalTaxAmountCustoms").text("");
-                        // $("#lblAllowanceAmountCustoms").text("");
-                        // $("#lblPayableAmountCustoms").text("");
-
-                        $("#lblTotalAmountCustoms").val("0");
-                        $("#lblTotalTaxAmountCustoms").val("0");
-                        $("#lblAllowanceAmountCustoms").val("0");
-                        $("#lblPayableAmountCustoms").val("0");
+                        $("#lblTotalAmountCustoms").text("");
+                        $("#lblTotalTaxAmountCustoms").text("");
+                        $("#lblAllowanceAmountCustoms").text("");
+                        $("#lblPayableAmountCustoms").text("");
 
                         totalPayableAmount = 0;
                         uploadPdfFileCustomAgency = "";
@@ -7265,15 +3773,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoITR").text(jsonResult.result["documentId"]);
                         $("#lblSupplierNameITR").text(jsonResult.result["registrationName"] + " --- " + jsonResult.result["companyId"]);
                         $("#lblIssuedDateITR").text(jsonResult.result["issueDate"]);
-                        // $("#lblTotalAmountITR").text(jsonResult.result["taxExclusiveAmount"]);
-                        // $("#lblTotalTaxAmountITR").text(jsonResult.result["taxAmount"]);
-                        // $("#lblAllowanceAmountITR").text(jsonResult.result["allowanceTotalAmount"]);
-                        // $("#lblPayableAmountITR").text(jsonResult.result["payableAmount"]);
-
-                        $("#lblTotalAmountITR").val(jsonResult.result["taxExclusiveAmountValue"]);
-                        $("#lblTotalTaxAmountITR").val(jsonResult.result["taxAmountValue"]);
-                        $("#lblAllowanceAmountITR").val(jsonResult.result["allowanceTotalAmountValue"]);
-                        $("#lblPayableAmountITR").val(jsonResult.result["payableAmountValue"]);
+                        $("#lblTotalAmountITR").text(jsonResult.result["taxExclusiveAmount"]);
+                        $("#lblTotalTaxAmountITR").text(jsonResult.result["taxAmount"]);
+                        $("#lblAllowanceAmountITR").text(jsonResult.result["allowanceTotalAmount"]);
+                        $("#lblPayableAmountITR").text(jsonResult.result["payableAmount"]);
 
                         if (jsonResult.result["fileExtension"] == "xml" || jsonResult.result["fileExtension"] == "XML") {
                             $("#divXmlITR").show();
@@ -7304,54 +3807,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         toastr.clear();
                         toastr.error(jsonResult.error);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#lblInvoiceNoITR").text("");
-                        $("#lblSupplierNameITR").text("");
-                        $("#lblIssuedDateITR").text("");
-                        $("#lblTotalAmountITR").val("0");
-                        $("#lblTotalTaxAmountITR").val("0");
-                        $("#lblAllowanceAmountITR").val("0");
-                        $("#lblPayableAmountITR").val("0");
-
-                        $("#divXmlITR").hide();
-                        $("#divPdfITR").show();
-                        $("#divContainersITR").hide();
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else if (jsonResult.warning != '') {
                         toastr.clear();
                         toastr.warning(jsonResult.warning);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#divXmlITR").hide();
-                        $("#divPdfITR").show();
-                        $("#divContainersCustomsITR").hide();
-
-                        $("#fileUploadDoc_ITR").val("");
-
-                        $("#lblInvoiceNoITR").text("");
-                        $("#lblSupplierNameITR").text("");
-                        $("#lblIssuedDateITR").text("");
-                        $("#lblTotalAmountITR").val("0");
-                        $("#lblTotalTaxAmountITR").val("0");
-                        $("#lblAllowanceAmountITR").val("0");
-                        $("#lblPayableAmountITR").val("0");
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else {
                         toastr.clear();
                     }
@@ -7399,14 +3858,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoPort").text(jsonResult.result["documentId"]);
                         $("#lblSupplierNamePort").text(jsonResult.result["registrationName"] + " --- " + jsonResult.result["companyId"]);
                         $("#lblIssuedDatePort").text(jsonResult.result["issueDate"]);
-                        // $("#lblTotalAmountPort").text(jsonResult.result["taxExclusiveAmount"]);
-                        // $("#lblTotalTaxAmountPort").text(jsonResult.result["taxAmount"]);
-                        // $("#lblAllowanceAmountPort").text(jsonResult.result["allowanceTotalAmount"]);
-                        // $("#lblPayableAmountPort").text(jsonResult.result["payableAmount"]);
-                        $("#lblTotalAmountPort").val(jsonResult.result["taxExclusiveAmountValue"]);
-                        $("#lblTotalTaxAmountPort").val(jsonResult.result["taxAmountValue"]);
-                        $("#lblAllowanceAmountPort").val(jsonResult.result["allowanceTotalAmountValue"]);
-                        $("#lblPayableAmountPort").val(jsonResult.result["payableAmountValue"]);
+                        $("#lblTotalAmountPort").text(jsonResult.result["taxExclusiveAmount"]);
+                        $("#lblTotalTaxAmountPort").text(jsonResult.result["taxAmount"]);
+                        $("#lblAllowanceAmountPort").text(jsonResult.result["allowanceTotalAmount"]);
+                        $("#lblPayableAmountPort").text(jsonResult.result["payableAmount"]);
 
                         if (jsonResult.result["fileExtension"] == "xml" || jsonResult.result["fileExtension"] == "XML") {
                             $("#divXmlPort").show();
@@ -7437,54 +3892,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         toastr.clear();
                         toastr.error(jsonResult.error);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#lblInvoiceNoPort").text("");
-                        $("#lblSupplierNamePort").text("");
-                        $("#lblIssuedDatePort").text("");
-                        $("#lblTotalAmountPort").val("0");
-                        $("#lblTotalTaxAmountPort").val("0");
-                        $("#lblAllowanceAmountPort").val("0");
-                        $("#lblPayableAmountPort").val("0");
-
-                        $("#divXmlPort").hide();
-                        $("#divPdfPort").show();
-                        $("#divContainersPort").hide();
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else if (jsonResult.warning != '') {
                         toastr.clear();
                         toastr.warning(jsonResult.warning);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#divXmlPort").hide();
-                        $("#divPdfPort").show();
-                        $("#divContainersCustomsPort").hide();
-
-                        $("#fileUploadDoc_Port").val("");
-
-                        $("#lblInvoiceNoPort").text("");
-                        $("#lblSupplierNamePort").text("");
-                        $("#lblIssuedDatePort").text("");
-                        $("#lblTotalAmountPort").val("0");
-                        $("#lblTotalTaxAmountPort").val("0");
-                        $("#lblAllowanceAmountPort").val("0");
-                        $("#lblPayableAmountPort").val("0");
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else {
                         toastr.clear();
                     }
@@ -7532,14 +3943,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoShipping").text(jsonResult.result["documentId"]);
                         $("#lblSupplierNameShipping").text(jsonResult.result["registrationName"] + " --- " + jsonResult.result["companyId"]);
                         $("#lblIssuedDateShipping").text(jsonResult.result["issueDate"]);
-                        // $("#lblTotalAmountShipping").text(jsonResult.result["taxExclusiveAmount"]);
-                        // $("#lblTotalTaxAmountShipping").text(jsonResult.result["taxAmount"]);
-                        // $("#lblAllowanceAmountShipping").text(jsonResult.result["allowanceTotalAmount"]);
-                        // $("#lblPayableAmountShipping").text(jsonResult.result["payableAmount"]);
-                        $("#lblTotalAmountShipping").val(jsonResult.result["taxExclusiveAmountValue"]);
-                        $("#lblTotalTaxAmountShipping").val(jsonResult.result["taxAmountValue"]);
-                        $("#lblAllowanceAmountShipping").val(jsonResult.result["allowanceTotalAmountValue"]);
-                        $("#lblPayableAmountShipping").val(jsonResult.result["payableAmountValue"]);
+                        $("#lblTotalAmountShipping").text(jsonResult.result["taxExclusiveAmount"]);
+                        $("#lblTotalTaxAmountShipping").text(jsonResult.result["taxAmount"]);
+                        $("#lblAllowanceAmountShipping").text(jsonResult.result["allowanceTotalAmount"]);
+                        $("#lblPayableAmountShipping").text(jsonResult.result["payableAmount"]);
 
                         if (jsonResult.result["fileExtension"] == "xml" || jsonResult.result["fileExtension"] == "XML") {
                             $("#divXmlShipping").show();
@@ -7570,54 +3977,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         toastr.clear();
                         toastr.error(jsonResult.error);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#divXmlShipping").hide();
-                        $("#divPdfShipping").show();
-                        $("#divContainersCustomsShipping").hide();
-
-                        $("#fileUploadDoc_Shipping").val("");
-
-                        $("#lblInvoiceNoShipping").text("");
-                        $("#lblSupplierNameShipping").text("");
-                        $("#lblIssuedDateShipping").text("");
-                        $("#lblTotalAmountShipping").val("0");
-                        $("#lblTotalTaxAmountShipping").val("0");
-                        $("#lblAllowanceAmountShipping").val("0");
-                        $("#lblPayableAmountShipping").val("0");
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else if (jsonResult.warning != '') {
                         toastr.clear();
                         toastr.warning(jsonResult.warning);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#lblInvoiceNoShipping").text("");
-                        $("#lblSupplierNameShipping").text("");
-                        $("#lblIssuedDateShipping").text("");
-                        $("#lblTotalAmountShipping").val("0");
-                        $("#lblTotalTaxAmountShipping").val("0");
-                        $("#lblAllowanceAmountShipping").val("0");
-                        $("#lblPayableAmountShipping").val("0");
-
-                        $("#divXmlShipping").hide();
-                        $("#divPdfShipping").show();
-                        $("#divContainersShipping").hide();
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else {
                         toastr.clear();
                     }
@@ -7665,14 +4028,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoFumigation").text(jsonResult.result["documentId"]);
                         $("#lblSupplierNameFumigation").text(jsonResult.result["registrationName"] + " --- " + jsonResult.result["companyId"]);
                         $("#lblIssuedDateFumigation").text(jsonResult.result["issueDate"]);
-                        // $("#lblTotalAmountFumigation").text(jsonResult.result["taxExclusiveAmount"]);
-                        // $("#lblTotalTaxAmountFumigation").text(jsonResult.result["taxAmount"]);
-                        // $("#lblAllowanceAmountFumigation").text(jsonResult.result["allowanceTotalAmount"]);
-                        // $("#lblPayableAmountFumigation").text(jsonResult.result["payableAmount"]);
-                        $("#lblTotalAmountFumigation").val(jsonResult.result["taxExclusiveAmountValue"]);
-                        $("#lblTotalTaxAmountFumigation").val(jsonResult.result["taxAmountValue"]);
-                        $("#lblAllowanceAmountFumigation").val(jsonResult.result["allowanceTotalAmountValue"]);
-                        $("#lblPayableAmountFumigation").val(jsonResult.result["payableAmountValue"]);
+                        $("#lblTotalAmountFumigation").text(jsonResult.result["taxExclusiveAmount"]);
+                        $("#lblTotalTaxAmountFumigation").text(jsonResult.result["taxAmount"]);
+                        $("#lblAllowanceAmountFumigation").text(jsonResult.result["allowanceTotalAmount"]);
+                        $("#lblPayableAmountFumigation").text(jsonResult.result["payableAmount"]);
 
                         if (jsonResult.result["fileExtension"] == "xml" || jsonResult.result["fileExtension"] == "XML") {
                             $("#divXmlFumigation").show();
@@ -7703,54 +4062,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         toastr.clear();
                         toastr.error(jsonResult.error);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#divXmlFumigation").hide();
-                        $("#divPdfFumigation").show();
-                        $("#divContainersFumigation").hide();
-
-                        $("#fileUploadDoc_Fumigation").val("");
-
-                        $("#lblInvoiceNoFumigation").text("");
-                        $("#lblSupplierNameFumigation").text("");
-                        $("#lblIssuedDateFumigation").text("");
-                        $("#lblTotalAmountFumigation").val("0");
-                        $("#lblTotalTaxAmountFumigation").val("0");
-                        $("#lblAllowanceAmountFumigation").val("0");
-                        $("#lblPayableAmountFumigation").val("0");
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else if (jsonResult.warning != '') {
                         toastr.clear();
                         toastr.warning(jsonResult.warning);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#lblInvoiceNoFumigation").text("");
-                        $("#lblSupplierNameFumigation").text("");
-                        $("#lblIssuedDateFumigation").text("");
-                        $("#lblTotalAmountFumigation").val("0");
-                        $("#lblTotalTaxAmountFumigation").val("0");
-                        $("#lblAllowanceAmountFumigation").val("0");
-                        $("#lblPayableAmountFumigation").val("0");
-
-                        $("#divXmlFumigation").hide();
-                        $("#divPdfFumigation").show();
-                        $("#divContainersFumigation").hide();
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else {
                         toastr.clear();
                     }
@@ -7798,14 +4113,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoCoteros").text(jsonResult.result["documentId"]);
                         $("#lblSupplierNameCoteros").text(jsonResult.result["registrationName"] + " --- " + jsonResult.result["companyId"]);
                         $("#lblIssuedDateCoteros").text(jsonResult.result["issueDate"]);
-                        // $("#lblTotalAmountCoteros").text(jsonResult.result["taxExclusiveAmount"]);
-                        // $("#lblTotalTaxAmountCoteros").text(jsonResult.result["taxAmount"]);
-                        // $("#lblAllowanceAmountCoteros").text(jsonResult.result["allowanceTotalAmount"]);
-                        // $("#lblPayableAmountCoteros").text(jsonResult.result["payableAmount"]);
-                        $("#lblTotalAmountCoteros").val(jsonResult.result["taxExclusiveAmountValue"]);
-                        $("#lblTotalTaxAmountCoteros").val(jsonResult.result["taxAmountValue"]);
-                        $("#lblAllowanceAmountCoteros").val(jsonResult.result["allowanceTotalAmountValue"]);
-                        $("#lblPayableAmountCoteros").val(jsonResult.result["payableAmountValue"]);
+                        $("#lblTotalAmountCoteros").text(jsonResult.result["taxExclusiveAmount"]);
+                        $("#lblTotalTaxAmountCoteros").text(jsonResult.result["taxAmount"]);
+                        $("#lblAllowanceAmountCoteros").text(jsonResult.result["allowanceTotalAmount"]);
+                        $("#lblPayableAmountCoteros").text(jsonResult.result["payableAmount"]);
 
                         if (jsonResult.result["fileExtension"] == "xml" || jsonResult.result["fileExtension"] == "XML") {
                             $("#divXmlCoteros").show();
@@ -7836,54 +4147,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         toastr.clear();
                         toastr.error(jsonResult.error);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#divXmlCoteros").hide();
-                        $("#divPdfCoteros").show();
-                        $("#divContainersCoteros").hide();
-
-                        $("#fileUploadDoc_Coteros").val("");
-
-                        $("#lblInvoiceNoCoteros").text("");
-                        $("#lblSupplierNameCoteros").text("");
-                        $("#lblIssuedDateCoteros").text("");
-                        $("#lblTotalAmountCoteros").val("0");
-                        $("#lblTotalTaxAmountCoteros").val("0");
-                        $("#lblAllowanceAmountCoteros").val("0");
-                        $("#lblPayableAmountCoteros").val("0");
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else if (jsonResult.warning != '') {
                         toastr.clear();
                         toastr.warning(jsonResult.warning);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#lblInvoiceNoCoteros").text("");
-                        $("#lblSupplierNameCoteros").text("");
-                        $("#lblIssuedDateCoteros").text("");
-                        $("#lblTotalAmountCoteros").val("0");
-                        $("#lblTotalTaxAmountCoteros").val("0");
-                        $("#lblAllowanceAmountCoteros").val("0");
-                        $("#lblPayableAmountCoteros").val("0");
-
-                        $("#divXmlCoteros").hide();
-                        $("#divPdfCoteros").show();
-                        $("#divContainersCoteros").hide();
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else {
                         toastr.clear();
                     }
@@ -7931,14 +4198,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoPhyto").text(jsonResult.result["documentId"]);
                         $("#lblSupplierNamePhyto").text(jsonResult.result["registrationName"] + " --- " + jsonResult.result["companyId"]);
                         $("#lblIssuedDatePhyto").text(jsonResult.result["issueDate"]);
-                        // $("#lblTotalAmountPhyto").text(jsonResult.result["taxExclusiveAmount"]);
-                        // $("#lblTotalTaxAmountPhyto").text(jsonResult.result["taxAmount"]);
-                        // $("#lblAllowanceAmountPhyto").text(jsonResult.result["allowanceTotalAmount"]);
-                        // $("#lblPayableAmountPhyto").text(jsonResult.result["payableAmount"]);
-                        $("#lblTotalAmountPhyto").val(jsonResult.result["taxExclusiveAmountValue"]);
-                        $("#lblTotalTaxAmountPhyto").val(jsonResult.result["taxAmountValue"]);
-                        $("#lblAllowanceAmountPhyto").val(jsonResult.result["allowanceTotalAmountValue"]);
-                        $("#lblPayableAmountPhyto").val(jsonResult.result["payableAmountValue"]);
+                        $("#lblTotalAmountPhyto").text(jsonResult.result["taxExclusiveAmount"]);
+                        $("#lblTotalTaxAmountPhyto").text(jsonResult.result["taxAmount"]);
+                        $("#lblAllowanceAmountPhyto").text(jsonResult.result["allowanceTotalAmount"]);
+                        $("#lblPayableAmountPhyto").text(jsonResult.result["payableAmount"]);
 
                         if (jsonResult.result["fileExtension"] == "xml" || jsonResult.result["fileExtension"] == "XML") {
                             $("#divXmlPhyto").show();
@@ -7969,54 +4232,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         toastr.clear();
                         toastr.error(jsonResult.error);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#divXmlPhyto").hide();
-                        $("#divPdfPhyto").show();
-                        $("#divContainersPhyto").hide();
-
-                        $("#fileUploadDoc_Phyto").val("");
-
-                        $("#lblInvoiceNoPhyto").text("");
-                        $("#lblSupplierNamePhyto").text("");
-                        $("#lblIssuedDatePhyto").text("");
-                        $("#lblTotalAmountPhyto").val("0");
-                        $("#lblTotalTaxAmountPhyto").val("0");
-                        $("#lblAllowanceAmountPhyto").val("0");
-                        $("#lblPayableAmountPhyto").val("0");
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else if (jsonResult.warning != '') {
                         toastr.clear();
                         toastr.warning(jsonResult.warning);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#lblInvoiceNoPhyto").text("");
-                        $("#lblSupplierNamePhyto").text("");
-                        $("#lblIssuedDatePhyto").text("");
-                        $("#lblTotalAmountPhyto").val("0");
-                        $("#lblTotalTaxAmountPhyto").val("0");
-                        $("#lblAllowanceAmountPhyto").val("0");
-                        $("#lblPayableAmountPhyto").val("0");
-
-                        $("#divXmlPhyto").hide();
-                        $("#divPdfPhyto").show();
-                        $("#divContainersPhyto").hide();
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else {
                         toastr.clear();
                     }
@@ -8064,14 +4283,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoIncentives").text(jsonResult.result["documentId"]);
                         $("#lblSupplierNameIncentives").text(jsonResult.result["registrationName"] + " --- " + jsonResult.result["companyId"]);
                         $("#lblIssuedDateIncentives").text(jsonResult.result["issueDate"]);
-                        // $("#lblTotalAmountIncentives").text(jsonResult.result["taxExclusiveAmount"]);
-                        // $("#lblTotalTaxAmountIncentives").text(jsonResult.result["taxAmount"]);
-                        // $("#lblAllowanceAmountIncentives").text(jsonResult.result["allowanceTotalAmount"]);
-                        // $("#lblPayableAmountIncentives").text(jsonResult.result["payableAmount"]);
-                        $("#lblTotalAmountIncentives").val(jsonResult.result["taxExclusiveAmountValue"]);
-                        $("#lblTotalTaxAmountIncentives").val(jsonResult.result["taxAmountValue"]);
-                        $("#lblAllowanceAmountIncentives").val(jsonResult.result["allowanceTotalAmountValue"]);
-                        $("#lblPayableAmountIncentives").val(jsonResult.result["payableAmountValue"]);
+                        $("#lblTotalAmountIncentives").text(jsonResult.result["taxExclusiveAmount"]);
+                        $("#lblTotalTaxAmountIncentives").text(jsonResult.result["taxAmount"]);
+                        $("#lblAllowanceAmountIncentives").text(jsonResult.result["allowanceTotalAmount"]);
+                        $("#lblPayableAmountIncentives").text(jsonResult.result["payableAmount"]);
 
                         if (jsonResult.result["fileExtension"] == "xml" || jsonResult.result["fileExtension"] == "XML") {
                             $("#divXmlIncentives").show();
@@ -8102,54 +4317,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         toastr.clear();
                         toastr.error(jsonResult.error);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#divXmlIncentives").hide();
-                        $("#divPdfIncentives").show();
-                        $("#divContainersIncentives").hide();
-
-                        $("#fileUploadDoc_Incentives").val("");
-
-                        $("#lblInvoiceNoIncentives").text("");
-                        $("#lblSupplierNameIncentives").text("");
-                        $("#lblIssuedDateIncentives").text("");
-                        $("#lblTotalAmountIncentives").val("0");
-                        $("#lblTotalTaxAmountIncentives").val("0");
-                        $("#lblAllowanceAmountIncentives").val("0");
-                        $("#lblPayableAmountIncentives").val("0");
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else if (jsonResult.warning != '') {
                         toastr.clear();
                         toastr.warning(jsonResult.warning);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#lblInvoiceNoIncentives").text("");
-                        $("#lblSupplierNameIncentives").text("");
-                        $("#lblIssuedDateIncentives").text("");
-                        $("#lblTotalAmountIncentives").val("0");
-                        $("#lblTotalTaxAmountIncentives").val("0");
-                        $("#lblAllowanceAmountIncentives").val("0");
-                        $("#lblPayableAmountIncentives").val("0");
-
-                        $("#divXmlIncentives").hide();
-                        $("#divPdfIncentives").show();
-                        $("#divContainersIncentives").hide();
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else {
                         toastr.clear();
                     }
@@ -8197,14 +4368,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         $("#lblInvoiceNoRemobilization").text(jsonResult.result["documentId"]);
                         $("#lblSupplierNameRemobilization").text(jsonResult.result["registrationName"] + " --- " + jsonResult.result["companyId"]);
                         $("#lblIssuedDateRemobilization").text(jsonResult.result["issueDate"]);
-                        // $("#lblTotalAmountRemobilization").text(jsonResult.result["taxExclusiveAmount"]);
-                        // $("#lblTotalTaxAmountRemobilization").text(jsonResult.result["taxAmount"]);
-                        // $("#lblAllowanceAmountRemobilization").text(jsonResult.result["allowanceTotalAmount"]);
-                        // $("#lblPayableAmountRemobilization").text(jsonResult.result["payableAmount"]);
-                        $("#lblTotalAmountRemobilization").val(jsonResult.result["taxExclusiveAmountValue"]);
-                        $("#lblTotalTaxAmountRemobilization").val(jsonResult.result["taxAmountValue"]);
-                        $("#lblAllowanceAmountRemobilization").val(jsonResult.result["allowanceTotalAmountValue"]);
-                        $("#lblPayableAmountRemobilization").val(jsonResult.result["payableAmountValue"]);
+                        $("#lblTotalAmountRemobilization").text(jsonResult.result["taxExclusiveAmount"]);
+                        $("#lblTotalTaxAmountRemobilization").text(jsonResult.result["taxAmount"]);
+                        $("#lblAllowanceAmountRemobilization").text(jsonResult.result["allowanceTotalAmount"]);
+                        $("#lblPayableAmountRemobilization").text(jsonResult.result["payableAmount"]);
 
                         if (jsonResult.result["fileExtension"] == "xml" || jsonResult.result["fileExtension"] == "XML") {
                             $("#divXmlRemobilization").show();
@@ -8235,54 +4402,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         toastr.clear();
                         toastr.error(jsonResult.error);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#divXmlRemobilization").hide();
-                        $("#divPdfRemobilization").show();
-                        $("#divContainersRemobilization").hide();
-
-                        $("#fileUploadDoc_Remobilization").val("");
-
-                        $("#lblInvoiceNoRemobilization").text("");
-                        $("#lblSupplierNameRemobilization").text("");
-                        $("#lblIssuedDateRemobilization").text("");
-                        $("#lblTotalAmountRemobilization").val("0");
-                        $("#lblTotalTaxAmountRemobilization").val("0");
-                        $("#lblAllowanceAmountRemobilization").val("0");
-                        $("#lblPayableAmountRemobilization").val("0");
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else if (jsonResult.warning != '') {
                         toastr.clear();
                         toastr.warning(jsonResult.warning);
                         $('input[name="csrf_cgrerp"]').val(jsonResult.csrf_hash);
-
-                        $("#lblInvoiceNoRemobilization").text("");
-                        $("#lblSupplierNameRemobilization").text("");
-                        $("#lblIssuedDateRemobilization").text("");
-                        $("#lblTotalAmountRemobilization").val("0");
-                        $("#lblTotalTaxAmountRemobilization").val("0");
-                        $("#lblAllowanceAmountRemobilization").val("0");
-                        $("#lblPayableAmountRemobilization").val("0");
-
-                        $("#divXmlRemobilization").hide();
-                        $("#divPdfRemobilization").show();
-                        $("#divContainersRemobilization").hide();
-
-                        totalPayableAmount = 0;
-                        uploadPdfFileCustomAgency = "";
-                        fileExtension = "";
-                        supplierId = 0;
-                        subTotalCustoms = 0;
-                        ivaCustoms = 0;
-                        retefuenteCustoms = 0;
-                        payableCustoms = 0;
                     } else {
                         toastr.clear();
                     }
@@ -8297,6 +4420,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 </script>
 
 <script>
+
     //CUSTOMS
     document.getElementById("issued_date_custom").addEventListener("change", function() {
         let inputDate = this.value;

@@ -5139,41 +5139,24 @@ class Exportordersales extends MY_Controller
 
                 $Return['csrf_hash'] = $this->security->get_csrf_hash();
 
-                $originId = $this->input->post("originid");
-                $saNumber = $this->input->post("sanumber");
-                $originalSANumber = $this->input->post("sanumber");
-                $exportOrderId = $this->input->post("exportid");
+                $invoiceIds = $this->input->post("invoiceIds");
 
-                $invoiceData = $this->Export_model->fetch_merge_invoice_history_invoice();
+                $invoiceData = $this->Export_model->fetch_merge_invoice_history_invoice($invoiceIds);
+                $exportids = $this->Export_model->fetch_exportids_byinvoiceids($invoiceIds)[0]->exportids;
 
                 $getBuyerDetails = $this->Master_model->get_buyers_details_by_id($invoiceData[0]->buyer_id);
                 $getBankDetails = $this->Master_model->get_bank_details_by_id($invoiceData[0]->bank_id);
                 $getSellerDetails = $this->Master_model->get_seller_details_by_id($invoiceData[0]->seller_id);
 
-                if ($originId == 3) {
-                    $getExportDetails = $this->Export_model->get_export_details_invoice_id($exportOrderId);
-                } else {
-                    $getExportDetails = $this->Export_model->get_export_details_invoice_export_origin(622);
-                }
+                $ids_array = array_map('intval', explode(',', $exportids));
+                $max_id = max($ids_array);
 
+                $getExportDetails = $this->Export_model->get_export_details_invoice_export_origin($max_id);
                 $arrBuyerAddress = explode("\n", $getBuyerDetails[0]->address);
-
-                if ($originId == 3) {
-                    $saNumber = $getExportDetails[0]->booking_no . "-" . str_replace("/", "-", $saNumber);
-                } else {
-                    $saNumber = str_replace("/", "-", $saNumber);
-                }
+                $saNumber = $this->Export_model->fetch_export_invoice_number($exportids)[0]->result;
 
                 $objExcel = PHPExcel_IOFactory::createReader('Excel2007');
-
-                $accountingInvoice = $this->input->post("accountingInvoice");
-
-                if ($originId == 1 && $accountingInvoice == 1) {
-                    $objExcel = $objExcel->load('./assets/templates/ProForma_Invoice_Template_Colombia_AcccoutingInvoice.xlsx');
-                } else {
-                    $objExcel = $objExcel->load('./assets/templates/' . $getSellerDetails[0]->template_file);
-                }
-
+                $objExcel = $objExcel->load('./assets/templates/ProForma_Invoice_Template_Merge.xlsx');
 
                 $objExcel->setActiveSheetIndex(0);
                 $objSheet = $objExcel->getActiveSheet();
@@ -5204,13 +5187,13 @@ class Exportordersales extends MY_Controller
                 $updateContainerNumberDataJson = json_decode($this->input->post("updatecontainerprice"), true);
                 $creditnotes = $invoiceData[0]->claim_id;
 
-                date_default_timezone_set($getExportDetails[0]->timezone_abbreviation);
+                //date_default_timezone_set($getExportDetails[0]->timezone_abbreviation);
                 $invoiceBuyerName = $getBuyerDetails[0]->invoice_name;
                 $objSheet->setCellValue('C8', "INVOICE -$invoiceBuyerName-$saNumber");
 
                 //EXPORT DETAILS
 
-                $todayDate = date($invoiceData[0]->invoice_date);
+                $todayDate = date("d/m/Y");
 
                 $shippedDate = PHPExcel_Shared_Date::PHPToExcel(DateTime::createFromFormat('!d/m/Y', $todayDate));
                 $objSheet->setCellValue("G11", $shippedDate);
@@ -5218,7 +5201,7 @@ class Exportordersales extends MY_Controller
 
                 $objSheet->setCellValue("G12", strtoupper($getExportDetails[0]->origin_name));
                 $objSheet->setCellValue("G13", strtoupper($getExportDetails[0]->pol));
-                $objSheet->setCellValue("G14", strtoupper($getExportDetails[0]->pod));
+                $objSheet->setCellValue("G14", strtoupper("Any Ports, India"));//strtoupper($getExportDetails[0]->pod));
 
                 $enableJumpShorts = $invoiceData[0]->enabled_jump_shorts;
                 $enableJumpSemi = $invoiceData[0]->enabled_jump_semi;
@@ -5376,7 +5359,7 @@ class Exportordersales extends MY_Controller
                 $circAdjustment = $invoiceData[0]->circ_adjustment;
                 $measurementsystem = $invoiceData[0]->measurement_system;
 
-                $getExportItemDetails = $this->Export_model->get_export_data_by_export_id_merge($originId, $circAllowance, $lengthAllowance, $circAdjustment, $measurementsystem);
+                $getExportItemDetails = $this->Export_model->get_export_data_by_export_id_merge($circAllowance, $lengthAllowance, $circAdjustment, $measurementsystem, $exportids);
 
                 $totalValue = 0;
                 $containerItemArray = array();
@@ -5568,11 +5551,12 @@ class Exportordersales extends MY_Controller
                     $containerDataArray = array_merge($containerDataArray, $containerFinalArray);
                 }
 
+                $totalContainers = 0;
                 if (count($containerDataArray) > 0) {
                     $exportItemsRowCount = 19;
 
                     foreach ($containerDataArray as $container) {
-
+                        $totalContainers = $totalContainers + 1;
                         $exportItemsRowCount = $exportItemsRowCount + 1;
                         $containerUPrice = 0;
 
@@ -5641,9 +5625,10 @@ class Exportordersales extends MY_Controller
                 if ($invoiceData[0]->advance_enabled == 1 && $salesAdvanceCost != 0) {
                     $lastRowDetails = $lastRowDetails - 1;
                     $objSheet->setCellValue("B$lastRowDetails", "(Less Advance)");
-                    $objSheet->setCellValue("G$lastRowDetails", "=COUNT(G20:G$exportItemsRowCount)*-$salesAdvanceCost");
 
-                    $advanceCost = $getExportDetails[0]->d_total_containers * ($salesAdvanceCost);
+                    $advanceCost = $totalContainers * ($salesAdvanceCost);
+                    $advanceCostRounded = floor($advanceCost / 100) * 100;
+                    $objSheet->setCellValue("G$lastRowDetails", "-" . $advanceCostRounded + 0);
                 }
 
                 $salesServiceCost = 0;
@@ -5677,7 +5662,7 @@ class Exportordersales extends MY_Controller
                         }
                     }
                 }
-                
+
                 $totalInvoiceValue = $totalInvoiceValue - $advanceCost + $claimCost;
 
                 $objSheet->setCellValue("D63", "=SUM(D20:D62)");
@@ -5716,11 +5701,9 @@ class Exportordersales extends MY_Controller
                 $objSheet->setCellValue("C73", $getBankDetails[0]->account_number);
                 $objSheet->getStyle("C73")->getNumberFormat()->setFormatCode('0');
 
-                $saNumber = str_replace("/", "_", $saNumber);
+                //$saNumber = str_replace("/", "_", $saNumber);
                 $month_name = ucfirst(date("dmY"));
-
-
-                $filename =  "Proforma_Invoice_" . $saNumber . "_" . $month_name . ".xlsx";
+                $filename =  "Proforma_Invoice_" . $month_name . ".xlsx";
 
                 $objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
                 $objWriter->save("./reports/ExportReports/" . $filename);
@@ -5744,6 +5727,35 @@ class Exportordersales extends MY_Controller
             $Return["result"] = "";
             $Return["redirect"] = false;
             $Return["csrf_hash"] = $this->security->get_csrf_hash();
+            $this->output($Return);
+            exit;
+        }
+    }
+
+    public function dialog_merge_invoice()
+    {
+        $Return = array("pages" => "", "redirect" => false, "result" => "", "error" => "", "csrf_hash" => "");
+        $session = $this->session->userdata("fullname");
+        if (!empty($session)) {
+
+            $originId = $this->input->post("origin_id");
+
+            $data = array(
+                "pageheading" => $this->lang->line("merge_invoice"),
+                "pagetype" => "merge_invoice",
+                "csrfhash" => $this->security->get_csrf_hash(),
+                "originid" => $originId,
+                "invoiceslist" => json_encode($this->Export_model->fetch_merge_invoices_list($originId)),
+            );
+
+            $this->load->view("exportsales/dialog_view_merge_invoice", $data);
+        } else {
+            $Return["pagemessage"] = "";
+            $Return["pageheading"] = "";
+            $Return["pages"] = "";
+            $Return["messagetype"] = "redirect";
+            $Return["pagemessage"] = "";
+            $Return["redirect"] = true;
             $this->output($Return);
             exit;
         }

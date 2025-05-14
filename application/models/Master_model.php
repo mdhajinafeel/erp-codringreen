@@ -1231,4 +1231,103 @@ class Master_model extends CI_Model
 				WHERE is_active = 1 AND supplier_id = $supplierid");
 		return $query->result();
 	}
+
+	//POD
+	public function all_exportpod()
+	{
+		$query = $this->db->query("SELECT A.id, A.pod_name, A.country_id, A.latitude, A.longitude, A.color_code, A.is_active, B.name 
+				FROM tbl_export_pod A 
+				INNER JOIN tbl_countries B ON B.id = A.country_id");
+		return $query->result();
+	}
+
+	public function all_active_exportpod()
+	{
+		$query = $this->db->query("SELECT id, pod_name, country_id, latitude, longitude, color_code, is_active FROM tbl_export_pod WHERE is_active = 1");
+		return $query->result();
+	}
+
+	public function get_exportpod_detail_by_id($id)
+	{
+		$query = $this->db->query("SELECT id, pod_name, country_id, latitude, longitude, color_code, is_active
+				FROM tbl_export_pod WHERE id = $id");
+		return $query->result();
+	}
+
+	public function add_exportpod($data)
+	{
+		$this->db->set('created_date', 'NOW()', FALSE);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->insert('tbl_export_pod', $data);
+		if ($this->db->affected_rows() > 0) {
+			$insert_id = $this->db->insert_id();
+			return $insert_id;
+		} else {
+			return 0;
+		}
+	}
+
+	public function update_exportpod($data, $id)
+	{
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->where('id', $id);
+		if ($this->db->update('tbl_export_pod', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	//POL
+	public function all_exportpol()
+	{
+		$query = $this->db->query("SELECT id, pol_name, pol_short_name, origin_id, latitude, longitude, is_active, getapplicableorigins_byid(origin_id) AS origin
+			FROM tbl_export_pol");
+		return $query->result();
+	}
+
+	public function all_exportpol_by_origin($originid)
+	{
+		$query = $this->db->query("SELECT id, pol_name, pol_short_name, origin_id, latitude, longitude, is_active, getapplicableorigins_byid(origin_id) AS origin
+				FROM tbl_export_pol WHERE origin_id = $originid");
+		return $query->result();
+	}
+
+	public function all_active_exportpol()
+	{
+		$query = $this->db->query("SELECT id, pol_name, pol_short_name, origin_id, latitude, longitude, getapplicableorigins_byid(origin_id) AS origin 
+			FROM tbl_export_pol WHERE is_active = 1");
+		return $query->result();
+	}
+
+	public function get_exportpol_detail_by_id($id)
+	{
+		$query = $this->db->query("SELECT id, pol_name, pol_short_name, origin_id, latitude, longitude, is_active
+				FROM tbl_export_pol WHERE id = $id"); 
+		return $query->result();
+	}
+
+	public function add_exportpol($data)
+	{
+		$this->db->set('created_date', 'NOW()', FALSE);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->insert('tbl_export_pol', $data);
+		if ($this->db->affected_rows() > 0) {
+			$insert_id = $this->db->insert_id();
+			return $insert_id;
+		} else {
+			return 0;
+		}
+	}
+
+	public function update_exportpol($data, $id)
+	{
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->where('id', $id);
+		if ($this->db->update('tbl_export_pol', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
