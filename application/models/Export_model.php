@@ -247,7 +247,8 @@ class Export_model extends CI_Model
     public function delete_exports($exportid, $sanumber, $dispatchids, $userid)
     {
         $updateData = array(
-            "isactive" => 0, "updatedby" => $userid,
+            "isactive" => 0,
+            "updatedby" => $userid,
         );
         $multiClause = array('id' => $exportid, 'sa_number' => $sanumber);
         $this->db->where($multiClause);
@@ -255,7 +256,8 @@ class Export_model extends CI_Model
         if ($this->db->update('tbl_export_container_details', $updateData)) {
 
             $updateData = array(
-                "isactive" => 0, "updatedby" => $userid,
+                "isactive" => 0,
+                "updatedby" => $userid,
             );
             $multiClause = array('container_details_id' => $exportid);
             $this->db->where($multiClause);
@@ -273,7 +275,7 @@ class Export_model extends CI_Model
                 // $this->db->where_in($multiClause);
                 // $this->db->set('updateddate', 'NOW()', FALSE);
                 //if ($this->db->update('tbl_dispatch_container', $updateData)) {
-                if($this->db->query($updateQuery)) {
+                if ($this->db->query($updateQuery)) {
                     return true;
                 } else {
                     return false;
@@ -302,10 +304,10 @@ class Export_model extends CI_Model
                 ORDER BY C.dispatch_id ASC, STR_TO_DATE(C.dispatch_date, '%d/%m/%Y')");
         return $query->result();
     }
-    
+
     public function get_container_dispatch_data_old($dispatchid, $containernumber, $originid)
     {
-        if($originid == 1) {
+        if ($originid == 1) {
             $query = $this->db->query("SELECT CASE A.is_special WHEN 1 THEN SUM(A.dispatch_pieces) ELSE C.scanned_code END AS scanned_code, 
                     C.length_bought, (C.circumference_bought + 1) AS circumference_bought, A.is_special 
                     FROM tbl_dispatch_data A
@@ -331,7 +333,7 @@ class Export_model extends CI_Model
 
     public function get_container_dispatch_data($dispatchid, $containernumber, $originid)
     {
-        if($originid == 1) {
+        if ($originid == 1) {
             $query = $this->db->query("SELECT CASE A.is_special WHEN 1 THEN SUM(A.dispatch_pieces) ELSE C.scanned_code END AS scanned_code, 
                     C.length_bought, C.circumference_bought AS circumference_bought, A.is_special 
                     FROM tbl_dispatch_data A
@@ -341,7 +343,7 @@ class Export_model extends CI_Model
                     WHERE B.dispatch_id = $dispatchid AND B.container_number = '$containernumber' AND B.origin_id = $originid AND A.isactive = 1 
                     AND A.isduplicatescanned = 0 GROUP BY C.circumference_bought, C.length_bought 
                     ORDER BY C.circumference_bought, C.length_bought, A.dispatch_data_id");
-        } else if($originid == 3) {
+        } else if ($originid == 3) {
             $query = $this->db->query("SELECT CASE A.is_special WHEN 1 THEN A.dispatch_pieces ELSE C.scanned_code END AS scanned_code, 
                     C.length_bought, C.circumference_bought AS circumference_bought, A.is_special 
                     FROM tbl_dispatch_data A
@@ -364,10 +366,10 @@ class Export_model extends CI_Model
         }
         return $query->result();
     }
-    
+
     public function get_container_dispatch_data_square_blocks($dispatchid, $containernumber, $originid)
     {
-        if($originid == 1) {
+        if ($originid == 1) {
             $query = $this->db->query("SELECT C.circumference_bought, C.length_bought, C.thickness_bought, C.width_bought, A.dispatch_pieces, 
                     C.salvoconducto, C.reception_data_id, C.reception_id, A.dispatch_id, B.container_number 
                     FROM tbl_dispatch_data A 
@@ -423,7 +425,7 @@ class Export_model extends CI_Model
         $query = $this->db->query($strQuery);
         return $query->result();
     }
-    
+
     public function get_export_details_invoice_id($exportid)
     {
         $strQuery = "SELECT A.sa_number, B.pol_short_name AS pol, CONCAT(C.pod_name, ', ', D.code) AS pod, A.bl_no AS booking_no, 
@@ -454,7 +456,7 @@ class Export_model extends CI_Model
         $query = $this->db->query($strQuery);
         return $query->result();
     }
-    
+
     public function get_export_volume_by_id($exportid, $sanumber, $originid)
     {
         $strQuery = "SELECT SUM(Y.total_pieces) AS total_pieces, SUM(Y.gross_volume) AS gross_volume, SUM(Y.net_volume) AS net_volume
@@ -481,7 +483,7 @@ class Export_model extends CI_Model
 
     public function get_export_data_by_export_id($exportid, $sanumber, $originid, $circallowance, $lengthallowance, $circadjust, $measurementsystem)
     {
-        if($measurementsystem == 2 || $measurementsystem == 5) {
+        if ($measurementsystem == 2 || $measurementsystem == 5) {
             $strQuery = "SELECT Y.dispatch_id, LEFT(REPLACE(TRIM(Y.container_number), ' ', ''), 11) AS container_number, Y.total_pieces, Y.gross_volume, Y.net_volume, Y.gross_cft, Y.net_cft, Y.avg_circumference, Y.avg_length, 
             CASE WHEN (Y.product_type_id = 1 OR Y.product_type_id = 3) THEN 4 ELSE CASE WHEN Y.avg_length < 2.75 THEN 1 WHEN Y.avg_length < 6 THEN 2 ELSE 3 END END AS product_type
             FROM (
@@ -536,7 +538,7 @@ class Export_model extends CI_Model
             GROUP BY X.container_number) Y
             ORDER BY Y.dispatch_id ASC ";
         }
-        
+
         $query = $this->db->query($strQuery);
         return $query->result();
     }
@@ -570,7 +572,8 @@ class Export_model extends CI_Model
         return $query->result();
     }
 
-    public function fetch_sa_numbers_by_origin($originid) {
+    public function fetch_sa_numbers_by_origin($originid)
+    {
         $strQuery = "SELECT id, sa_number FROM 
             tbl_export_container_details WHERE isactive = 1 AND origin_id = $originid";
 
@@ -579,32 +582,32 @@ class Export_model extends CI_Model
     }
 
     public function add_export_invoice_history($data)
-	{
-		$this->db->set('created_date', 'NOW()', FALSE);
-		$this->db->set('updated_date', 'NOW()', FALSE);
-		$this->db->insert('tbl_export_invoice_history', $data);
-		if ($this->db->affected_rows() > 0) {
-			$insert_id = $this->db->insert_id();
-			return $insert_id;
-		} else {
-			return 0;
-		}
-	}
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_export_invoice_history', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
 
     public function add_export_container_price($data)
-	{
-		$this->db->set('created_date', 'NOW()', FALSE);
-		$this->db->set('updated_date', 'NOW()', FALSE);
-		$this->db->insert('tbl_export_invoice_container', $data);
-		if ($this->db->affected_rows() > 0) {
-			$insert_id = $this->db->insert_id();
-			return $insert_id;
-		} else {
-			return 0;
-		}
-	}
-	
-	public function update_sales_buyer_ledger($exportid, $userid)
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_export_invoice_container', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
+
+    public function update_sales_buyer_ledger($exportid, $userid)
     {
         $query = "UPDATE tbl_sales_buyer_ledger SET is_active = 0, updated_by = $userid,
                 updated_date = NOW() 
@@ -613,19 +616,20 @@ class Export_model extends CI_Model
     }
 
     public function add_sales_buyer_ledger($data)
-	{
-		$this->db->set('created_date', 'NOW()', FALSE);
-		$this->db->set('updated_date', 'NOW()', FALSE);
-		$this->db->insert('tbl_sales_buyer_ledger', $data);
-		if ($this->db->affected_rows() > 0) {
-			$insert_id = $this->db->insert_id();
-			return $insert_id;
-		} else {
-			return 0;
-		}
-	}
-	
-	public function fetch_invoice_history($exportid) {
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_sales_buyer_ledger', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
+
+    public function fetch_invoice_history($exportid)
+    {
         $strQuery = "SELECT A.id, A.invoice_date, A.total_containers, A.circ_allowance, A.length_allowance, 
             A.circ_adjustment, A.measurement_system, A.service_enabled, A.service_sales_percentage, A.total_service_cost, 
             A.advance_enabled, A.advance_cost, A.total_advance_cost, A.accounting_invoice, A.claim_id, A.claim_amount, 
@@ -643,7 +647,8 @@ class Export_model extends CI_Model
         return $query->result();
     }
 
-    public function fetch_container_invoice_price_by_export($exportid) {
+    public function fetch_container_invoice_price_by_export($exportid)
+    {
         $strQuery = "SELECT B.id AS invoice_id, A.container_number, A.unit_price 
             FROM tbl_export_invoice_container A 
             INNER JOIN tbl_export_invoice_history B ON B.id = A.export_invoice_id 
@@ -669,8 +674,9 @@ class Export_model extends CI_Model
     //     $query = $this->db->query($strQuery);
     //     return $query->result();
     // }
-    
-    public function fetch_invoice_history_invoice($exportid, $invoiceid) {
+
+    public function fetch_invoice_history_invoice($exportid, $invoiceid)
+    {
         $strQuery = "SELECT A.id, A.invoice_date, A.total_containers, A.circ_allowance, A.length_allowance, 
             A.circ_adjustment, A.measurement_system, A.service_enabled, A.service_sales_percentage, A.total_service_cost, 
             A.advance_enabled, A.advance_cost, A.total_advance_cost, A.accounting_invoice, A.claim_id, A.claim_amount, 
@@ -687,7 +693,7 @@ class Export_model extends CI_Model
         $query = $this->db->query($strQuery);
         return $query->result();
     }
-    
+
     public function get_ledger_transaction_details_by_export($exportid)
     {
         $query = $this->db->query("SELECT buyer_id, total_invoice_value 
@@ -696,7 +702,7 @@ class Export_model extends CI_Model
 
         return $query->result();
     }
-    
+
     public function fetch_exportid_trader($traderid)
     {
         if ($traderid > 0) {
@@ -906,54 +912,54 @@ class Export_model extends CI_Model
     }
 
     public function add_exportdocuments($data)
-	{
-		$this->db->set('created_date', 'NOW()', FALSE);
-		$this->db->set('updated_date', 'NOW()', FALSE);
-		$this->db->insert('tbl_export_documents', $data);
-		if ($this->db->affected_rows() > 0) {
-			$insert_id = $this->db->insert_id();
-			return $insert_id;
-		} else {
-			return 0;
-		}
-	}
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_export_documents', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
 
-	public function update_exportdocuments($data, $exportid, $exporttype)
-	{
-		$this->db->set('updated_date', 'NOW()', FALSE);
-		$multiClause = array('export_id' => $exportid, 'export_type' => $exporttype);
-		$this->db->where($multiClause);
-		if ($this->db->update('tbl_export_documents', $data)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    public function update_exportdocuments($data, $exportid, $exporttype)
+    {
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $multiClause = array('export_id' => $exportid, 'export_type' => $exporttype);
+        $this->db->where($multiClause);
+        if ($this->db->update('tbl_export_documents', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public function add_exportcontainerdoc($data)
-	{
-		$this->db->set('created_date', 'NOW()', FALSE);
-		$this->db->set('updated_date', 'NOW()', FALSE);
-		$this->db->insert('tbl_export_document_container', $data);
-		if ($this->db->affected_rows() > 0) {
-			$insert_id = $this->db->insert_id();
-			return $insert_id;
-		} else {
-			return 0;
-		}
-	}
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_export_document_container', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
 
-	public function update_exportcontainerdoc($data, $exportid, $exporttype)
-	{
-		$this->db->set('updated_date', 'NOW()', FALSE);
-		$multiClause = array('export_id' => $exportid, 'export_type' => $exporttype);
-		$this->db->where($multiClause);
-		if ($this->db->update('tbl_export_document_container', $data)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    public function update_exportcontainerdoc($data, $exportid, $exporttype)
+    {
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $multiClause = array('export_id' => $exportid, 'export_type' => $exporttype);
+        $this->db->where($multiClause);
+        if ($this->db->update('tbl_export_document_container', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public function fetch_export_documents($exportid, $exporttype)
     {
@@ -973,29 +979,29 @@ class Export_model extends CI_Model
     }
 
     public function update_exportcontainercost($data, $exportid)
-	{
-		$this->db->set('updated_date', 'NOW()', FALSE);
-		$multiClause = array('export_id' => $exportid);
-		$this->db->where($multiClause);
-		if ($this->db->update('tbl_export_document_container_cost', $data)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    {
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $multiClause = array('export_id' => $exportid);
+        $this->db->where($multiClause);
+        if ($this->db->update('tbl_export_document_container_cost', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public function add_exportcontainercost($data)
-	{
-		$this->db->set('created_date', 'NOW()', FALSE);
-		$this->db->set('updated_date', 'NOW()', FALSE);
-		$this->db->insert('tbl_export_document_container_cost', $data);
-		if ($this->db->affected_rows() > 0) {
-			$insert_id = $this->db->insert_id();
-			return $insert_id;
-		} else {
-			return 0;
-		}
-	}
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_export_document_container_cost', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
 
     public function fetch_export_container_costs($exportid)
     {
@@ -1005,7 +1011,8 @@ class Export_model extends CI_Model
         return $query->result();
     }
 
-    public function fetch_merge_invoice_history_invoice($invoiceids) {
+    public function fetch_merge_invoice_history_invoice($invoiceids)
+    {
         $strQuery = "SELECT A.id, A.invoice_date, A.total_containers, A.circ_allowance, A.length_allowance, 
             A.circ_adjustment, A.measurement_system, A.service_enabled, A.service_sales_percentage, A.total_service_cost, 
             A.advance_enabled, A.advance_cost, A.total_advance_cost, A.accounting_invoice, A.claim_id, A.claim_amount, 
@@ -1025,7 +1032,7 @@ class Export_model extends CI_Model
 
     public function get_export_data_by_export_id_merge($circallowance, $lengthallowance, $circadjust, $measurementsystem, $exportids)
     {
-        if($measurementsystem == 2 || $measurementsystem == 5) {
+        if ($measurementsystem == 2 || $measurementsystem == 5) {
             $strQuery = "SELECT Y.dispatch_id, LEFT(REPLACE(TRIM(Y.container_number), ' ', ''), 11) AS container_number, Y.total_pieces, Y.gross_volume, Y.net_volume, Y.gross_cft, Y.net_cft, Y.avg_circumference, Y.avg_length, 
             CASE WHEN (Y.product_type_id = 1 OR Y.product_type_id = 3) THEN 4 ELSE CASE WHEN Y.avg_length < 2.75 THEN 1 WHEN Y.avg_length < 6 THEN 2 ELSE 3 END END AS product_type
             FROM (
@@ -1080,12 +1087,13 @@ class Export_model extends CI_Model
             GROUP BY X.container_number) Y
             ORDER BY Y.dispatch_id ASC ";
         }
-        
+
         $query = $this->db->query($strQuery);
         return $query->result();
     }
 
-    public function fetch_merge_invoices_list($originid) {
+    public function fetch_merge_invoices_list($originid)
+    {
         $strQuery = "SELECT A.export_id, A.sa_number, A.invoice_id, B1.seller_name, C1.buyer_name, A.total_volume, A.total_invoice_value, 
                 A.total_service_cost, A.total_advance_cost, A.total_containers, A.total_sales_value 
                 FROM (SELECT A.export_id, B.sa_number, MAX(A.id) AS invoice_id, A.seller_id, A.buyer_id, A.total_volume, A.total_invoice_value, 
@@ -1102,14 +1110,16 @@ class Export_model extends CI_Model
         return $query->result();
     }
 
-    public function fetch_exportids_byinvoiceids($invoiceids) {
+    public function fetch_exportids_byinvoiceids($invoiceids)
+    {
         $strQuery = "SELECT GROUP_CONCAT(export_id SEPARATOR ', ') AS exportids FROM tbl_export_invoice_history WHERE id IN ($invoiceids)";
 
         $query = $this->db->query($strQuery);
         return $query->result();
     }
 
-    public function fetch_export_invoice_number($exportids) {
+    public function fetch_export_invoice_number($exportids)
+    {
         $strQuery = "SELECT CONCAT(
                     'SA',
                     GROUP_CONCAT(
@@ -1170,14 +1180,24 @@ class Export_model extends CI_Model
     }
 
     public function update_exportcontainerdoc_dispatch_invoice($data, $exportid, $invoiceid, $dispatchid)
-	{
-		$this->db->set('updated_date', 'NOW()', FALSE);
-		$multiClause = array('export_doc_id' => $invoiceid, 'export_id' => $exportid, 'dispatch_id' => $dispatchid);
-		$this->db->where($multiClause);
-		if ($this->db->update('tbl_export_document_container', $data)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    {
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $multiClause = array('export_doc_id' => $invoiceid, 'export_id' => $exportid, 'dispatch_id' => $dispatchid);
+        $this->db->where($multiClause);
+        if ($this->db->update('tbl_export_document_container', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function fetch_container_by_exportid($exportid)
+    {
+        $strQuery = "SELECT A.dispatch_id, REPLACE(B.container_number, ' ', '' ) AS container_number FROM tbl_export_container A 
+                INNER JOIN tbl_dispatch_container B ON B.dispatch_id = A.dispatch_id 
+                WHERE A.isactive = 1 AND A.container_details_id = $exportid";
+
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
 }

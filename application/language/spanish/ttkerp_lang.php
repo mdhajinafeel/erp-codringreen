@@ -951,3 +951,9 @@ $lang["error_select_invoice"] = "Por favor seleccione la factura a fusionar";
 $lang["total_container_value"] = "Valor total del contenedor";
 $lang["invoice_list"] = "Listas de facturas";
 $lang["invoice_no"] = "Factura #";
+$lang["extraction_cost"] = "Costo de extracción";
+$lang["loading_cost"] = "Costo de carga";
+$lang["unloading_cost"] = "Costo de descarga";
+
+#BUYER
+$lang["buyers"] = "Compradores";

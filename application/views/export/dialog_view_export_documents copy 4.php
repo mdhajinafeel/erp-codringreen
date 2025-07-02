@@ -7146,18 +7146,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             ivaCustoms = jsonResult.result["taxAmountValue"];
                             retefuenteCustoms = jsonResult.result["allowanceTotalAmountValue"];
                             payableCustoms = jsonResult.result["payableAmountValue"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='custom_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
                             $("#divXml").hide();
                             $("#divPdf").show();
@@ -7166,18 +7154,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='custom_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         }
 
                     } else if (jsonResult.error != '') {
@@ -7251,7 +7227,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
             });
         } else {
             toastr.clear();
-            $("#fileUploadDoc").val("");
         }
     };
 
@@ -7315,18 +7290,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             ivaCustoms = jsonResult.result["taxAmountValue"];
                             retefuenteCustoms = jsonResult.result["allowanceTotalAmountValue"];
                             payableCustoms = jsonResult.result["payableAmountValue"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='itr_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
                             $("#divXmlITR").hide();
                             $("#divPdfITR").show();
@@ -7335,18 +7298,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='itr_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         }
 
                     } else if (jsonResult.error != '') {
@@ -7472,18 +7423,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             ivaCustoms = jsonResult.result["taxAmountValue"];
                             retefuenteCustoms = jsonResult.result["allowanceTotalAmountValue"];
                             payableCustoms = jsonResult.result["payableAmountValue"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='port_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
                             $("#divXmlPort").hide();
                             $("#divPdfPort").show();
@@ -7492,18 +7431,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='port_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         }
 
                     } else if (jsonResult.error != '') {
@@ -7629,18 +7556,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             ivaCustoms = jsonResult.result["taxAmountValue"];
                             retefuenteCustoms = jsonResult.result["allowanceTotalAmountValue"];
                             payableCustoms = jsonResult.result["payableAmountValue"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='shipping_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
                             $("#divXmlShipping").hide();
                             $("#divPdfShipping").show();
@@ -7649,18 +7564,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='shipping_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         }
 
                     } else if (jsonResult.error != '') {
@@ -7786,18 +7689,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             ivaCustoms = jsonResult.result["taxAmountValue"];
                             retefuenteCustoms = jsonResult.result["allowanceTotalAmountValue"];
                             payableCustoms = jsonResult.result["payableAmountValue"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='fumigation_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
                             $("#divXmlFumigation").hide();
                             $("#divPdfFumigation").show();
@@ -7806,18 +7697,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='fumigation_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         }
 
                     } else if (jsonResult.error != '') {
@@ -7943,18 +7822,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             ivaCustoms = jsonResult.result["taxAmountValue"];
                             retefuenteCustoms = jsonResult.result["allowanceTotalAmountValue"];
                             payableCustoms = jsonResult.result["payableAmountValue"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='coteros_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
                             $("#divXmlCoteros").hide();
                             $("#divPdfCoteros").show();
@@ -7963,18 +7830,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='coteros_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         }
 
                     } else if (jsonResult.error != '') {
@@ -8100,18 +7955,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             ivaCustoms = jsonResult.result["taxAmountValue"];
                             retefuenteCustoms = jsonResult.result["allowanceTotalAmountValue"];
                             payableCustoms = jsonResult.result["payableAmountValue"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='phyto_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
                             $("#divXmlPhyto").hide();
                             $("#divPdfPhyto").show();
@@ -8120,18 +7963,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='phyto_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         }
 
                     } else if (jsonResult.error != '') {
@@ -8194,7 +8025,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         } else {
             toastr.clear();
             //toastr.error(common_error);
-            $("#fileUploadDoc_Phyto").val("");
+            $("#fileUploadDoc_Coteros").val("");
         }
     };
 
@@ -8257,18 +8088,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             ivaCustoms = jsonResult.result["taxAmountValue"];
                             retefuenteCustoms = jsonResult.result["allowanceTotalAmountValue"];
                             payableCustoms = jsonResult.result["payableAmountValue"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='incentives_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
                             $("#divXmlIncentives").hide();
                             $("#divPdfIncentives").show();
@@ -8277,18 +8096,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='incentives_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         }
 
                     } else if (jsonResult.error != '') {
@@ -8351,7 +8158,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         } else {
             toastr.clear();
             //toastr.error(common_error);
-            $("#fileUploadDoc_Incentives").val("");
+            $("#fileUploadDoc_Coteros").val("");
         }
     };
 
@@ -8414,18 +8221,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             ivaCustoms = jsonResult.result["taxAmountValue"];
                             retefuenteCustoms = jsonResult.result["allowanceTotalAmountValue"];
                             payableCustoms = jsonResult.result["payableAmountValue"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='remobilization_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
                             $("#divXmlRemobilization").hide();
                             $("#divPdfRemobilization").show();
@@ -8434,18 +8229,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             uploadPdfFileCustomAgency = jsonResult.result["fileUrl"];
                             fileExtension = jsonResult.result["fileExtension"];
                             supplierId = jsonResult.result["supplierId"];
-
-                            var containerData = JSON.parse(jsonResult.result["containerValue"]);
-                            containerData.forEach(function(container) {
-                                var dispatchId = container.dispatchId;
-                                var containerValue = container.containerValue;
-
-                                // Find the input with name matching the dispatch ID
-                                var input = $("input[name='remobilization_container_value[" + dispatchId + "]']");
-                                if (input.length > 0) {
-                                    input.val(parseFloat(containerValue));
-                                }
-                            });
                         }
 
                     } else if (jsonResult.error != '') {
@@ -8508,7 +8291,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         } else {
             toastr.clear();
             //toastr.error(common_error);
-            $("#fileUploadDoc_Remobilization").val("");
+            $("#fileUploadDoc_Coteros").val("");
         }
     };
 </script>

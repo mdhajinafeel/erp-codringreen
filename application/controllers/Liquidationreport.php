@@ -2139,6 +2139,8 @@ class Liquidationreport extends MY_Controller
                         } else if ($sheetinventory->product_type == 1 || $sheetinventory->product_type == 3) {
                         } else {
 
+                            $getFarmDetail = $this->Financemaster_model->get_farm_detail($contractId, $supplierId, $originId, $sheetinventory->inventory_order, $lang_code[0]->language_format_code);
+
                             $objWorkInventorySheet->SetCellValue("A2", $this->lang->line("costsummary_date"));
                             $objWorkInventorySheet->SetCellValue("A4", $this->lang->line("truck_plate"));
                             $objWorkInventorySheet->SetCellValue("A6", $this->lang->line("supplier_name"));
@@ -2176,9 +2178,6 @@ class Liquidationreport extends MY_Controller
                             $objWorkInventorySheet->getStyle("J2")->getFont()->setBold(true);
                             $objWorkInventorySheet->getStyle("J3")->getFont()->setBold(true);
                             $objWorkInventorySheet->getStyle("J6")->getFont()->setBold(true);
-
-                            $getFarmDetail = $this->Financemaster_model->get_farm_detail($contractId, $supplierId, $originId, $sheetinventory->inventory_order, $lang_code[0]->language_format_code);
-
 
                             $objWorkInventorySheet->SetCellValue("B2", $getFarmDetail[0]->purchase_date);
                             $objWorkInventorySheet->getStyle("B2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("A9D08E");

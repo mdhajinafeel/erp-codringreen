@@ -951,3 +951,9 @@ $lang["error_select_invoice"] = "Please select the invoice to merge";
 $lang["total_container_value"] = "Total Container Value";
 $lang["invoice_list"] = "Invoice Lists";
 $lang["invoice_no"] = "Invoice #";
+$lang["extraction_cost"] = "Extraction Cost";
+$lang["loading_cost"] = "Loading Cost";
+$lang["unloading_cost"] = "Unloading Cost";
+
+#BUYER
+$lang["buyers"] = "Buyers";

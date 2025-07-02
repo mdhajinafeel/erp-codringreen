@@ -1733,25 +1733,65 @@ class Exports extends MY_Controller
                         $embeddedXpath->registerNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
 
                         // Extract `TaxExclusiveAmount` from the embedded XML
+                        // $taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
+                        // $taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
+                        // $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
+                        // $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
+
+                        // $taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
+                        // $taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
+                        // $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
+                        // $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
+
+                        // if ($taxExclusiveAmountNode->length > 0) {
+                        //     $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
+                        // }
+
+                        // if ($taxInclusiveAmountNode->length > 0) {
+                        //     $taxInclusiveAmount = $taxInclusiveAmountNode->item(0)->nodeValue + 0;
+                        // }
+
+                        // $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+
+                        // if($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                        //     $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                        //     $taxInclusiveAmount = 0;
+                        //     $taxAmount = 0;
+                        // }
+
+                        // if ($allowanceTotalAmountNode->length > 0) {
+                        //     $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;
+                        // }
+
+                        // if ($payableAmountNode->length > 0) {
+                        //     $payableAmount = $payableAmountNode->item(0)->nodeValue + 0;
+                        // }
+
                         $taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
-                        $taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
+                        //$taxExclusiveAmountNode = $embeddedXpath->query("//cbc:TaxableAmount");
+                        $taxInclusiveAmountNode = $embeddedXpath->query("//cbc:TaxAmount");
                         $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
                         $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
 
-                        if ($taxExclusiveAmountNode->length > 0) {
-                            $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
-                        }
+                        // if ($taxExclusiveAmountNode->length > 0) {
+                        //     $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
+                        // }
 
                         if ($taxInclusiveAmountNode->length > 0) {
                             $taxInclusiveAmount = $taxInclusiveAmountNode->item(0)->nodeValue + 0;
                         }
 
-                        $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+                        $taxAmount = $taxInclusiveAmount; //- $taxExclusiveAmount;
 
-                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
-                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
-                            $taxInclusiveAmount = 0;
-                            $taxAmount = 0;
+
+                        // if($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                        //     $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                        //     $taxInclusiveAmount = 0;
+                        //     $taxAmount = 0;
+                        // }
+                        
+                        if ($taxExclusiveAmountNode->length > 0) {
+                            $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
                         }
 
                         if ($allowanceTotalAmountNode->length > 0) {
@@ -1761,6 +1801,8 @@ class Exports extends MY_Controller
                         if ($payableAmountNode->length > 0) {
                             $payableAmount = $payableAmountNode->item(0)->nodeValue + 0;
                         }
+
+                        //$taxExclusiveAmount = $payableAmount - $taxAmount;
                     }
                 }
             }

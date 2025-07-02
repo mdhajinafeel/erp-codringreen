@@ -191,7 +191,7 @@ $applicable_origins = $session["applicable_origins"];
                 <select class="form-control" name="adjustment_tax[]" id="adjustment_tax" data-plugin="select_erp" multiple>
                 </select>
             </div>
-            
+
             <div class="col-md-6">
                 <label for="process"><?php echo $this->lang->line('process'); ?></label>
                 <select class="form-control" name="process" id="process" data-plugin="select_erp">
@@ -600,6 +600,7 @@ $applicable_origins = $session["applicable_origins"];
             var warehouseid_roundlogs = $("#wh_name_roundlogs").val();
             var measurement_system_roundlogs = $("#measurement_system_roundlogs").val();
             var process = $("#process").val();
+            
 
             var isValid1 = true,
                 isValid2 = true,
@@ -993,7 +994,7 @@ $applicable_origins = $session["applicable_origins"];
                     action = obj.attr('name'),
                     form_table = obj.data('form-table');
 
-                $("#loading").show();
+                //$("#loading").show();
 
                 $.ajax({
                     type: "POST",

@@ -1,7 +1,7 @@
 <?php
 
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
-ini_set('display_errors', '0');
+// error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
+// ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -122,7 +122,7 @@ class Exports extends MY_Controller
                     "originid" => $getExportDetails[0]->origin_id,
                     "dispatchids" => $getExportDetails[0]->dispatchids,
                     "product_type_id" => $getExportDetails[0]->product_type_id,
-                    "measurementsystems" => $this->Master_model->fetch_measurementsystems_by_origin($getExportDetails[0]->origin_id, $getExportDetails[0]->product_type_id),
+                    "measurementsystems" => $this->Master_model->fetch_measurementsystems_by_origin_multi($getExportDetails[0]->origin_id, $getExportDetails[0]->product_type_id),
                     "formsubmit" => "exports/update",
                     "csrfhash" => $this->security->get_csrf_hash(),
                 );
@@ -1346,7 +1346,20 @@ class Exports extends MY_Controller
                                     'fileUrl' => $fileurl,
                                 ];
 
-                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);
+
+                                $containerArray = array();
+                                $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                $totalContainers = count($fetchExportContainers);
+                                if ($totalContainers > 0) {
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerArray[] = array(
+                                            "dispatchId" => $container->dispatch_id + 0,
+                                            "containerValue" => 0,
+                                        );
+                                    }
+                                }
+                                $dataResponse['containerValue'] = json_encode($containerArray);
 
                                 $Return['result'] = $dataResponse;
                                 $Return['error'] = "";
@@ -1381,7 +1394,54 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
+                                $containerArray = array();
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
+                                $valueWithoutTax = $xmlResponse['taxExclusiveAmountValue'];
+                                if ($valueWithoutTax > 0) {
+                                    $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                    $totalContainers = 0;
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerNumber = $container->container_number;
+                                        if (strlen($containerNumber) == 11) {
+                                            $totalContainers = $totalContainers + 1;
+                                        }
+                                    }
+
+                                    $eachContainerValue = round($valueWithoutTax / $totalContainers, 2);
+                                    $totalContainerCheck = 0;
+                                    $firstValidIndex = null;
+                                    if ($totalContainers > 0) {
+                                        foreach ($fetchExportContainers as $container) {
+                                            $containerNumber = $container->container_number;
+                                            if(strlen($containerNumber) == 11){
+
+                                                if ($firstValidIndex === null) {
+                                                    $firstValidIndex = count($containerArray);
+                                                }
+                                            
+                                                $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => $eachContainerValue + 0,
+                                                );
+                                            } else {
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => 0,
+                                                );
+                                            }
+                                        }
+                                    }
+
+                                    $remainingValue = $valueWithoutTax - $totalContainerCheck;
+                                }
+
+                                if (count($containerArray) > 0) {
+                                    //$containerArray[0]['containerValue'] = round($containerArray[0]['containerValue'] + $remainingValue, 2);
+                                    $containerArray[$firstValidIndex]['containerValue'] = round($containerArray[$firstValidIndex]['containerValue'] + $remainingValue, 2);
+                                }
+                                $xmlResponse['containerValue'] = json_encode($containerArray);
+
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1424,7 +1484,20 @@ class Exports extends MY_Controller
                                     'fileUrl' => $fileurl,
                                 ];
 
-                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);
+
+                                $containerArray = array();
+                                $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                $totalContainers = count($fetchExportContainers);
+                                if ($totalContainers > 0) {
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerArray[] = array(
+                                            "dispatchId" => $container->dispatch_id + 0,
+                                            "containerValue" => 0,
+                                        );
+                                    }
+                                }
+                                $dataResponse['containerValue'] = json_encode($containerArray);
 
                                 $Return['result'] = $dataResponse;
                                 $Return['error'] = "";
@@ -1459,7 +1532,55 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
+                                $containerArray = array();
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
+                                $valueWithoutTax = $xmlResponse['taxExclusiveAmountValue'];
+                                if ($valueWithoutTax > 0) {
+                                    $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+
+                                    $totalContainers = 0;
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerNumber = $container->container_number;
+                                        if (strlen($containerNumber) == 11) {
+                                            $totalContainers = $totalContainers + 1;
+                                        }
+                                    }
+
+                                    $eachContainerValue = round($valueWithoutTax / $totalContainers, 2);
+                                    $totalContainerCheck = 0;
+                                    $firstValidIndex = null;
+                                    if ($totalContainers > 0) {
+                                        foreach ($fetchExportContainers as $container) {
+                                            $containerNumber = $container->container_number;
+                                            if(strlen($containerNumber) == 11){
+
+                                                if ($firstValidIndex === null) {
+                                                    $firstValidIndex = count($containerArray);
+                                                }
+                                            
+                                                $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => $eachContainerValue + 0,
+                                                );
+                                            } else {
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => 0,
+                                                );
+                                            }
+                                        }
+                                    }
+
+                                    $remainingValue = $valueWithoutTax - $totalContainerCheck;
+                                }
+
+                                if (count($containerArray) > 0) {
+                                    //$containerArray[0]['containerValue'] = round($containerArray[0]['containerValue'] + $remainingValue, 2);
+                                    $containerArray[$firstValidIndex]['containerValue'] = round($containerArray[$firstValidIndex]['containerValue'] + $remainingValue, 2);
+                                }
+                                $xmlResponse['containerValue'] = json_encode($containerArray);
+
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1502,7 +1623,20 @@ class Exports extends MY_Controller
                                     'fileUrl' => $fileurl,
                                 ];
 
-                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);
+
+                                $containerArray = array();
+                                $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                $totalContainers = count($fetchExportContainers);
+                                if ($totalContainers > 0) {
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerArray[] = array(
+                                            "dispatchId" => $container->dispatch_id + 0,
+                                            "containerValue" => 0,
+                                        );
+                                    }
+                                }
+                                $dataResponse['containerValue'] = json_encode($containerArray);
 
                                 $Return['result'] = $dataResponse;
                                 $Return['error'] = "";
@@ -1537,7 +1671,55 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
+                                $containerArray = array();
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
+                                $valueWithoutTax = $xmlResponse['taxExclusiveAmountValue'];
+                                if ($valueWithoutTax > 0) {
+                                    $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                    
+                                    $totalContainers = 0;
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerNumber = $container->container_number;
+                                        if (strlen($containerNumber) == 11) {
+                                            $totalContainers = $totalContainers + 1;
+                                        }
+                                    }
+
+                                    $eachContainerValue = round($valueWithoutTax / $totalContainers, 2);
+                                    $totalContainerCheck = 0;
+                                    $firstValidIndex = null;
+                                    if ($totalContainers > 0) {
+                                        foreach ($fetchExportContainers as $container) {
+                                            $containerNumber = $container->container_number;
+                                            if(strlen($containerNumber) == 11){
+
+                                                if ($firstValidIndex === null) {
+                                                    $firstValidIndex = count($containerArray);
+                                                }
+                                            
+                                                $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => $eachContainerValue + 0,
+                                                );
+                                            } else {
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => 0,
+                                                );
+                                            }
+                                        }
+                                    }
+
+                                    $remainingValue = $valueWithoutTax - $totalContainerCheck;
+                                }
+
+                                if (count($containerArray) > 0) {
+                                    //$containerArray[0]['containerValue'] = round($containerArray[0]['containerValue'] + $remainingValue, 2);
+                                    $containerArray[$firstValidIndex]['containerValue'] = round($containerArray[$firstValidIndex]['containerValue'] + $remainingValue, 2);
+                                }
+                                $xmlResponse['containerValue'] = json_encode($containerArray);
+
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1580,7 +1762,20 @@ class Exports extends MY_Controller
                                     'fileUrl' => $fileurl,
                                 ];
 
-                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);
+
+                                $containerArray = array();
+                                $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                $totalContainers = count($fetchExportContainers);
+                                if ($totalContainers > 0) {
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerArray[] = array(
+                                            "dispatchId" => $container->dispatch_id + 0,
+                                            "containerValue" => 0,
+                                        );
+                                    }
+                                }
+                                $dataResponse['containerValue'] = json_encode($containerArray);
 
                                 $Return['result'] = $dataResponse;
                                 $Return['error'] = "";
@@ -1615,7 +1810,55 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
+                                $containerArray = array();
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
+                                $valueWithoutTax = $xmlResponse['taxExclusiveAmountValue'];
+                                if ($valueWithoutTax > 0) {
+                                    $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                    
+                                    $totalContainers = 0;
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerNumber = $container->container_number;
+                                        if (strlen($containerNumber) == 11) {
+                                            $totalContainers = $totalContainers + 1;
+                                        }
+                                    }
+                                    
+                                    $eachContainerValue = round($valueWithoutTax / $totalContainers, 2);
+                                    $totalContainerCheck = 0;
+                                    $firstValidIndex = null;
+                                    if ($totalContainers > 0) {
+                                        foreach ($fetchExportContainers as $container) {
+                                            $containerNumber = $container->container_number;
+                                            if(strlen($containerNumber) == 11){
+
+                                                if ($firstValidIndex === null) {
+                                                    $firstValidIndex = count($containerArray);
+                                                }
+                                            
+                                                $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => $eachContainerValue + 0,
+                                                );
+                                            } else {
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => 0,
+                                                );
+                                            }
+                                        }
+                                    }
+
+                                    $remainingValue = $valueWithoutTax - $totalContainerCheck;
+                                }
+
+                                if (count($containerArray) > 0) {
+                                    //$containerArray[0]['containerValue'] = round($containerArray[0]['containerValue'] + $remainingValue, 2);
+                                    $containerArray[$firstValidIndex]['containerValue'] = round($containerArray[$firstValidIndex]['containerValue'] + $remainingValue, 2);
+                                }
+                                $xmlResponse['containerValue'] = json_encode($containerArray);
+
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1658,7 +1901,20 @@ class Exports extends MY_Controller
                                     'fileUrl' => $fileurl,
                                 ];
 
-                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);
+
+                                $containerArray = array();
+                                $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                $totalContainers = count($fetchExportContainers);
+                                if ($totalContainers > 0) {
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerArray[] = array(
+                                            "dispatchId" => $container->dispatch_id + 0,
+                                            "containerValue" => 0,
+                                        );
+                                    }
+                                }
+                                $dataResponse['containerValue'] = json_encode($containerArray);
 
                                 $Return['result'] = $dataResponse;
                                 $Return['error'] = "";
@@ -1693,7 +1949,55 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
+                                $containerArray = array();
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
+                                $valueWithoutTax = $xmlResponse['taxExclusiveAmountValue'];
+                                if ($valueWithoutTax > 0) {
+                                    $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                    
+                                    $totalContainers = 0;
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerNumber = $container->container_number;
+                                        if (strlen($containerNumber) == 11) {
+                                            $totalContainers = $totalContainers + 1;
+                                        }
+                                    }
+
+                                    $eachContainerValue = round($valueWithoutTax / $totalContainers, 2);
+                                    $totalContainerCheck = 0;
+                                    $firstValidIndex = null;
+                                    if ($totalContainers > 0) {
+                                        foreach ($fetchExportContainers as $container) {
+                                            $containerNumber = $container->container_number;
+                                            if(strlen($containerNumber) == 11){
+
+                                                if ($firstValidIndex === null) {
+                                                    $firstValidIndex = count($containerArray);
+                                                }
+                                            
+                                                $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => $eachContainerValue + 0,
+                                                );
+                                            } else {
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => 0,
+                                                );
+                                            }
+                                        }
+                                    }
+
+                                    $remainingValue = $valueWithoutTax - $totalContainerCheck;
+                                }
+
+                                if (count($containerArray) > 0) {
+                                    //$containerArray[0]['containerValue'] = round($containerArray[0]['containerValue'] + $remainingValue, 2);
+                                    $containerArray[$firstValidIndex]['containerValue'] = round($containerArray[$firstValidIndex]['containerValue'] + $remainingValue, 2);
+                                }
+                                $xmlResponse['containerValue'] = json_encode($containerArray);
+
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1736,7 +2040,20 @@ class Exports extends MY_Controller
                                     'fileUrl' => $fileurl,
                                 ];
 
-                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);
+
+                                $containerArray = array();
+                                $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                $totalContainers = count($fetchExportContainers);
+                                if ($totalContainers > 0) {
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerArray[] = array(
+                                            "dispatchId" => $container->dispatch_id + 0,
+                                            "containerValue" => 0,
+                                        );
+                                    }
+                                }
+                                $dataResponse['containerValue'] = json_encode($containerArray);
 
                                 $Return['result'] = $dataResponse;
                                 $Return['error'] = "";
@@ -1771,7 +2088,55 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
+                                $containerArray = array();
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
+                                $valueWithoutTax = $xmlResponse['taxExclusiveAmountValue'];
+                                if ($valueWithoutTax > 0) {
+                                    $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                    
+                                    $totalContainers = 0;
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerNumber = $container->container_number;
+                                        if (strlen($containerNumber) == 11) {
+                                            $totalContainers = $totalContainers + 1;
+                                        }
+                                    }
+                                    
+                                    $eachContainerValue = round($valueWithoutTax / $totalContainers, 2);
+                                    $totalContainerCheck = 0;
+                                    $firstValidIndex = null;
+                                    if ($totalContainers > 0) {
+                                        foreach ($fetchExportContainers as $container) {
+                                            $containerNumber = $container->container_number;
+                                            if(strlen($containerNumber) == 11){
+
+                                                if ($firstValidIndex === null) {
+                                                    $firstValidIndex = count($containerArray);
+                                                }
+                                            
+                                                $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => $eachContainerValue + 0,
+                                                );
+                                            } else {
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => 0,
+                                                );
+                                            }
+                                        }
+                                    }
+
+                                    $remainingValue = $valueWithoutTax - $totalContainerCheck;
+                                }
+
+                                if (count($containerArray) > 0) {
+                                    //$containerArray[0]['containerValue'] = round($containerArray[0]['containerValue'] + $remainingValue, 2);
+                                    $containerArray[$firstValidIndex]['containerValue'] = round($containerArray[$firstValidIndex]['containerValue'] + $remainingValue, 2);
+                                }
+                                $xmlResponse['containerValue'] = json_encode($containerArray);
+
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1814,7 +2179,20 @@ class Exports extends MY_Controller
                                     'fileUrl' => $fileurl,
                                 ];
 
-                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);
+
+                                $containerArray = array();
+                                $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                $totalContainers = count($fetchExportContainers);
+                                if ($totalContainers > 0) {
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerArray[] = array(
+                                            "dispatchId" => $container->dispatch_id + 0,
+                                            "containerValue" => 0,
+                                        );
+                                    }
+                                }
+                                $dataResponse['containerValue'] = json_encode($containerArray);
 
                                 $Return['result'] = $dataResponse;
                                 $Return['error'] = "";
@@ -1849,7 +2227,55 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
+                                $containerArray = array();
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
+                                $valueWithoutTax = $xmlResponse['taxExclusiveAmountValue'];
+                                if ($valueWithoutTax > 0) {
+                                    $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                    
+                                    $totalContainers = 0;
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerNumber = $container->container_number;
+                                        if (strlen($containerNumber) == 11) {
+                                            $totalContainers = $totalContainers + 1;
+                                        }
+                                    }
+                                    
+                                    $eachContainerValue = round($valueWithoutTax / $totalContainers, 2);
+                                    $totalContainerCheck = 0;
+                                    $firstValidIndex = null;
+                                    if ($totalContainers > 0) {
+                                        foreach ($fetchExportContainers as $container) {
+                                            $containerNumber = $container->container_number;
+                                            if(strlen($containerNumber) == 11){
+
+                                                if ($firstValidIndex === null) {
+                                                    $firstValidIndex = count($containerArray);
+                                                }
+                                            
+                                                $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => $eachContainerValue + 0,
+                                                );
+                                            } else {
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => 0,
+                                                );
+                                            }
+                                        }
+                                    }
+
+                                    $remainingValue = $valueWithoutTax - $totalContainerCheck;
+                                }
+
+                                if (count($containerArray) > 0) {
+                                    //$containerArray[0]['containerValue'] = round($containerArray[0]['containerValue'] + $remainingValue, 2);
+                                    $containerArray[$firstValidIndex]['containerValue'] = round($containerArray[$firstValidIndex]['containerValue'] + $remainingValue, 2);
+                                }
+                                $xmlResponse['containerValue'] = json_encode($containerArray);
+
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1892,7 +2318,20 @@ class Exports extends MY_Controller
                                     'fileUrl' => $fileurl,
                                 ];
 
-                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);
+
+                                $containerArray = array();
+                                $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                $totalContainers = count($fetchExportContainers);
+                                if ($totalContainers > 0) {
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerArray[] = array(
+                                            "dispatchId" => $container->dispatch_id + 0,
+                                            "containerValue" => 0,
+                                        );
+                                    }
+                                }
+                                $dataResponse['containerValue'] = json_encode($containerArray);
 
                                 $Return['result'] = $dataResponse;
                                 $Return['error'] = "";
@@ -1927,7 +2366,55 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
+                                $containerArray = array();
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
+                                $valueWithoutTax = $xmlResponse['taxExclusiveAmountValue'];
+                                if ($valueWithoutTax > 0) {
+                                    $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                   
+                                    $totalContainers = 0;
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerNumber = $container->container_number;
+                                        if (strlen($containerNumber) == 11) {
+                                            $totalContainers = $totalContainers + 1;
+                                        }
+                                    }
+                                    
+                                    $eachContainerValue = round($valueWithoutTax / $totalContainers, 2);
+                                    $totalContainerCheck = 0;
+                                    $firstValidIndex = null;
+                                    if ($totalContainers > 0) {
+                                        foreach ($fetchExportContainers as $container) {
+                                            $containerNumber = $container->container_number;
+                                            if(strlen($containerNumber) == 11){
+
+                                                if ($firstValidIndex === null) {
+                                                    $firstValidIndex = count($containerArray);
+                                                }
+                                            
+                                                $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => $eachContainerValue + 0,
+                                                );
+                                            } else {
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => 0,
+                                                );
+                                            }
+                                        }
+                                    }
+
+                                    $remainingValue = $valueWithoutTax - $totalContainerCheck;
+                                }
+
+                                if (count($containerArray) > 0) {
+                                    //$containerArray[0]['containerValue'] = round($containerArray[0]['containerValue'] + $remainingValue, 2);
+                                    $containerArray[$firstValidIndex]['containerValue'] = round($containerArray[$firstValidIndex]['containerValue'] + $remainingValue, 2);
+                                }
+                                $xmlResponse['containerValue'] = json_encode($containerArray);
+
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -1970,7 +2457,20 @@ class Exports extends MY_Controller
                                     'fileUrl' => $fileurl,
                                 ];
 
-                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);;
+                                $dataResponse = json_decode(json_encode($dados, JSON_PRETTY_PRINT), true);
+
+                                $containerArray = array();
+                                $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                $totalContainers = count($fetchExportContainers);
+                                if ($totalContainers > 0) {
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerArray[] = array(
+                                            "dispatchId" => $container->dispatch_id + 0,
+                                            "containerValue" => 0,
+                                        );
+                                    }
+                                }
+                                $dataResponse['containerValue'] = json_encode($containerArray);
 
                                 $Return['result'] = $dataResponse;
                                 $Return['error'] = "";
@@ -2005,7 +2505,55 @@ class Exports extends MY_Controller
                                 //     exit;
                                 // }
 
+                                $containerArray = array();
                                 $xmlResponse = json_decode($this->importInvoice($docXml, $ext, $originId, $exporttype, $fileurl), true);
+                                $valueWithoutTax = $xmlResponse['taxExclusiveAmountValue'];
+                                if ($valueWithoutTax > 0) {
+                                    $fetchExportContainers = $this->Export_model->fetch_container_by_exportid($exportId);
+                                   
+                                    $totalContainers = 0;
+                                    foreach ($fetchExportContainers as $container) {
+                                        $containerNumber = $container->container_number;
+                                        if (strlen($containerNumber) == 11) {
+                                            $totalContainers = $totalContainers + 1;
+                                        }
+                                    }
+                                    
+                                    $eachContainerValue = round($valueWithoutTax / $totalContainers, 2);
+                                    $totalContainerCheck = 0;
+                                    $firstValidIndex = null;
+                                    if ($totalContainers > 0) {
+                                        foreach ($fetchExportContainers as $container) {
+                                            $containerNumber = $container->container_number;
+                                            if(strlen($containerNumber) == 11){
+
+                                                if ($firstValidIndex === null) {
+                                                    $firstValidIndex = count($containerArray);
+                                                }
+                                            
+                                                $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => $eachContainerValue + 0,
+                                                );
+                                            } else {
+                                                $containerArray[] = array(
+                                                    "dispatchId" => $container->dispatch_id + 0,
+                                                    "containerValue" => 0,
+                                                );
+                                            }
+                                        }
+                                    }
+
+                                    $remainingValue = $valueWithoutTax - $totalContainerCheck;
+                                }
+
+                                if (count($containerArray) > 0) {
+                                    //$containerArray[0]['containerValue'] = round($containerArray[0]['containerValue'] + $remainingValue, 2);
+                                    $containerArray[$firstValidIndex]['containerValue'] = round($containerArray[$firstValidIndex]['containerValue'] + $remainingValue, 2);
+                                }
+                                $xmlResponse['containerValue'] = json_encode($containerArray);
+
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
                                     $Return['error'] = "";
@@ -3027,6 +3575,8 @@ class Exports extends MY_Controller
             $companyIdNode = $xpath->query('//cac:SenderParty/cac:PartyTaxScheme/cbc:CompanyID');
             $supplierId = 0;
 
+            $companyIdValue = $companyIdNode->length > 0 ? $companyIdNode->item(0)->nodeValue : "";
+
             //CHECK AND REGISTER COMPANY ID
             $checkCompanyIdExistsCount = $this->Master_model->check_company_id_exportsupplier_count($companyIdNode->item(0)->nodeValue);
             if ($checkCompanyIdExistsCount[0]->cnt == 0) {
@@ -3067,26 +3617,39 @@ class Exports extends MY_Controller
                         $embeddedXpath->registerNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
 
                         // Extract `TaxExclusiveAmount` from the embedded XML
-                        $taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
-                        $taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
+                        //$taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
+                        $taxExclusiveAmountNode = $embeddedXpath->query("//cac:InvoiceLine/cbc:LineExtensionAmount");
+                        //$taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
+                        $taxInclusiveAmountNode = $embeddedXpath->query("//cbc:TaxAmount");
                         $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
                         $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
 
                         if ($taxExclusiveAmountNode->length > 0) {
-                            $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
+                            if($companyIdValue == "900081359") {
+                                $taxExclusiveAmount = $taxExclusiveAmountNode->item($taxExclusiveAmountNode->length - 1)->nodeValue + 0;
+                            } else {
+                                $taxExclusiveAmount = $taxExclusiveAmountNode->item(1)->nodeValue + 0;
+                            }
+                            //$taxExclusiveAmount = $taxExclusiveAmountNode->item($taxExclusiveAmountNode->length - 1)->nodeValue + 0;
+                            //$taxExclusiveAmount = $taxExclusiveAmountNode->item(1)->nodeValue + 0;
                         }
 
                         if ($taxInclusiveAmountNode->length > 0) {
-                            $taxInclusiveAmount = $taxInclusiveAmountNode->item(0)->nodeValue + 0;
+                            if($companyIdValue == "900081359") {
+                                $taxInclusiveAmount = 0;
+                            } else {
+                                $taxInclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;//$taxInclusiveAmountNode->item(0)->nodeValue + 0;
+                            }
                         }
 
-                        $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+                        // $taxAmount = $taxInclusiveAmount - $taxExclusiveAmount;
+                        $taxAmount = $taxInclusiveAmount; //- $taxExclusiveAmount;
 
-                        if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
-                            $taxExclusiveAmount = $taxInclusiveAmount + 0;
-                            $taxInclusiveAmount = 0;
-                            $taxAmount = 0;
-                        }
+                        // if ($taxExclusiveAmount <= 0 && $taxInclusiveAmount >= 0) {
+                        //     $taxExclusiveAmount = $taxInclusiveAmount + 0;
+                        //     $taxInclusiveAmount = 0;
+                        //     $taxAmount = 0;
+                        // }
 
                         if ($allowanceTotalAmountNode->length > 0) {
                             $allowanceTotalAmount = $allowanceTotalAmountNode->item(0)->nodeValue + 0;

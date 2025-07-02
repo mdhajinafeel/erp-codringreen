@@ -1,7 +1,7 @@
 <?php
 
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
-ini_set('display_errors', '0');
+// error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
+// ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -2907,7 +2907,7 @@ class Farms extends MY_Controller
 
                         if ($getInventoryOrderCount[0]->cnt == 0) {
 
-                            $getFarmDetail = $this->Farm_model->get_farm_details($farm_id, $contract_id, $inventory_order);
+                            $getFarmDetail = $this->Farm_model->get_farm_details($farm_id, $contract_id, $input_inventory_order);
                             $productTypeId = $getFarmDetail[0]->product_type_id;
                             $supplierid = $getFarmDetail[0]->supplier_id;
 
@@ -5380,9 +5380,6 @@ class Farms extends MY_Controller
                     $farmadjustment = $this->input->post('farmadjustment');
                     $adjustrf = $this->input->post('adjustrf');
                     $processType = $this->input->post('processType');
-                    $extractionCost = $this->input->post('extractionCost');
-                    $loadingCost = $this->input->post('loadingCost');
-                    $unloadingCost = $this->input->post('unloadingCost');
 
                     if ($input_inventory_order == $inventory_order) {
 
@@ -5880,9 +5877,6 @@ class Farms extends MY_Controller
                                 "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                 "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
                                 "process_type" => $processType,
-                                "extraction_cost" => $extractionCost,
-                                "loading_cost" => $loadingCost,
-                                "unloading_cost" => $unloadingCost,
                             );
 
                             $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
@@ -6450,9 +6444,6 @@ class Farms extends MY_Controller
                                     "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
                                     "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
                                     "process_type" => $processType,
-                                    "extraction_cost" => $extractionCost,
-                                    "loading_cost" => $loadingCost,
-                                    "unloading_cost" => $unloadingCost,
                                 );
 
                                 $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);

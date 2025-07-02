@@ -7251,7 +7251,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
             });
         } else {
             toastr.clear();
-            $("#fileUploadDoc").val("");
         }
     };
 
@@ -8194,7 +8193,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         } else {
             toastr.clear();
             //toastr.error(common_error);
-            $("#fileUploadDoc_Phyto").val("");
+            $("#fileUploadDoc_Coteros").val("");
         }
     };
 
@@ -8351,7 +8350,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         } else {
             toastr.clear();
             //toastr.error(common_error);
-            $("#fileUploadDoc_Incentives").val("");
+            $("#fileUploadDoc_Coteros").val("");
         }
     };
 
@@ -8508,7 +8507,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         } else {
             toastr.clear();
             //toastr.error(common_error);
-            $("#fileUploadDoc_Remobilization").val("");
+            $("#fileUploadDoc_Coteros").val("");
         }
     };
 </script>

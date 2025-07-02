@@ -575,6 +575,19 @@ class Master_model extends CI_Model
 		return $query->result();
 	}
 
+	public function fetch_measurementsystems_by_origin_multi($originid, $producttypeid)
+	{
+		if($producttypeid == 1) {
+			$producttypeid = '1,3';
+		} else {
+			$producttypeid = '2,4';
+		}
+		$query = $this->db->query("SELECT measurement_id, measurement_name
+				FROM tbl_measurement_system WHERE origin_id = $originid AND product_type_id IN ($producttypeid)
+				AND isactive = 1");
+		return $query->result();
+	}
+
 	public function get_measurementsystem_detail_by_id($id)
 	{
 		$query = $this->db->query("SELECT measurement_id, measurement_name, isactive, origin_id 

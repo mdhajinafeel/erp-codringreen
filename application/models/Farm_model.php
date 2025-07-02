@@ -317,7 +317,7 @@ class Farm_model extends CI_Model
                 CASE WHEN (getcurrencyexcelformat_origin(A.origin_id) IS NULL OR '') THEN getdefaultcurrency() ELSE getcurrencyexcelformat_origin(A.origin_id) END as currency_excel_format, A.product_type_id, 
                 A.supplier_taxes, A.logistic_taxes, A.service_taxes, A.logistic_provider_taxes, A.service_provider_taxes, 
                 A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, 
-                A.rounding_factor, C.existing_price_condition, A.driver_name, A.process_type    
+                A.rounding_factor, C.existing_price_condition, A.driver_name, A.process_type, A.extraction_cost, A.loading_cost, A.unloading_cost     
                 FROM tbl_farm A 
                 INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                 INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
