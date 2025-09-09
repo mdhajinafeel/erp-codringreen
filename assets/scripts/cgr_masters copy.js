@@ -1,5 +1,5 @@
 $(document).ready(function () {
-
+	
 	$("#loading").hide();
 
 	$("#origin_product").select2({ dropdownCssClass: "myFont" });
@@ -629,9 +629,9 @@ $(document).ready(function () {
 	});
 
 	$("#origin_qrcode").change(function () {
-		if ($("#origin_qrcode").val() == 0) {
+		if($("#origin_qrcode").val() == 0) {
 			$("#generate_type").attr("disabled", "disabled");
-		} else {
+		}else {
 			$("#generate_type").removeAttr("disabled");
 		}
 		$("#generate_type").val("0").change();
@@ -645,100 +645,6 @@ $(document).ready(function () {
 			"lengthMenu": [[20, 50, 100, -1], [20, 50, 100, "All"]],
 			"ajax": {
 				url: base_url + "/qrcode_list?originid=" + $("#origin_qrcode").val(),
-				type: 'GET'
-			},
-			//dom: 'lBfrtip',
-			"sScrollX": "100%",
-			"scrollCollapse": true,
-			"bPaginate": true,
-			"sPaginationType": "full_numbers",
-			paging: true,
-			searching: true,
-			fixedColumns: true,
-			responsive: true,
-			"order": [
-				[0, "asc"]
-			], "language": {
-				"url": datatable_language
-			}
-		});
-	});
-
-	//MACHINES
-	$('#xin_table_machines').DataTable({
-		"bDestroy": true,
-		"lengthMenu": [[20, 50, 100, -1], [20, 50, 100, "All"]],
-		"ajax": {
-			url: base_url + "/machines_list?originid=" + $("#origin_machine").val(),
-			type: 'GET'
-		},
-		//dom: 'lBfrtip',
-		"sScrollX": "100%",
-		"scrollCollapse": true,
-		"bPaginate": true,
-		"sPaginationType": "full_numbers",
-		paging: true,
-		searching: true,
-		fixedColumns: true,
-		responsive: true,
-		"order": [
-			[0, "asc"]
-		], "language": {
-			"url": datatable_language
-		}
-	});
-
-	$('#btn_new_machine').click(function () {
-		$.ajax({
-			url: base_url + "/dialog_machine_add",
-			type: "GET",
-			data: 'jd=1&is_ajax=1&mode=modal&type=addmachine',
-			success: function (response) {
-				if (response.redirect == true) {
-					window.location.replace(login_url);
-				} else {
-					$("#ajax_modal_lg_bd").html(response);
-					$("#add-modal-data-lg-bd").modal('show');
-					$("#status").select2({ dropdownCssClass: "myFont", dropdownParent: $('#ajax_modal_lg_bd') });
-					$("#origin").select2({ dropdownCssClass: "myFont", dropdownParent: $('#ajax_modal_lg_bd') });
-					$("#supplier_name").select2({
-						dropdownCssClass: "myFont",
-						dropdownParent: $('#ajax_modal_lg_bd')
-					});
-				}
-			}
-		});
-	});
-
-	$(document).on('click', 'button[data-role=editmachine]', function () {
-		var id = $(this).data('machine_id');
-		$.ajax({
-			url: base_url + "/dialog_machine_add",
-			type: "GET",
-			data: 'jd=1&is_ajax=3&mode=modal&type=editmachine&mid=' + id,
-			success: function (response) {
-				if (response.redirect == true) {
-					window.location.replace(login_url);
-				} else {
-					$("#ajax_modal_lg_bd").html(response);
-					$("#add-modal-data-lg-bd").modal('show');
-					$("#status").select2({ dropdownCssClass: "myFont", dropdownParent: $('#ajax_modal_lg_bd') });
-					$("#origin").select2({ dropdownCssClass: "myFont", dropdownParent: $('#ajax_modal_lg_bd') });
-					$("#supplier_name").select2({
-						dropdownCssClass: "myFont",
-						dropdownParent: $('#ajax_modal_lg_bd')
-					});
-				}
-			}
-		});
-	});
-
-	$("#origin_machine").change(function () {
-		$('#xin_table_machines').DataTable({
-			"bDestroy": true,
-			"lengthMenu": [[20, 50, 100, -1], [20, 50, 100, "All"]],
-			"ajax": {
-				url: base_url + "/machines_list?originid=" + $("#origin_machine").val(),
 				type: 'GET'
 			},
 			//dom: 'lBfrtip',
@@ -791,7 +697,7 @@ function deletefilesfromfolder() {
 		contentType: false,
 		cache: false,
 		processData: false,
-		success: function (JSON) {
+		success: function(JSON) {
 			$("#loading").hide();
 		}
 	});

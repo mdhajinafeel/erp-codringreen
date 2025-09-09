@@ -954,6 +954,110 @@ $lang["invoice_no"] = "Factura #";
 $lang["extraction_cost"] = "Costo de extracción";
 $lang["loading_cost"] = "Costo de carga";
 $lang["unloading_cost"] = "Costo de descarga";
+$lang["process_cost"] = "Costo del proceso";
 
 #BUYER
 $lang["buyers"] = "Compradores";
+
+#SAWMILL
+$lang["sawmill_title"] = "Aserradero";
+$lang["sawmill_process"] = "Proceso de Aserradero";
+$lang["girth_rl"] = "Girth RL";
+$lang["girth_rsq"] = "Girth RSQ";
+$lang["gross_volume_rl"] = "Volumen bruto RL";
+$lang["gross_volume_rsq"] = "Volumen bruto RSQ";
+$lang["net_volume_rl"] = "Volumen neto RL";
+$lang["net_volume_rsq"] = "Volumen neto RSQ";
+$lang["gross_loss"] = "Pérdida bruta";
+$lang["gross_loss_percentage"] = "Porcentaje de pérdida bruta";
+$lang["net_loss"] = "Pérdida neta";
+$lang["net_loss_percentage"] = "Porcentaje de pérdida neta";
+$lang["zona"] = "Zona";
+$lang["total_processed_volume"] = "Total de volumen procesado (m³)";
+$lang["total_exported_volume"] = "Total de volumen exportado (m³)";
+$lang["sawmill_inventory"] = "Inventario de Aserradero";
+$lang["exported_container"] = "Contenedor Exportado";
+$lang["total_trucks"] = "Total de Camiones";
+$lang["remaining_inventory_volume"] = "Volumen de inventario restante (m³)";
+$lang["cost_per_cbm"] = "Costo por m³";
+$lang["exported_cost"] = "Costo Exportado";
+$lang["remaining_inventory_cost"] = "Costo de Inventario Restante";
+$lang["processed_cost"] = "Costo Procesado";
+
+//FINCA OPERATIONS
+$lang["costings"] = "Costos";
+$lang["acpm"] = "Combustible (ACPM)";
+$lang["maintenance"] = "Mantenimiento";
+$lang["miscellaneous"] = "Varios";
+$lang["expense_date"] = "Fecha de Gasto";
+$lang["quantity"] = "Cantidad";
+$lang["purchase"] = "Compra";
+$lang["spend"] = "Gastar";
+$lang["machine_type"] = "Tipo de Máquina";
+$lang["error_machine"] = "Por favor ingrese el tipo de máquina";
+$lang["concept"] = "Concepto";
+$lang["error_concept"] = "Por favor ingrese el concepto";
+$lang["received"] = "Recibido";
+$lang["processed"] = "Procesado";
+$lang["in_inventory"] = "En Inventario";
+$lang["sawmill_operations"] = "Operaciones de Aserradero";
+$lang["detailed_data"] = "Datos Detallados";
+$lang["total_bins"] = "Total de Bins";
+$lang["acpm_list"] = "Listas de combustible (ACPM)";
+$lang["maintenance_list"] = "Listas de Mantenimiento";
+$lang["miscellaneous_list"] = "Listas Varios";
+$lang["extraction"] = "Extracción";
+$lang["extraction_lists"] = "Listas de Extracción";
+$lang["tree_count"] = "Conteo de Árboles";
+
+//PURCHASERS
+$lang["purchaser"] = "Comprador";
+$lang["costing_purchasers"] = "Compradores de Costos";
+$lang["purchaser_name"] = "Nombre del Comprador";
+$lang["costing_type"] = "Tipo de Costeo";
+$lang["add_purchaser"] = "Agregar Comprador";
+$lang["edit_purchaser"] = "Editar Comprador";
+
+$lang["download_summary_report"] = "Descargar Informe Resumen";
+$lang["costing_name"] = "Nombre del Costeo";
+$lang["ytd"] = "YTD";
+$lang["loading"] = "Cargando";
+$lang["zona"] = "Zona";
+$lang["total_ica"] = "Total ICAs";
+$lang["cost_ica"] = "Costo por m³";
+$lang["expense_summary"] = "Informe de Resumen de Gastos";
+$lang["total_purchase"] = "Total de Compras";
+$lang["total_spend"] = "Total Gastado";
+$lang["total_inventory"] = "Total de Inventario";
+$lang["icas"] = "ICAs";
+$lang["export_summary"] = "Resumen de Exportación";
+$lang["ica_number"] = "ICA #";
+$lang["received_pieces"] = "Piezas Recibidas";
+$lang["dispatched_pieces"] = "Piezas Despachadas";
+$lang["cost_per_pcs"] = "Costo por Pieza";
+$lang["dispatch_cost"] = "Costo de Piezas Despachadas";
+$lang["loading_date"] = "Fecha de Carga";
+$lang["container_#"] = "Contenedor #";
+$lang["total_processed_pieces"] = "Total de Piezas Procesadas";
+$lang["total_exported_pieces"] = "Total de Piezas Exportadas";
+$lang["remaining_inventory_pieces"] = "Piezas de Inventario Restantes";
+$lang["unprocessed_pieces"] = "Piezas No Procesadas";
+$lang["unprocessed"] = "No Procesado";
+$lang["generate_acpm_report"] = "Generar Informe ACPM";
+$lang["report_type"] = "Tipo de Informe";
+$lang["expense_report_type"] = "Informe de Gastos";
+$lang["nominal_report_type"] = "Informe Nomina";
+$lang["date_type"] = "Tipo de Fecha";
+$lang["year"] = "Año";
+$lang["maintenance_report_type"] = "Informe de Mantenimiento";
+$lang["miscellaneous_report_type"] = "Informe Varios";
+$lang["chassis_model"] = "Chasis / Modelo";
+
+//Machine
+$lang['machine_title'] = 'Maquinas';
+$lang['machine_name'] = 'Nombre de la Máquina';
+$lang['add_machine'] = 'Agregar Máquina';
+$lang['edit_machine'] = 'Editar Máquina';
+$lang['error_machine_name'] = 'Por favor ingrese el nombre de la máquina';
+$lang['error_chassis_model'] = 'Por favor ingrese el chasis / modelo';
+$lang['error_select_supplier'] = 'Por favor seleccione un proveedor';

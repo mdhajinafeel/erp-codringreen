@@ -165,7 +165,7 @@ endif;
 																		|| $this->router->fetch_class() == "shippinglines" || $this->router->fetch_class() == "measurementsystems"
 																		|| $this->router->fetch_class() == "inputparameters" || $this->router->fetch_class() == "qrcodegenerator"
 																		|| $this->router->fetch_class() == "inputparametersettings" || $this->router->fetch_class() == "exportpod" 
-																		|| $this->router->fetch_class() == "exportpol"
+																		|| $this->router->fetch_class() == "exportpol" || $this->router->fetch_class() == "machines"
 																	) {
 																		echo 'show';
 																	} else {
@@ -261,6 +261,16 @@ endif;
 														</div>
 													</a>
 												</li>
+												<li class="nav-item">
+													<a class="nav-link <?php if ($this->router->fetch_class() == "machines") {
+																			echo 'active';
+																		} else {
+																			'';
+																		} ?>" href="<?php echo site_url('machines'); ?>" aria-expanded="false">
+														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('machine_title'); ?></span></span>
+														</div>
+													</a>
+												</li>
 											</ul>
 
 										<?php } ?>
@@ -287,6 +297,19 @@ endif;
 													</a>
 												</li>
 											</ul>
+
+											<li class="nav-item">
+												<!-- parent pages-->
+												<a class="nav-link <?php if ($this->router->fetch_class() == "sawmills") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('sawmills'); ?>" role="button" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-link"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('sawmill_title'); ?></span>
+													</div>
+												</a>
+											</li>
+
 
 											<a class="nav-link dropdown-indicator" href="#reception" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
 												<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-warehouse"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('reception_title'); ?></span>
@@ -514,7 +537,7 @@ endif;
 										<ul class="nav collapse <?php if (
 																	$this->router->fetch_class() == "ledgertypes" || $this->router->fetch_class() == "suppliers" ||
 																	$this->router->fetch_class() == "accountheads" || $this->router->fetch_class() == "taxsettings" ||
-																	$this->router->fetch_class() == "exportsuppliers"
+																	$this->router->fetch_class() == "exportsuppliers" || $this->router->fetch_class() == "costingpurchasers"
 																) {
 																	echo 'show';
 																} else {
@@ -543,6 +566,16 @@ endif;
 																		'';
 																	} ?>" href="<?php echo site_url('exportsuppliers'); ?>" aria-expanded="false">
 													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('export_suppliers'); ?></span></span>
+													</div>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "costingpurchasers") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('costingpurchasers'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('costing_purchasers'); ?></span></span>
 													</div>
 												</a>
 											</li>
@@ -626,6 +659,16 @@ endif;
 																'';
 															} ?>" href="<?php echo site_url('purchasecontracts'); ?>" role="button" aria-expanded="false">
 											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-file-circle-check"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('contracts_title'); ?></span>
+											</div>
+										</a>
+										
+
+										<a class="nav-link <?php if ($this->router->fetch_class() == "costings") {
+																echo 'active';
+															} else {
+																'';
+															} ?>" href="<?php echo site_url('costings'); ?>" role="button" aria-expanded="false">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fas fa-hand-holding-usd"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('costings'); ?></span>
 											</div>
 										</a>
 

@@ -42,7 +42,7 @@ $applicable_origins = $session["applicable_origins"]; ?>
 
                     <div class="row mb-3 ml-10">
                         <div class="col-md-2 mb-3">
-                            <label class="head-label" for="origin_exportcontainers"><?php echo $this->lang->line('export_origin'); ?></label>
+                            <label class="head-label" for="origin_exportcontainers"><?php echo $this->lang->line('origin'); ?></label>
                             <select class="form-control select2 form-select" id="origin_exportcontainers">
                                 <?php if (count($applicable_origins) == 1) { ?>
                                     <?php foreach ($applicable_origins as $origin) { ?>
@@ -56,7 +56,7 @@ $applicable_origins = $session["applicable_origins"]; ?>
                             </select>
                         </div>
                         <div class="col-md-2 mb-3">
-                            <label class="head-label" for="year_exportcontainers"><?php echo $this->lang->line('year_title'); ?></label>
+                            <label class="head-label" for="year_exportcontainers"><?php echo $this->lang->line('year'); ?></label>
                             <select class="form-control select2 form-select" id="year_exportcontainers">
                                 <?php
                                 $sYear = date("Y");

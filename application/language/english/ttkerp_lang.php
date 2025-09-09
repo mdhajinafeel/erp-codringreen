@@ -954,6 +954,110 @@ $lang["invoice_no"] = "Invoice #";
 $lang["extraction_cost"] = "Extraction Cost";
 $lang["loading_cost"] = "Loading Cost";
 $lang["unloading_cost"] = "Unloading Cost";
+$lang["process_cost"] = "Processing Cost";
 
 #BUYER
 $lang["buyers"] = "Buyers";
+
+#SAWMILL
+$lang["sawmill_title"] = "Saw Mill";
+$lang["sawmill_process"] = "Saw Mill Process";
+$lang["girth_rl"] = "Girth RL";
+$lang["girth_rsq"] = "Girth RSQ";
+$lang["gross_volume_rl"] = "Gross Volume RL";
+$lang["gross_volume_rsq"] = "Gross Volume RSQ";
+$lang["net_volume_rl"] = "Net Volume RL";
+$lang["net_volume_rsq"] = "Net Volume RSQ";
+$lang["gross_loss"] = "Gross Loss";
+$lang["gross_loss_percentage"] = "Gross Loss Percentage";
+$lang["net_loss"] = "Net Loss";
+$lang["net_loss_percentage"] = "Net Loss Percentage";
+$lang["zona"] = "Zona";
+$lang["total_processed_volume"] = "Total Processed Volume (m³)";
+$lang["total_exported_volume"] = "Total Exported Volume (m³)";
+$lang["sawmill_inventory"] = "Saw Mill Inventory";
+$lang["exported_container"] = "Exported Container";
+$lang["total_trucks"] = "Total Trucks";
+$lang["remaining_inventory_volume"] = "Remaining Inventory Volume (m³)";
+$lang["cost_per_cbm"] = "Cost per m³";
+$lang["exported_cost"] = "Exported Cost";
+$lang["remaining_inventory_cost"] = "Remaining Inventory Cost";
+$lang["processed_cost"] = "Processed Cost";
+
+//FINCA OPERATIONS
+$lang["costings"] = "Costings";
+$lang["acpm"] = "Fuel (ACPM)";
+$lang["maintenance"] = "Maintenance";
+$lang["miscellaneous"] = "Miscellaneous";
+$lang["expense_date"] = "Expense Date";
+$lang["quantity"] = "Quantity";
+$lang["purchase"] = "Purchase";
+$lang["spend"] = "Spend";
+$lang["machine_type"] = "Machine Type";
+$lang["error_machine"] = "Please enter the machine type";
+$lang["concept"] = "Concept";
+$lang["error_concept"] = "Please enter the concept";
+$lang["received"] = "Received";
+$lang["processed"] = "Processed";
+$lang["in_inventory"] = "In Inventory";
+$lang["sawmill_operations"] = "Sawmill Operations";
+$lang["detailed_data"] = "Detailed Data";
+$lang["total_bins"] = "Total Bins";
+$lang["acpm_list"] = "Fuel (ACPM) Lists";
+$lang["maintenance_list"] = "Maintenance Lists";
+$lang["miscellaneous_list"] = "Miscellaneous Lists";
+$lang["extraction"] = "Extraction";
+$lang["extraction_lists"] = "Extraction Lists";
+$lang["tree_count"] = "Tree Count";
+
+//PURCHASERS
+$lang["purchaser"] = "Purchaser";
+$lang["costing_purchasers"] = "Costing Purchasers";
+$lang["purchaser_name"] = "Purchaser Name";
+$lang["costing_type"] = "Costing Type";
+$lang["add_purchaser"] = "Add Purchaser";
+$lang["edit_purchaser"] = "Edit Purchaser";
+
+$lang["download_summary_report"] = "Download Summary Report";
+$lang["costing_name"] = "Costing Name";
+$lang["ytd"] = "YTD";
+$lang["loading"] = "Loading";
+$lang["zona"] = "Zona";
+$lang["total_ica"] = "Total ICAs";
+$lang["cost_ica"] = "Cost per m³";
+$lang["expense_summary"] = "Expense Summary Report";
+$lang["total_purchase"] = "Total Purchase";
+$lang["total_spend"] = "Total Spend";
+$lang["total_inventory"] = "Total Inventory";
+$lang["icas"] = "ICAs";
+$lang["export_summary"] = "Export Summary";
+$lang["ica_number"] = "ICA #";
+$lang["received_pieces"] = "Received Pieces";
+$lang["dispatched_pieces"] = "Dispatched Pieces";
+$lang["cost_per_pcs"] = "Cost per Piece";
+$lang["dispatch_cost"] = "Cost of Dispatched Pieces";
+$lang["loading_date"] = "Loading Date";
+$lang["container_#"] = "Container #";
+$lang["total_processed_pieces"] = "Total Processed Pieces";
+$lang["total_exported_pieces"] = "Total Exported Pieces";
+$lang["remaining_inventory_pieces"] = "Remaining Inventory Pieces";
+$lang["unprocessed_pieces"] = "Unprocessed Pieces";
+$lang["unprocessed"] = "Unprocessed";
+$lang["generate_acpm_report"] = "Generate ACPM Report";
+$lang["report_type"] = "Report Type";
+$lang["expense_report_type"] = "Expense Report";
+$lang["nominal_report_type"] = "Nomina Report";
+$lang["date_type"] = "Date Type";
+$lang["year"] = "Year";
+$lang["maintenance_report_type"] = "Maintenance Report";
+$lang["miscellaneous_report_type"] = "Miscellaneous Report";
+$lang["chassis_model"] = "Chassis / Model";
+
+//Machine
+$lang['machine_title'] = 'Machines';
+$lang['machine_name'] = 'Machine Name';
+$lang['add_machine'] = 'Add Machine';
+$lang['edit_machine'] = 'Edit Machine';
+$lang['error_machine_name'] = 'Please enter the machine name';
+$lang['error_chassis_model'] = 'Please enter the chassis / model';
+$lang['error_select_supplier'] = 'Please select a supplier';

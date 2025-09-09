@@ -31,7 +31,7 @@ class Traderinvoice extends MY_Controller
         if (empty($session)) {
             redirect("/logout");
         }
-        $data["path_url"] = "cgr_exportsales";
+        $data["path_url"] = "cgr_traderinvoice";
         if (!empty($session)) {
 
             $data["buyers"] = $this->Master_model->get_traders();

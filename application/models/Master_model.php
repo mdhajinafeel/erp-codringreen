@@ -1170,6 +1170,46 @@ class Master_model extends CI_Model
 				FROM tbl_master_sellers WHERE is_active = 1 AND id = $sellerid");
 		return $query->result();
 	}
+
+	public function get_traders() {
+		$query = $this->db->query("SELECT id, buyer_name FROM tbl_master_buyers A 
+					WHERE A.is_active = 1 AND A.is_trader = 1");
+		return $query->result();
+	}
+
+	public function fetch_buyers_list_no_traders($originid)
+	{
+	    if($originid > 0) {
+	        $originid = 0;
+	    }
+		$query = $this->db->query("SELECT id, buyer_name FROM tbl_master_buyers WHERE is_active = 1 AND origin_id = $originid AND is_trader = 0");
+		return $query->result();
+	}
+
+	public function fetch_sellers_list_traders()
+	{
+		$query = $this->db->query("SELECT id, seller_name FROM tbl_master_sellers WHERE is_active = 1 AND is_trader = 1");
+		return $query->result();
+	}
+
+	public function get_existing_exchange_rate($formattedDate)
+	{
+		$query = $this->db->query("SELECT COUNT(date) AS cnt FROM tbl_exchange_rate WHERE date = $formattedDate AND is_active = 1");
+		return $query->result();
+	}
+
+	public function add_exchangerate($data)
+	{
+		$this->db->set('created_date', 'NOW()', FALSE);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->insert('tbl_exchange_rate', $data);
+		if ($this->db->affected_rows() > 0) {
+			$insert_id = $this->db->insert_id();
+			return $insert_id;
+		} else {
+			return 0;
+		}
+	}
 	
 	//EXPORT SUPPLIERS
 
@@ -1338,6 +1378,126 @@ class Master_model extends CI_Model
 		$this->db->set('updated_date', 'NOW()', FALSE);
 		$this->db->where('id', $id);
 		if ($this->db->update('tbl_export_pol', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	//PURCHASERS
+	public function all_costing_types() {
+		$query = $this->db->query("SELECT id, costing_name, translate_name FROM tbl_master_farm_costings WHERE is_active = 1");
+		return $query->result();
+	}
+
+	public function all_costingpurchasers() {
+		$query = $this->db->query("SELECT id, purchaser_name, company_id, getcostingtype_byid(costing_type) AS costing_type, is_active FROM tbl_farm_costing_purchasers");
+		return $query->result();
+	}
+
+	public function all_costingpurchasers_origin($origin_id) {
+		$query = $this->db->query("SELECT id, purchaser_name, company_id, getcostingtype_byid(costing_type) AS costing_type, is_active FROM tbl_farm_costing_purchasers 
+				WHERE origin_id = $origin_id");
+		return $query->result();
+	}
+
+	public function add_costingpurchaser($data)
+	{
+		$this->db->set('created_date', 'NOW()', FALSE);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->insert('tbl_farm_costing_purchasers', $data);
+		if ($this->db->affected_rows() > 0) {
+			$insert_id = $this->db->insert_id();
+			return $insert_id;
+		} else {
+			return 0;
+		}
+	}
+
+	public function update_costingpurchaser($data, $id)
+	{
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->where('id', $id);
+		if ($this->db->update('tbl_farm_costing_purchasers', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function get_costingpurchaser_detail_by_id($purchaserid) {
+		$query = $this->db->query("SELECT id, purchaser_name, company_id, costing_type, getcostingtype_byid(costing_type) AS costing_types,  is_active, origin_id 
+				FROM tbl_farm_costing_purchasers WHERE id = $purchaserid");
+		return $query->result();
+	}
+
+	public function get_costingpurchaser_report($originid) {
+		$query = $this->db->query("SELECT purchaser_name, company_id, getcostingtype_byid(costing_type) AS costing_types, is_active 
+				FROM tbl_farm_costing_purchasers WHERE origin_id = $originid");
+		return $query->result();
+	}
+
+	public function check_company_id_costingpurchaser_count($supplierid, $costingtype) {
+		$query = $this->db->query("SELECT COUNT(*) AS cnt FROM tbl_farm_costing_purchasers 
+				WHERE is_active = 1 AND company_id = $supplierid AND costing_type = $costingtype");
+		return $query->result();
+	}
+
+	public function check_company_id_costingpurchaser($supplierid, $costingtype) {
+		$query = $this->db->query("SELECT id, purchaser_name, company_id FROM tbl_farm_costing_purchasers 
+				WHERE is_active = 1 AND company_id = $supplierid AND costing_type = $costingtype");
+		return $query->result();
+	}
+
+	//MACHINES
+	public function all_machines()
+	{
+		$query = $this->db->query("SELECT A.id, A.machine_type, A.chassis_no, CASE WHEN B.supplier_name IS NULL THEN '-' ELSE B.supplier_name END AS supplier_name, A.is_active, getapplicableorigins_byid(A.origin_id) AS origin 
+				FROM tbl_master_machines A 
+				INNER JOIN tbl_suppliers B ON B.id = A.supplier_id");
+		return $query->result();
+	}
+
+	public function all_machines_originid($originid)
+	{
+		$query = $this->db->query("SELECT A.id, A.machine_type, A.chassis_no, CASE WHEN B.supplier_name IS NULL THEN '-' ELSE B.supplier_name END AS supplier_name, A.is_active, getapplicableorigins_byid(A.origin_id) AS origin
+				FROM tbl_master_machines A 
+				INNER JOIN tbl_suppliers B ON B.id = A.supplier_id WHERE A.origin_id = $originid");
+		return $query->result();
+	}
+
+	public function all_active_machines()
+	{
+		$query = $this->db->query("SELECT id, machine_type, chassis_no  
+				FROM tbl_master_machines WHERE is_active = 1");
+		return $query->result();
+	}
+
+	public function get_machine_detail_by_id($id)
+	{
+		$query = $this->db->query("SELECT id, machine_type, chassis_no, supplier_id, origin_id, is_active   
+				FROM tbl_master_machines WHERE id = $id");
+		return $query->result();
+	}
+
+	public function add_machine($data)
+	{
+		$this->db->set('created_date', 'NOW()', FALSE);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->insert('tbl_master_machines', $data);
+		if ($this->db->affected_rows() > 0) {
+			$insert_id = $this->db->insert_id();
+			return $insert_id;
+		} else {
+			return 0;
+		}
+	}
+
+	public function update_machine($data, $id)
+	{
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		$this->db->where('id', $id);
+		if ($this->db->update('tbl_master_machines', $data)) {
 			return true;
 		} else {
 			return false;

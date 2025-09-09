@@ -32713,3 +32713,8 @@ table .btn-downloadreceipt {
 .nav-tabs {
     overflow-y: hidden !important;
 }
+
+.mandatory {
+    color: red;
+    font-weight: bold;
+}

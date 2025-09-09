@@ -38,7 +38,7 @@ $applicable_origins = $session["applicable_origins"];
 		</div>
 		<div class="col-md-6">
 			<label for="origin"><?php echo $this->lang->line('origin'); ?></label>
-			<select class="form-control" name="origin" id="origin" data-plugin="select_erp" <?php if($pagetype == "edit") { ?> disabled <?php } ?>>
+			<select class="form-control" name="origin" id="origin" data-plugin="select_erp" <?php if ($pagetype == "edit") { ?> disabled <?php } ?>>
 				<option value="0"><?php echo $this->lang->line("select"); ?></option>
 				<?php foreach ($applicable_origins as $origin) { ?>
 					<?php if ($get_warehouse_details[0]->origin_id == $origin->id) { ?>
@@ -52,7 +52,7 @@ $applicable_origins = $session["applicable_origins"];
 		</div>
 	</div>
 	<div class="row">
-	<div class="col-md-6">
+		<div class="col-md-6">
 			<label for="port_of_loading"><?php echo $this->lang->line('port_of_loading'); ?></label>
 			<select class="form-control" name="port_of_loading" id="port_of_loading" data-plugin="select_erp">
 				<option value="0"><?php echo $this->lang->line("select"); ?></option>
@@ -82,14 +82,13 @@ $applicable_origins = $session["applicable_origins"];
 </div>
 <div class="modal-footer">
 	<?php echo form_button(array('data-bs-dismiss' => 'modal', 'type' => 'button', 'class' => 'btn btn-secondary', 'content' => $this->lang->line('close'))); ?>
-	<?php echo form_button(array('name' => 'cgrerp_form_origin', 'type' => 'submit', 'class' => 'btn btn-success addwarehouse', 'content' => $pagetype == 'edit' ? $this->lang->line('update') :$this->lang->line('add'))); ?>
+	<?php echo form_button(array('name' => 'cgrerp_form_origin', 'type' => 'submit', 'class' => 'btn btn-success addwarehouse', 'content' => $pagetype == 'edit' ? $this->lang->line('update') : $this->lang->line('add'))); ?>
 </div>
 <?php echo form_close(); ?>
 <link rel="stylesheet" href="<?php echo base_url() . 'assets/css/bootstrap-multiselect.css'; ?>">
 <script src="<?php echo base_url() . 'assets/js/bootstrap-multiselect.js'; ?>"></script>
 
 <script type="text/javascript">
-
 	$(document).ready(function() {
 
 		$("#error-name").hide();
@@ -107,9 +106,12 @@ $applicable_origins = $session["applicable_origins"];
 			var address = $("#address").val().trim();
 			var whorigin = $("#origin").val();
 			var port_of_loading = $("#port_of_loading").val();
-			
+
 			var isValid1 = true,
-				isValid2 = true, isValid3 = true, isValid4 = true, isValid5 = true;
+				isValid2 = true,
+				isValid3 = true,
+				isValid4 = true,
+				isValid5 = true;
 
 			if (name.length == 0) {
 				$("#error-name").show();
@@ -143,7 +145,7 @@ $applicable_origins = $session["applicable_origins"];
 				isValid4 = true;
 			}
 
-			if(port_of_loading == 0) {
+			if (port_of_loading == 0) {
 				$("#error-pol").show();
 				isValid5 = false;
 			} else {
@@ -170,7 +172,7 @@ $applicable_origins = $session["applicable_origins"];
 				var obj = $(this),
 					action = obj.attr('name'),
 					form_table = obj.data('form-table');
-				
+
 				$("#loading").show();
 
 				$.ajax({
@@ -214,22 +216,22 @@ $applicable_origins = $session["applicable_origins"];
 	});
 
 	function fetchExportPolByOrigin(originid) {
-        $("#loading").show();
-        $.ajax({
-            url: base_url + "/get_export_pol_by_origin?originid=" + originid,
-            cache: false,
-            method: "GET",
-            dataType: 'json',
-            success: function(JSON) {
-                $("#loading").hide();
-                if (JSON.redirect == true) {
-                    window.location.replace(login_url);
-                } else if (JSON.result != '') {
-                    $("#port_of_loading").empty();
-                    $("#port_of_loading").append(JSON.result);
+		$("#loading").show();
+		$.ajax({
+			url: base_url + "/get_export_pol_by_origin?originid=" + originid,
+			cache: false,
+			method: "GET",
+			dataType: 'json',
+			success: function(JSON) {
+				$("#loading").hide();
+				if (JSON.redirect == true) {
+					window.location.replace(login_url);
+				} else if (JSON.result != '') {
+					$("#port_of_loading").empty();
+					$("#port_of_loading").append(JSON.result);
 					$("#port_of_loading").attr("disabled", false);
-                }
-            }
-        });
-    }
+				}
+			}
+		});
+	}
 </script>
