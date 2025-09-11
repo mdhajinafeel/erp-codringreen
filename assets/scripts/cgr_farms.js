@@ -3,12 +3,13 @@ $(document).ready(function () {
 	$("#loading").hide();
 
 	$("#origin").select2({ dropdownCssClass: "myFont" });
+	$("#year_farm").select2({ dropdownCssClass: "myFont" });
 
 	$('#xin_table_farms').DataTable({
 		"bDestroy": true,
 		"lengthMenu": [[50, 100, 200, -1], [50, 100, 200, "All"]],
 		"ajax": {
-			url: base_url + "/farm_list?originid=" + $("#origin").val(),
+			url: base_url + "/farm_list?originid=" + $("#origin").val() + "&year=" + $("#year_farm").val(),
 			type: 'GET'
 		},
 		//dom: 'lBfrtip',
@@ -40,7 +41,40 @@ $(document).ready(function () {
 			"bDestroy": true,
 			"lengthMenu": [[50, 100, 200, -1], [50, 100, 200, "All"]],
 			"ajax": {
-				url: base_url + "/farm_list?originid=" + $("#origin").val(),
+				url: base_url + "/farm_list?originid=" + $("#origin").val() + "&year=" + $("#year_farm").val(),
+				type: 'GET'
+			},
+			//dom: 'lBfrtip',
+			"sScrollX": "100%",
+			"scrollCollapse": true,
+			"bPaginate": true,
+			"sPaginationType": "full_numbers",
+			paging: true,
+			searching: true,
+			fixedColumns: true,
+			responsive: true,
+			"columnDefs": [
+				{
+				   "searchable": true,
+				   "orderable": true,
+				   "targets": 5,
+				   "type": 'date'
+				}
+		   ],
+			"order": [
+				[0, "asc"]
+			], "language": {
+				"url": datatable_language
+			}
+		});
+	});
+
+	$("#year_farm").change(function () {
+		$('#xin_table_farms').DataTable({
+			"bDestroy": true,
+			"lengthMenu": [[50, 100, 200, -1], [50, 100, 200, "All"]],
+			"ajax": {
+				url: base_url + "/farm_list?originid=" + $("#origin").val() + "&year=" + $("#year_farm").val(),
 				type: 'GET'
 			},
 			//dom: 'lBfrtip',

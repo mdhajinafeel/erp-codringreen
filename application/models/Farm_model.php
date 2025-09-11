@@ -809,4 +809,27 @@ class Farm_model extends CI_Model
             return false;
         }
     }
+
+    public function all_farms_year($year)
+    {
+        $query = $this->db->query("SELECT farm_id, inventory_order, supplier_name, contract_id, 
+                contract_code, product_name, product_type_name, 
+                DATE_FORMAT(STR_TO_DATE(purchase_date, '%Y-%m-%d'),'%d/%m/%Y') AS purchase_date, 
+                total_volume, uploaded_by, origin, created_from
+                FROM v_fetch_farms 
+                WHERE YEAR(purchase_date) = $year
+                ORDER BY STR_TO_DATE(purchase_date, '%Y-%m-%d') DESC, created_date DESC");
+        return $query->result();
+    }
+
+    public function all_farms_origin_year($originid, $year)
+    {
+        $query = $this->db->query("SELECT farm_id, inventory_order, supplier_name, contract_id, 
+                contract_code, product_name, product_type_name, 
+                DATE_FORMAT(STR_TO_DATE(purchase_date, '%Y-%m-%d'),'%d/%m/%Y') AS purchase_date, 
+                total_volume, uploaded_by, origin, created_from 
+                FROM v_fetch_farms WHERE origin_id = $originid AND YEAR(purchase_date) = $year
+                ORDER BY STR_TO_DATE(purchase_date, '%Y-%m-%d') DESC, created_date DESC");
+        return $query->result();
+    }
 }

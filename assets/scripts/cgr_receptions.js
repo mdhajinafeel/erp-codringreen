@@ -3,10 +3,15 @@ $(document).ready(function () {
 	$("#loading").hide();
 
 	$("#origin").select2({ dropdownCssClass: "myFont" });
+	$("#year_reception").select2({ dropdownCssClass: "myFont" });
 
 	fetch_receptions();
 
 	$("#origin").change(function () {
+		fetch_receptions();
+	});
+
+	$("#year_reception").change(function () {
 		fetch_receptions();
 	});
 
@@ -105,7 +110,7 @@ function fetch_receptions() {
 		"bDestroy": true,
 		"lengthMenu": [[50, 100, 200, -1], [50, 100, 200, "All"]],
 		"ajax": {
-			url: base_url + "/reception_list?originid=" + $("#origin").val(),
+			url: base_url + "/reception_list?originid=" + $("#origin").val() + "&year=" + $("#year_reception").val(),
 			type: 'GET'
 		},
 		//dom: 'lBfrtip',

@@ -724,4 +724,39 @@ class Reception_model extends CI_Model
                 AND A.reception_id = $receptionid AND A.salvoconducto = '$inventoryorder'");
         return $query->result();
     }
+
+    public function all_receptions_year($year)
+    {
+        $query = $this->db->query("SELECT A.reception_id, A.salvoconducto, B.supplier_name, E.product_name, D.product_type_name, 
+                    DATE_FORMAT(STR_TO_DATE(A.received_date, '%d/%m/%Y'),'%d/%m/%Y') AS received_date, 
+                    F.warehouse_name, getapplicableorigins_byid(A.origin_id) AS origin, 
+                    total_volume AS totalvolume,
+                    getusername_byuserid(A.createdby) AS uploadedby FROM tbl_reception A 
+                    INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
+                    INNER JOIN tbl_suppliers_products C ON C.product_id = A.supplier_product_id 
+                    INNER JOIN tbl_product_types D ON D.type_id = A.supplier_product_typeid 
+                    INNER JOIN tbl_product_master E ON E.product_id = C.product_name 
+                    INNER JOIN tbl_warehouses F ON F.whid = A.warehouse_id
+                    WHERE A.isactive = 1 AND YEAR(STR_TO_DATE(A.received_date, '%d/%m/%Y')) = $year
+                    ORDER BY STR_TO_DATE(A.received_date, '%d/%m/%Y') DESC, A.createddate DESC");
+        return $query->result();
+    }
+
+    public function all_receptions_origin_year($originid, $year)
+    {
+        $query = $this->db->query("SELECT A.reception_id, A.salvoconducto, B.supplier_name, E.product_name, D.product_type_name, 
+                    DATE_FORMAT(STR_TO_DATE(A.received_date, '%d/%m/%Y'),'%d/%m/%Y') AS received_date, F.warehouse_name, 
+                    getapplicableorigins_byid(A.origin_id) AS origin, 
+                    total_volume AS totalvolume,
+                    getusername_byuserid(A.createdby) AS uploadedby FROM tbl_reception A 
+                    INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
+                    INNER JOIN tbl_suppliers_products C ON C.product_id = A.supplier_product_id 
+                    INNER JOIN tbl_product_types D ON D.type_id = A.supplier_product_typeid 
+                    INNER JOIN tbl_product_master E ON E.product_id = C.product_name 
+                    INNER JOIN tbl_warehouses F ON F.whid = A.warehouse_id
+                    WHERE A.isactive = 1 AND A.origin_id = $originid 
+                    AND YEAR(STR_TO_DATE(A.received_date, '%d/%m/%Y')) = $year
+                    ORDER BY STR_TO_DATE(A.received_date, '%d/%m/%Y') DESC, A.createddate DESC");
+        return $query->result();
+    }
 }

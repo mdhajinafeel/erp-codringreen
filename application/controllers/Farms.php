@@ -67,11 +67,12 @@ class Farms extends MY_Controller
 
         $draw = intval($this->input->get("draw"));
         $originid = intval($this->input->get("originid"));
+        $year = intval($this->input->get("year"));
 
         if ($originid == 0) {
-            $farms = $this->Farm_model->all_farms();
+            $farms = $this->Farm_model->all_farms_year($year);
         } else {
-            $farms = $this->Farm_model->all_farms_origin($originid);
+            $farms = $this->Farm_model->all_farms_origin_year($originid, $year);
         }
 
         $data = array();

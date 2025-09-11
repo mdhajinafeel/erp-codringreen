@@ -55,11 +55,12 @@ class Receptions extends MY_Controller
 
         $draw = intval($this->input->get("draw"));
         $originid = intval($this->input->get("originid"));
+        $year = intval($this->input->get("year"));
 
         if ($originid == 0) {
-            $receptions = $this->Reception_model->all_receptions();
+            $receptions = $this->Reception_model->all_receptions_year($year);
         } else {
-            $receptions = $this->Reception_model->all_receptions_origin($originid);
+            $receptions = $this->Reception_model->all_receptions_origin_year($originid, $year);
         }
 
         $data = array();
