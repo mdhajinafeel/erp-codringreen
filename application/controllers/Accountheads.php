@@ -1,7 +1,7 @@
 <?php
 
- error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
-        ini_set('display_errors', '0');
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
+ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -148,16 +148,20 @@ class Accountheads extends MY_Controller
 					$ledger_account_head = $this->input->post('ledger_account_head');
 					$ledger_type = $this->input->post('ledger_type');
 
-					if($status == 0) {
+					if ($status == 0) {
 						$status = false;
 					} else {
 						$status = true;
 					}
 
 					$dataAccountHead = array(
-						"code" => $accountheadcode, "name_in_ledger" => $ledger_account_head, 
-						"ledger_type" => $ledger_type, "name_in_app" => $app_account_head, "created_by" => $session['user_id'],
-						"updated_by" => $session['user_id'], 'is_active' => $status,
+						"code" => $accountheadcode,
+						"name_in_ledger" => $ledger_account_head,
+						"ledger_type" => $ledger_type,
+						"name_in_app" => $app_account_head,
+						"created_by" => $session['user_id'],
+						"updated_by" => $session['user_id'],
+						'is_active' => $status,
 						'origin_id' => $origin,
 					);
 
@@ -183,16 +187,19 @@ class Accountheads extends MY_Controller
 					$ledger_account_head = $this->input->post('ledger_account_head');
 					$ledger_type = $this->input->post('ledger_type');
 
-					if($status == 0) {
+					if ($status == 0) {
 						$status = false;
 					} else {
 						$status = true;
 					}
 
 					$dataAccountHead = array(
-						"code" => $accountheadcode, "name_in_ledger" => $ledger_account_head, 
-						"ledger_type" => $ledger_type, "name_in_app" => $app_account_head,
-						"updated_by" => $session['user_id'], 'is_active' => $status
+						"code" => $accountheadcode,
+						"name_in_ledger" => $ledger_account_head,
+						"ledger_type" => $ledger_type,
+						"name_in_app" => $app_account_head,
+						"updated_by" => $session['user_id'],
+						'is_active' => $status
 					);
 
 					$updateAccountHead = $this->Financemaster_model->update_account_heads($dataAccountHead, $accountheadid);
@@ -223,29 +230,29 @@ class Accountheads extends MY_Controller
 			$this->output($Return);
 		}
 	}
-	
+
 	public function get_ledger_types_by_origin()
-    {
-        $session = $this->session->userdata("fullname");
-        $Return = array("pages" => "", "redirect" => false, "result" => "", "error" => "", "csrf_hash" => "");
-        $Return["csrf_hash"] = $this->security->get_csrf_hash();
-        if (!empty($session)) {
+	{
+		$session = $this->session->userdata("fullname");
+		$Return = array("pages" => "", "redirect" => false, "result" => "", "error" => "", "csrf_hash" => "");
+		$Return["csrf_hash"] = $this->security->get_csrf_hash();
+		if (!empty($session)) {
 
-            $result = "<option value='0'>" . $this->lang->line("select") . "</option>";
-            if ($this->input->get("originid") > 0) {
-                $getLedgerTypes = $this->Financemaster_model->all_ledger_types($this->input->get("originid"));
-                foreach ($getLedgerTypes as $ledgertype) {
-                    $result = $result . "<option value='" . $ledgertype->id . "'>" . $ledgertype->product_name . "</option>";
-                }
-            }
+			$result = "<option value='0'>" . $this->lang->line("select") . "</option>";
+			if ($this->input->get("originid") > 0) {
+				$getLedgerTypes = $this->Financemaster_model->all_ledger_types($this->input->get("originid"));
+				foreach ($getLedgerTypes as $ledgertype) {
+					$result = $result . "<option value='" . $ledgertype->id . "'>" . $ledgertype->product_name . "</option>";
+				}
+			}
 
-            $Return["result"] = $result;
-            $Return["redirect"] = false;
-            $this->output($Return);
-        } else {
-            $Return["pages"] = "";
-            $Return["redirect"] = true;
-            $this->output($Return);
-        }
-    }
+			$Return["result"] = $result;
+			$Return["redirect"] = false;
+			$this->output($Return);
+		} else {
+			$Return["pages"] = "";
+			$Return["redirect"] = true;
+			$this->output($Return);
+		}
+	}
 }
