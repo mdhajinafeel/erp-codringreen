@@ -44,27 +44,28 @@ $applicable_origins = $session["applicable_origins"];
                 <?php } ?>
             </select>
         </div>
-        <div class="col-md-6">
-            <label for="ledger_type"><?php echo $this->lang->line('ledger_type'); ?></label>
-            <select class="form-control" name="ledger_type" id="ledger_type" data-plugin="select_erp" <?php if ($pagetype == "edit") { ?> disabled <?php } ?>>
-                <option value="0"><?php echo $this->lang->line("select"); ?></option>
-                <?php foreach ($ledgertypes as $ledgertype) { ?>
-                    <?php if ($get_accounthead_details[0]->ledger_type == $ledgertype->id) { ?>
-                        <option value="<?php echo $ledgertype->id; ?>" selected="selected"><?php echo $ledgertype->ledger_name; ?></option>
-                    <?php } else { ?>
-                        <option value="<?php echo $ledgertype->id; ?>"><?php echo $ledgertype->ledger_name; ?></option>
-                    <?php } ?>
-                <?php } ?>
-            </select>
-            <label id="error-ledgertype" class="error-text"><?php echo $this->lang->line('error_ledger_type'); ?></label>
-        </div>
-    </div>
-    <div class="row">
+        <!--<div class="col-md-6">-->
+        <!--    <label for="ledger_type"><?php echo $this->lang->line('ledger_type'); ?></label>-->
+        <!--    <select class="form-control" name="ledger_type" id="ledger_type" data-plugin="select_erp" <?php if ($pagetype == "edit") { ?> disabled <?php } ?>>-->
+        <!--        <option value="0"><?php echo $this->lang->line("select"); ?></option>-->
+        <!--        <?php foreach ($ledgertypes as $ledgertype) { ?>-->
+        <!--            <?php if ($get_accounthead_details[0]->ledger_type == $ledgertype->id) { ?>-->
+        <!--                <option value="<?php echo $ledgertype->id; ?>" selected="selected"><?php echo $ledgertype->ledger_name; ?></option>-->
+        <!--            <?php } else { ?>-->
+        <!--                <option value="<?php echo $ledgertype->id; ?>"><?php echo $ledgertype->ledger_name; ?></option>-->
+        <!--            <?php } ?>-->
+        <!--        <?php } ?>-->
+        <!--    </select>-->
+        <!--    <label id="error-ledgertype" class="error-text"><?php echo $this->lang->line('error_ledger_type'); ?></label>-->
+        <!--</div>-->
         <div class="col-md-6">
             <label for="account_head_code"><?php echo $this->lang->line('account_head_code'); ?></label>
             <input class="form-control text-uppercase" placeholder="<?php echo $this->lang->line('account_head_code'); ?>" name="account_head_code" id="account_head_code" type="text" value="<?php echo isset($get_accounthead_details[0]->code) ? $get_accounthead_details[0]->code : ''; ?>">
             <label id="error-accountheadcode" class="error-text"><?php echo $this->lang->line('error_account_head_code'); ?></label>
         </div>
+    </div>
+    <div class="row">
+        
         <div class="col-md-6">
             <label for="status"><?php echo $this->lang->line('status'); ?></label>
             <select class="form-control" name="status" id="status" data-plugin="select_erp">
@@ -92,7 +93,7 @@ $applicable_origins = $session["applicable_origins"];
 
         $("#error-appaccounthead").hide();
         $("#error-ledgeraccounthead").hide();
-        $("#error-ledgertype").hide();
+        //$("#error-ledgertype").hide();
         $("#error-accountheadcode").hide();
 
         $("#add_accounthead").submit(function(e) {
@@ -102,7 +103,7 @@ $applicable_origins = $session["applicable_origins"];
             var app_account_head = $("#app_account_head").val().trim();
             var ledger_account_head = $("#ledger_account_head").val().trim();
             var origin = $("#origin").val();
-            var ledger_type = $("#ledger_type").val();
+            //var ledger_type = $("#ledger_type").val();
             var account_head_code = $("#account_head_code").val();
 
             var isValid1 = true,
@@ -126,13 +127,13 @@ $applicable_origins = $session["applicable_origins"];
                 isValid2 = true;
             }
 
-            if (ledger_type == 0) {
-                $("#error-ledgertype").show();
-                isValid3 = false;
-            } else {
-                $("#error-ledgertype").hide();
-                isValid3 = true;
-            }
+            // if (ledger_type == 0) {
+            //     $("#error-ledgertype").show();
+            //     isValid3 = false;
+            // } else {
+            //     $("#error-ledgertype").hide();
+            //     isValid3 = true;
+            // }
 
             if (account_head_code.length == 0) {
                 $("#error-accountheadcode").show();
@@ -155,7 +156,8 @@ $applicable_origins = $session["applicable_origins"];
                 fd.append("ledger_account_head", ledger_account_head);
                 fd.append("accountheadid", accountheadid);
                 fd.append("accountheadcode", account_head_code);
-                fd.append("ledger_type", ledger_type);
+                //fd.append("ledger_type", ledger_type);
+                fd.append("ledger_type", 0);
 
                 $(".addaccounthead").prop('disabled', true);
                 toastr.info(processing_request);

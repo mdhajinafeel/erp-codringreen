@@ -9,7 +9,7 @@ $applicable_origins = $session["applicable_origins"];
         <div class="row flex-between-end">
             <div class="col-auto align-self-center">
                 <input type="hidden" id="hdnCsrf" name="hdnCsrf" value="<?php echo $csrf_cgrerp; ?>" />
-                <h3> <?php echo $this->lang->line('advanceregistry_title'); ?> </h3>
+                <h3> <?php echo $this->lang->line('expense_credit'); ?> </h3>
             </div>
         </div>
     </div>
@@ -43,6 +43,13 @@ $applicable_origins = $session["applicable_origins"];
                 <div class="mb-4 row"></div>
             </div>
 
+            <label class="col-sm-2 col-form-label lbl-font" for="conceptgeneral" id="lblConceptGeneral"><?php echo $this->lang->line('concept_general'); ?></label>
+            <div class="col-sm-10">
+                <input type="text" id="conceptgeneral" name="conceptgeneral" class="form-control" placeholder="<?php echo $this->lang->line("concept_general"); ?>" />
+                <label id="error-conceptgeneral" class="error-text"><?php echo $this->lang->line("error_conceptgeneral"); ?></label>
+                <div class="mb-4 row"></div>
+            </div>
+
             <label class="col-sm-2 col-form-label lbl-font" for="transaction_date"><?php echo $this->lang->line('transaction_date'); ?></label>
             <div class="col-sm-10">
                 <input type="text" id="transaction_date" name="transaction_date" class="form-control" placeholder="<?php echo $this->lang->line("transaction_date"); ?>" readonly />
@@ -68,6 +75,7 @@ $applicable_origins = $session["applicable_origins"];
     $("#error-name").hide();
     $("#error-value").hide();
     $("#error-date").hide();
+    $("#error-conceptgeneral").hide();
 
     var error_value = "<?php echo $this->lang->line("error_value"); ?>";
     var error_zero_value = "<?php echo $this->lang->line("error_zero_value"); ?>";
@@ -77,8 +85,8 @@ $applicable_origins = $session["applicable_origins"];
             dateFormat: "dd/mm/yy",
             changeMonth: true,
             changeYear: true,
-            minDate: "-1m",
-            maxDate: "10d",
+            minDate: "-1y",
+            maxDate: "1m",
             onSelect: function(date) {
                 //$("#error-dispatchdate").hide();
             }
@@ -98,12 +106,14 @@ $applicable_origins = $session["applicable_origins"];
             var beneficaryname = $("#beneficiary_name").val();
             var amount = $("#amount").val().trim();
             var transactiondate = $("#transaction_date").val().trim();
+            var conceptgeneral = $("#conceptgeneral").val().trim();
 
             var isValid1 = true,
                 isValid2 = true,
                 isValid3 = true,
                 isValid4 = true,
-                isValid5 = true;
+                isValid5 = true,
+                isValid6 = true;
 
             if (originid == 0) {
                 $("#error-origin").show();
@@ -151,7 +161,15 @@ $applicable_origins = $session["applicable_origins"];
                 isValid4 = true;
             }
 
-            if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5) {
+            if (conceptgeneral.length == 0) {
+                $("#error-conceptgeneral").show();
+                isValid6 = false;
+            } else {
+                $("#error-conceptgeneral").hide();
+                isValid6 = true;
+            }
+
+            if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6) {
                 var fd = new FormData();
                 fd.append("is_ajax", 2);
                 fd.append("add_type", "advanceregistry");
@@ -160,6 +178,7 @@ $applicable_origins = $session["applicable_origins"];
                 fd.append("beneficary_name", beneficaryname);
                 fd.append("amount", amount);
                 fd.append("transaction_date", transactiondate);
+                fd.append("conceptgeneral", conceptgeneral);
                 fd.append("csrf_cgrerp", $("#hdnCsrf").val());
 
                 toastr.info(processing_request);
@@ -190,9 +209,10 @@ $applicable_origins = $session["applicable_origins"];
                             $('#hdnCsrf').val(JSON.csrf_hash);
 
                             $("#origin").select2("val", "0");
-                            $("#beneficiary_name option:selected").attr("selectedIndex", 0);
+                            $("#beneficiary_name").select2("val", "0");
                             $("#amount").val("");
                             $("#transaction_date").val("");
+                            $("#conceptgeneral").val("");
                         }
                     }
                 });

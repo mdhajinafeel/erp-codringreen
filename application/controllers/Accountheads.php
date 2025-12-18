@@ -63,7 +63,7 @@ class Accountheads extends MY_Controller
 
 				$data[] = array(
 					$editAccountHeads,
-					$r->ledger_name,
+					//$r->ledger_name,
 					$r->code,
 					$r->name_in_app,
 					$r->name_in_ledger,

@@ -590,65 +590,6 @@ class Sawmills extends MY_Controller
 
                     //END EXPORT SUMMARY
 
-                    //REMAINING INVENTORY
-
-                    $getSawmillRemainingInventory = $this->Sawmill_model->fetch_remaining_inventory_data();
-
-                    if (count($getSawmillRemainingInventory) > 0) {
-
-                        $sheetNo++;
-                        $objRemainingSummarySheet = $this->excel->createSheet($sheetNo);
-                        $objRemainingSummarySheet->setTitle($this->lang->line("sawmill_remaining_inventory"));
-                        $objRemainingSummarySheet->getParent()->getDefaultStyle()->getFont()->setName('Calibri')->setSize(10);
-
-                        $objRemainingSummarySheet->SetCellValue('A4', $this->lang->line('sa_no'));
-                        $objRemainingSummarySheet->SetCellValue('B4', $this->lang->line('girth_rl'));
-                        $objRemainingSummarySheet->SetCellValue('C4', $this->lang->line('length'));
-                        $objRemainingSummarySheet->SetCellValue('D4', $this->lang->line('text_volume'));
-
-                        $objRemainingSummarySheet->getStyle("A4:D4")->getFont()->setBold(true);
-                        $objRemainingSummarySheet->setAutoFilter('A4:D4');
-                        $objRemainingSummarySheet->getStyle('A4:D4')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('add8e6');
-                        $objRemainingSummarySheet->getStyle("A4:D4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-
-                        $objRemainingSummarySheet->getColumnDimension('A')->setAutoSize(true);
-                        $objRemainingSummarySheet->getColumnDimension('B')->setAutoSize(true);
-                        $objRemainingSummarySheet->getColumnDimension('C')->setAutoSize(true);
-                        $objRemainingSummarySheet->getColumnDimension('D')->setAutoSize(true);
-
-                        $rowRemainingData = 5;
-
-                        $dataNumber = 0;
-                        foreach ($getSawmillRemainingInventory as $remainingData) {
-
-                            $dataNumber++;
-                            $objRemainingSummarySheet->SetCellValue("A$rowRemainingData", $dataNumber);
-                            $objRemainingSummarySheet->SetCellValue("B$rowRemainingData", $remainingData->girth_rl + 0);
-                            $objRemainingSummarySheet->SetCellValue("C$rowRemainingData", $remainingData->length + 0);
-                            $objRemainingSummarySheet->SetCellValue("D$rowRemainingData", $remainingData->volume + 0);
-
-                            $rowRemainingData++;
-                        }
-
-                        $lastRowRemainingData = $rowRemainingData - 1;
-
-                        $objRemainingSummarySheet->getStyle("A4:D$lastRowRemainingData")->applyFromArray($styleArray);
-                        $objRemainingSummarySheet->getStyle("D4:D$lastRowRemainingData")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
-
-                        $objRemainingSummarySheet->SetCellValue("D3", "=SUM(D5:D$lastRowRemainingData)");
-                        $objRemainingSummarySheet->SetCellValue("C3", "=COUNT(C5:C$lastRowRemainingData)");
-
-                        $objRemainingSummarySheet->getStyle("D3")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
-
-                        $objRemainingSummarySheet->getStyle("C3")->applyFromArray($styleArray);
-                        $objRemainingSummarySheet->getStyle("D3")->applyFromArray($styleArray);
-
-                        $objRemainingSummarySheet->getStyle("C3")->getFont()->setBold(true);
-                        $objRemainingSummarySheet->getStyle("D3")->getFont()->setBold(true);
-                    }
-
-                    //END REMAINING INVENTORY
-
                     $objSheet->getSheetView()->setZoomScale(95);
                     $this->excel->setActiveSheetIndex(0);
 
@@ -1116,7 +1057,7 @@ class Sawmills extends MY_Controller
         $values[] = $data[0]->exported_volume + 0; // y-axis values
 
         $categories[] = $this->lang->line("in_inventory");  // x-axis labels
-        $values[] = $data[0]->remaining_volume + 0; //$data[0]->processed_volume  - $data[0]->exported_volume + 0; // y-axis values
+        $values[] = $data[0]->processed_volume  - $data[0]->exported_volume + 0; // y-axis values
 
 
         echo json_encode(['categories' => $categories, 'values' => $values]);
@@ -1128,7 +1069,6 @@ class Sawmills extends MY_Controller
         $data = $this->Sawmill_model->fetch_inventory_summary_data($originid);
         $dataReceived = $this->Sawmill_model->fetch_farm_summary_data($originid);
         $dataExported = $this->Sawmill_model->fetch_dispatch_summary_data($originid);
-        //$dataRemaining = $this->Sawmill_model->fetch_remaining_inventory_data();
 
         $totalProcessedVolume = $data[0]->processed_volume + 0;
         $totalProcessedCost = $data[0]->processed_cost + 0;

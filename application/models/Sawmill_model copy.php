@@ -155,8 +155,7 @@ class Sawmill_model extends CI_Model
     public function fetch_inventory_chart_data($originid) {
         $query = $this->db->query("SELECT SUM(DISTINCT gettotalvolume_farm_supplier(A.supplier_id, 0, 0, 1)) AS total_volume, 
                 CASE WHEN $originid = 1 THEN getprocessed_volume_sawmill() ELSE 0 END AS processed_volume, 
-                CASE WHEN $originid = 1 THEN getexported_volume_sawmill() ELSE 0 END AS exported_volume, 
-                CASE WHEN $originid = 1 THEN getremaining_volume_sawmill() ELSE 0 END AS remaining_volume
+                CASE WHEN $originid = 1 THEN getexported_volume_sawmill() ELSE 0 END AS exported_volume 
                 FROM tbl_farm A 
                 INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                 WHERE A.is_active = 1 AND A.process_type = 1 AND A.origin_id = $originid AND B.is_saw_mill = 0");
@@ -260,14 +259,6 @@ class Sawmill_model extends CI_Model
                         WHERE A.is_saw_mill_loading = 1 AND A.isactive = 1 AND A.origin_id = $originid AND B.isactive = 1 AND C.isactive = 1
                         GROUP BY A.container_number 
                         ORDER BY STR_TO_DATE(A.dispatch_date, '%d/%m/%Y'), A.dispatch_id ASC");
-        return $query->result();
-    }
-
-    //REMAINING INVENTORY
-    public function fetch_remaining_inventory_data() {
-        $query = $this->db->query("SELECT girth_rl, length, volume 
-                FROM tbl_sawmill_remaining_inventory 
-                WHERE is_active = 1");
         return $query->result();
     }
 }

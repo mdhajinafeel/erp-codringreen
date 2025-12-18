@@ -743,7 +743,7 @@ class Costsummaryreport extends MY_Controller
                     $objSheet->SetCellValue("S1", $this->lang->line("COTEROS"));
                     $objSheet->SetCellValue("T1", $this->lang->line("SELLOS PROVISIONALES"));
                     $objSheet->SetCellValue("U1", $this->lang->line("INCENTIVO"));
-                    $objSheet->SetCellValue("V1", $this->lang->line("REMOVILIZACION"));
+                    $objSheet->SetCellValue("V1", $this->lang->line("MOTOCARGAS"));
                     $objSheet->SetCellValue("W1", $this->lang->line("FACTURA NAVIERA"));
                     $objSheet->SetCellValue("X1", $this->lang->line("PUERTO BODEGAJE"));
                     $objSheet->SetCellValue("Y1", $this->lang->line("FLETE"));
@@ -1453,21 +1453,22 @@ class Costsummaryreport extends MY_Controller
                     $objSheet->SetCellValue("R3", $this->lang->line("FACTURA COTEROS"));
                     $objSheet->SetCellValue("S3", $this->lang->line("COTEROS"));
                     $objSheet->SetCellValue("T3", $this->lang->line("INCENTIVO"));
-                    $objSheet->SetCellValue("U3", $this->lang->line("REMOVILIZACION"));
-                    $objSheet->SetCellValue("V3", $this->lang->line("TOTAL DE EXPORTACION POR CONTENEDOR"));
-                    $objSheet->SetCellValue("W3", $this->lang->line("COSTO DE MATERIAL"));
-                    $objSheet->SetCellValue("X3", $this->lang->line("TOTAL DE LOS COSTOS"));
-                    $objSheet->SetCellValue("Y3", $this->lang->line("VR VENTA UNT"));
-                    $objSheet->SetCellValue("Z3", $this->lang->line("VR VENTA CONT TOTAL"));
-                    $objSheet->SetCellValue("AA3", $this->lang->line("TRM"));
-                    $objSheet->SetCellValue("AB3", $this->lang->line("VR PESOS INGRESO"));
-                    $objSheet->SetCellValue("AC3", $this->lang->line("PERDIDA / GANANCIA"));
-                    $objSheet->SetCellValue("AD3", $this->lang->line("MES"));
+                    $objSheet->SetCellValue("U3", $this->lang->line("MOTOCARGAS"));
+                    $objSheet->SetCellValue("V3", $this->lang->line("OTHERCOSTS"));
+                    $objSheet->SetCellValue("W3", $this->lang->line("TOTAL DE EXPORTACION POR CONTENEDOR"));
+                    $objSheet->SetCellValue("X3", $this->lang->line("COSTO DE MATERIAL"));
+                    $objSheet->SetCellValue("Y3", $this->lang->line("TOTAL DE LOS COSTOS"));
+                    $objSheet->SetCellValue("Z3", $this->lang->line("VR VENTA UNT"));
+                    $objSheet->SetCellValue("AA3", $this->lang->line("VR VENTA CONT TOTAL"));
+                    $objSheet->SetCellValue("AB3", $this->lang->line("TRM"));
+                    $objSheet->SetCellValue("AC3", $this->lang->line("VR PESOS INGRESO"));
+                    $objSheet->SetCellValue("AD3", $this->lang->line("PERDIDA / GANANCIA"));
+                    $objSheet->SetCellValue("AE3", $this->lang->line("MES"));
 
-                    $objSheet->getStyle("A3:AD3")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                    $objSheet->getStyle("A3:AD3")->getAlignment()->setWrapText(true);
-                    $objSheet->getStyle("A3:AD3")->getFont()->setBold(true);
-                    $objSheet->getStyle("A3:AD3")->applyFromArray($styleArray);
+                    $objSheet->getStyle("A3:AE3")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    $objSheet->getStyle("A3:AE3")->getAlignment()->setWrapText(true);
+                    $objSheet->getStyle("A3:AE3")->getFont()->setBold(true);
+                    $objSheet->getStyle("A3:AE3")->applyFromArray($styleArray);
 
                     //END HEADING
 
@@ -1481,6 +1482,7 @@ class Costsummaryreport extends MY_Controller
                         $dispatchId = $cdata->dispatch_id;
 
                         $fetchContainerCost = $this->Financemaster_model->get_container_cost($exportId, $dispatchId);
+                        $fetchContainerLoadingCost = $this->Financemaster_model->get_container_loading_cost($exportId, $dispatchId);
 
                         $objSheet->SetCellValue("A$rowDataCount", $cdata->sa_number);
                         $objSheet->SetCellValue("B$rowDataCount", $cdata->container_number);
@@ -1502,16 +1504,17 @@ class Costsummaryreport extends MY_Controller
                         $objSheet->SetCellValue("R$rowDataCount", $cdata->coteros_invoice);
                         $objSheet->SetCellValue("S$rowDataCount", $cdata->coteros_value);
                         $objSheet->SetCellValue("T$rowDataCount", $cdata->incentive_value);
-                        $objSheet->SetCellValue("U$rowDataCount", $cdata->remobilization_value);
-                        $objSheet->SetCellValue("V$rowDataCount", "=G$rowDataCount+I$rowDataCount+K$rowDataCount+M$rowDataCount+O$rowDataCount+Q$rowDataCount+S$rowDataCount+T$rowDataCount+U$rowDataCount");
-                        $objSheet->SetCellValue("W$rowDataCount", "$cdata->material_cost");
-                        $objSheet->SetCellValue("X$rowDataCount", "=V$rowDataCount+W$rowDataCount");
-                        $objSheet->SetCellValue("Y$rowDataCount", $fetchContainerCost[0]->unit_price + 0);
-                        $objSheet->SetCellValue("Z$rowDataCount", "=Y$rowDataCount*D$rowDataCount");
-                        $objSheet->SetCellValue("AA$rowDataCount", $fetchContainerCost[0]->exchange_rate + 0);
-                        $objSheet->SetCellValue("AB$rowDataCount", "=Z$rowDataCount*AA$rowDataCount");
-                        $objSheet->SetCellValue("AC$rowDataCount", "=AB$rowDataCount-X$rowDataCount");
-                        $objSheet->SetCellValue("AD$rowDataCount", strtoupper($cdata->shipped_date));
+                        $objSheet->SetCellValue("U$rowDataCount", $fetchContainerLoadingCost[0]->loading_cost + 0);
+                        $objSheet->SetCellValue("V$rowDataCount", $cdata->other_cost_value);
+                        $objSheet->SetCellValue("W$rowDataCount", "=G$rowDataCount+I$rowDataCount+K$rowDataCount+M$rowDataCount+O$rowDataCount+Q$rowDataCount+S$rowDataCount+T$rowDataCount+U$rowDataCount+Y$rowDataCount");
+                        $objSheet->SetCellValue("X$rowDataCount", "$cdata->material_cost");
+                        $objSheet->SetCellValue("Y$rowDataCount", "=W$rowDataCount+X$rowDataCount");
+                        $objSheet->SetCellValue("Z$rowDataCount", $fetchContainerCost[0]->unit_price + 0);
+                        $objSheet->SetCellValue("AA$rowDataCount", "=Z$rowDataCount*D$rowDataCount");
+                        $objSheet->SetCellValue("AB$rowDataCount", $fetchContainerCost[0]->exchange_rate + 0);
+                        $objSheet->SetCellValue("AC$rowDataCount", "=AA$rowDataCount*AB$rowDataCount");
+                        $objSheet->SetCellValue("AD$rowDataCount", "=AC$rowDataCount-Y$rowDataCount");
+                        $objSheet->SetCellValue("AE$rowDataCount", strtoupper($cdata->shipped_date));
 
                         $rowDataCount++;
                     }
@@ -1529,10 +1532,10 @@ class Costsummaryreport extends MY_Controller
                     $objSheet->getStyle("M4:M$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
                     $objSheet->getStyle("O4:O$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
                     $objSheet->getStyle("Q4:Q$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
-                    $objSheet->getStyle("S4:U$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
-                    $objSheet->getStyle("V4:AC$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("S4:V$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("W4:AD$rowDataCount")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
 
-                    $objSheet->getStyle("A4:AD$rowDataCount")->applyFromArray($styleArray);
+                    $objSheet->getStyle("A4:AE$rowDataCount")->applyFromArray($styleArray);
 
                     //CALC DATA
 
@@ -1585,15 +1588,16 @@ class Costsummaryreport extends MY_Controller
                     $objSheet->SetCellValue("V2", "=SUBTOTAL(9, V4:V$rowDataCount)");
                     $objSheet->SetCellValue("W2", "=SUBTOTAL(9, W4:W$rowDataCount)");
                     $objSheet->SetCellValue("X2", "=SUBTOTAL(9, X4:X$rowDataCount)");
-                    $objSheet->getStyle("S2:X2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
-                    $objSheet->getStyle("S2:X2")->applyFromArray($styleArray);
+                    $objSheet->SetCellValue("Y2", "=SUBTOTAL(9, Y4:Y$rowDataCount)");
+                    $objSheet->getStyle("S2:Y2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("S2:Y2")->applyFromArray($styleArray);
 
-                    $objSheet->SetCellValue("Z2", "=SUBTOTAL(9, Z4:Z$rowDataCount)");
-                    $objSheet->SetCellValue("AB2", "=SUBTOTAL(9, AB4:AB$rowDataCount)");
-                    $objSheet->getStyle("Z2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
-                    $objSheet->getStyle("Z2")->applyFromArray($styleArray);
-                    $objSheet->getStyle("AB2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
-                    $objSheet->getStyle("AB2")->applyFromArray($styleArray);
+                    $objSheet->SetCellValue("AA2", "=SUBTOTAL(9, AA4:AA$rowDataCount)");
+                    $objSheet->SetCellValue("AC2", "=SUBTOTAL(9, AC4:AC$rowDataCount)");
+                    $objSheet->getStyle("AA2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("AA2")->applyFromArray($styleArray);
+                    $objSheet->getStyle("AC2")->getNumberFormat()->setFormatCode('_-"$" * #,##0.00_-;-"$" * #,##0.00_-;_-"$" * "-"??_-;_-@_-');
+                    $objSheet->getStyle("AC2")->applyFromArray($styleArray);
 
                     //END CALC DATA
 
@@ -1628,9 +1632,10 @@ class Costsummaryreport extends MY_Controller
                     $objSheet->getColumnDimension("Y")->setAutoSize(true);
                     $objSheet->getColumnDimension("Z")->setAutoSize(true);
                     $objSheet->getColumnDimension("AA")->setAutoSize(true);
-                    $objSheet->getColumnDimension("AB")->setAutoSize(true);
+                    $objSheet->getColumnDimension("AB")->setAutoSize(false)->setWidth(15);
                     $objSheet->getColumnDimension("AC")->setAutoSize(true);
                     $objSheet->getColumnDimension("AD")->setAutoSize(true);
+                    $objSheet->getColumnDimension("AE")->setAutoSize(true);
 
                     $objSheet->getSheetView()->setZoomScale(95);
 

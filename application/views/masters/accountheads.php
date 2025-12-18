@@ -41,7 +41,7 @@ $applicable_origins = $session["applicable_origins"];
 			<thead>
 				<tr>
 					<th><?php echo $this->lang->line('action'); ?></th>
-					<th><?php echo $this->lang->line('ledger_type'); ?></th>
+					<!-- <th><?php echo $this->lang->line('ledger_type'); ?></th> -->
 					<th><?php echo $this->lang->line('account_head_code'); ?></th>
 					<th><?php echo $this->lang->line('app_account_head'); ?></th>
 					<th><?php echo $this->lang->line('ledger_account_head'); ?></th>

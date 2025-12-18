@@ -164,7 +164,7 @@ endif;
 																		$this->router->fetch_class() == "products" || $this->router->fetch_class() == "warehouses"
 																		|| $this->router->fetch_class() == "shippinglines" || $this->router->fetch_class() == "measurementsystems"
 																		|| $this->router->fetch_class() == "inputparameters" || $this->router->fetch_class() == "qrcodegenerator"
-																		|| $this->router->fetch_class() == "inputparametersettings" || $this->router->fetch_class() == "exportpod" 
+																		|| $this->router->fetch_class() == "inputparametersettings" || $this->router->fetch_class() == "exportpod"
 																		|| $this->router->fetch_class() == "exportpol" || $this->router->fetch_class() == "machines"
 																	) {
 																		echo 'show';
@@ -297,172 +297,172 @@ endif;
 													</a>
 												</li>
 											</ul>
+									</li>
+									<li class="nav-item">
+										<!-- parent pages-->
+										<a class="nav-link <?php if ($this->router->fetch_class() == "sawmills") {
+																echo 'active';
+															} else {
+																'';
+															} ?>" href="<?php echo site_url('sawmills'); ?>" role="button" aria-expanded="false">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-link"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('sawmill_title'); ?></span>
+											</div>
+										</a>
+									</li>
 
+									<li class="nav-item">
+										<a class="nav-link dropdown-indicator" href="#reception" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-warehouse"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('reception_title'); ?></span>
+											</div>
+										</a>
+										<ul class="nav collapse <?php if ($this->router->fetch_class() == "receptions" || $this->router->fetch_class() == "receptiontracking") {
+																	echo 'show';
+																} else {
+																	'false';
+																} ?>" id="reception">
 											<li class="nav-item">
-												<!-- parent pages-->
-												<a class="nav-link <?php if ($this->router->fetch_class() == "sawmills") {
+												<a class="nav-link <?php if ($this->router->fetch_class() == "receptions") {
 																		echo 'active';
 																	} else {
 																		'';
-																	} ?>" href="<?php echo site_url('sawmills'); ?>" role="button" aria-expanded="false">
-													<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-link"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('sawmill_title'); ?></span>
+																	} ?>" href="<?php echo site_url('receptions'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('reception_list_title'); ?></span>
 													</div>
 												</a>
 											</li>
-
-
-											<a class="nav-link dropdown-indicator" href="#reception" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
-												<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-warehouse"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('reception_title'); ?></span>
-												</div>
-											</a>
-											<ul class="nav collapse <?php if ($this->router->fetch_class() == "receptions" || $this->router->fetch_class() == "receptiontracking") {
-																		echo 'show';
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "receptiontracking") {
+																		echo 'active';
 																	} else {
-																		'false';
-																	} ?>" id="reception">
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "receptions") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('receptions'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('reception_list_title'); ?></span>
-														</div>
-													</a>
-												</li>
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "receptiontracking") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('receptiontracking'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('viewtracking_title'); ?></span>
-														</div>
-													</a>
-												</li>
-											</ul>
+																		'';
+																	} ?>" href="<?php echo site_url('receptiontracking'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('viewtracking_title'); ?></span>
+													</div>
+												</a>
+											</li>
+										</ul>
 
-											<a class="nav-link dropdown-indicator" href="#dispatch" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
-												<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-truck"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('dispatch_title'); ?></span>
-												</div>
-											</a>
-											<ul class="nav collapse <?php if ($this->router->fetch_class() == "dispatches" || $this->router->fetch_class() == "dispatchtracking") {
-																		echo 'show';
+										<a class="nav-link dropdown-indicator" href="#dispatch" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-truck"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('dispatch_title'); ?></span>
+											</div>
+										</a>
+										<ul class="nav collapse <?php if ($this->router->fetch_class() == "dispatches" || $this->router->fetch_class() == "dispatchtracking") {
+																	echo 'show';
+																} else {
+																	'false';
+																} ?>" id="dispatch">
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "dispatches") {
+																		echo 'active';
 																	} else {
-																		'false';
-																	} ?>" id="dispatch">
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "dispatches") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('dispatches'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('dispatch_list_title'); ?></span>
-														</div>
-													</a>
-												</li>
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "dispatchtracking") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('dispatchtracking'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('viewtracking_title'); ?></span>
-														</div>
-													</a>
-												</li>
-											</ul>
+																		'';
+																	} ?>" href="<?php echo site_url('dispatches'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('dispatch_list_title'); ?></span>
+													</div>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "dispatchtracking") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('dispatchtracking'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('viewtracking_title'); ?></span>
+													</div>
+												</a>
+											</li>
+										</ul>
 
-											<a class="nav-link dropdown-indicator" href="#export" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
-												<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-ship"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('export_title'); ?></span>
-												</div>
-											</a>
-											<ul class="nav collapse <?php if (
-																		$this->router->fetch_class() == "exports" || $this->router->fetch_class() == "readyforexport"
-																		|| $this->router->fetch_class() == "exportcreation"
+										<a class="nav-link dropdown-indicator" href="#export" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-ship"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('export_title'); ?></span>
+											</div>
+										</a>
+										<ul class="nav collapse <?php if (
+																	$this->router->fetch_class() == "exports" || $this->router->fetch_class() == "readyforexport"
+																	|| $this->router->fetch_class() == "exportcreation"
+																) {
+																	echo 'show';
+																} else {
+																	'false';
+																} ?>" id="export">
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "exports") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('exports'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('export_list_title'); ?></span>
+													</div>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "exportcreation") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('exportcreation'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('createexport_title'); ?></span>
+													</div>
+												</a>
+											</li>
+										</ul>
+
+										<a class="nav-link dropdown-indicator" href="#inventoryreports" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-file-text"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('reports_title'); ?></span>
+											</div>
+										</a>
+										<ul class="nav collapse  <?php if (
+																		$this->router->fetch_class() == "missinginventoryorder"
+																		|| $this->router->fetch_class() == "farmreports" || $this->router->fetch_class() == "exportorder"
+																		|| $this->router->fetch_class() == "inventoryreports"
 																	) {
 																		echo 'show';
 																	} else {
 																		'false';
-																	} ?>" id="export">
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "exports") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('exports'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('export_list_title'); ?></span>
-														</div>
-													</a>
-												</li>
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "exportcreation") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('exportcreation'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('createexport_title'); ?></span>
-														</div>
-													</a>
-												</li>
-											</ul>
+																	} ?>" id="inventoryreports">
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "farmreports") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('farmreports'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('farmreport_title'); ?></span>
+													</div>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "inventoryreports") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('inventoryreports'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('inventoryreport_title'); ?></span>
+													</div>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "exportorder") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('exportorder'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('exportorder_title'); ?></span>
+													</div>
+												</a>
+											</li>
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "missinginventoryorder") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('missinginventoryorder'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('missinginventory_title'); ?></span>
+													</div>
+												</a>
+											</li>
+										</ul>
 
-											<a class="nav-link dropdown-indicator" href="#inventoryreports" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
-												<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-file-text"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('reports_title'); ?></span>
-												</div>
-											</a>
-											<ul class="nav collapse  <?php if (
-																			$this->router->fetch_class() == "missinginventoryorder"
-																			|| $this->router->fetch_class() == "farmreports" || $this->router->fetch_class() == "exportorder"
-																			|| $this->router->fetch_class() == "inventoryreports"
-																		) {
-																			echo 'show';
-																		} else {
-																			'false';
-																		} ?>" id="inventoryreports">
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "farmreports") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('farmreports'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('farmreport_title'); ?></span>
-														</div>
-													</a>
-												</li>
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "inventoryreports") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('inventoryreports'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('inventoryreport_title'); ?></span>
-														</div>
-													</a>
-												</li>
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "exportorder") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('exportorder'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('exportorder_title'); ?></span>
-														</div>
-													</a>
-												</li>
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "missinginventoryorder") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('missinginventoryorder'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('missinginventory_title'); ?></span>
-														</div>
-													</a>
-												</li>
-											</ul>
-
-										<?php } ?>
+									<?php } ?>
 									</li>
 								<?php } ?>
 							<?php } ?>
@@ -536,7 +536,7 @@ endif;
 										</a>
 										<ul class="nav collapse <?php if (
 																	$this->router->fetch_class() == "ledgertypes" || $this->router->fetch_class() == "suppliers" ||
-																	$this->router->fetch_class() == "accountheads" || $this->router->fetch_class() == "taxsettings" ||
+																	$this->router->fetch_class() == "taxsettings" ||
 																	$this->router->fetch_class() == "exportsuppliers" || $this->router->fetch_class() == "costingpurchasers"
 																) {
 																	echo 'show';
@@ -598,16 +598,6 @@ endif;
 												<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('ledgertype_title'); ?></span>
 												</div>
 											</a>
-										</li>
-										<li class="nav-item">
-											<a class="nav-link <?php if ($this->router->fetch_class() == "accountheads") {
-																	echo 'active';
-																} else {
-																	'';
-																} ?>" href="<?php echo site_url('accountheads'); ?>" aria-expanded="false">
-												<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('accounthead_title'); ?></span>
-												</div>
-											</a>
 										</li> -->
 										</ul>
 
@@ -661,7 +651,7 @@ endif;
 											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-file-circle-check"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('contracts_title'); ?></span>
 											</div>
 										</a>
-										
+
 
 										<a class="nav-link <?php if ($this->router->fetch_class() == "costings") {
 																echo 'active';
@@ -825,6 +815,89 @@ endif;
 								</li>
 							<?php } ?>
 
+							<?php if (in_array('1', $role_resources_ids) || in_array('2', $role_resources_ids) || in_array('4', $role_resources_ids)) { ?>
+								<li class="nav-item">
+									<div class="row navbar-vertical-label-wrapper mt-3 mb-2">
+										<div class="col-auto navbar-vertical-label"><?php echo $this->lang->line('expense_tracker'); ?>
+										</div>
+										<div class="col ps-0">
+											<hr class="mb-0 navbar-vertical-divider" />
+										</div>
+									</div>
+
+									<?php if (in_array('1', $role_resources_ids) || in_array('2', $role_resources_ids) || in_array('4', $role_resources_ids)) { ?>
+										<a class="nav-link dropdown-indicator" href="#expensetracker" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="email">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-gears"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('master_title'); ?></span>
+											</div>
+										</a>
+										<ul class="nav collapse <?php if ($this->router->fetch_class() == "accountheads") {
+																	echo 'show';
+																} else {
+																	'false';
+																} ?>" id="expensetracker">
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "accountheads") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('accountheads'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('accounthead_title'); ?></span></span>
+													</div>
+												</a>
+											</li>
+										</ul>
+
+										<a class="nav-link <?php if ($this->router->fetch_class() == "expenseadvanceregistry") {
+																echo 'active';
+															} else {
+																'';
+															} ?>" href="<?php echo site_url('expenseadvanceregistry'); ?>" role="button" aria-expanded="false">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-money-bill-wave"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('expense_credit'); ?></span>
+											</div>
+										</a>
+
+										<a class="nav-link <?php if ($this->router->fetch_class() == "expensedebitregistry") {
+																echo 'active';
+															} else {
+																'';
+															} ?>" href="<?php echo site_url('expensedebitregistry'); ?>" role="button" aria-expanded="false">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-coins"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('expense_debit'); ?></span>
+											</div>
+										</a>
+
+										<a class="nav-link <?php if ($this->router->fetch_class() == "expenseledger") {
+																echo 'active';
+															} else {
+																'';
+															} ?>" href="<?php echo site_url('expenseledger'); ?>" role="button" aria-expanded="false">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-file-invoice-dollar"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('expenseledger_title'); ?></span>
+											</div>
+										</a>
+
+										<a class="nav-link dropdown-indicator" href="#expenseledgerreport" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="email">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-file-invoice"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('reports_title'); ?></span>
+											</div>
+										</a>
+										<ul class="nav collapse <?php if ($this->router->fetch_class() == "expenseledgerreport") {
+																	echo 'show';
+																} else {
+																	'false';
+																} ?>" id="expenseledgerreport">
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "expenseledgerreport") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('expenseledgerreport'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('ledgerreport_title'); ?></span></span>
+													</div>
+												</a>
+											</li>
+										</ul>
+									<?php } ?>
+								</li>
+							<?php } ?>
+
 							<?php if (in_array('1', $role_resources_ids)) { ?>
 								<li class="nav-item">
 									<!-- label-->
@@ -869,6 +942,14 @@ endif;
 					</a>
 
 					<ul class="navbar-nav navbar-nav-icons ms-auto flex-row align-items-center">
+
+						<li class="nav-item">
+							<div class="theme-control-toggle fa-icon-wait px-2">
+								<input class="form-check-input ms-0 theme-control-toggle-input" id="themeControlToggle" type="checkbox" data-theme-control="theme" value="dark" />
+								<label class="mb-0 theme-control-toggle-label theme-control-toggle-light" id="themeControlIconLight" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left" title="<?php echo $this->lang->line("switch_light"); ?>"><span class="fas fa-sun fs-0"></span></label>
+								<label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" id="themeControlIconDark" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left" title="<?php echo $this->lang->line("switch_dark"); ?>"><span class="fas fa-moon fs-0"></span></label>
+							</div>
+						</li>
 
 						<?php if ($system[0]->module_language == 1) { ?>
 							<li class="nav-item dropdown">
@@ -966,6 +1047,38 @@ endif;
 			toastr.options.preventDuplicates = true;
 			toastr.options.positionClass = "toast-bottom-right";
 			var site_url = '<?php echo site_url(); ?>';
+		});
+	</script>
+
+	<script>
+		const body = document.body;
+		const toggleBtn = document.getElementById("themeControlToggle");
+		const themeControlIconLight = document.getElementById("themeControlIconLight");
+		const themeControlIconDark = document.getElementById("themeControlIconDark");
+
+		// Load saved theme
+		if (localStorage.getItem("theme") === "dark") {
+			body.classList.add("dark-theme");
+			// themeIcon.classList.replace("fa-moon", "fa-sun");
+			themeControlIconDark.style.display = "none";
+			themeControlIconLight.style.display = "inline-block";
+			toggleBtn.checked = true;
+		}
+
+		toggleBtn.addEventListener("click", () => {
+			body.classList.toggle("dark-theme");
+
+			if (body.classList.contains("dark-theme")) {
+				// themeIcon.classList.replace("fa-moon", "fa-sun");
+				themeControlIconDark.style.display = "none";
+				themeControlIconLight.style.display = "inline-block";
+				localStorage.setItem("theme", "dark");
+			} else {
+				// themeIcon.classList.replace("fa-sun", "fa-moon");
+				themeControlIconLight.style.display = "none";
+				themeControlIconDark.style.display = "inline-block";
+				localStorage.setItem("theme", "light");
+			}
 		});
 	</script>
 </body>

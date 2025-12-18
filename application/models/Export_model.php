@@ -1200,4 +1200,37 @@ class Export_model extends CI_Model
         $query = $this->db->query($strQuery);
         return $query->result();
     }
+
+    public function fetch_export_loading_costs($exportid)
+    {
+        $strQuery = "SELECT dispatch_id, loading_cost FROM tbl_export_document_loading_cost 
+            WHERE is_active = 1 AND export_id = $exportid";
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function update_exportcontainer_loading_cost($data, $exportid)
+    {
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $multiClause = array('export_id' => $exportid);
+        $this->db->where($multiClause);
+        if ($this->db->update('tbl_export_document_loading_cost', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function add_exportcontainer_loading_cost($data)
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_export_document_loading_cost', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
 }

@@ -380,6 +380,11 @@ $applicable_origins = $session["applicable_origins"];
 						'#fd7e14' // orange
 					];
 
+					let isDark = false;
+					if(localStorage.getItem("theme") == "dark") {
+						isDark = true;
+					} 
+
 					var getDefaultOptions = function getDefaultOptions() {
 						return {
 							// tooltip: {
@@ -400,10 +405,10 @@ $applicable_origins = $session["applicable_origins"];
 							tooltip: {
 								trigger: 'axis',
 								padding: [7, 10],
-								backgroundColor: utils.getGrays()['100'],
+								backgroundColor: isDark ? utils.getGrays()['black'] : utils.getGrays()['white'],
 								borderColor: utils.getGrays()['300'],
 								textStyle: {
-									color: utils.getColors().dark
+									color: isDark ? utils.getGrays()['white'] : utils.getGrays()['black'],
 								},
 								borderWidth: 1,
 								transitionDuration: 0,
@@ -431,7 +436,7 @@ $applicable_origins = $session["applicable_origins"];
 									show: false
 								},
 								axisLabel: {
-									color: utils.getGrays()['black'],
+									color: isDark ? utils.getGrays()['white'] : utils.getGrays()['black'],
 									formatter: function formatter(value) {
 										return value; //.substring(0, 3);
 									},
@@ -446,7 +451,7 @@ $applicable_origins = $session["applicable_origins"];
 								boundaryGap: true,
 								axisLabel: {
 									show: true,
-									color: utils.getGrays()['black'],
+									color: isDark ? utils.getGrays()['white'] : utils.getGrays()['black'],
 									margin: 15
 								},
 								splitLine: {

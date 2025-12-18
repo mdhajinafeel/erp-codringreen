@@ -1061,3 +1061,38 @@ $lang['edit_machine'] = 'Edit Machine';
 $lang['error_machine_name'] = 'Please enter the machine name';
 $lang['error_chassis_model'] = 'Please enter the chassis / model';
 $lang['error_select_supplier'] = 'Please select a supplier';
+
+//Dark
+$lang['switch_light'] = 'Switch to light theme';
+$lang['switch_dark'] = 'Switch to dark theme';
+
+$lang["doc_containerloading"] = "CONTAINER LIFT LOADING";
+$lang["doc_othercost"] = "OTHER COSTS";
+
+$lang["sawmill_remaining_inventory"] = "Remaining Inventory";
+
+$lang["MOTOCARGAS"] = "MOTOCARGAS";
+$lang["OTHERCOSTS"] = "OTHER COSTS";
+
+//EXPENSE TRACKER
+$lang["expense_tracker"] = "Expense Tracker";
+$lang["Expense Tracker (App)"] = "Expense Tracker (App)";
+$lang["concept_general"] = "Concept General";
+$lang["error_conceptgeneral"] = "Please enter the concept general";
+$lang["credit_details"] = "Credit Detail";
+$lang["debit_details"] = "Debit Detail";
+$lang["expense_credit"] = "Expense Credit";
+$lang["expense_debit"] = "Expense Debit";
+$lang["document_number"] = "Document Number";
+$lang["preview_not_available"] = "Preview not available";
+$lang["expense_report_date"] = "Date of legalization";
+$lang["FECHA"] = "DATE";
+$lang["BENEFICIARIO"] = "BENEFICIARY";
+$lang["IDENTIFICACION"] = "IDENTIFICATION";
+$lang["CONCEPTO"] = "CONCEPT";
+$lang["VALOR"] = "AMOUNT";
+$lang["advance_received"] = "Advances Received";
+$lang["balance"] = "Balance";
+$lang["employee_signature"] = "Employee Signature";
+$lang['debitregistry_title'] = 'Debit Registry';
+$lang['download_file'] = 'Download File';

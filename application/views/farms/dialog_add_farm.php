@@ -1282,6 +1282,7 @@ $applicable_origins = $session["applicable_origins"];
             toastr.error(error_purchase_contract);
             $("#error-purchasecontract").show();
             $("#fileFarmExcel").val("");
+            return true;
         } else {
             $("#error-purchasecontract").hide();
         }
@@ -1294,6 +1295,7 @@ $applicable_origins = $session["applicable_origins"];
                 toastr.error(error_inventory_order);
                 $("#error-inventoryorder_add").show();
                 $("#fileFarmExcel").val("");
+                return true;
             } else {
                 $("#error-inventoryorder_add").hide();
             }

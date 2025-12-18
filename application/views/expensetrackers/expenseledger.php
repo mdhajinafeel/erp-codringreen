@@ -9,7 +9,7 @@ $applicable_origins = $session["applicable_origins"];
         <div class="row flex-between-end">
             <div class="col-auto align-self-center">
                 <input type="hidden" id="hdnCsrf" name="hdnCsrf" value="<?php echo $csrf_cgrerp; ?>" />
-                <h3> <?php echo $this->lang->line('viewledger_title'); ?> </h3>
+                <h3> <?php echo $this->lang->line('expenseledger_title'); ?> </h3>
             </div>
         </div>
     </div>
@@ -115,6 +115,7 @@ $applicable_origins = $session["applicable_origins"];
                                             <tr>
                                                 <th width="100px"><?php echo $this->lang->line("action"); ?></th>
                                                 <th><?php echo $this->lang->line("transaction_id"); ?></th>
+                                                <th><?php echo $this->lang->line("concept_general"); ?></th>
                                                 <th><?php echo $this->lang->line("transaction_date"); ?></th>
                                                 <th><?php echo $this->lang->line("amount"); ?></th>
                                                 <th><?php echo $this->lang->line("last_updated_by"); ?></th>
@@ -249,6 +250,8 @@ $applicable_origins = $session["applicable_origins"];
                 data: 'action'
             }, {
                 data: 'transactionDisplayId'
+            }, {
+                data: 'conceptGeneral'
             }, {
                 data: 'transactionDate'
             }, {

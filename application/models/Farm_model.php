@@ -299,33 +299,160 @@ class Farm_model extends CI_Model
 
     public function get_farm_details($farmid, $contractid, $inventoryorder)
     {
-        $query = $this->db->query("SELECT A.inventory_order, A.supplier_id, B.supplier_name, B.supplier_code, C.contract_code, 
-                D.product_name, E.product_type_name, DATE_FORMAT(A.purchase_date, '%d/%m/%Y') AS purchase_date, 
-                A.service_cost, A.pay_service_to, CASE WHEN getsuppliername_bysupplierid(A.pay_service_to) IS NULL THEN '-' ELSE getsuppliername_bysupplierid(A.pay_service_to) END as service_pay_to, 
-                A.logistic_cost, A.pay_logistics_to, CASE WHEN getsuppliername_bysupplierid(A.pay_logistics_to) IS NULL THEN '-' ELSE getsuppliername_bysupplierid(A.pay_logistics_to) END as logistic_pay_to, 
-                A.wood_value, A.adjustment, gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id) AS total_payment, 
-                getapplicableorigins_byid(A.origin_id) AS origin, 
-                CASE WHEN A.created_from = 1 THEN gettotalpieces_byfarm_contract(A.contract_id, A.farm_id, A.inventory_order) 
-                ELSE getnoofpieces_farm_fieldpurchase(A.inventory_order,0,0) END AS total_pieces, 
-                A.total_volume, getusername_byuserid(A.created_by) as uploaded_by, 
-                CASE WHEN (A.origin_id = 2 OR A.origin_id = 4) THEN 0 WHEN A.created_from = 1 THEN ABS(A.total_value - gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id)) 
-                ELSE ABS(A.wood_value - A.service_cost - A.logistic_cost - gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id)) END 
-                AS total_taxes, 
-                A.plate_number, A.exchange_rate, 
-                CASE WHEN (getcurrencyabbreviation_origin(A.origin_id) IS NULL OR '') THEN getcurrencyabbreviation_default() ELSE getcurrencyabbreviation_origin(A.origin_id) END AS currency_abbreviation,
-                F.purchase_unit, C.purchase_allowance, C.purchase_allowance_length, C.unit_of_purchase, A.origin_id, 
-                CASE WHEN (getcurrencyexcelformat_origin(A.origin_id) IS NULL OR '') THEN getdefaultcurrency() ELSE getcurrencyexcelformat_origin(A.origin_id) END as currency_excel_format, A.product_type_id, 
-                A.supplier_taxes, A.logistic_taxes, A.service_taxes, A.logistic_provider_taxes, A.service_provider_taxes, 
-                A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, 
-                A.rounding_factor, C.existing_price_condition, A.driver_name, A.process_type, A.extraction_cost, A.loading_cost, A.unloading_cost     
-                FROM tbl_farm A 
-                INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
-                INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
-                INNER JOIN tbl_product_master D ON D.product_id = A.product_id 
-                INNER JOIN tbl_product_types E ON E.type_id = A.product_type_id 
-                INNER JOIN tbl_purchase_unit F ON F.id = C.unit_of_purchase
-                WHERE A.is_active = 1 AND A.farm_id = $farmid AND A.inventory_order = '$inventoryorder' 
-                AND A.contract_id = $contractid");
+        // $query = $this->db->query("SELECT A.inventory_order, A.supplier_id, B.supplier_name, B.supplier_code, C.contract_code, 
+        //         D.product_name, E.product_type_name, DATE_FORMAT(A.purchase_date, '%d/%m/%Y') AS purchase_date, 
+        //         A.service_cost, A.pay_service_to, CASE WHEN getsuppliername_bysupplierid(A.pay_service_to) IS NULL THEN '-' ELSE getsuppliername_bysupplierid(A.pay_service_to) END as service_pay_to, 
+        //         A.logistic_cost, A.pay_logistics_to, CASE WHEN getsuppliername_bysupplierid(A.pay_logistics_to) IS NULL THEN '-' ELSE getsuppliername_bysupplierid(A.pay_logistics_to) END as logistic_pay_to, 
+        //         A.wood_value, A.adjustment, gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id) AS total_payment, 
+        //         getapplicableorigins_byid(A.origin_id) AS origin, 
+        //         CASE WHEN A.created_from = 1 THEN gettotalpieces_byfarm_contract(A.contract_id, A.farm_id, A.inventory_order) 
+        //         ELSE getnoofpieces_farm_fieldpurchase(A.inventory_order,0,0) END AS total_pieces, 
+        //         A.total_volume, getusername_byuserid(A.created_by) as uploaded_by, 
+        //         CASE WHEN (A.origin_id = 2 OR A.origin_id = 4) THEN 0 WHEN A.created_from = 1 THEN ABS(A.total_value - gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id)) 
+        //         ELSE ABS(A.wood_value - A.service_cost - A.logistic_cost - gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id)) END 
+        //         AS total_taxes, 
+        //         A.plate_number, A.exchange_rate, 
+        //         CASE WHEN (getcurrencyabbreviation_origin(A.origin_id) IS NULL OR '') THEN getcurrencyabbreviation_default() ELSE getcurrencyabbreviation_origin(A.origin_id) END AS currency_abbreviation,
+        //         F.purchase_unit, C.purchase_allowance, C.purchase_allowance_length, C.unit_of_purchase, A.origin_id, 
+        //         CASE WHEN (getcurrencyexcelformat_origin(A.origin_id) IS NULL OR '') THEN getdefaultcurrency() ELSE getcurrencyexcelformat_origin(A.origin_id) END as currency_excel_format, A.product_type_id, 
+        //         A.supplier_taxes, A.logistic_taxes, A.service_taxes, A.logistic_provider_taxes, A.service_provider_taxes, 
+        //         A.adjusted_value, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, C.currency, A.adjust_taxes, A.product_id, A.rounding_factor, C.existing_price_condition, A.driver_name, 
+        //         A.process_type, A.extraction_cost, A.loading_cost, A.unloading_cost           
+        //         FROM tbl_farm A 
+        //         INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
+        //         INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
+        //         INNER JOIN tbl_product_master D ON D.product_id = A.product_id 
+        //         INNER JOIN tbl_product_types E ON E.type_id = A.product_type_id 
+        //         INNER JOIN tbl_purchase_unit F ON F.id = C.unit_of_purchase
+        //         WHERE A.is_active = 1 AND A.farm_id = $farmid AND A.inventory_order = '$inventoryorder' 
+        //         AND A.contract_id = $contractid");
+        
+        $query = $this->db->query("SELECT 
+                        A.inventory_order, 
+                        A.supplier_id, 
+                        B.supplier_name, 
+                        B.supplier_code, 
+                        C.contract_code, 
+                        D.product_name, 
+                        E.product_type_name, 
+                        DATE_FORMAT(A.purchase_date, '%d/%m/%Y') AS purchase_date, 
+                        A.service_cost, 
+                        A.pay_service_to, 
+                        CASE 
+                            WHEN getsuppliername_bysupplierid(A.pay_service_to) IS NULL 
+                            THEN '-' 
+                            ELSE getsuppliername_bysupplierid(A.pay_service_to) 
+                        END AS service_pay_to, 
+                        A.logistic_cost, 
+                        A.pay_logistics_to, 
+                        CASE 
+                            WHEN getsuppliername_bysupplierid(A.pay_logistics_to) IS NULL 
+                            THEN '-' 
+                            ELSE getsuppliername_bysupplierid(A.pay_logistics_to) 
+                        END AS logistic_pay_to, 
+                        A.wood_value, 
+                        A.adjustment, 
+                        
+                        -- Inline total payment query (instead of function)
+                        (
+                            SELECT SUM(L.amount) 
+                            FROM tbl_inventory_ledger L
+                            WHERE L.is_active = 1 
+                              AND L.ledger_type = 2 
+                              AND L.expense_type IN (1,2,3)
+                              AND L.inventory_order = A.inventory_order 
+                              AND L.contract_id = A.contract_id 
+                              AND L.amount != 0
+                        ) AS total_payment, 
+                        
+                        getapplicableorigins_byid(A.origin_id) AS origin, 
+                        
+                        CASE 
+                            WHEN A.created_from = 1 
+                            THEN gettotalpieces_byfarm_contract(A.contract_id, A.farm_id, A.inventory_order) 
+                            ELSE getnoofpieces_farm_fieldpurchase(A.inventory_order,0,0) 
+                        END AS total_pieces, 
+                        
+                        A.total_volume, 
+                        getusername_byuserid(A.created_by) AS uploaded_by, 
+                        
+                        CASE 
+                            WHEN (A.origin_id = 2 OR A.origin_id = 4) 
+                                THEN 0 
+                            WHEN A.created_from = 1 
+                                THEN ABS(A.total_value - (
+                                    SELECT SUM(L.amount) 
+                                    FROM tbl_inventory_ledger L
+                                    WHERE L.is_active = 1 
+                                      AND L.ledger_type = 2 
+                                      AND L.expense_type IN (1,2,3)
+                                      AND L.inventory_order = A.inventory_order 
+                                      AND L.contract_id = A.contract_id 
+                                      AND L.amount != 0
+                                )) 
+                            ELSE ABS(A.wood_value - A.service_cost - A.logistic_cost - (
+                                    SELECT SUM(L.amount) 
+                                    FROM tbl_inventory_ledger L
+                                    WHERE L.is_active = 1 
+                                      AND L.ledger_type = 2 
+                                      AND L.expense_type IN (1,2,3)
+                                      AND L.inventory_order = A.inventory_order 
+                                      AND L.contract_id = A.contract_id 
+                                      AND L.amount != 0
+                                )) 
+                        END AS total_taxes, 
+                        
+                        A.plate_number, 
+                        A.exchange_rate, 
+                        CASE 
+                            WHEN (getcurrencyabbreviation_origin(A.origin_id) IS NULL OR '') 
+                            THEN getcurrencyabbreviation_default() 
+                            ELSE getcurrencyabbreviation_origin(A.origin_id) 
+                        END AS currency_abbreviation,
+                        
+                        F.purchase_unit, 
+                        C.purchase_allowance, 
+                        C.purchase_allowance_length, 
+                        C.unit_of_purchase, 
+                        A.origin_id, 
+                        
+                        CASE 
+                            WHEN (getcurrencyexcelformat_origin(A.origin_id) IS NULL OR '') 
+                            THEN getdefaultcurrency() 
+                            ELSE getcurrencyexcelformat_origin(A.origin_id) 
+                        END AS currency_excel_format, 
+                        
+                        A.product_type_id, 
+                        A.supplier_taxes, 
+                        A.logistic_taxes, 
+                        A.service_taxes, 
+                        A.logistic_provider_taxes, 
+                        A.service_provider_taxes, 
+                        A.adjusted_value, 
+                        A.supplier_taxes_array, 
+                        A.logistics_taxes_array, 
+                        A.service_taxes_array, 
+                        C.currency, 
+                        A.adjust_taxes, 
+                        A.product_id, 
+                        A.rounding_factor, 
+                        C.existing_price_condition, 
+                        A.driver_name, 
+                        A.process_type, 
+                        A.extraction_cost, 
+                        A.loading_cost, 
+                        A.unloading_cost           
+                    FROM tbl_farm A 
+                    INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
+                    INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
+                    INNER JOIN tbl_product_master D ON D.product_id = A.product_id 
+                    INNER JOIN tbl_product_types E ON E.type_id = A.product_type_id 
+                    INNER JOIN tbl_purchase_unit F ON F.id = C.unit_of_purchase
+                    WHERE A.is_active = 1 
+                      AND A.farm_id = $farmid 
+                      AND A.inventory_order = '$inventoryorder'
+                      AND A.contract_id = $contractid");
+        
         return $query->result();
     }
 
@@ -348,7 +475,7 @@ class Farm_model extends CI_Model
                 AND inventory_number = '$inventoryorder' AND is_active = 1 ORDER BY minrange_grade1");
         } else {
             $query = $this->db->query("SELECT minrange_grade1, maxrange_grade2, pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs, 
-                    getnoofpieces_priceranges_farm('$inventoryorder', $farmid, minrange_grade1, maxrange_grade2) as pieces_farm
+                    getnoofpieces_priceranges_farm($farmid, minrange_grade1, maxrange_grade2) as pieces_farm
                     FROM tbl_supplier_contract_inventory_price WHERE contract_id = $contractid 
                     AND inventory_number = '$inventoryorder' AND is_active = 1 ORDER BY minrange_grade1");
         }
@@ -613,12 +740,13 @@ class Farm_model extends CI_Model
         $query = $this->db->query("SELECT * FROM (SELECT A.farm_id, A.supplier_id, A.product_id, A.product_type_id, A.inventory_order, 
                             A.contract_id, A.purchase_unit_id, DATE_FORMAT(STR_TO_DATE(A.purchase_date, '%Y-%m-%d'), '%d/%m/%Y') AS purchase_date, 
                             A.plate_number, A.driver_name, A.total_pieces, A.total_gross_volume, A.total_volume, B.supplier_name, C.purchase_unit, D.product_name, 
-                            A.circ_allowance, A.length_allowance, E.description, A.is_closed, A.closed_by, A.closed_date, 0 AS fordata
+                            A.circ_allowance, A.length_allowance, E.description, A.is_closed, A.closed_by, A.closed_date, F.product_type_name, 0 AS fordata
                             FROM tbl_farm A 
                             INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                             INNER JOIN tbl_purchase_unit C ON C.id = A.purchase_unit_id 
                             INNER JOIN tbl_product_master D ON D.product_id = A.product_id 
                             INNER JOIN tbl_supplier_purchase_contract E ON E.contract_id = A.contract_id 
+                            INNER JOIN tbl_product_types F ON F.type_id = A.product_type_id 
                             WHERE A.is_active = 1 AND A.origin_id = $originid AND A.is_closed = 0
                             
                 UNION ALL
@@ -626,16 +754,17 @@ class Farm_model extends CI_Model
                 SELECT A.farm_id, A.supplier_id, A.product_id, A.product_type_id, A.inventory_order, 
                             A.contract_id, A.purchase_unit_id, DATE_FORMAT(STR_TO_DATE(A.purchase_date, '%Y-%m-%d'), '%d/%m/%Y') AS purchase_date, 
                             A.plate_number, A.driver_name, A.total_pieces, A.total_gross_volume, A.total_volume, B.supplier_name, C.purchase_unit, D.product_name, 
-                            A.circ_allowance, A.length_allowance, E.description, A.is_closed, A.closed_by, A.closed_date, 1 AS fordata
+                            A.circ_allowance, A.length_allowance, E.description, A.is_closed, A.closed_by, A.closed_date, F.product_type_name, 1 AS fordata
                             FROM tbl_farm A 
                             INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                             INNER JOIN tbl_purchase_unit C ON C.id = A.purchase_unit_id 
                             INNER JOIN tbl_product_master D ON D.product_id = A.product_id 
                             INNER JOIN tbl_supplier_purchase_contract E ON E.contract_id = A.contract_id 
-                            WHERE A.is_active = 1 AND A.origin_id =$originid AND A.purchase_date >= CURDATE() - INTERVAL 4 DAY AND A.farm_id NOT IN (
+                            INNER JOIN tbl_product_types F ON F.type_id = A.product_type_id 
+                            WHERE A.is_active = 1 AND A.origin_id = $originid AND A.purchase_date >= CURDATE() - INTERVAL 4 DAY AND A.farm_id NOT IN (
                     SELECT farm_id
                     FROM tbl_farm
-                    WHERE is_active = 1 AND is_closed = 0 AND origin_id = 1
+                    WHERE is_active = 1 AND is_closed = 0 AND origin_id = $originid
                 )
                 ) X ORDER BY X.farm_id DESC");
         return $query->result();
@@ -759,15 +888,15 @@ class Farm_model extends CI_Model
                 D.product_name, E.product_type_name, DATE_FORMAT(A.purchase_date, '%d/%m/%Y') AS purchase_date, 
                 A.service_cost, A.pay_service_to, CASE WHEN getsuppliername_bysupplierid(A.pay_service_to) IS NULL THEN '-' ELSE getsuppliername_bysupplierid(A.pay_service_to) END as service_pay_to, 
                 A.logistic_cost, A.pay_logistics_to, CASE WHEN getsuppliername_bysupplierid(A.pay_logistics_to) IS NULL THEN '-' ELSE getsuppliername_bysupplierid(A.pay_logistics_to) END as logistic_pay_to, 
-                A.wood_value, A.adjustment, gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id) AS total_payment, 
+                A.wood_value, A.adjustment, 0 AS total_payment, 
                 getapplicableorigins_byid(A.origin_id) AS origin, 
-                CASE WHEN A.created_from = 1 THEN gettotalpieces_byfarm_contract(A.contract_id, A.farm_id, A.inventory_order) 
+                CASE WHEN A.created_from = 1 THEN gettotalpieces_byfarm_contract(A.farm_id) 
                 ELSE getnoofpieces_farm_fieldpurchase(A.inventory_order,0,0) END AS total_pieces, 
                 A.total_volume, getusername_byuserid(A.created_by) as uploaded_by, 
                 CASE 
                 WHEN (A.origin_id = 2 OR A.origin_id = 4) THEN 0 
-                WHEN A.created_from = 1 THEN ABS(A.total_value - gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id)) 
-                ELSE ABS(A.wood_value - A.service_cost - A.logistic_cost - gettotal_payamount_inventoryorder(A.inventory_order, A.contract_id)) END 
+                WHEN A.created_from = 1 THEN ABS(A.total_value - 0) 
+                ELSE ABS(A.wood_value - A.service_cost - A.logistic_cost - 0) END 
                 AS total_taxes, 
                 A.plate_number, A.exchange_rate, 
                 CASE WHEN (getcurrencyabbreviation_origin(A.origin_id) IS NULL OR '') THEN getcurrencyabbreviation_default() ELSE getcurrencyabbreviation_origin(A.origin_id) END AS currency_abbreviation,
@@ -797,7 +926,7 @@ class Farm_model extends CI_Model
             return false;
         }
     }
-
+    
     public function update_farm_inventory_order($farmid, $contractid, $supplierid, $data)
     {
         $multiClause = array('farm_id' => $farmid, 'contract_id' => $contractid, 'supplier_id' => $supplierid, 'is_active' => 1);
@@ -809,7 +938,7 @@ class Farm_model extends CI_Model
             return false;
         }
     }
-
+    
     public function all_farms_year($year)
     {
         $query = $this->db->query("SELECT farm_id, inventory_order, supplier_name, contract_id, 

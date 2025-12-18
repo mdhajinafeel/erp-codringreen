@@ -1061,3 +1061,38 @@ $lang['edit_machine'] = 'Editar Máquina';
 $lang['error_machine_name'] = 'Por favor ingrese el nombre de la máquina';
 $lang['error_chassis_model'] = 'Por favor ingrese el chasis / modelo';
 $lang['error_select_supplier'] = 'Por favor seleccione un proveedor';
+
+//Dark
+$lang['switch_light'] = 'Cambiar al tema claro';
+$lang['switch_dark'] = 'Cambiar al tema oscuro';
+
+$lang["doc_containerloading"] = "MONTACARGAS";
+$lang["doc_othercost"] = "OTROS COSTOS";
+
+$lang["sawmill_remaining_inventory"] = "Inventario Restante";
+
+$lang["MOTOCARGAS"] = "MOTOCARGAS";
+$lang["OTHERCOSTS"] = "OTROS COSTOS";
+
+//EXPENSE TRACKER
+$lang["expense_tracker"] = "Rastreador de gastos";
+$lang["Expense Tracker (App)"] = "Rastreador de gastos (App)";
+$lang["concept_general"] = "Concepto General";
+$lang["error_conceptgeneral"] = "Por favor ingrese el concepto general";
+$lang["credit_details"] = "Detalle de Crédito";
+$lang["debit_details"] = "Detalle de Débito";
+$lang["expense_credit"] = "Crédito de Gasto";
+$lang["expense_debit"] = "Débito de Gasto";
+$lang["document_number"] = "Número de Documento";
+$lang["preview_not_available"] = "Vista previa no disponible";
+$lang["expense_report_date"] = "Fecha de legalizacion";
+$lang["FECHA"] = "FECHA";
+$lang["BENEFICIARIO"] = "BENEFICIARIO";
+$lang["IDENTIFICACION"] = "IDENTIFICACION";
+$lang["CONCEPTO"] = "CONCEPTO";
+$lang["VALOR"] = "VALOR";
+$lang["advance_received"] = "Anticipos recibido";
+$lang["balance"] = "Saldo";
+$lang["employee_signature"] = "Firma de empleado";
+$lang['debitregistry_title'] = 'Registro de Débito';
+$lang['download_file'] = 'Descargar Archivo';

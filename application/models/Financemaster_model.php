@@ -71,15 +71,19 @@ class Financemaster_model extends CI_Model
 	//ACCOUNT HEADS
 	public function all_account_heads($originid)
 	{
-		$strQuery = "SELECT A.id, A.code, A.name_in_ledger, A.name_in_app, A.ledger_type, B.ledger_name, A.is_active, getapplicableorigins_byid(A.origin_id) AS origin FROM tbl_accounting_heads A 
-			INNER JOIN tbl_ledger_type_master B ON B.id = A.ledger_type";
+		$strQuery = "SELECT A.id, A.code, A.name_in_ledger, A.name_in_app, A.ledger_type, A.is_active, A.icon, 
+			getapplicableorigins_byid(A.origin_id) AS origin, A.color_code_primary, A.color_code_secondary FROM tbl_accounting_heads A";
+
+		//$strQuery = "SELECT A.id, A.code, A.name_in_ledger, A.name_in_app, A.ledger_type, B.ledger_name, A.is_active, getapplicableorigins_byid(A.origin_id) AS origin FROM tbl_accounting_heads A"
+		//INNER JOIN tbl_ledger_type_master B ON B.id = A.ledger_type";
 
 
 		if ($originid > 0) {
 			$strQuery = $strQuery . " WHERE A.origin_id = $originid";
 		}
 
-		$strQuery = $strQuery . " ORDER BY A.ledger_type";
+		//$strQuery = $strQuery . " ORDER BY A.ledger_type";
+		$strQuery = $strQuery . " ORDER BY A.id";
 
 		$query = $this->db->query($strQuery);
 		return $query->result();
@@ -133,7 +137,7 @@ class Financemaster_model extends CI_Model
 	public function get_credit_transactions_by_user($originid, $userid)
 	{
 		$query = $this->db->query("SELECT transaction_id, transaction_display_id, 
-				A.transaction_date, C.fullname, A.amount FROM tbl_transaction A
+				A.transaction_date, C.fullname, A.amount, A.concept_general FROM tbl_transaction A
 				INNER JOIN tbl_user_registration C ON C.userid = A.created_by
 				WHERE is_active = 1 AND A.origin_id = $originid AND A.transaction_type = 1 AND A.user_id = $userid 
 				ORDER BY transaction_id DESC");
@@ -143,13 +147,12 @@ class Financemaster_model extends CI_Model
 	public function get_debit_transactions_by_user($originid, $userid)
 	{
 		$query = $this->db->query("SELECT A.transaction_id, A.transaction_display_id, 
-				A.transaction_date, 
-				A.amount, CONCAT(D.ledger_name,' / ', E.name_in_ledger) as expensetype, 
+				A.transaction_date, A.user_id, 
+				A.amount, E.name_in_ledger as expensetype, 
 				B.beneficiary_name, U.fullname as updated_by FROM tbl_transaction A 
 				INNER JOIN tbl_expense_details B ON B.transaction_id = A.transaction_id
 				INNER JOIN tbl_user_registration C ON C.userid = A.created_by 
 				INNER JOIN tbl_user_registration U ON U.userid = A.updated_by 
-				INNER JOIN tbl_ledger_type_master D ON D.id = B.expense_type 
 				INNER JOIN tbl_accounting_heads E ON E.id = B.account_head
 				WHERE A.is_active = 1 AND A.transaction_type = 2 AND A.user_id = $userid AND A.origin_id = $originid  
 				ORDER BY transaction_id DESC");
@@ -633,7 +636,7 @@ class Financemaster_model extends CI_Model
 			// 		AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
 			// 		BETWEEN '$startdate' AND '$enddate')) AND A.product_type_id IN ($producttypeid) AND A.origin_id = $originid GROUP BY B.dispatch_id ORDER BY A.sa_number ASC");
 
-		$query = $this->db->query("SELECT A.id AS export_id, A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
+			$query = $this->db->query("SELECT A.id AS export_id, A.sa_number, CASE WHEN (A.shipped_date IS NULL or A.shipped_date = '') THEN '' ELSE DATE_FORMAT(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),'%M') END AS shipped_date, B.total_pieces, 
 					B.net_volume, B.dispatch_id, C.container_number, B.cft_value, 
 					UPPER(GROUP_CONCAT(DISTINCT D1.invoice_no SEPARATOR ', ')) AS custom_invoice, SUM(DISTINCT D.container_value) AS custom_value, 
 					UPPER(GROUP_CONCAT(DISTINCT E1.invoice_no SEPARATOR ', ')) AS itr_invoice, SUM(DISTINCT E.container_value) AS itr_value, 
@@ -643,7 +646,7 @@ class Financemaster_model extends CI_Model
 					UPPER(GROUP_CONCAT(DISTINCT I1.invoice_no SEPARATOR ', ')) AS phyto_invoice, SUM(DISTINCT I.container_value) AS phyto_value, 
 					UPPER(GROUP_CONCAT(DISTINCT J1.invoice_no SEPARATOR ', ')) AS coteros_invoice, SUM(DISTINCT J.container_value) AS coteros_value, 
 					UPPER(GROUP_CONCAT(DISTINCT K1.invoice_no SEPARATOR ', ')) AS incentive_invoice, SUM(DISTINCT K.container_value) AS incentive_value,
-					UPPER(GROUP_CONCAT(DISTINCT L1.invoice_no SEPARATOR ', ')) AS remobilization_invoice, SUM(DISTINCT L.container_value) AS remobilization_value, 
+					UPPER(GROUP_CONCAT(DISTINCT L1.invoice_no SEPARATOR ', ')) AS other_cost_invoice, SUM(DISTINCT L.container_value) AS other_cost_value, 
 					CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
 					C.dispatch_id
 					FROM tbl_export_container_details A
@@ -665,8 +668,8 @@ class Financemaster_model extends CI_Model
 					LEFT JOIN tbl_export_documents J1 ON J1.export_id = A.id AND J1.export_type = 6 AND J1.is_active = 1 
 					LEFT JOIN tbl_export_document_container K ON K.dispatch_id = C.dispatch_id AND K.export_type = 7 AND K.is_active = 1 
 					LEFT JOIN tbl_export_documents K1 ON K1.export_id = A.id AND K1.export_type = 7 AND K1.is_active = 1  
-					LEFT JOIN tbl_export_document_container L ON L.dispatch_id = C.dispatch_id AND L.export_type = 8 AND L.is_active = 1 
-					LEFT JOIN tbl_export_documents L1 ON L1.export_id = A.id AND L1.export_type = 8 AND L1.is_active = 1 
+					LEFT JOIN tbl_export_document_container L ON L.dispatch_id = C.dispatch_id AND L.export_type = 12 AND L.is_active = 1 
+					LEFT JOIN tbl_export_documents L1 ON L1.export_id = A.id AND L1.export_type = 12 AND L1.is_active = 1 
 					AND C.isduplicatedispatched = 0
 					WHERE A.isactive = 1 AND B.isactive = 1 
 					AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
@@ -1669,10 +1672,89 @@ class Financemaster_model extends CI_Model
 	}
 
 	public function get_container_cost($exportid, $dispatchid)
-    {
-        $strQuery = "SELECT dispatch_id, unit_price, exchange_rate FROM tbl_export_document_container_cost 
+	{
+		$strQuery = "SELECT dispatch_id, unit_price, exchange_rate FROM tbl_export_document_container_cost 
             WHERE is_active = 1 AND export_id = $exportid AND dispatch_id = $dispatchid";
-        $query = $this->db->query($strQuery);
+		$query = $this->db->query($strQuery);
+		return $query->result();
+	}
+
+	public function get_container_loading_cost($exportid, $dispatchid)
+	{
+		$strQuery = "SELECT loading_cost FROM tbl_export_document_loading_cost 
+            WHERE is_active = 1 AND export_id = $exportid AND dispatch_id = $dispatchid";
+		$query = $this->db->query($strQuery);
+		return $query->result();
+	}
+
+	public function delete_credit_transaction($transactionId, $displayId, $userid)
+	{
+		$updateData = array(
+			"is_active" => 0,
+			"updated_by" => $userid,
+		);
+		$multiClause = array('transaction_id' => $transactionId, 'transaction_display_id' => $displayId);
+		$this->db->where($multiClause);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		if ($this->db->update('tbl_transaction', $updateData)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function get_credit_details_by_id($transactionId, $displayId, $originId, $userId)
+    {
+        $query = $this->db->query("SELECT transaction_id, transaction_display_id, amount, transaction_date, concept_general 
+			FROM tbl_transaction WHERE is_active = 1 AND origin_id = $originId AND transaction_display_id = '$displayId' 
+			AND transaction_id = $transactionId AND user_id = $userId");
         return $query->result();
     }
+
+	public function update_credit_details($transactionId, $displayId, $userid, $originId, $data)
+	{
+		$multiClause = array('transaction_type' => 1, 'transaction_id' => $transactionId, 'transaction_display_id' => $displayId, 'user_id' => $userid, 'origin_id' => $originId);
+		$this->db->where($multiClause);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		if ($this->db->update('tbl_transaction', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function get_debit_details_by_id($transactionId, $displayId, $originId, $userId)
+    {
+        $query = $this->db->query("SELECT A.credit_transaction_id,  A.transaction_id, A.transaction_display_id, A.amount, 
+			B.expense_date, B.account_head, B.beneficiary_name, B.document_number, B.expense_uploaded_image 
+			FROM tbl_transaction A 
+			INNER JOIN tbl_expense_details B ON B.transaction_id = A.transaction_id AND B.transaction_display_id = A.transaction_display_id
+			WHERE A.is_active = 1 AND A.origin_id = $originId AND A.transaction_display_id = '$displayId' 
+			AND A.transaction_id = $transactionId AND user_id = $userId");
+        return $query->result();
+    }
+
+	public function update_debit_details($transactionId, $displayId, $userid, $originId, $data)
+	{
+		$multiClause = array('transaction_type' => 2, 'transaction_id' => $transactionId, 'transaction_display_id' => $displayId, 'user_id' => $userid, 'origin_id' => $originId);
+		$this->db->where($multiClause);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		if ($this->db->update('tbl_transaction', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function update_debit_expense_details($transactionId, $displayId, $data)
+	{
+		$multiClause = array('transaction_id' => $transactionId, 'transaction_display_id' => $displayId);
+		$this->db->where($multiClause);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		if ($this->db->update('tbl_expense_details', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
