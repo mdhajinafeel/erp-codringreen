@@ -14,6 +14,7 @@ class Expenseledgerreport extends MY_Controller
         $this->load->model("Financemaster_model");
         $this->load->model("Expense_model");
         $this->load->library('excel');
+        $this->load->library('zip');
     }
 
     public function output($Return = array())
@@ -496,6 +497,94 @@ class Expenseledgerreport extends MY_Controller
         }
     }
 
+    public function download_expense_ledger_files()
+    {
+        try {
+
+            $session = $this->session->userdata("fullname");
+
+            $Return = array("result" => "", "error" => "", "redirect" => false, "csrf_hash" => "", "successmessage" => "");
+
+            if (empty($session)) {
+                redirect("/logout");
+            }
+
+            $this->deletefilesfromfolder();
+            $Return['csrf_hash'] = $this->security->get_csrf_hash();
+
+            $originId       = $this->input->post("originId");
+            $userId         = $this->input->post("userId");
+            $fromDate       = $this->input->post("fromDate");
+            $toDate         = $this->input->post("toDate");
+            $conceptGeneral = $this->input->post("conceptGeneral");
+            $accountHead    = $this->input->post("accountHead");
+
+            // 📁 Public download folder
+            $downloadDir = FCPATH . 'uploads/downloadedphotos/';
+            if (!is_dir($downloadDir)) {
+                mkdir($downloadDir, 0777, true);
+            }
+
+            // 📦 ZIP name
+            $zipFileName = 'facturas_' . time() . '.zip';
+            $zipFullPath = $downloadDir . $zipFileName;
+
+            $zip = new ZipArchive();
+            if ($zip->open($zipFullPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+                $Return["error"] = $this->lang->line('file_creation_failed');
+                $this->output($Return);
+                return;
+            }
+
+            // 🔍 Fetch data
+            $fetchExpenseReportDetails =
+                $this->Expense_model->fetch_expense_report_details($originId, $userId, $fromDate, $toDate, $conceptGeneral, $accountHead);
+
+            if (count($fetchExpenseReportDetails) == 0) {
+                $zip->close();
+                unlink($zipFullPath);
+
+                $Return["error"] = $this->lang->line('no_data_reports');
+                $this->output($Return);
+                return;
+            }
+
+            // ➕ Add files
+            foreach ($fetchExpenseReportDetails as $row) {
+
+                if (empty($row->expense_uploaded_image)) {
+                    continue;
+                }
+
+                $fileName = basename(parse_url($row->expense_uploaded_image, PHP_URL_PATH));
+                $localPath = FCPATH . 'uploads/expensedocuments/' . $fileName;
+
+                if (file_exists($localPath)) {
+                    // Prevent duplicate names in ZIP
+                    $zip->addFile($localPath, uniqid() . '_' . $fileName);
+                }
+            }
+
+            $zip->close();
+
+            // ✅ Success response
+            $Return['result'] = $this->lang->line('file_downloaded');
+            $Return['downloadfile'] = site_url('uploads/downloadedphotos/' . $zipFileName);
+            $Return['redirect'] = false;
+
+            $this->output($Return);
+
+        } catch (Exception $e) {
+
+            $Return["error"] = $e->getMessage();
+            $Return["result"] = "";
+            $Return["redirect"] = false;
+            $Return["csrf_hash"] = $this->security->get_csrf_hash();
+            $this->output($Return);
+            exit;
+        }
+    }
+
     public function deletefilesfromfolder()
     {
         $files = glob(FCPATH . "reports/*.xlsx");
@@ -506,6 +595,13 @@ class Expenseledgerreport extends MY_Controller
         }
 
         $files = glob(FCPATH . "reports/ExpenseReports/*.xlsx");
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
+
+        $files = glob(FCPATH . "uploads/downloadedphotos/*.zip");
         foreach ($files as $file) {
             if (is_file($file)) {
                 unlink($file);

@@ -1096,3 +1096,5 @@ $lang["balance"] = "Saldo";
 $lang["employee_signature"] = "Firma de empleado";
 $lang['debitregistry_title'] = 'Registro de Débito';
 $lang['download_file'] = 'Descargar Archivo';
+$lang['download_invoices'] = 'Descargar Facturas';
+$lang['file_creation_failed'] = 'La creación del archivo falló. Por favor, inténtelo de nuevo.';

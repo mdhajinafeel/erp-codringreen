@@ -173,7 +173,7 @@ class Expense_model extends CI_Model
 
     public function fetch_expense_report_details($originId, $userId, $fromDate, $toDate, $conceptGeneral, $accountHead) {
 
-        $sqlQuery = "SELECT B.expense_date, B.beneficiary_name, B.document_number, C.name_in_ledger, A.amount 
+        $sqlQuery = "SELECT B.expense_date, B.beneficiary_name, B.document_number, C.name_in_ledger, A.amount, B.expense_uploaded_image  
             FROM tbl_transaction A 
             INNER JOIN tbl_expense_details B ON B.transaction_id = A.transaction_id 
             INNER JOIN tbl_accounting_heads C ON C.id = B.account_head 

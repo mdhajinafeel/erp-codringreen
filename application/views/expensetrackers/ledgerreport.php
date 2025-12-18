@@ -70,6 +70,9 @@ $applicable_origins = $session["applicable_origins"];
                     <button class="btn btn-primary btn-block" title="<?php echo $this->lang->line("download_reports"); ?>" type="button" id="btn_download_reports">
                         <span class="ms-1"><?php echo $this->lang->line("download_reports"); ?></span></button>
 
+                    <button class="btn btn-primary btn-success ml-10" title="<?php echo $this->lang->line("download_invoices"); ?>" type="button" id="btn_download_files">
+                        <span class="ms-1"><?php echo $this->lang->line("download_invoices"); ?></span></button>
+
                     <button class="btn btn-danger btn-block ml-10" title="<?php echo $this->lang->line("reset"); ?>" type="button" id="btn_reset">
                         <span class="ms-1"><?php echo $this->lang->line("reset"); ?></span></button>
                 </div>
@@ -187,6 +190,77 @@ $applicable_origins = $session["applicable_origins"];
                             toastr.success(response.successmessage);
                             $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
                             window.location = response.result;
+                        }
+                    }
+                });
+            }
+        });
+
+        $("#btn_download_files").click(function() {
+            var isValid = true;
+            var originReport = $("#origin_report").val();
+            var userName = $("#user_name").val();
+            var fromDate = $("#report_from_date").val();
+            var toDate = $("#report_to_date").val();
+
+            if (originReport == 0) {
+                $("#error-origin").show();
+                isValid = false;
+            } else {
+                $("#error-origin").hide();
+            }
+
+            if (userName == 0) {
+                $("#error-name").show();
+                isValid = false;
+            } else {
+                $("#error-name").hide();
+            }
+
+            if(fromDate.length > 0 && toDate.length == 0) {
+                $("#error-to_date").show();
+                isValid = false;
+            } else {
+                $("#error-to_date").hide();
+            }
+
+            if (isValid) {
+                var originId = $("#origin_report").val();
+                var userId = $("#user_name").val();
+
+                var conceptGeneral = $("#concept_general").val();
+                var accountHead = $("#accounthead").val();
+
+                $("#loading").show();
+                var fd = new FormData();
+                fd.append("type", "ledgerreport_files");
+
+                fd.append("originId", originId);
+                fd.append("userId", userId);
+                fd.append("fromDate", fromDate);
+                fd.append("toDate", toDate);
+                fd.append("conceptGeneral", conceptGeneral);
+                fd.append("accountHead", accountHead);
+
+                fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+                toastr.info(processing_request);
+                $.ajax({
+                    url: base_url + "/download_expense_ledger_files",
+                    type: "POST",
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        $("#loading").hide();
+                        if (response.redirect == true) {
+                            window.location.replace(login_url);
+                        } else if (response.error != '') {
+                            toastr.error(response.error);
+                            $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
+                        } else {
+                            toastr.success(response.result);
+                            $('input[name="csrf_cgrerp"]').val(response.csrf_hash);
+                            window.location = response.downloadfile;
                         }
                     }
                 });

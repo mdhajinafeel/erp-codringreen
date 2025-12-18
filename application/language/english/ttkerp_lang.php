@@ -1096,3 +1096,5 @@ $lang["balance"] = "Balance";
 $lang["employee_signature"] = "Employee Signature";
 $lang['debitregistry_title'] = 'Debit Registry';
 $lang['download_file'] = 'Download File';
+$lang['download_invoices'] = 'Download Invoices';
+$lang['file_creation_failed'] = 'File creation failed';
