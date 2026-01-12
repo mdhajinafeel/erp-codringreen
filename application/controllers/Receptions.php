@@ -1,7 +1,7 @@
 <?php
 
- error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
-        ini_set('display_errors', '0');
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING);
+ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -253,8 +253,12 @@ class Receptions extends MY_Controller
             $session = $this->session->userdata('fullname');
 
             $Return = array(
-                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
-                'warning' => '', 'success' => '',
+                'result' => '',
+                'error' => '',
+                'redirect' => false,
+                'csrf_hash' => '',
+                'warning' => '',
+                'success' => '',
             );
 
             if (!empty($session)) {
@@ -671,7 +675,7 @@ class Receptions extends MY_Controller
     {
         $Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
         $session = $this->session->userdata('fullname');
-        
+
         if ($this->input->post('add_type') == 'reception') {
 
             if (!empty($session)) {
@@ -720,14 +724,25 @@ class Receptions extends MY_Controller
                             } else if ($producttypeid == 2 || $producttypeid == 4) {
 
                                 $dataReception = array(
-                                    "warehouse_id" => $warehouseid, "supplier_id" => $supplierid,
-                                    "supplier_code" => $suppliercode, "supplier_product_id" => $productid,
-                                    "supplier_product_typeid" => $producttypeid, "measurementsystem_id" => $measurementsystemid,
-                                    "received_date" => $receptiondate, "salvoconducto" => $inventoryorder,
-                                    "createdby" => $session['user_id'], "updatedby" => $session['user_id'], "isactive" => 1,
-                                    "isclosed" => 0, "closedby" => 0, "captured_timestamp" => 0, "isduplicatecaptured" => 0,
-                                    "is_special_uploaded" => $isspecialuploaded, "origin_id" => $originid,
-                                    "total_volume" => $totalvolumeuploaded, "total_pieces" => $totalpiecesuploaded,
+                                    "warehouse_id" => $warehouseid,
+                                    "supplier_id" => $supplierid,
+                                    "supplier_code" => $suppliercode,
+                                    "supplier_product_id" => $productid,
+                                    "supplier_product_typeid" => $producttypeid,
+                                    "measurementsystem_id" => $measurementsystemid,
+                                    "received_date" => $receptiondate,
+                                    "salvoconducto" => $inventoryorder,
+                                    "createdby" => $session['user_id'],
+                                    "updatedby" => $session['user_id'],
+                                    "isactive" => 1,
+                                    "isclosed" => 0,
+                                    "closedby" => 0,
+                                    "captured_timestamp" => 0,
+                                    "isduplicatecaptured" => 0,
+                                    "is_special_uploaded" => $isspecialuploaded,
+                                    "origin_id" => $originid,
+                                    "total_volume" => $totalvolumeuploaded,
+                                    "total_pieces" => $totalpiecesuploaded,
                                 );
 
                                 $insertReception = $this->Reception_model->add_reception($dataReception);
@@ -735,8 +750,12 @@ class Receptions extends MY_Controller
                                 if ($insertReception > 0) {
 
                                     $dataReceptionTracking = array(
-                                        "reception_id" => $insertReception, "user_id" => $session['user_id'],
-                                        "isclosed" => 0, "createdby" => $session['user_id'], "updatedby" => $session['user_id'], "isactive" => 1,
+                                        "reception_id" => $insertReception,
+                                        "user_id" => $session['user_id'],
+                                        "isclosed" => 0,
+                                        "createdby" => $session['user_id'],
+                                        "updatedby" => $session['user_id'],
+                                        "isactive" => 1,
                                     );
 
                                     $insertReceptionTracking = $this->Reception_model->add_reception_tracking($dataReceptionTracking);
@@ -758,15 +777,30 @@ class Receptions extends MY_Controller
 
                                         if ($noOfPieces > 0) {
                                             $dataReceptionData[] = array(
-                                                "reception_id" => $insertReception, "salvoconducto" => $inventoryorder,
-                                                "scanned_code" => $noOfPieces, "length_bought" => $length,
-                                                "width_bought" => 0, "thickness_bought" => 0,
-                                                "circumference_bought" => $circumference, "volumepie_bought" => 0,
-                                                "cbm_bought" => $grossVolume, "length_export" => 0, "width_export" => 0,
-                                                "thickness_export" => 0, "cbm_export" => $netVolume, "grade" => 0,
-                                                "createdby" => $session['user_id'], "updatedby" => $session['user_id'], "isactive" => 1,
-                                                "isdispatch" => 0, "scanned_timestamp" => 0, "isduplicatescanned" => 0, "is_special" => $isspecialuploaded,
-                                                "createddate" => date('Y-m-d H:i:s'), "updateddate" => date('Y-m-d H:i:s'), "remaining_stock_count" => $remainingstockcount,
+                                                "reception_id" => $insertReception,
+                                                "salvoconducto" => $inventoryorder,
+                                                "scanned_code" => $noOfPieces,
+                                                "length_bought" => $length,
+                                                "width_bought" => 0,
+                                                "thickness_bought" => 0,
+                                                "circumference_bought" => $circumference,
+                                                "volumepie_bought" => 0,
+                                                "cbm_bought" => $grossVolume,
+                                                "length_export" => 0,
+                                                "width_export" => 0,
+                                                "thickness_export" => 0,
+                                                "cbm_export" => $netVolume,
+                                                "grade" => 0,
+                                                "createdby" => $session['user_id'],
+                                                "updatedby" => $session['user_id'],
+                                                "isactive" => 1,
+                                                "isdispatch" => 0,
+                                                "scanned_timestamp" => 0,
+                                                "isduplicatescanned" => 0,
+                                                "is_special" => $isspecialuploaded,
+                                                "createddate" => date('Y-m-d H:i:s'),
+                                                "updateddate" => date('Y-m-d H:i:s'),
+                                                "remaining_stock_count" => $remainingstockcount,
                                             );
                                         }
                                     }
@@ -827,7 +861,9 @@ class Receptions extends MY_Controller
                     if ($input_inventory_order == $inventory_order) {
 
                         $dataReception = array(
-                            "warehouse_id" => $warehouseid, "received_date" => $receiveddate, "updatedby" => $session['user_id']
+                            "warehouse_id" => $warehouseid,
+                            "received_date" => $receiveddate,
+                            "updatedby" => $session['user_id']
                         );
 
                         $updateReception = $this->Reception_model->update_reception($receptionid, $inventory_order, $dataReception);
@@ -852,8 +888,10 @@ class Receptions extends MY_Controller
                         if ($getInventoryOrderCount[0]->cnt == 0) {
 
                             $dataReception = array(
-                                "warehouse_id" => $warehouseid, "salvoconducto" => $input_inventory_order,
-                                "received_date" => $receiveddate, "updatedby" => $session['user_id']
+                                "warehouse_id" => $warehouseid,
+                                "salvoconducto" => $input_inventory_order,
+                                "received_date" => $receiveddate,
+                                "updatedby" => $session['user_id']
                             );
 
                             $updateReception = $this->Reception_model->update_reception($receptionid, $inventory_order, $dataReception);
@@ -861,7 +899,8 @@ class Receptions extends MY_Controller
                             if ($updateReception == true) {
 
                                 $dataReceptionData = array(
-                                    "salvoconducto" => $input_inventory_order, "updatedby" => $session['user_id']
+                                    "salvoconducto" => $input_inventory_order,
+                                    "updatedby" => $session['user_id']
                                 );
 
                                 $updateReceptionData = $this->Reception_model->update_reception_data($receptionid, $inventory_order, $dataReceptionData);
@@ -1009,7 +1048,10 @@ class Receptions extends MY_Controller
             $session = $this->session->userdata('fullname');
 
             $Return = array(
-                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
+                'result' => '',
+                'error' => '',
+                'redirect' => false,
+                'csrf_hash' => '',
                 'successmessage' => ''
             );
 
@@ -1097,7 +1139,7 @@ class Receptions extends MY_Controller
                     }
 
 
-                    if ($getReceptionDetails[0]->product_id == 2 && ($getReceptionDetails[0]->measurementsystem_id == 1 || $getReceptionDetails[0]->measurementsystem_id == 4)) {
+                    if (($getReceptionDetails[0]->product_id == 2 || $getReceptionDetails[0]->product_id == 4) && ($getReceptionDetails[0]->measurementsystem_id == 1 || $getReceptionDetails[0]->measurementsystem_id == 4)) {
 
                         $objSheet->SetCellValue("A$rowCount", $this->lang->line('length') . ' ' . $this->lang->line('feet'));
                         $objSheet->SetCellValue("B$rowCount", $this->lang->line('width') . ' ' . $this->lang->line('inch'));
@@ -1131,28 +1173,84 @@ class Receptions extends MY_Controller
                         $objSheet->getStyle("A$rowCount:L$rowCount")->applyFromArray($styleArray);
 
                         $rowCountData = 9;
-                        $txtFeet = '"ft"';
-                        $txtMeter = '"m"';
-                        $txtInch = '"in"';
-                        $txtCm = '"cm"';
                         foreach ($getReceptionDataDetails as $receptiondata) {
 
-                            $objSheet->SetCellValue("A$rowCountData", ($receptiondata->length_bought + 0));
-                            $objSheet->SetCellValue("B$rowCountData", ($receptiondata->width_bought + 0));
-                            $objSheet->SetCellValue("C$rowCountData", ($receptiondata->thickness_bought + 0));
-                            $objSheet->SetCellValue("D$rowCountData", $receptiondata->scanned_code);
+                            // Numeric inputs
+                            $length_ft   = (float)$receptiondata->length_bought;
+                            $width_in    = (float)$receptiondata->width_bought;
+                            $thick_in    = (float)$receptiondata->thickness_bought;
+                            $scanCount   = (float)$receptiondata->scanned_code;
+                            $stockCount = (float)$receptiondata->remaining_stock_count;
 
-                            $objSheet->SetCellValue("E$rowCountData", "=IFERROR(TRUNC((A$rowCountData*B$rowCountData*C$rowCountData/12)*D$rowCountData,0),0)");
-                            $objSheet->SetCellValue("F$rowCountData", "=IFERROR(B$rowCountData*C$rowCountData,0)");
-                            $objSheet->SetCellValue("G$rowCountData", "=ROUND(((CONVERT(A$rowCountData,$txtFeet,$txtMeter))*(CONVERT(B$rowCountData,$txtInch,$txtMeter))*(CONVERT(C$rowCountData,$txtInch,$txtMeter))),3) * D$rowCountData");
-                            $objSheet->SetCellValue("H$rowCountData", "=IFERROR(ROUND((TRUNC(CONVERT(A$rowCountData,$txtFeet,$txtMeter),2))*(TRUNC(CONVERT(B$rowCountData,$txtInch,$txtCm),2))*(TRUNC(CONVERT(C$rowCountData,$txtInch,$txtCm),2))/10000,3)*D$rowCountData,0)");
+                            // Sheet values
+                            $objSheet->setCellValueExplicit("A$rowCountData", $length_ft, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            $objSheet->setCellValueExplicit("B$rowCountData", $width_in, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            $objSheet->setCellValueExplicit("C$rowCountData", $thick_in, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            $objSheet->setCellValue("D$rowCountData", $scanCount);
 
-                            $objSheet->SetCellValue("I$rowCountData", $receptiondata->remaining_stock_count);
-                            $objSheet->SetCellValue("J$rowCountData", "=ROUND(((CONVERT(A$rowCountData,$txtFeet,$txtMeter))*(CONVERT(B$rowCountData,$txtInch,$txtMeter))*(CONVERT(C$rowCountData,$txtInch,$txtMeter))),3) * I$rowCountData");
-                            $objSheet->SetCellValue("K$rowCountData", "=IFERROR(ROUND((TRUNC(CONVERT(A$rowCountData,$txtFeet,$txtMeter),2))*(TRUNC(CONVERT(B$rowCountData,$txtInch,$txtCm),2))*(TRUNC(CONVERT(C$rowCountData,$txtInch,$txtCm),2))/10000,3)*I$rowCountData,0)");
+                            // Existing formulas (these are SAFE)
+                            $objSheet->setCellValue(
+                                "E$rowCountData",
+                                "=IFERROR(TRUNC((A$rowCountData*B$rowCountData*C$rowCountData/12),2)*D$rowCountData,0)"
+                            );
 
-                            $objSheet->SetCellValue("L$rowCountData", $receptiondata->container_number);
-                            
+                            $objSheet->setCellValue(
+                                "F$rowCountData",
+                                "=IFERROR(B$rowCountData*C$rowCountData,0)"
+                            );
+
+                            $objSheet->setCellValueExplicit(
+                                "I$rowCountData",
+                                $stockCount,
+                                PHPExcel_Cell_DataType::TYPE_NUMERIC
+                            );
+
+                            $objSheet->setCellValueExplicit(
+                                "D$rowCountData",
+                                $scanCount,
+                                PHPExcel_Cell_DataType::TYPE_NUMERIC
+                            );
+
+                            // Convert units
+                            $length_m = $length_ft * 0.3048;
+                            $width_m  = $width_in * 0.0254;
+                            $thick_m  = $thick_in * 0.0254;
+
+                            $width_cm = $width_in * 2.54;
+                            $thick_cm = $thick_in * 2.54;
+
+                            // J column (CBM in meters)
+                            $jValue = round(($length_m * $width_m * $thick_m), 3) * $stockCount;
+                            $gValue = round(($length_m * $width_m * $thick_m), 3) * $scanCount;
+
+                            // K column (CBM using CM logic)
+                            $kValue = round(
+                                (
+                                    round($length_m, 2) *
+                                    round($width_cm, 2) *
+                                    round($thick_cm, 2)
+                                ) / 10000,
+                                3
+                            ) * $stockCount;
+                            $hValue = round(
+                                (
+                                    round($length_m, 2) *
+                                    round($width_cm, 2) *
+                                    round($thick_cm, 2)
+                                ) / 10000,
+                                3
+                            ) * $scanCount;
+
+
+                            // Set calculated values
+                            $objSheet->setCellValueExplicit("G$rowCountData", $gValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            $objSheet->setCellValueExplicit("H$rowCountData", $hValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            $objSheet->setCellValueExplicit("J$rowCountData", $jValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            $objSheet->setCellValueExplicit("K$rowCountData", $kValue, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+
+                            // Other data
+                            $objSheet->setCellValue("L$rowCountData", $receptiondata->container_number);
+
                             $rowCountData++;
                         }
 
@@ -1176,9 +1274,10 @@ class Receptions extends MY_Controller
                         $objSheet->getColumnDimension("J")->setAutoSize(true);
                         $objSheet->getColumnDimension("K")->setAutoSize(true);
                         $objSheet->getColumnDimension("L")->setAutoSize(false)->setWidth(40);
-
-                    } else if ($getReceptionDetails[0]->measurementsystem_id == 2 || $getReceptionDetails[0]->measurementsystem_id == 3 
-                            || $getReceptionDetails[0]->measurementsystem_id == 5 || $getReceptionDetails[0]->measurementsystem_id == 6 || $getReceptionDetails[0]->measurementsystem_id == 12 || $getReceptionDetails[0]->measurementsystem_id == 14) {
+                    } else if (
+                        $getReceptionDetails[0]->measurementsystem_id == 2 || $getReceptionDetails[0]->measurementsystem_id == 3
+                        || $getReceptionDetails[0]->measurementsystem_id == 5 || $getReceptionDetails[0]->measurementsystem_id == 6 || $getReceptionDetails[0]->measurementsystem_id == 12 || $getReceptionDetails[0]->measurementsystem_id == 14
+                    ) {
 
                         $objSheet->SetCellValue("A$rowCount", $this->lang->line("circumference"));
                         $objSheet->SetCellValue("B$rowCount", $this->lang->line("length"));
@@ -1210,68 +1309,68 @@ class Receptions extends MY_Controller
 
                         $rowCountData = 9;
                         foreach ($getReceptionDataDetails as $receptiondata) {
-                            
-                            if($getReceptionDetails[0]->measurementsystem_id == 12 || $getReceptionDetails[0]->measurementsystem_id == 14) {
+
+                            if ($getReceptionDetails[0]->measurementsystem_id == 12 || $getReceptionDetails[0]->measurementsystem_id == 14) {
 
                                 $grossVolumeFormulae = str_replace(
                                     array('$l', '$c', '$pcs'),
                                     array("B$rowCountData", "A$rowCountData", "C$rowCountData"),
                                     $grossVolumeFormula
                                 );
-    
+
                                 $netVolumeFormulae = str_replace(
                                     array('$ac', '$al', '$l', '$c', '$pcs'),
                                     array($getReceptionDetails[0]->circ_allowance, $getReceptionDetails[0]->length_allowance, "B$rowCountData", "A$rowCountData", "C$rowCountData"),
                                     $netVolumeFormula
                                 );
-                                
+
                                 $grossVolumeFormulae1 = str_replace(
                                     array('$l', '$c', '$pcs'),
                                     array("B$rowCountData", "A$rowCountData", "F$rowCountData"),
                                     $grossVolumeFormula
                                 );
-    
+
                                 $netVolumeFormulae1 = str_replace(
                                     array('$ac', '$al', '$l', '$c', '$pcs'),
                                     array($getReceptionDetails[0]->circ_allowance, $getReceptionDetails[0]->length_allowance, "B$rowCountData", "A$rowCountData",  "F$rowCountData"),
                                     $netVolumeFormula
                                 );
-    
+
                                 $objSheet->SetCellValue("A$rowCountData", ($receptiondata->circumference_bought + 0));
                                 $objSheet->SetCellValue("B$rowCountData", ($receptiondata->length_bought + 0));
                                 $objSheet->SetCellValue("C$rowCountData", ($receptiondata->scanned_code + 0));
                                 $objSheet->SetCellValue("F$rowCountData", ($receptiondata->remaining_stock_count + 0));
-                                
+
                                 $objSheet->SetCellValue("D$rowCountData", "=$grossVolumeFormulae");
                                 $objSheet->SetCellValue("E$rowCountData", "=$netVolumeFormulae");
                                 $objSheet->SetCellValue("G$rowCountData", "=$grossVolumeFormulae1");
                                 $objSheet->SetCellValue("H$rowCountData", "=$netVolumeFormulae1");
-    
+
                                 $objSheet->SetCellValue("I$rowCountData", $receptiondata->container_number);
                                 $rowCountData++;
                             } else {
-                                 $grossVolumeFormulae = str_replace(
+                                $grossVolumeFormulae = str_replace(
                                     array('$l', '$c'),
                                     array("B$rowCountData", "A$rowCountData"),
                                     $grossVolumeFormula
                                 );
-    
+
                                 $netVolumeFormulae = str_replace(
                                     array('$l', '$c'),
                                     array("B$rowCountData", "A$rowCountData"),
                                     $netVolumeFormula
                                 );
-    
+
                                 $objSheet->SetCellValue("A$rowCountData", ($receptiondata->circumference_bought + 0));
                                 $objSheet->SetCellValue("B$rowCountData", ($receptiondata->length_bought + 0));
                                 $objSheet->SetCellValue("C$rowCountData", ($receptiondata->scanned_code + 0));
                                 $objSheet->SetCellValue("F$rowCountData", ($receptiondata->remaining_stock_count + 0));
-                                
+
                                 $objSheet->SetCellValue("D$rowCountData", "=$grossVolumeFormulae*C$rowCountData");
                                 $objSheet->SetCellValue("E$rowCountData", "=$netVolumeFormulae*C$rowCountData");
                                 $objSheet->SetCellValue("G$rowCountData", "=$grossVolumeFormulae*F$rowCountData");
                                 $objSheet->SetCellValue("H$rowCountData", "=$netVolumeFormulae*F$rowCountData");
-    
+
                                 $objSheet->SetCellValue("I$rowCountData", $receptiondata->container_number);
                                 $rowCountData++;
                             }
@@ -1282,8 +1381,8 @@ class Receptions extends MY_Controller
 
                         $objSheet->SetCellValue("D3", "=SUM(C9:C$rowCountData)");
                         $objSheet->SetCellValue("D5", "=SUM(F9:F$rowCountData)");
-                        
-                        if($getReceptionDetails[0]->rounding_factor > 0) {
+
+                        if ($getReceptionDetails[0]->rounding_factor > 0) {
                             $roundingFactorVal = $getReceptionDetails[0]->rounding_factor;
                             $objSheet->SetCellValue("D4", "=ROUND(SUM(E9:E$rowCountData), $roundingFactorVal)");
                             $objSheet->SetCellValue("D6", "=ROUND(SUM(H9:H$rowCountData), $roundingFactorVal)");

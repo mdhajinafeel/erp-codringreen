@@ -63,6 +63,8 @@ class Syncexpensedata extends MY_Controller
                 $transactionDisplayId = $row["transactionDisplayId"];
                 $isDeleted = filter_var($row["isDeleted"] ?? false, FILTER_VALIDATE_BOOLEAN);
                 $isEdited  = filter_var($row["isDataEdited"] ?? false, FILTER_VALIDATE_BOOLEAN);
+                $isForestry  = filter_var($row["isForestry"] ?? false, FILTER_VALIDATE_BOOLEAN);
+                $forestryCostType = $row["forestryCostType"];
 
                 $exists = $this->Expense_model->check_existing_transaction_count($timestamp, $userid, $originid);
 
@@ -93,7 +95,9 @@ class Syncexpensedata extends MY_Controller
                             "credit_transaction_id" => $creditTransactionId,
                             "amount" => $row["amount"],
                             "transaction_date" => $row["expenseDate"],
-                            "updated_by" => $userid
+                            "updated_by" => $userid, 
+                            "is_forestry" => $isForestry,
+                            "forestry_cost_type" => $forestryCostType
                         ]
                     );
 
@@ -130,7 +134,9 @@ class Syncexpensedata extends MY_Controller
                         "temp_expense_id" => "T_" . $timestamp,
                         "created_by" => $userid,
                         "updated_by" => $userid,
-                        "is_active" => 1
+                        "is_active" => 1,
+                        "is_forestry" => $isForestry,
+                        "forestry_cost_type" => $forestryCostType
                     ], true);
 
 

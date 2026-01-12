@@ -1,7 +1,7 @@
 <?php
 
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
-ini_set('display_errors', '0');
+// error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
+// ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -91,6 +91,7 @@ class Purchasecontracts extends MY_Controller
             $data[] = array(
                 $editContract,
                 $r->supplier_name,
+                $r->description,
                 $r->contract_code,
                 $contractType,
                 $measurmentSystem,
@@ -379,6 +380,7 @@ class Purchasecontracts extends MY_Controller
                 $contractstatus = $this->input->post('contractstatus');
                 $pricearray = $this->input->post('pricearray');
                 $description = $this->input->post('description');
+                $extractionCost = $this->input->post('extraction_cost');
 
                 if ($this->input->post('page_type') == 'add') {
 
@@ -413,6 +415,7 @@ class Purchasecontracts extends MY_Controller
                             "end_date" => $enddate,
                             "remaining_volume" => $totalvolume,
                             "description" => $description,
+                            "extraction_cost" => $extractionCost,
                             "is_expired" => 0,
                             "created_by" => $session['user_id'],
                             "updated_by" => $session['user_id'],
@@ -469,14 +472,14 @@ class Purchasecontracts extends MY_Controller
 
                     $isExpired = 0;
 
-                    $expDate =  date_create($newformat);
-                    $todayDate = date_create($today);
-                    $diff =  date_diff($todayDate, $expDate);
-                    if ($diff->format("%R%a") > 0) {
-                        $isExpired = 0;
-                    } else {
-                        $isExpired = 1;
-                    }
+                    // $expDate =  date_create($newformat);
+                    // $todayDate = date_create($today);
+                    // $diff =  date_diff($todayDate, $expDate);
+                    // if ($diff->format("%R%a") > 0) {
+                    //     $isExpired = 0;
+                    // } else {
+                    //     $isExpired = 1;
+                    // }
 
                     if ($contractstatus == 0) {
                         $dataPurchaseContract = array(
@@ -485,6 +488,7 @@ class Purchasecontracts extends MY_Controller
                             "end_date" => $enddate,
                             "remaining_volume" => $remainingVolume,
                             "description" => $description,
+                            "extraction_cost" => $extractionCost,
                             "is_expired" => $isExpired,
                             "updated_by" => $session['user_id'],
                             'is_active' => 0,
@@ -496,6 +500,7 @@ class Purchasecontracts extends MY_Controller
                             "end_date" => $enddate,
                             "remaining_volume" => $remainingVolume,
                             "description" => $description,
+                            "extraction_cost" => $extractionCost,
                             "is_expired" => $isExpired,
                             "updated_by" => $session['user_id'],
                             'is_active' => 1,
@@ -604,6 +609,7 @@ class Purchasecontracts extends MY_Controller
                     'total_volume' => ($getContractDetails[0]->total_volume + 0),
                     'remaining_volume' => ($getContractDetails[0]->remaining_volume + 0),
                     'currency_abbreviation' => $getContractDetails[0]->currency_abbreviation,
+                    'extraction_cost' => $getContractDetails[0]->extraction_cost + 0,
                 );
                 $this->load->view('purchasecontracts/dialog_view_contract', $data);
             } else {

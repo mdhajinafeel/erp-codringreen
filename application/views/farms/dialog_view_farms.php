@@ -19,6 +19,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 	<input type="hidden" id="hdnContractId" name="hdnContractId" value="<?php echo $contractid; ?>">
 	<input type="hidden" id="hdnInventoryOrder" name="hdnInventoryOrder" value="<?php echo $inventoryorder; ?>">
 	<input type="hidden" id="hdnOriginId" name="hdnOriginId" value="<?php echo $farm_details[0]->origin_id; ?>">
+	<input type="hidden" id="hdnCsrf" name="hdnCsrf" value="<?php echo $csrf_hash; ?>">
 
 	<div class="row mb-3">
 		<div class="col-md-6">
@@ -382,6 +383,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 				fd.append("extractionCost", extraction_cost);
 				fd.append("loadingCost", loading_cost);
 				fd.append("unloadingCost", unloading_cost);
+				fd.append("csrf_cgrerp", $("#hdnCsrf").val());
 
 				$(".action_button").prop('disabled', true);
 				toastr.info(processing_request);

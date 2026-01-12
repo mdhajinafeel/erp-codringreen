@@ -72,7 +72,7 @@ class Financemaster_model extends CI_Model
 	public function all_account_heads($originid)
 	{
 		$strQuery = "SELECT A.id, A.code, A.name_in_ledger, A.name_in_app, A.ledger_type, A.is_active, A.icon, 
-			getapplicableorigins_byid(A.origin_id) AS origin, A.color_code_primary, A.color_code_secondary FROM tbl_accounting_heads A";
+			getapplicableorigins_byid(A.origin_id) AS origin, A.color_code_primary, A.color_code_secondary, A.is_forestry, A.forestry_cost_type FROM tbl_accounting_heads A";
 
 		//$strQuery = "SELECT A.id, A.code, A.name_in_ledger, A.name_in_app, A.ledger_type, B.ledger_name, A.is_active, getapplicableorigins_byid(A.origin_id) AS origin FROM tbl_accounting_heads A"
 		//INNER JOIN tbl_ledger_type_master B ON B.id = A.ledger_type";

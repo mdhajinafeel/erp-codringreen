@@ -48,6 +48,7 @@ $applicable_origins = $session["applicable_origins"];
 				<tr>
 					<th><?php echo $this->lang->line('action'); ?></th>
 					<th><?php echo $this->lang->line('name'); ?></th>
+					<th><?php echo $this->lang->line('description'); ?></th>
 					<th><?php echo $this->lang->line('contract_code'); ?></th>
 					<th><?php echo $this->lang->line('contract_type'); ?></th>
 					<th><?php echo $this->lang->line('measuremet_system'); ?></th>

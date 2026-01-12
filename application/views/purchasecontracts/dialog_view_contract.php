@@ -204,6 +204,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 	<div class="row">
 		<div class="col-md-6">
+			<label class="head-label"><?php echo $this->lang->line('extraction_cost'); ?></label>
+			<div class="input-group">
+				<label class="control-label"><?php echo $fmt->format($extraction_cost); ?></label>
+			</div>
+		</div>
+		<div class="col-md-6">
 			<label class="head-label"><?php echo $this->lang->line('status'); ?></label>
 			<div class="input-group">
 				<label class="control-label"><?php echo $status; ?></label>

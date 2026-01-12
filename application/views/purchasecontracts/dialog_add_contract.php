@@ -476,6 +476,25 @@ $applicable_origins = $session["applicable_origins"];
             <?php } ?>
             <label id="error-totalvolume" class="error-text"><?php echo $this->lang->line('error_value'); ?></label>
         </div>
+        <div class="col-md-6 mb-2">
+            <label for="extraction_cost"><?php echo $this->lang->line('extraction_cost'); ?></label>
+            <?php if ($pagetype == 'edit') { ?>
+                <input type="number" step="any" id="extraction_cost" name="extraction_cost" class="form-control" value="<?php echo ($get_contract_details[0]->extraction_cost + 0); ?>">
+            <?php } else { ?>
+                <input type="number" step="any" id="extraction_cost" name="extraction_cost" class="form-control" value="0">
+            <?php } ?>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+         <div class="col-md-6 mb-2">
+            <label for="description"><?php echo $this->lang->line('description'); ?></label>
+            <?php if ($pagetype == 'edit') { ?>
+                <input type="text" id="description" name="description" class="form-control" value="<?php echo ($get_contract_details[0]->description); ?>">
+            <?php } else { ?>
+                <input type="text" id="description" name="description" class="form-control"">
+            <?php } ?>
+        </div>
         <div class="col-md-6">
             <label for="status"><?php echo $this->lang->line('status'); ?></label>
             <select class="form-control" name="status" id="status" data-plugin="select_erp">
@@ -487,17 +506,6 @@ $applicable_origins = $session["applicable_origins"];
                     <option value="0" <?php if ($get_contract_details[0]->is_active == 0) : ?> selected="selected" <?php endif; ?>><?php echo $this->lang->line('inactive'); ?></option>
                 <?php } ?>
             </select>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-6 mb-2">
-            <label for="description"><?php echo $this->lang->line('description'); ?></label>
-            <?php if ($pagetype == 'edit') { ?>
-                <input type="text" id="description" name="description" class="form-control" value="<?php echo ($get_contract_details[0]->description); ?>">
-            <?php } else { ?>
-                <input type="text" id="description" name="description" class="form-control"">
-            <?php } ?>
         </div>
     </div>
 </div>
@@ -838,6 +846,11 @@ $applicable_origins = $session["applicable_origins"];
             var totalvolume = $("#total_volume").val();
             var contractstatus = $("#status").val();
             var description = $("#description").val();
+            var extraction_cost = $("#extraction_cost").val().trim();
+
+            if(extraction_cost == null || extraction_cost == "") {
+                extraction_cost = 0;
+            }
 
             var isValid1 = true,
                 isValid2 = true,
@@ -894,9 +907,17 @@ $applicable_origins = $session["applicable_origins"];
                             var minRange = $(this).closest('div').find('#min_range').val().trim();
                             var maxRange = $(this).closest('div').find('#max_range').val().trim();
                             var priceRange = $(this).closest('div').find('#price_range').val().trim();
+                            var priceRangeSemi = $(this).closest('div').find('#price_range_semi').val().trim();
+                            var priceRangeLongs = $(this).closest('div').find('#price_range_longs').val().trim();
+
+                            priceRangeSemi = priceRangeSemi == "" ? 0 : priceRangeSemi;
+                            priceRangeLongs = priceRangeLongs == "" ? 0 : priceRangeLongs;
+                            priceRange = priceRange == "" ? 0 : priceRange;
+
                             if (minRange != "" && Number(minRange) > 0) {
                                 if (maxRange != "" && Number(maxRange) > 0) {
-                                    if (priceRange != "" && Number(priceRange) > 0) {
+                                    if ((priceRange != "" && Number(priceRange) >= 0) && (priceRangeSemi != "" && Number(priceRangeSemi) >= 0) &&
+                                        (priceRangeLongs != "" && Number(priceRangeLongs) >= 0)) {
 
                                         if (Number(minRange) >= Number(maxRange)) {
 
@@ -915,7 +936,9 @@ $applicable_origins = $session["applicable_origins"];
                                             var priceData = {};
                                             priceData.minRange = minRange;
                                             priceData.maxRange = maxRange;
-                                            priceData.price = priceRange;
+                                            priceData.priceShorts = priceRange;
+                                            priceData.priceSemi = priceRangeSemi;
+                                            priceData.priceLongs = priceRangeLongs;
                                             price_array.push(priceData);
                                             isValid11 = true;
                                             lastMaxRange = maxRange;
@@ -1212,6 +1235,7 @@ $applicable_origins = $session["applicable_origins"];
                     fd.append("description", description);
                     fd.append("contractstatus", contractstatus);
                     fd.append("pricearray", JSON.stringify(price_array));
+                    fd.append("extraction_cost", extraction_cost);
 
                     toastr.info(processing_request);
                     var obj = $(this),

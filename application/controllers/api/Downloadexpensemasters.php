@@ -54,6 +54,8 @@ class Downloadexpensemasters extends MY_Controller
                             $row_array_accounthead["icon"] = $accounthead->icon;
                             $row_array_accounthead["colorCodePrimary"] = $accounthead->color_code_primary;
                             $row_array_accounthead["colorCodeSecondary"] = $accounthead->color_code_secondary;
+                            $row_array_accounthead["isForestry"] = (bool) $accounthead->is_forestry;
+                            $row_array_accounthead["forestryCostType"] = (int) $accounthead->forestry_cost_type;
                             array_push($return_arr_accountheads, $row_array_accounthead);
                         }
                         $row_array_final["accountHeads"] = $return_arr_accountheads;

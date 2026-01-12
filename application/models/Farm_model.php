@@ -459,7 +459,7 @@ class Farm_model extends CI_Model
     public function get_farm_data_details($farmid, $contractid, $inventoryorder)
     {
         $query = $this->db->query("SELECT no_of_pieces AS no_of_pieces, A.circumference, A.length, A.scanned_code, A.width, A.thickness, 
-                A.width_export, A.length_export, A.thickness_export, A.grade_id FROM tbl_farm_data A  
+                A.width_export, A.length_export, A.thickness_export, A.grade_id, A.face, A.volume_pie FROM tbl_farm_data A  
                 INNER JOIN tbl_farm B ON B.farm_id = A.farm_id 
                 WHERE A.is_active = 1 AND B.farm_id = $farmid AND B.inventory_order = '$inventoryorder' 
                 AND B.contract_id = $contractid 
@@ -772,7 +772,7 @@ class Farm_model extends CI_Model
 
     public function get_farm_data_by_farm_id_detailed($farmid) {
         $query = $this->db->query("SELECT A.no_of_pieces, A.circumference, A.length, A.gross_volume, A.volume, 
-            A.captured_timestamp, A.farm_data_id, A.farm_id 
+            A.captured_timestamp, A.farm_data_id, A.farm_id, A.width, A.thickness, A.length_export, A.width_export, A.thickness_export, A.face, A.volume_pie  
             FROM tbl_farm_data A 
             WHERE A.is_active = 1 AND A.farm_id = $farmid");
         return $query->result();

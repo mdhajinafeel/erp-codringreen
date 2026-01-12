@@ -858,6 +858,7 @@ $lang["rounding_factor"] = "Rounding Factor";
 $lang["Fixed Price"] = "Fixed Price";
 $lang["Sales Admin"] = "Sales Admin";
 $lang["Farm Loader"] = "Farm Loader";
+$lang["Export Admin"] = "Export Admin";
 
 //DOCUMENT REPORTS
 $lang["document_view"] = "View Documents";
@@ -987,7 +988,7 @@ $lang["processed_cost"] = "Processed Cost";
 //FINCA OPERATIONS
 $lang["costings"] = "Costings";
 $lang["acpm"] = "Fuel (ACPM)";
-$lang["maintenance"] = "Maintenance";
+$lang["maintenance"] = "Machine Maintenance";
 $lang["miscellaneous"] = "Miscellaneous";
 $lang["expense_date"] = "Expense Date";
 $lang["quantity"] = "Quantity";
@@ -1098,3 +1099,49 @@ $lang['debitregistry_title'] = 'Debit Registry';
 $lang['download_file'] = 'Download File';
 $lang['download_invoices'] = 'Download Invoices';
 $lang['file_creation_failed'] = 'File creation failed';
+
+//FORESTRY
+$lang["forestry_title"] = "Forestry";
+
+//EXTRACTION COSTS
+$lang["add_extraction_cost"] = "Add Extraction Cost";
+$lang["edit_extraction_cost"] = "Edit Extraction Cost";
+$lang["extraction_date"] = "Date of Extraction";
+$lang["tree_no"] = "Tree No.";
+$lang["total_trees"] = "Total Trees";
+$lang["select_tree_no"] = "Please select the tree no";
+$lang["log_number"] = "Log No.";
+$lang["error_extraction_cost"] = "Extraction cost should not be zero or less than zero";
+$lang["exist_forestry_extraction"] = "Data already exists with the given criteria. Please click edit from the list and update";
+$lang["error_extraction_details"] = "Please add at least one extraction detail";
+$lang["error_fill_all_rows"] = "Please fill all fields in row ";
+$lang["extraction_lists"] = "Extraction Lists";
+$lang["add_extraction"] = "Add Extraction";
+$lang["row_required"] = "At least one row is required";
+$lang["operational_costs"] = "Operational Costs";
+$lang["machine_rental"] = "Machine Rental";
+$lang["manual_labour"] = "Manual Labour";
+$lang["lubricants"] = "Lubricants";
+$lang["machinerental_list"] = "Machine Rental Lists";
+$lang["manuallabour_list"] = "Manual Labour Lists";
+$lang["lubricants_list"] = "Lubricants Lists";
+$lang["others_list"] = "Others Lists";
+$lang["forestry_report"] = "Forestry Report";
+
+// FORESTRY REPORT
+$lang["transport"] = "Transport";
+$lang["machine_maintenance_cost"] = "Maintenance Cost";
+$lang["machine_rental_cost"] = "Machine Rental Cost";
+$lang["manual_labour_cost"] = "Labour Cost";
+$lang["lubricants_cost"] = "Lubricants Cost";
+$lang["acpm_cost"] = "ACPM Cost";
+$lang["value_ica"] = "Value / ICA";
+$lang["value_tree"] = "Value / Tree";
+$lang["manual_labours"] = "Manual Labours";
+$lang["tree"] = "Tree";
+$lang["assigned_to"] = "Assigned To";
+$lang["error_assigned_to"] = "Please select the assigned to";
+$lang["inventory"] = "Inventory";
+$lang["remaining"] = "Remaining";
+$lang["extracted"] = "Extracted";
+$lang["loaded"] = "Loaded";

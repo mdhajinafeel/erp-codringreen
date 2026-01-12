@@ -14,7 +14,7 @@ class Contract_model extends CI_Model
     {
         $query = $this->db->query("SELECT contract_id, contract_type, supplier_name, 
                                 contract_code, purchase_unit, total_volume, remaining_volume, 
-                                is_expired, getapplicableorigins_byid(origin_id) as origin, is_active
+                                is_expired, getapplicableorigins_byid(origin_id) as origin, is_active, description
                                 FROM v_fetch_contracts
                                 ORDER BY contract_id");
         return $query->result();
@@ -24,7 +24,7 @@ class Contract_model extends CI_Model
     {
         $query = $this->db->query("SELECT contract_id, contract_type, supplier_name, 
                         contract_code, purchase_unit, total_volume, remaining_volume, 
-                        is_expired, getapplicableorigins_byid(origin_id) as origin, is_active
+                        is_expired, getapplicableorigins_byid(origin_id) as origin, is_active, description
                         FROM v_fetch_contracts
                         WHERE origin_id = $originid ORDER BY contract_id");
         return $query->result();
@@ -108,7 +108,7 @@ class Contract_model extends CI_Model
         $query = $this->db->query("SELECT id, purchase_unit FROM tbl_purchase_unit WHERE type_id = $producttypeid AND is_active = 1 ORDER BY id");
         return $query->result();
     }
-    
+
     public function get_purchase_unit_origin($producttypeid, $originid)
     {
 
@@ -117,14 +117,14 @@ class Contract_model extends CI_Model
         } else if ($producttypeid == 4) {
             $producttypeid = 2;
         }
-        
-        if($originid == 3 || $originid == 4) {
+
+        if ($originid == 3 || $originid == 4) {
             $query = $this->db->query("SELECT id, purchase_unit FROM tbl_purchase_unit WHERE type_id = $producttypeid AND is_active = 1 AND origin_id = $originid ORDER BY id");
         } else {
             $query = $this->db->query("SELECT id, purchase_unit FROM tbl_purchase_unit WHERE type_id = $producttypeid AND is_active = 1 AND origin_id = 0 ORDER BY id");
         }
 
-        
+
         return $query->result();
     }
 
@@ -182,7 +182,7 @@ class Contract_model extends CI_Model
                         A.contract_code, A.product, A.product_type, A.purchase_allowance, A.purchase_allowance_length, 
                         A.unit_of_purchase, A.currency, A.payment_method, A.start_date, A.end_date, A.total_volume, A.remaining_volume, 
                         A.is_expired, A.is_active, A.origin_id, gettotalvolume_bycontractid(A.contract_id) as mapping_volume, 
-                        A.description
+                        A.description, A.existing_price_condition, A.extraction_cost
                         FROM tbl_supplier_purchase_contract A
                         WHERE A.contract_id = $contractid");
         return $query->result();
@@ -241,7 +241,7 @@ class Contract_model extends CI_Model
                         LOWER(DATE_FORMAT(STR_TO_DATE(A.start_date, '%d/%m/%Y'), '%M')) as start_date_month, 
                         LOWER(DATE_FORMAT(STR_TO_DATE(A.end_date, '%d/%m/%Y'), '%M')) as end_date_month, 
                         getapplicableorigins_byid(A.origin_id) as origin, A.is_active, D.currency_abbreviation, 
-                        A.description    
+                        A.description, A.extraction_cost    
                         FROM tbl_supplier_purchase_contract A
                         LEFT JOIN tbl_suppliers B ON B.id = A.supplier_id
                         INNER JOIN tbl_purchase_unit C ON C.id = A.unit_of_purchase
@@ -288,8 +288,9 @@ class Contract_model extends CI_Model
                 FROM tbl_supplier_purchase_contract WHERE is_active = 1 AND origin_id = $originid AND contract_type = $contracttype");
         return $query->result();
     }
-    
-    public function fetch_purchase_contract_origin($originid) {
+
+    public function fetch_purchase_contract_origin($originid)
+    {
         $query = $this->db->query("SELECT contract_id, supplier_id, contract_code, product, product_type, 
                 B.purchase_unit, A.unit_of_purchase AS purchase_unit_id, 
                 CONCAT(C.currency_name, ' (', C.currency_code,')') AS currency, A.purchase_allowance, A.purchase_allowance_length, A.description 
@@ -297,6 +298,22 @@ class Contract_model extends CI_Model
                 INNER JOIN tbl_purchase_unit B ON B.id = A.unit_of_purchase
                 INNER JOIN tbl_currency C ON C.id = A.currency 
                 WHERE A.origin_id = $originid AND A.is_active = 1 ORDER BY A.contract_id");
+        return $query->result();
+    }
+
+    public function get_contracts_by_suppliers($originid, $supplierid)
+    {
+        $query = $this->db->query("SELECT contract_id, contract_code, description FROM tbl_supplier_purchase_contract 
+            WHERE is_active = 1 AND is_expired = 0 AND origin_id = $originid AND supplier_id = $supplierid ORDER BY contract_id ASC");
+        return $query->result();
+    }
+
+    public function fetch_contract_details_by_contract_id($originid, $contractid)
+    {
+        $query = $this->db->query("SELECT remaining_volume, currency_code, purchase_unit, currency, unit_of_purchase, circumference_allowance, length_allowance, 
+            extraction_cost, description 
+            FROM v_fetch_contracts 
+            WHERE is_active = 1 AND contract_id = $contractid AND origin_id = $originid");
         return $query->result();
     }
 }

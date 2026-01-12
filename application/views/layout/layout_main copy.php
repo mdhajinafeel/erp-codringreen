@@ -147,78 +147,6 @@ endif;
 									<li class="nav-item">
 										<!-- label-->
 										<div class="row navbar-vertical-label-wrapper mt-3 mb-2">
-											<div class="col-auto navbar-vertical-label"><?php echo $this->lang->line('forestry_title'); ?>
-											</div>
-											<div class="col ps-0">
-												<hr class="mb-0 navbar-vertical-divider" />
-											</div>
-										</div>
-
-										<?php if (in_array('1', $role_resources_ids) || in_array('2', $role_resources_ids)) { ?>
-
-											<a class="nav-link dropdown-indicator" href="#forestrycostings" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="email">
-												<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-donate"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('costings'); ?></span>
-												</div>
-											</a>
-											<ul class="nav collapse <?php if ($this->router->fetch_class() == "extractioncost" || $this->router->fetch_class() == "operationalcost") {
-																		echo 'show';
-																	} else {
-																		'false';
-																	} ?>" id="forestrycostings">
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "extractioncost") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('forestry/extractioncost'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('extraction_cost'); ?></span>
-														</div>
-													</a>
-												</li>
-
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "operationalcost") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('forestry/operationalcost'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('operational_costs'); ?></span>
-														</div>
-													</a>
-												</li>
-											</ul>
-
-											<a class="nav-link dropdown-indicator" href="#forestryreports" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
-												<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-file-text"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('reports_title'); ?></span>
-												</div>
-											</a>
-											<ul class="nav collapse  <?php if (
-																		$this->router->fetch_class() == "forestryreports"
-																	) {
-																		echo 'show';
-																	} else {
-																		'false';
-																	} ?>" id="forestryreports">
-												<li class="nav-item">
-													<a class="nav-link <?php if ($this->router->fetch_class() == "forestryreports") {
-																			echo 'active';
-																		} else {
-																			'';
-																		} ?>" href="<?php echo site_url('forestry/forestryreports'); ?>" aria-expanded="false">
-														<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('forestry_report'); ?></span>
-														</div>
-													</a>
-												</li>
-											</ul>
-										<?php } ?>
-									</li>
-								<?php } ?>
-
-								<?php if (in_array('1', $role_resources_ids) || in_array('2', $role_resources_ids) || in_array('3', $role_resources_ids)) { ?>
-
-									<li class="nav-item">
-										<!-- label-->
-										<div class="row navbar-vertical-label-wrapper mt-3 mb-2">
 											<div class="col-auto navbar-vertical-label"><?php echo $this->lang->line('inventory_title'); ?>
 											</div>
 											<div class="col ps-0">
@@ -1099,7 +1027,6 @@ endif;
 	<!-- INTERNAL Vector js -->
 	<script type="text/javascript">
 		var base_url = '<?php echo site_url() . $this->router->fetch_class(); ?>';
-		const BASE_URL_SUBFOLDER = "<?= base_url(); ?>";
 		var login_url = '<?php echo site_url() . "logout"; ?>';
 		var site_url = '<?php echo base_url(); ?>';
 		var lang_name = '<?php echo $language_name; ?>';
@@ -1152,22 +1079,6 @@ endif;
 				themeControlIconDark.style.display = "inline-block";
 				localStorage.setItem("theme", "light");
 			}
-		});
-
-		$(document).on('show.bs.modal', '.modal', function () {
-			let zIndex = 1040 + (10 * $('.modal:visible').length);
-			$(this).css('z-index', zIndex);
-
-			setTimeout(() => {
-				$('.modal-backdrop')
-					.not('.modal-stack')
-					.css('z-index', zIndex - 1)
-					.addClass('modal-stack');
-			});
-		});
-
-		$(document).on('hidden.bs.modal', '.modal', function () {
-			$('.modal-backdrop.modal-stack').remove();
 		});
 	</script>
 </body>

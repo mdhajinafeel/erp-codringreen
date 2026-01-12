@@ -64,7 +64,8 @@ class Reception_model extends CI_Model
                     "cbm_export" => $r->volume, "grade" => $r->grade_id, "face" => $r->face,
                     "createddate" => date('Y-m-d H:i:s'), "createdby" => $userid,
                     "updateddate" => date('Y-m-d H:i:s'), "updatedby" => $userid,
-                    "isactive" => 1, "isdispatch" => 0, "scanned_timestamp" => 0, "isduplicatescanned" => 0,
+                    "isactive" => 1, "isdispatch" => 0, "scanned_timestamp" => 0, "isduplicatescanned" => 0, 
+                    "remaining_stock_count" => $r->no_of_pieces, "is_special" => 1,
                 );
             } else if ($purchaseunitid == 2) {
                 $dataReception = array(
@@ -75,7 +76,8 @@ class Reception_model extends CI_Model
                     "cbm_export" => $r->volume, "grade" => $r->grade_id, "face" => $r->face,
                     "createddate" => date('Y-m-d H:i:s'), "createdby" => $userid,
                     "updateddate" => date('Y-m-d H:i:s'), "updatedby" => $userid,
-                    "isactive" => 1, "isdispatch" => 0, "scanned_timestamp" => 0, "isduplicatescanned" => 0
+                    "isactive" => 1, "isdispatch" => 0, "scanned_timestamp" => 0, "isduplicatescanned" => 0, 
+                    "remaining_stock_count" => $r->no_of_pieces, "is_special" => 1,
                 );
             } else if ($purchaseunitid == 11) {
                 $dataReception = array(
