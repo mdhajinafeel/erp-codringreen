@@ -11,6 +11,7 @@ class Downloadfarmmasters extends MY_Controller
         $this->load->model("Master_model");
         $this->load->model("Contract_model");
         $this->load->model("Farm_model");
+        $this->load->model("Costing_model");
         $this->load->library("jwttoken");
         $this->load->helper('url');
     }
@@ -167,6 +168,19 @@ class Downloadfarmmasters extends MY_Controller
                             array_push($return_arr_farmdetails, $row_array_farmdetail);
                         }
                         $row_array_final["farmDetails"] = $return_arr_farmdetails;
+
+                        //MACHINES
+                        $fetchMachines = $this->Master_model->fetch_machines($originid);
+                        $return_arr_machines = array();
+                        foreach ($fetchMachines as $machine) {
+                            $row_array_machine["machineId"] = (int) $machine->id;
+                            $row_array_machine["machineType"] = $machine->machine_type;
+                            $row_array_machine["modelNo"] = $machine->chassis_no;
+                            $row_array_machine["supplierId"] = (int) $machine->supplier_id;
+
+                            array_push($return_arr_machines, $row_array_machine);
+                        }
+                        $row_array_final["machines"] = $return_arr_machines;
 
                         $Return["status"] = true;
                         $Return["message"] = "";
