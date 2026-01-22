@@ -97,7 +97,7 @@ class Supplierledger extends MY_Controller
         $Return["csrf_hash"] = $this->security->get_csrf_hash();
         if (!empty($session)) {
 
-            $getExpenseLedgerDetails = $this->Financemaster_model->get_ledger_details_by_supplier_year($this->input->get("supplierid"), $this->input->get("year"));
+            $getExpenseLedgerDetails = $this->Financemaster_model->get_ledger_details_by_supplier($this->input->get("supplierid"));
 
             if (count($getExpenseLedgerDetails) > 0) {
 
@@ -205,7 +205,7 @@ class Supplierledger extends MY_Controller
             if (!empty($session)) {
                 if ($this->input->get("originid") > 0) {
 
-                    $getAllSupplierLedger = $this->Financemaster_model->get_all_supplier_ledger_by_origin_year($this->input->get("originid"), $this->input->get("year"));
+                    $getAllSupplierLedger = $this->Financemaster_model->get_all_supplier_ledger_by_origin($this->input->get("originid"));
 
                     if (count($getAllSupplierLedger) == 0) {
                         $Return["error"] = $this->lang->line("no_data_reports");
@@ -356,8 +356,8 @@ class Supplierledger extends MY_Controller
             if (!empty($session)) {
                 if ($this->input->get("originid") > 0) {
 
-                    $getSupplierCreditTransaction = $this->Financemaster_model->get_supplier_credit_transactions_year($this->input->get("supplierid"), $this->input->get("year"));
-                    $getSupplierDebitTransaction = $this->Financemaster_model->get_supplier_debit_transactions_year($this->input->get("supplierid"), $this->input->get("year"));
+                    $getSupplierCreditTransaction = $this->Financemaster_model->get_supplier_credit_transactions($this->input->get("supplierid"));
+                    $getSupplierDebitTransaction = $this->Financemaster_model->get_supplier_debit_transactions($this->input->get("supplierid"));
 
                     if (count($getSupplierCreditTransaction) == 0 && count($getSupplierDebitTransaction) == 0) {
                         $Return["error"] = $this->lang->line("no_data_reports");
@@ -378,7 +378,7 @@ class Supplierledger extends MY_Controller
                             )
                         );
 
-                        $getSupplierTotalVolume = $this->Financemaster_model->get_total_volume_by_supplier_year($this->input->get("supplierid"), $this->input->get("year"));
+                        $getSupplierTotalVolume = $this->Financemaster_model->get_total_volume_by_supplier($this->input->get("supplierid"));
                         $getSupplierName = $this->Financemaster_model->get_supplier_name_ledger($this->input->get("supplierid"));
 
                         $objSheet->SetCellValue('A3', strtoupper($this->lang->line("supplier_name")));

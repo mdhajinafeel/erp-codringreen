@@ -198,6 +198,43 @@ class Forestry_model extends CI_Model
             ->row();
     }
 
+    public function generate_extraction_report($originId, $supplierId, $contractId, $fromDate, $toDate)
+    {
+        $strQuery = "SELECT extraction_cost, DATE_FORMAT(STR_TO_DATE(extraction_date, '%d/%m/%Y'), '%d/%m/%Y') AS date, tree_no, supplier_name, contract_code, description,    
+            MAX(CASE WHEN rn = 1 THEN circumference END) AS circ1, MAX(CASE WHEN rn = 1 THEN length END) AS len1, 
+            MAX(CASE WHEN rn = 2 THEN circumference END) AS circ2, MAX(CASE WHEN rn = 2 THEN length END) AS len2, 
+            MAX(CASE WHEN rn = 3 THEN circumference END) AS circ3, MAX(CASE WHEN rn = 3 THEN length END) AS len3, 
+            MAX(CASE WHEN rn = 4 THEN circumference END) AS circ4, MAX(CASE WHEN rn = 4 THEN length END) AS len4, 
+            MAX(CASE WHEN rn = 5 THEN circumference END) AS circ5, MAX(CASE WHEN rn = 5 THEN length END) AS len5, 
+            MAX(CASE WHEN rn = 6 THEN circumference END) AS circ6, MAX(CASE WHEN rn = 6 THEN length END) AS len6, 
+            MAX(CASE WHEN rn = 7 THEN circumference END) AS circ7, MAX(CASE WHEN rn = 7 THEN length END) AS len7, 
+            MAX(CASE WHEN rn = 8 THEN circumference END) AS circ8, MAX(CASE WHEN rn = 8 THEN length END) AS len8, 
+            MAX(CASE WHEN rn = 9 THEN circumference END) AS circ9, MAX(CASE WHEN rn = 9 THEN length END) AS len9, 
+            MAX(CASE WHEN rn = 10 THEN circumference END) AS circ10, MAX(CASE WHEN rn = 10 THEN length END) AS len10,
+            MAX(CASE WHEN rn = 11 THEN circumference END) AS circ11, MAX(CASE WHEN rn = 11 THEN length END) AS len11,
+            MAX(CASE WHEN rn = 12 THEN circumference END) AS circ12, MAX(CASE WHEN rn = 12 THEN length END) AS len12,
+            MAX(CASE WHEN rn = 13 THEN circumference END) AS circ13, MAX(CASE WHEN rn = 13 THEN length END) AS len13,
+            MAX(CASE WHEN rn = 14 THEN circumference END) AS circ14, MAX(CASE WHEN rn = 14 THEN length END) AS len14,
+            MAX(CASE WHEN rn = 15 THEN circumference END) AS circ15, MAX(CASE WHEN rn = 15 THEN length END) AS len15  
+            FROM ( SELECT A.extraction_date, A.extraction_cost, B.id AS tree_id, B.tree_no AS tree_no, D.supplier_name, E.contract_code, E.description, C.circumference, C.length, ROW_NUMBER() OVER ( PARTITION BY A.extraction_date, B.id ORDER BY C.id ) AS rn 
+            FROM tbl_forestry_extractions A 
+            JOIN tbl_forestry_extraction_trees B ON B.extraction_id = A.id 
+            JOIN tbl_forestry_extraction_tree_details C ON C.extraction_tree_id = B.id 
+            JOIN tbl_suppliers D ON D.id = A.supplier_id 
+            JOIN tbl_supplier_purchase_contract E ON E.contract_id = A.contract_id 
+            WHERE A.is_active = 1 AND B.is_active = 1 AND C.is_active = 1 AND A.origin_id = $originId AND A.contract_id = $contractId AND A.supplier_id = $supplierId";
+
+        if ($fromDate != '' && $toDate != '') {
+            $strQuery .= " AND STR_TO_DATE(A.extraction_date, '%d/%m/%Y') BETWEEN STR_TO_DATE('$fromDate', '%d/%m/%Y') AND STR_TO_DATE('$toDate', '%d/%m/%Y')";
+        }
+
+        $strQuery .= " ) x GROUP BY extraction_date, tree_id 
+            ORDER BY STR_TO_DATE(extraction_date, '%d/%m/%Y'), tree_no";
+
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
     // OPERATIONAL COSTS
     public function add_opertational_costs($data)
     {
@@ -227,17 +264,19 @@ class Forestry_model extends CI_Model
     public function get_operational_costing($originId, $costType)
     {
         if ($costType == 4 || $costType == 9 || $costType == 6) {
-            $strQuery = "SELECT A.id, B.supplier_name, C.contract_code, C.description, A.invoice_number, A.quantity, A.amount, A.expense_date 
+            $strQuery = "SELECT A.id, B.supplier_name, C.contract_code, C.description, A.invoice_number, A.quantity, A.amount, A.expense_date, A.expense_type 
                         FROM tbl_forestry_operational_costs A 
                         INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                         INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
                         WHERE A.is_active = 1 AND A.cost_type = $costType AND A.origin_id = $originId  
                         ORDER BY STR_TO_DATE(A.expense_date, '%d/%m/%Y') DESC";
         } else if ($costType == 5) {
-            $strQuery = "SELECT A.id, B.supplier_name, C.contract_code, C.description, A.invoice_number, A.sub_total, A.tax_amount, A.amount, A.expense_date 
+            $strQuery = "SELECT A.id, B.supplier_name, C.contract_code, C.description, A.invoice_number, A.sub_total, 
+                        A.tax_amount, A.amount, A.expense_date, D.machine_type, D.chassis_no 
                         FROM tbl_forestry_operational_costs A 
                         INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                         INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
+                        LEFT JOIN tbl_master_machines D ON D.id = A.machine_type 
                         WHERE A.is_active = 1 AND A.cost_type = $costType AND A.origin_id = $originId  
                         ORDER BY STR_TO_DATE(A.expense_date, '%d/%m/%Y') DESC";
         } else if ($costType == 7 || $costType == 8) {
@@ -262,16 +301,16 @@ class Forestry_model extends CI_Model
             INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
             WHERE A.is_active = 1
             AND A.origin_id = $originId";
-        
-        if($supplierId > 0) {
+
+        if ($supplierId > 0) {
             $strQuery .= " AND A.supplier_id = $supplierId";
         }
-        
-        if($contractId > 0) {
+
+        if ($contractId > 0) {
             $strQuery .= " AND A.contract_id = $contractId";
         }
 
-        if($fromDate != '' && $toDate != '') {
+        if ($fromDate != '' && $toDate != '') {
             $strQuery .= " AND STR_TO_DATE(A.purchase_date, '%Y-%m-%d') BETWEEN STR_TO_DATE('$fromDate', '%d/%m/%Y') AND STR_TO_DATE('$toDate', '%d/%m/%Y')";
         }
 
@@ -311,7 +350,8 @@ class Forestry_model extends CI_Model
         return $query->result();
     }
 
-    public function get_forestry_operation_cost_report_data_15days($originId, $supplierId, $contractId, $fromDate, $toDate, $costType) {
+    public function get_forestry_operation_cost_report_data_15days($originId, $supplierId, $contractId, $fromDate, $toDate, $costType)
+    {
         $conditions = [];
 
         $conditions[] = "cost_type = $costType";
@@ -386,7 +426,8 @@ class Forestry_model extends CI_Model
         return $query->result();
     }
 
-    public function get_forestry_operation_cost_report_data_week($originId, $supplierId, $contractId, $fromDate, $toDate, $costType) {
+    public function get_forestry_operation_cost_report_data_week($originId, $supplierId, $contractId, $fromDate, $toDate, $costType)
+    {
         $conditions = [];
 
         $conditions[] = "A.cost_type = $costType";
@@ -466,7 +507,8 @@ class Forestry_model extends CI_Model
 
     public function get_forestry_operation_report_data($originId, $supplierId, $contractId, $fromDate, $toDate, $costType)
     {
-        $strQuery = "SELECT A.expense_date, B.supplier_name, C.contract_code, C.description, A.quantity, A.amount FROM tbl_forestry_operational_costs A 
+        $strQuery = "SELECT A.expense_date, B.supplier_name, C.contract_code, C.description, SUM(A.quantity) AS quantity, SUM(A.amount) AS amount 
+                    FROM tbl_forestry_operational_costs A 
                     INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
                     INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id
                     WHERE A.cost_type = $costType AND A.is_active = 1 AND A.origin_id = $originId";
@@ -477,6 +519,10 @@ class Forestry_model extends CI_Model
 
         if ($contractId != 0) {
             $strQuery .= " AND A.contract_id = $contractId";
+        }
+
+        if($costType == 4 || $costType == 9) {
+            $strQuery .= " AND A.expense_type = 0";
         }
 
         // if($fromDate != '' && $toDate != '') {
@@ -503,8 +549,36 @@ class Forestry_model extends CI_Model
 
     public function get_operational_cost_details_byid($originId, $costType, $costingId)
     {
-        $strQuery = "SELECT id, supplier_id, contract_id, purchaser_id, invoice_number, quantity, sub_total, tax_amount, amount, expense_date, remarks, origin_id 
+        $strQuery = "SELECT id, supplier_id, contract_id, purchaser_id, invoice_number, quantity, sub_total, tax_amount, amount, 
+            expense_date, remarks, origin_id, machine_type, expense_type, clock_start, clock_end    
             FROM tbl_forestry_operational_costs WHERE is_active = 1 AND origin_id = $originId AND cost_type = $costType AND id = $costingId";
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function fetch_operations_report_data($costType, $originId, $supplierId, $contractId, $fromDate, $toDate)
+    {
+        $strQuery = "SELECT B.supplier_name, C.contract_code, C.description, D.purchaser_name, D.company_id, A.invoice_number, 
+                A.expense_date, A.quantity, A.sub_total, A.tax_amount, A.amount, A.remarks, A.expense_type, E.machine_type, E.chassis_no  
+                FROM tbl_forestry_operational_costs A 
+                INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
+                INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
+                LEFT JOIN tbl_farm_costing_purchasers D ON D.id = A.purchaser_id 
+                LEFT JOIN tbl_master_machines E ON E.id = A.machine_type 
+                WHERE A.origin_id = $originId AND A.is_active = 1 AND A.cost_type = $costType";
+
+        if ($supplierId != 0) {
+            $strQuery .= " AND A.supplier_id = $supplierId";
+        }
+
+        if ($contractId != 0) {
+            $strQuery .= " AND A.contract_id = $contractId";
+        }
+
+        if ($fromDate != '' && $toDate != '') {
+            $strQuery .= " AND STR_TO_DATE(A.expense_date, '%d/%m/%Y') BETWEEN STR_TO_DATE('$fromDate', '%d/%m/%Y') AND STR_TO_DATE('$toDate', '%d/%m/%Y')";
+        }
+
         $query = $this->db->query($strQuery);
         return $query->result();
     }

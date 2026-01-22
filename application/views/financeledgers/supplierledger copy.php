@@ -39,21 +39,6 @@ $applicable_origins = $session["applicable_origins"];
                 <div class="mb-4 row"></div>
             </div>
 
-            <label class="col-sm-2 col-form-label lbl-font" for="year_ledger"><?php echo $this->lang->line('year'); ?></label>
-            <div class="col-sm-10">
-                <select class="form-control select2 form-select" id="year_ledger">
-					<?php
-					$sYear = date("Y");
-					$eYear = 2023;
-
-					for ($i = $sYear; $i >= $eYear; $i--) {
-						echo '<option value="' . $i . '">' . $i . '</option>';
-					}
-					?>
-				</select>
-                <div class="mb-4 row"></div>
-            </div>
-
             <div class="row flex-between-end">
                 <div class="col-md-10 ms-auto">
                     <button class="btn btn-primary btn-block" title="<?php echo $this->lang->line("download_reports"); ?>" type="button" id="btn_download_reports">
@@ -205,43 +190,7 @@ $applicable_origins = $session["applicable_origins"];
 
             $("#loading").show();
             $.ajax({
-                url: base_url + "/get_ledger_details_by_supplier?originid=" + $("#origin_ledger").val() + "&supplierid=" + $("#supplier_name_ledger").val() + "&year=" + $("#year_ledger").val(),
-                cache: false,
-                method: "GET",
-                dataType: "json",
-                success: function(JSON) {
-                    $("#loading").hide();
-                    if (JSON.redirect == true) {
-                        window.location.replace(login_url);
-                    } else if (JSON.result != '') {
-
-                        $("#txtTotalCredits").text(JSON.result["totalCredits"]);
-                        $("#txtTotalDebits").text(JSON.result["totalDebits"]);
-                        $("#txtTotalOutstanding").text(JSON.result["totalOutstanding"]);
-                        parseCreditTransactions(JSON.result["creditTransactions"]);
-                        parseDebitTransactions(JSON.result["debitTransactions"]);
-
-                        $("#divInventoryLedgers").show();
-                        $("#divTransactions").show();
-                    } else {
-                        toastr.clear();
-                        toastr.error(JSON.error);
-                        
-                        $("#divInventoryLedgers").hide();
-                        $("#divTransactions").hide();
-                    }
-                }
-            });
-        });
-
-        $("#year_ledger").change(function() {
-
-            $("#divExpenseLedgers").hide();
-            $("#divTransactions").hide();
-
-            $("#loading").show();
-            $.ajax({
-                url: base_url + "/get_ledger_details_by_supplier?originid=" + $("#origin_ledger").val() + "&supplierid=" + $("#supplier_name_ledger").val() + "&year=" + $("#year_ledger").val(),
+                url: base_url + "/get_ledger_details_by_supplier?originid=" + $("#origin_ledger").val() + "&supplierid=" + $("#supplier_name_ledger").val(),
                 cache: false,
                 method: "GET",
                 dataType: "json",
@@ -272,7 +221,6 @@ $applicable_origins = $session["applicable_origins"];
 
         $("#btn_reset").click(function() {
             $("#origin_ledger").select2("val", "0");
-            $("#year_ledger").select2("val", "0");
         });
         
         $("#btn_all_suppliers").click(function() {
@@ -329,7 +277,7 @@ $applicable_origins = $session["applicable_origins"];
 
                 $("#loading").show();
                 $.ajax({
-                    url: base_url + "/generate_supplier_ledger?originid=" + $("#origin_ledger").val()+"&supplierid=" + $("#supplier_name_ledger").val() +"&year=" + $("#year_ledger").val(),
+                    url: base_url + "/generate_supplier_ledger?originid=" + $("#origin_ledger").val()+"&supplierid=" + $("#supplier_name_ledger").val(),
                     cache: false,
                     method: "GET",
                     dataType: "json",

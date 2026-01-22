@@ -1757,4 +1757,67 @@ class Financemaster_model extends CI_Model
 			return false;
 		}
 	}
+
+	//FINANCE MASTER MODEL
+	public function get_ledger_details_by_supplier_year($supplierid, $year)
+	{
+		$query = $this->db->query("SELECT CASE WHEN getsupplierledgeramount_type_year(A.supplier_id, 1, $year) IS NULL THEN 0 ELSE 
+                    getsupplierledgeramount_type_year(A.supplier_id, 1, $year) END as creditamount, 
+                    CASE WHEN getdebitedamount_bysupplier_year(A.supplier_id, $year) IS NULL THEN 0 ELSE 
+                    getdebitedamount_bysupplier_year(A.supplier_id, $year) END as debitamount
+                    FROM tbl_inventory_ledger A 
+                    WHERE A.is_active = 1 AND A.supplier_id = $supplierid
+                    GROUP BY A.supplier_id 
+                    ORDER BY A.id");
+		return $query->result();
+	}
+
+	public function get_supplier_credit_transactions_year($supplierid, $year)
+	{
+		$query = $this->db->query("SELECT A.id, C.supplier_name, A.amount,
+				DATE_FORMAT(STR_TO_DATE(A.expense_date, '%Y-%m-%d'), '%d %M %Y') as expense_date 
+				FROM tbl_inventory_ledger A 
+				INNER JOIN tbl_supplier_purchase_contract B ON B.contract_id = A.contract_id 
+				INNER JOIN tbl_suppliers C ON C.id = B.supplier_id 
+				where A.is_active = 1 AND A.supplier_id = $supplierid AND expense_type IN (0,1) AND ledger_type = 1 
+				AND YEAR(STR_TO_DATE(A.expense_date, '%Y-%m-%d')) = $year
+				ORDER BY A.created_date DESC");
+		return $query->result();
+	}
+
+	public function get_supplier_debit_transactions_year($supplierid, $year)
+	{
+		$query = $this->db->query("SELECT A.id, inventory_order, B.type_name, D.supplier_name, A.amount,
+				DATE_FORMAT(STR_TO_DATE(A.expense_date, '%Y-%m-%d'), '%d %M %Y') as expense_date, 
+				C.contract_type, A.contract_id, A.supplier_id, A.expense_type FROM tbl_inventory_ledger A
+				INNER JOIN tbl_inventor_ledger_types B ON B.id = A.expense_type 
+				INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
+				INNER JOIN tbl_suppliers D ON D.id = A.supplier_id
+				WHERE A.supplier_id = $supplierid AND A.ledger_type = 2 AND A.is_active = 1 
+				AND YEAR(STR_TO_DATE(A.expense_date, '%Y-%m-%d')) = $year
+				ORDER BY A.created_date DESC, A.expense_type");
+		return $query->result();
+	}
+
+	public function get_total_volume_by_supplier_year($supplierid, $year)
+	{
+		$query = $this->db->query("SELECT SUM(total_volume) as total_volume
+				FROM tbl_farm WHERE supplier_id = $supplierid AND YEAR(STR_TO_DATE(created_date, '%Y-%m-%d')) = $year");
+		return $query->result();
+	}
+
+	public function get_all_supplier_ledger_by_origin_year($originid, $year)
+	{
+		$query = $this->db->query("SELECT A.supplier_id, supplier_name, supplier_code,
+					CASE WHEN getsupplierledgeramount_type_year(A.supplier_id, 1, $year) IS NULL THEN 0 ELSE 
+					getsupplierledgeramount_type_year(A.supplier_id, 1, $year) END as creditamount, 
+					CASE WHEN getdebitedamount_bysupplier_year(A.supplier_id, $year) IS NULL THEN 0 ELSE 
+					getdebitedamount_bysupplier_year(A.supplier_id, $year) END as debitamount
+					FROM tbl_inventory_ledger A 
+					INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
+					WHERE A.is_active = 1 AND B.origin_id = $originid
+					GROUP BY A.supplier_id 
+					ORDER BY B.id");
+		return $query->result();
+	}
 }

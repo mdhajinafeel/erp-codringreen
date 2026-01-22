@@ -532,6 +532,7 @@ $wz_lang = $site_lang->session->userdata('site_lang');
         $("#btn_reset_extraction_trees").click(function() {
             $("#divExtractionTrees").show();
             $("#divExtractionDetails").hide();
+            var extractionId = $("#hdnExtractionId").val();
 
             // 🔥 RESET FORM ROWS AFTER SAVE
             resetExtractionFormRows();

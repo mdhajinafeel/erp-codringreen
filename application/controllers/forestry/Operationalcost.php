@@ -1,7 +1,7 @@
 <?php
 
-// error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING);
-// ini_set('display_errors', '0');
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING);
+ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -60,6 +60,12 @@ class Operationalcost extends MY_Controller
                 $editCostings = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('edit') . '"><button type="button" class="btn icon-btn btn-xs btn-edit waves-effect waves-light" data-role="editcosting_acpm" data-toggle="modal" data-target=".edit-modal-data" data-costing_id="' . $r->id . '"><span class="fas fa-pencil"></span></button></span>
                         <span style="margin-left:5px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('delete') . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deletecosting_acpm" data-toggle="modal" data-target=".edit-modal-data" data-costing_id="' . $r->id . '"><span class="fas fa-trash"></span></button></span>';
 
+                if ($r->expense_type == 0) {
+                    $expenseType = $this->lang->line('purchase');
+                } else {
+                    $expenseType = $this->lang->line('spend');
+                }
+
                 $data[] = array(
                     $editCostings,
                     $r->supplier_name,
@@ -68,6 +74,7 @@ class Operationalcost extends MY_Controller
                     $r->expense_date,
                     ($r->quantity + 0),
                     '$ ' . number_format(($r->amount + 0), 2, ',', '.'),
+                    $expenseType
                 );
             }
         } else if ($costType == 5) {
@@ -77,11 +84,22 @@ class Operationalcost extends MY_Controller
                 $editCostings = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('edit') . '"><button type="button" class="btn icon-btn btn-xs btn-edit waves-effect waves-light" data-role="editcosting_maintenance" data-toggle="modal" data-target=".edit-modal-data" data-costing_id="' . $r->id . '"><span class="fas fa-pencil"></span></button></span>
                         <span style="margin-left:5px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('delete') . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deletecosting_maintenance" data-toggle="modal" data-target=".edit-modal-data" data-costing_id="' . $r->id . '"><span class="fas fa-trash"></span></button></span>';
 
+                if($r->machine_type != null && $r->machine_type != "") {
+                    if($r->chassis_no != null && $r->chassis_no != "") {
+                        $r->machine_type = $r->machine_type. ' / ' . $r->chassis_no;
+                    } else {
+                        $r->machine_type = $r->machine_type;
+                    }
+                } else {
+                    $r->machine_type = "";
+                }
+                        
                 $data[] = array(
                     $editCostings,
                     $r->supplier_name,
                     $r->contract_code . ' -- ' . $r->description,
                     $r->invoice_number,
+                    $r->machine_type,
                     $r->expense_date,
                     '$ ' . number_format(($r->amount + 0), 2, ',', '.'),
                 );
@@ -139,6 +157,12 @@ class Operationalcost extends MY_Controller
                 $editCostings = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('edit') . '"><button type="button" class="btn icon-btn btn-xs btn-edit waves-effect waves-light" data-role="editcosting_lubricants" data-toggle="modal" data-target=".edit-modal-data" data-costing_id="' . $r->id . '"><span class="fas fa-pencil"></span></button></span>
                         <span style="margin-left:5px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line('delete') . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deletecosting_lubricants" data-toggle="modal" data-target=".edit-modal-data" data-costing_id="' . $r->id . '"><span class="fas fa-trash"></span></button></span>';
 
+                if ($r->expense_type == 0) {
+                    $expenseType = $this->lang->line('purchase');
+                } else {
+                    $expenseType = $this->lang->line('spend');
+                }
+
                 $data[] = array(
                     $editCostings,
                     $r->supplier_name,
@@ -147,6 +171,7 @@ class Operationalcost extends MY_Controller
                     $r->expense_date,
                     ($r->quantity + 0),
                     '$ ' . number_format(($r->amount + 0), 2, ',', '.'),
+                    $expenseType,
                 );
             }
         }
@@ -207,6 +232,30 @@ class Operationalcost extends MY_Controller
         }
     }
 
+    public function fetch_machines()
+    {
+        $session = $this->session->userdata('fullname');
+        $Return = array('pages' => '', 'redirect' => false, 'result' => '', 'error' => '', 'csrf_hash' => '');
+        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+        if (!empty($session)) {
+            $result = "<option value='0'>" . $this->lang->line('select') . "</option>";
+            if ($this->input->get('originid') > 0 && $this->input->get('supplierid') > 0) {
+                $getMachines = $this->Costing_model->fetch_machines_masters($this->input->get('originid'), $this->input->get('supplierid'));
+                foreach ($getMachines as $machine) {
+                    $result = $result . "<option value='" . $machine->id . "'>" . $machine->machine_type . "</option>";
+                }
+            }
+
+            $Return['result'] = $result;
+            $Return['redirect'] = false;
+            $this->output($Return);
+        } else {
+            $Return['pages'] = "";
+            $Return['redirect'] = true;
+            $this->output($Return);
+        }
+    }
+
     public function save_opertaional_cost()
     {
         $Return = array("result" => "", "error" => "", "csrf_hash" => "");
@@ -220,11 +269,21 @@ class Operationalcost extends MY_Controller
                     $acpmQuantity = $this->input->post('acpmQuantity');
                     $acpmTotalValue = $this->input->post("acpmTotalValue");
                     $acpmClaimRemarks = $this->input->post("acpmClaimRemarks");
+                    $isPurchasedSpend = $this->input->post("isPurchasedSpend");
                     $acpmSuppliers = $this->input->post("acpmSuppliers");
                     $acpmPurchaseContract = $this->input->post("acpmPurchaseContract");
                     $acpmPurchaser = $this->input->post("acpmPurchaser");
                     $acpmInvoiceNumber = $this->input->post("acpmInvoiceNumber");
+                    $acpmMachineType = $this->input->post("acpmMachineType");
+                    $acpmClockStart = $this->input->post("acpmClockStart");
+                    $acpmClockEnd = $this->input->post("acpmClockEnd");
                     $editId = $this->input->post("edit_id");
+
+                    $expenseType = 0;
+                    if ($isPurchasedSpend == 1) {
+                        $acpmTotalValue = 0;
+                        $expenseType = 1;
+                    }
 
                     $costType = $this->input->post("costType");
 
@@ -241,6 +300,10 @@ class Operationalcost extends MY_Controller
                             "amount" => $acpmTotalValue,
                             "expense_date" => $acpmDate,
                             "remarks" => $acpmClaimRemarks,
+                            "expense_type" => $expenseType,
+                            "machine_type" => $acpmMachineType,
+                            "clock_start" => $acpmClockStart,
+                            "clock_end" => $acpmClockEnd,
                             "created_by" => $session['user_id'],
                             "is_active" => 1,
                         );
@@ -273,6 +336,10 @@ class Operationalcost extends MY_Controller
                             "amount" => $acpmTotalValue,
                             "expense_date" => $acpmDate,
                             "remarks" => $acpmClaimRemarks,
+                            "expense_type" => $expenseType,
+                            "machine_type" => $acpmMachineType,
+                            "clock_start" => $acpmClockStart,
+                            "clock_end" => $acpmClockEnd,
                             "created_by" => $session['user_id'],
                             "updated_by" => $session['user_id'],
                             "is_active" => 1,
@@ -307,6 +374,7 @@ class Operationalcost extends MY_Controller
                     $maintainanceSuppliers = $this->input->post("maintainanceSuppliers");
                     $maintainanceInvoiceNumber = $this->input->post("maintainanceInvoiceNumber");
                     $maintainancePurchaser = $this->input->post("maintainancePurchaser");
+                    $maintainanceMachineType = $this->input->post("maintainanceMachineType");
                     $editId = $this->input->post("edit_id");
 
                     $costType = $this->input->post("costType");
@@ -317,6 +385,7 @@ class Operationalcost extends MY_Controller
                             "supplier_id" => $maintainanceSuppliers,
                             "contract_id" => $maintainanceContract,
                             "purchaser_id" => $maintainancePurchaser,
+                            "machine_type" => $maintainanceMachineType,
                             "invoice_number" => $maintainanceInvoiceNumber,
                             "quantity" => 0,
                             "sub_total" => $maintainanceSubTotal,
@@ -349,6 +418,7 @@ class Operationalcost extends MY_Controller
                             "supplier_id" => $maintainanceSuppliers,
                             "contract_id" => $maintainanceContract,
                             "purchaser_id" => $maintainancePurchaser,
+                            "machine_type" => $maintainanceMachineType,
                             "invoice_number" => $maintainanceInvoiceNumber,
                             "quantity" => 0,
                             "sub_total" => $maintainanceSubTotal,
@@ -543,6 +613,7 @@ class Operationalcost extends MY_Controller
                     $lubricantsQuantity = $this->input->post('lubricantsQuantity');
                     $lubricantsTotalValue = $this->input->post("lubricantsTotalValue");
                     $lubricantsClaimRemarks = $this->input->post("lubricantsClaimRemarks");
+                    $isLubricantsPurchasedSpend = $this->input->post("isPurchasedSpend");
                     $lubricantsSuppliers = $this->input->post("lubricantsSuppliers");
                     $lubricantsPurchaseContract = $this->input->post("lubricantsPurchaseContract");
                     $lubricantsPurchaser = $this->input->post("lubricantsPurchaser");
@@ -550,6 +621,12 @@ class Operationalcost extends MY_Controller
                     $editId = $this->input->post("edit_id");
 
                     $costType = $this->input->post("costType");
+
+                    $expenseType = 0;
+                    if ($isLubricantsPurchasedSpend == 1) {
+                        $lubricantsTotalValue = 0;
+                        $expenseType = 1;
+                    }
 
                     if ($editId > 0) {
 
@@ -564,6 +641,7 @@ class Operationalcost extends MY_Controller
                             "amount" => $lubricantsTotalValue,
                             "expense_date" => $lubricantsDate,
                             "remarks" => $lubricantsClaimRemarks,
+                            "expense_type" => $expenseType,
                             "created_by" => $session['user_id'],
                             "is_active" => 1,
                         );
@@ -596,6 +674,7 @@ class Operationalcost extends MY_Controller
                             "amount" => $lubricantsTotalValue,
                             "expense_date" => $lubricantsDate,
                             "remarks" => $lubricantsClaimRemarks,
+                            "expense_type" => $expenseType,
                             "created_by" => $session['user_id'],
                             "updated_by" => $session['user_id'],
                             "is_active" => 1,
@@ -1625,6 +1704,7 @@ class Operationalcost extends MY_Controller
                     'contractId' => $operationalCostDetails[0]->contract_id + 0,
                     'purchaserId' => $operationalCostDetails[0]->purchaser_id + 0,
                     'invoiceNumber' => $operationalCostDetails[0]->invoice_number,
+                    'machineType' => $operationalCostDetails[0]->machine_type,
                     'expenseDate' => $operationalCostDetails[0]->expense_date,
                     'subTotal' => $operationalCostDetails[0]->sub_total + 0,
                     'taxAmount' => $operationalCostDetails[0]->tax_amount + 0,
@@ -1685,6 +1765,10 @@ class Operationalcost extends MY_Controller
                     'amount' => $operationalCostDetails[0]->amount + 0,
                     'remarks' => $operationalCostDetails[0]->remarks,
                     'costingid' => $operationalCostDetails[0]->id,
+                    'expenseType' => $operationalCostDetails[0]->expense_type,
+                    'machineType' => $operationalCostDetails[0]->machine_type,
+                    'clockStart' => $operationalCostDetails[0]->clock_start + 0,
+                    'clockEnd' => $operationalCostDetails[0]->clock_end + 0,
                 );
 
                 $Return["result"] = $data;
@@ -1705,6 +1789,7 @@ class Operationalcost extends MY_Controller
                     'amount' => $operationalCostDetails[0]->amount + 0,
                     'remarks' => $operationalCostDetails[0]->remarks,
                     'costingid' => $operationalCostDetails[0]->id,
+                    'expenseType' => $operationalCostDetails[0]->expense_type,
                 );
 
                 $Return["result"] = $data;
@@ -1946,17 +2031,791 @@ class Operationalcost extends MY_Controller
 
     public function deletefilesfromfolder()
     {
-        $files = glob("assets/costingdocs/xmlupload/*.xml");
-        foreach ($files as $file) {
-            if (is_file($file)) {
-                unlink($file);
-            }
-        }
 
-        $files1 = glob(FCPATH . "reports/ContractReports/*.xlsx");
+        $files1 = glob(FCPATH . "reports/ForestryReports/*.xlsx");
         foreach ($files1 as $file1) {
             if (is_file($file1)) {
                 unlink($file1);
+            }
+        }
+    }
+
+    public function dialog_operations_action()
+    {
+        $Return = array('pages' => '', 'redirect' => false, 'result' => '', 'error' => '', 'csrf_hash' => '');
+        $session = $this->session->userdata('fullname');
+
+        if (!empty($session)) {
+            
+            if ($this->input->get('type') == "generatemaintainancereport") {
+                $data = array(
+                    'downloadtype' => "generatemaintainancereport",
+                    'pageheading' => $this->lang->line('generate_report'),
+                    'csrf_hash' => $this->security->get_csrf_hash(),
+                );
+
+                $this->load->view('forestry/dialog_generate_operations', $data);
+            } else if ($this->input->get('type') == "generatemachinerentalreport") {
+                $data = array(
+                    'downloadtype' => "generatemachinerentalreport",
+                    'pageheading' => $this->lang->line('generate_report'),
+                    'csrf_hash' => $this->security->get_csrf_hash(),
+                );
+
+                $this->load->view('forestry/dialog_generate_operations', $data);
+            } else if ($this->input->get('type') == "generatemanuallabourreport") {
+                $data = array(
+                    'downloadtype' => "generatemanuallabourreport",
+                    'pageheading' => $this->lang->line('generate_report'),
+                    'csrf_hash' => $this->security->get_csrf_hash(),
+                );
+
+                $this->load->view('forestry/dialog_generate_operations', $data);
+            } else if ($this->input->get('type') == "generateacpmreport") {
+                $data = array(
+                    'downloadtype' => "generateacpmreport",
+                    'pageheading' => $this->lang->line('generate_report'),
+                    'csrf_hash' => $this->security->get_csrf_hash(),
+                );
+
+                $this->load->view('forestry/dialog_generate_operations', $data);
+            } else if ($this->input->get('type') == "generatelubricantsreport") {
+                $data = array(
+                    'downloadtype' => "generatelubricantsreport",
+                    'pageheading' => $this->lang->line('generate_report'),
+                    'csrf_hash' => $this->security->get_csrf_hash(),
+                );
+
+                $this->load->view('forestry/dialog_generate_operations', $data);
+            } else if ($this->input->get('type') == "generateothersreport") {
+                $data = array(
+                    'downloadtype' => "generateothersreport",
+                    'pageheading' => $this->lang->line('generate_report'),
+                    'csrf_hash' => $this->security->get_csrf_hash(),
+                );
+
+                $this->load->view('forestry/dialog_generate_operations', $data);
+            }
+        } else {
+            $Return['pages'] = "";
+            $Return['redirect'] = true;
+            $this->output($Return);
+        }
+    }
+
+    public function download_operations_report()
+    {
+        $Return = array('pages' => '', 'redirect' => false, 'result' => '', 'error' => '', 'csrf_hash' => '');
+        $session = $this->session->userdata('fullname');
+        if (empty($session)) {
+            redirect("/logout");
+        }
+
+        $this->deletefilesfromfolder();
+
+        $originId = (int)$this->input->post('originId');
+        $supplierId = (int)$this->input->post('supplierId');
+        $contractId = (int)$this->input->post('farmId');
+        $fromDate = $this->input->post('fromDate');
+        $toDate = $this->input->post('toDate');
+        $downloadType = $this->input->post('downloadType');
+
+        // Generate report
+        if ($downloadType == "generatemaintainancereport") {
+            $maintainanceReports = $this->Forestry_model->fetch_operations_report_data(5, $originId, $supplierId, $contractId, $fromDate, $toDate);
+
+            if (count($maintainanceReports) == 0) {
+                $Return['error'] = $this->lang->line('no_data_available');
+                $this->output($Return);
+            } else {
+
+                $this->excel->setActiveSheetIndex(0);
+                $objSheet = $this->excel->getActiveSheet();
+                $objSheet->setTitle($this->lang->line('maintenance_report_type'));
+                $objSheet->getParent()->getDefaultStyle()->getFont()->setName('Calibri')->setSize(10);
+
+                $styleArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                );
+
+                $styleThickArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THICK
+                        )
+                    )
+                );
+
+                $objSheet->SetCellValue('B1', $this->lang->line("maintenance_report_type"));
+                $objSheet->mergeCells('B1:G2');
+                $objSheet->getStyle("B1")->getFont()->setSize(13)->setBold(true);
+                $objSheet->getStyle("B1:G2")->applyFromArray($styleArray);
+                $objSheet->getStyle("B1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("B1")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $objSheet->SetCellValue("A4", $this->lang->line('assigned_to'));
+                $objSheet->SetCellValue("B4", $this->lang->line('contract_code'));
+                $objSheet->SetCellValue("C4", $this->lang->line('description'));
+                $objSheet->SetCellValue("D4", $this->lang->line('suppliercredit_title'));
+                $objSheet->SetCellValue("E4", $this->lang->line('invoice_number'));
+                $objSheet->SetCellValue("F4", $this->lang->line('machine_type'));
+                $objSheet->SetCellValue("G4", $this->lang->line('expense_date'));
+                $objSheet->SetCellValue("H4", $this->lang->line('export_subtotal'));
+                $objSheet->SetCellValue("I4", $this->lang->line('export_iva'));
+                $objSheet->SetCellValue("J4", $this->lang->line('amount'));
+                $objSheet->SetCellValue("K4", $this->lang->line('claim_remarks'));
+
+                $objSheet->getStyle("A4:K4")->getFont()->setBold(true);
+                $objSheet->getStyle("A4:K4")->applyFromArray($styleArray);
+                $objSheet->getStyle("A4:K4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("A4:K4")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $rowCount = 5;
+                foreach ($maintainanceReports as $mr) {
+
+                    $objSheet->SetCellValue("A$rowCount", $mr->supplier_name);
+                    $objSheet->SetCellValue("B$rowCount", $mr->contract_code);
+                    $objSheet->SetCellValue("C$rowCount", $mr->description);
+                    if($mr->purchaser_name != null && $mr->purchaser_name != "") {
+                        $objSheet->SetCellValue("D$rowCount", $mr->purchaser_name . " / " . $mr->company_id);
+                    } else {
+                        $objSheet->SetCellValue("D$rowCount", "");
+                    }
+                    $objSheet->SetCellValue("E$rowCount", $mr->invoice_number);
+
+                    if($mr->machine_type != null && $mr->machine_type != "") {
+                        $objSheet->SetCellValue("F$rowCount", $mr->machine_type . " / " . $mr->chassis_no);
+                    } else {
+                        $objSheet->SetCellValue("F$rowCount", "");
+                    }
+                    
+                    $dateObj = DateTime::createFromFormat('d/m/Y', trim($mr->expense_date));
+
+                    if ($dateObj !== false) {
+                        $dateObj->setTime(0, 0, 0);
+
+                        // FLOOR removes any decimal time fraction
+                        $excelDate = (int) PHPExcel_Shared_Date::PHPToExcel($dateObj);
+
+                        $objSheet->setCellValue('G' . $rowCount, $excelDate);
+                    }
+
+                    $objSheet->SetCellValue("H$rowCount", $mr->sub_total + 0);
+                    $objSheet->SetCellValue("I$rowCount", $mr->tax_amount + 0);
+                    $objSheet->SetCellValue("J$rowCount", $mr->amount + 0);
+                    $objSheet->SetCellValue("K$rowCount", $mr->remarks);
+
+                    $rowCount++;
+                }
+
+                $lastRow = $rowCount - 1;
+                $objSheet->getStyle("G5:G$lastRow")->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+                $objSheet->getStyle("H5:J$lastRow")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
+                $objSheet->getStyle("A5:K$lastRow")->applyFromArray($styleArray);
+
+                $objSheet->getColumnDimension('A')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('B')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('C')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('D')->setAutoSize(false)->setWidth(30);
+                $objSheet->getColumnDimension('E')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('F')->setAutoSize(false)->setWidth(20);
+                $objSheet->getColumnDimension('G')->setAutoSize(false)->setWidth(20);
+                $objSheet->getColumnDimension('H')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('I')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('J')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('K')->setAutoSize(false)->setWidth(25);
+
+                unset($styleArray);
+                unset($styleThickArray);
+                $six_digit_random_number = mt_rand(100000, 999999);
+                $month_name = ucfirst(date("dmY"));
+
+                $filename =  'MaintainanceReport_' . $month_name . '_' . $six_digit_random_number . '.xlsx';
+
+                header('Content-Type: application/vnd.ms-excel');
+                header('Content-Disposition: attachment;filename="' . $filename . '"');
+                header('Cache-Control: max-age=0');
+
+                $objWriter = new PHPExcel_Writer_Excel2007($this->excel);
+                $objWriter->save('./reports/ForestryReports/' . $filename);
+                $objWriter->setPreCalculateFormulas(true);
+                $Return['error'] = '';
+                $Return['result'] = site_url() . 'reports/ForestryReports/' . $filename;
+                $Return['successmessage'] = $this->lang->line('report_downloaded');
+                if ($Return['result'] != '') {
+                    $this->output($Return);
+                }
+            }
+        } else if ($downloadType == "generatemachinerentalreport") {
+            $machinrRentalReports = $this->Forestry_model->fetch_operations_report_data(7, $originId, $supplierId, $contractId, $fromDate, $toDate);
+
+            if (count($machinrRentalReports) == 0) {
+                $Return['error'] = $this->lang->line('no_data_available');
+                $this->output($Return);
+            } else {
+
+                $this->excel->setActiveSheetIndex(0);
+                $objSheet = $this->excel->getActiveSheet();
+                $objSheet->setTitle($this->lang->line('machine_rental_report'));
+                $objSheet->getParent()->getDefaultStyle()->getFont()->setName('Calibri')->setSize(10);
+
+                $styleArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                );
+
+                $styleThickArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THICK
+                        )
+                    )
+                );
+
+                $objSheet->SetCellValue('B1', $this->lang->line("machine_rental_report"));
+                $objSheet->mergeCells('B1:D2');
+                $objSheet->getStyle("B1")->getFont()->setSize(13)->setBold(true);
+                $objSheet->getStyle("B1:D2")->applyFromArray($styleArray);
+                $objSheet->getStyle("B1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("B1")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $objSheet->SetCellValue("A4", $this->lang->line('assigned_to'));
+                $objSheet->SetCellValue("B4", $this->lang->line('contract_code'));
+                $objSheet->SetCellValue("C4", $this->lang->line('description'));
+                $objSheet->SetCellValue("D4", $this->lang->line('expense_date'));
+                $objSheet->SetCellValue("E4", $this->lang->line('amount'));
+                $objSheet->SetCellValue("F4", $this->lang->line('claim_remarks'));
+
+                $objSheet->getStyle("A4:F4")->getFont()->setBold(true);
+                $objSheet->getStyle("A4:F4")->applyFromArray($styleArray);
+                $objSheet->getStyle("A4:F4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("A4:F4")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $rowCount = 5;
+                foreach ($machinrRentalReports as $mr) {
+
+                    $objSheet->SetCellValue("A$rowCount", $mr->supplier_name);
+                    $objSheet->SetCellValue("B$rowCount", $mr->contract_code);
+                    $objSheet->SetCellValue("C$rowCount", $mr->description);
+
+                    $dateObj = DateTime::createFromFormat('d/m/Y', trim($mr->expense_date));
+
+                    if ($dateObj !== false) {
+                        $dateObj->setTime(0, 0, 0);
+
+                        // FLOOR removes any decimal time fraction
+                        $excelDate = (int) PHPExcel_Shared_Date::PHPToExcel($dateObj);
+
+                        $objSheet->setCellValue('D' . $rowCount, $excelDate);
+                    }
+
+                    $objSheet->SetCellValue("E$rowCount", $mr->amount + 0);
+                    $objSheet->SetCellValue("F$rowCount", $mr->remarks);
+
+                    $rowCount++;
+                }
+
+                $lastRow = $rowCount - 1;
+                $objSheet->getStyle("D5:D$lastRow")->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+                $objSheet->getStyle("E5:E$lastRow")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
+                $objSheet->getStyle("A5:F$lastRow")->applyFromArray($styleArray);
+
+                $objSheet->getColumnDimension('A')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('B')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('C')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('D')->setAutoSize(false)->setWidth(30);
+                $objSheet->getColumnDimension('E')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('F')->setAutoSize(false)->setWidth(20);
+
+                unset($styleArray);
+                unset($styleThickArray);
+                $six_digit_random_number = mt_rand(100000, 999999);
+                $month_name = ucfirst(date("dmY"));
+
+                $filename =  'MachineRentalReport_' . $month_name . '_' . $six_digit_random_number . '.xlsx';
+
+                header('Content-Type: application/vnd.ms-excel');
+                header('Content-Disposition: attachment;filename="' . $filename . '"');
+                header('Cache-Control: max-age=0');
+
+                $objWriter = new PHPExcel_Writer_Excel2007($this->excel);
+                $objWriter->save('./reports/ForestryReports/' . $filename);
+                $objWriter->setPreCalculateFormulas(true);
+                $Return['error'] = '';
+                $Return['result'] = site_url() . 'reports/ForestryReports/' . $filename;
+                $Return['successmessage'] = $this->lang->line('report_downloaded');
+                if ($Return['result'] != '') {
+                    $this->output($Return);
+                }
+            }
+        } else if ($downloadType == "generatemanuallabourreport") {
+            $manualLabourReports = $this->Forestry_model->fetch_operations_report_data(8, $originId, $supplierId, $contractId, $fromDate, $toDate);
+
+            if (count($manualLabourReports) == 0) {
+                $Return['error'] = $this->lang->line('no_data_available');
+                $this->output($Return);
+            } else {
+
+                $this->excel->setActiveSheetIndex(0);
+                $objSheet = $this->excel->getActiveSheet();
+                $objSheet->setTitle($this->lang->line('manual_labour_report'));
+                $objSheet->getParent()->getDefaultStyle()->getFont()->setName('Calibri')->setSize(10);
+
+                $styleArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                );
+
+                $styleThickArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THICK
+                        )
+                    )
+                );
+
+                $objSheet->SetCellValue('B1', $this->lang->line("manual_labour_report"));
+                $objSheet->mergeCells('B1:D2');
+                $objSheet->getStyle("B1")->getFont()->setSize(13)->setBold(true);
+                $objSheet->getStyle("B1:D2")->applyFromArray($styleArray);
+                $objSheet->getStyle("B1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("B1")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $objSheet->SetCellValue("A4", $this->lang->line('assigned_to'));
+                $objSheet->SetCellValue("B4", $this->lang->line('contract_code'));
+                $objSheet->SetCellValue("C4", $this->lang->line('description'));
+                $objSheet->SetCellValue("D4", $this->lang->line('expense_date'));
+                $objSheet->SetCellValue("E4", $this->lang->line('amount'));
+                $objSheet->SetCellValue("F4", $this->lang->line('claim_remarks'));
+
+                $objSheet->getStyle("A4:F4")->getFont()->setBold(true);
+                $objSheet->getStyle("A4:F4")->applyFromArray($styleArray);
+                $objSheet->getStyle("A4:F4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("A4:F4")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $rowCount = 5;
+                foreach ($manualLabourReports as $mr) {
+
+                    $objSheet->SetCellValue("A$rowCount", $mr->supplier_name);
+                    $objSheet->SetCellValue("B$rowCount", $mr->contract_code);
+                    $objSheet->SetCellValue("C$rowCount", $mr->description);
+
+                    $dateObj = DateTime::createFromFormat('d/m/Y', trim($mr->expense_date));
+
+                    if ($dateObj !== false) {
+                        $dateObj->setTime(0, 0, 0);
+
+                        // FLOOR removes any decimal time fraction
+                        $excelDate = (int) PHPExcel_Shared_Date::PHPToExcel($dateObj);
+
+                        $objSheet->setCellValue('D' . $rowCount, $excelDate);
+                    }
+
+                    $objSheet->SetCellValue("E$rowCount", $mr->amount + 0);
+                    $objSheet->SetCellValue("F$rowCount", $mr->remarks);
+
+                    $rowCount++;
+                }
+
+                $lastRow = $rowCount - 1;
+                $objSheet->getStyle("D5:D$lastRow")->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+                $objSheet->getStyle("E5:E$lastRow")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
+                $objSheet->getStyle("A5:F$lastRow")->applyFromArray($styleArray);
+
+                $objSheet->getColumnDimension('A')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('B')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('C')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('D')->setAutoSize(false)->setWidth(30);
+                $objSheet->getColumnDimension('E')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('F')->setAutoSize(false)->setWidth(20);
+
+                unset($styleArray);
+                unset($styleThickArray);
+                $six_digit_random_number = mt_rand(100000, 999999);
+                $month_name = ucfirst(date("dmY"));
+
+                $filename =  'ManualLaboursReport_' . $month_name . '_' . $six_digit_random_number . '.xlsx';
+
+                header('Content-Type: application/vnd.ms-excel');
+                header('Content-Disposition: attachment;filename="' . $filename . '"');
+                header('Cache-Control: max-age=0');
+
+                $objWriter = new PHPExcel_Writer_Excel2007($this->excel);
+                $objWriter->save('./reports/ForestryReports/' . $filename);
+                $objWriter->setPreCalculateFormulas(true);
+                $Return['error'] = '';
+                $Return['result'] = site_url() . 'reports/ForestryReports/' . $filename;
+                $Return['successmessage'] = $this->lang->line('report_downloaded');
+                if ($Return['result'] != '') {
+                    $this->output($Return);
+                }
+            }
+        } else if ($downloadType == "generateacpmreport") {
+            $acpmReports = $this->Forestry_model->fetch_operations_report_data(4, $originId, $supplierId, $contractId, $fromDate, $toDate);
+
+            if (count($acpmReports) == 0) {
+                $Return['error'] = $this->lang->line('no_data_available');
+                $this->output($Return);
+            } else {
+
+                $this->excel->setActiveSheetIndex(0);
+                $objSheet = $this->excel->getActiveSheet();
+                $objSheet->setTitle($this->lang->line('acpm_report'));
+                $objSheet->getParent()->getDefaultStyle()->getFont()->setName('Calibri')->setSize(10);
+
+                $styleArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                );
+
+                $styleThickArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THICK
+                        )
+                    )
+                );
+
+                $objSheet->SetCellValue('B1', $this->lang->line("acpm_report"));
+                $objSheet->mergeCells('B1:G2');
+                $objSheet->getStyle("B1")->getFont()->setSize(13)->setBold(true);
+                $objSheet->getStyle("B1:G2")->applyFromArray($styleArray);
+                $objSheet->getStyle("B1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("B1")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $objSheet->SetCellValue("A4", $this->lang->line('assigned_to'));
+                $objSheet->SetCellValue("B4", $this->lang->line('contract_code'));
+                $objSheet->SetCellValue("C4", $this->lang->line('description'));
+                $objSheet->SetCellValue("D4", $this->lang->line('suppliercredit_title'));
+                $objSheet->SetCellValue("E4", $this->lang->line('invoice_number'));
+                $objSheet->SetCellValue("F4", $this->lang->line('expense_date'));
+                $objSheet->SetCellValue("G4", $this->lang->line('quantity'));
+                $objSheet->SetCellValue("H4", $this->lang->line('ledger_type'));
+                $objSheet->SetCellValue("I4", $this->lang->line('amount'));
+                $objSheet->SetCellValue("J4", $this->lang->line('claim_remarks'));
+
+                $objSheet->getStyle("A4:J4")->getFont()->setBold(true);
+                $objSheet->getStyle("A4:J4")->applyFromArray($styleArray);
+                $objSheet->getStyle("A4:J4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("A4:J4")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $rowCount = 5;
+                foreach ($acpmReports as $mr) {
+
+                    $objSheet->SetCellValue("A$rowCount", $mr->supplier_name);
+                    $objSheet->SetCellValue("B$rowCount", $mr->contract_code);
+                    $objSheet->SetCellValue("C$rowCount", $mr->description);
+                    if($mr->purchaser_name != null && $mr->purchaser_name != "") {
+                        $objSheet->SetCellValue("D$rowCount", $mr->purchaser_name . " / " . $mr->company_id);
+                    } else {
+                        $objSheet->SetCellValue("D$rowCount", "");
+                    }
+                    $objSheet->SetCellValue("E$rowCount", $mr->invoice_number);
+
+                    $dateObj = DateTime::createFromFormat('d/m/Y', trim($mr->expense_date));
+
+                    if ($dateObj !== false) {
+                        $dateObj->setTime(0, 0, 0);
+
+                        // FLOOR removes any decimal time fraction
+                        $excelDate = (int) PHPExcel_Shared_Date::PHPToExcel($dateObj);
+
+                        $objSheet->setCellValue('F' . $rowCount, $excelDate);
+                    }
+
+                    $objSheet->SetCellValue("G$rowCount", $mr->quantity + 0);
+                    $objSheet->SetCellValue("H$rowCount", $mr->expense_type == 0 ? $this->lang->line('purchase') : $this->lang->line('spend'));
+                    $objSheet->SetCellValue("I$rowCount", $mr->amount + 0);
+                    $objSheet->SetCellValue("J$rowCount", $mr->remarks);
+
+                    $rowCount++;
+                }
+
+                $lastRow = $rowCount - 1;
+                $objSheet->getStyle("F5:F$lastRow")->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+                $objSheet->getStyle("I5:I$lastRow")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
+                $objSheet->getStyle("A5:J$lastRow")->applyFromArray($styleArray);
+
+                $objSheet->getColumnDimension('A')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('B')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('C')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('D')->setAutoSize(false)->setWidth(30);
+                $objSheet->getColumnDimension('E')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('F')->setAutoSize(false)->setWidth(20);
+                $objSheet->getColumnDimension('G')->setAutoSize(false)->setWidth(20);
+                $objSheet->getColumnDimension('H')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('I')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('J')->setAutoSize(false)->setWidth(25);
+
+                unset($styleArray);
+                unset($styleThickArray);
+                $six_digit_random_number = mt_rand(100000, 999999);
+                $month_name = ucfirst(date("dmY"));
+
+                $filename =  'ACPMReport_' . $month_name . '_' . $six_digit_random_number . '.xlsx';
+
+                header('Content-Type: application/vnd.ms-excel');
+                header('Content-Disposition: attachment;filename="' . $filename . '"');
+                header('Cache-Control: max-age=0');
+
+                $objWriter = new PHPExcel_Writer_Excel2007($this->excel);
+                $objWriter->save('./reports/ForestryReports/' . $filename);
+                $objWriter->setPreCalculateFormulas(true);
+                $Return['error'] = '';
+                $Return['result'] = site_url() . 'reports/ForestryReports/' . $filename;
+                $Return['successmessage'] = $this->lang->line('report_downloaded');
+                if ($Return['result'] != '') {
+                    $this->output($Return);
+                }
+            }
+        } else if ($downloadType == "generatelubricantsreport") {
+            $lubricatsReports = $this->Forestry_model->fetch_operations_report_data(9, $originId, $supplierId, $contractId, $fromDate, $toDate);
+
+            if (count($lubricatsReports) == 0) {
+                $Return['error'] = $this->lang->line('no_data_available');
+                $this->output($Return);
+            } else {
+
+                $this->excel->setActiveSheetIndex(0);
+                $objSheet = $this->excel->getActiveSheet();
+                $objSheet->setTitle($this->lang->line('lubricants_report'));
+                $objSheet->getParent()->getDefaultStyle()->getFont()->setName('Calibri')->setSize(10);
+
+                $styleArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                );
+
+                $styleThickArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THICK
+                        )
+                    )
+                );
+
+                $objSheet->SetCellValue('B1', $this->lang->line("lubricants_report"));
+                $objSheet->mergeCells('B1:G2');
+                $objSheet->getStyle("B1")->getFont()->setSize(13)->setBold(true);
+                $objSheet->getStyle("B1:G2")->applyFromArray($styleArray);
+                $objSheet->getStyle("B1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("B1")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $objSheet->SetCellValue("A4", $this->lang->line('assigned_to'));
+                $objSheet->SetCellValue("B4", $this->lang->line('contract_code'));
+                $objSheet->SetCellValue("C4", $this->lang->line('description'));
+                $objSheet->SetCellValue("D4", $this->lang->line('suppliercredit_title'));
+                $objSheet->SetCellValue("E4", $this->lang->line('invoice_number'));
+                $objSheet->SetCellValue("F4", $this->lang->line('expense_date'));
+                $objSheet->SetCellValue("G4", $this->lang->line('quantity'));
+                $objSheet->SetCellValue("H4", $this->lang->line('ledger_type'));
+                $objSheet->SetCellValue("I4", $this->lang->line('amount'));
+                $objSheet->SetCellValue("J4", $this->lang->line('claim_remarks'));
+
+                $objSheet->getStyle("A4:J4")->getFont()->setBold(true);
+                $objSheet->getStyle("A4:J4")->applyFromArray($styleArray);
+                $objSheet->getStyle("A4:J4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("A4:J4")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $rowCount = 5;
+                foreach ($lubricatsReports as $mr) {
+
+                    $objSheet->SetCellValue("A$rowCount", $mr->supplier_name);
+                    $objSheet->SetCellValue("B$rowCount", $mr->contract_code);
+                    $objSheet->SetCellValue("C$rowCount", $mr->description);
+                    if($mr->purchaser_name != null && $mr->purchaser_name != "") {
+                        $objSheet->SetCellValue("D$rowCount", $mr->purchaser_name . " / " . $mr->company_id);
+                    } else {
+                        $objSheet->SetCellValue("D$rowCount", "");
+                    }
+                    $objSheet->SetCellValue("E$rowCount", $mr->invoice_number);
+
+                    $dateObj = DateTime::createFromFormat('d/m/Y', trim($mr->expense_date));
+
+                    if ($dateObj !== false) {
+                        $dateObj->setTime(0, 0, 0);
+
+                        // FLOOR removes any decimal time fraction
+                        $excelDate = (int) PHPExcel_Shared_Date::PHPToExcel($dateObj);
+
+                        $objSheet->setCellValue('F' . $rowCount, $excelDate);
+                    }
+
+                    $objSheet->SetCellValue("G$rowCount", $mr->quantity + 0);
+                    $objSheet->SetCellValue("H$rowCount", $mr->expense_type == 0 ? $this->lang->line('purchase') : $this->lang->line('spend'));
+                    $objSheet->SetCellValue("I$rowCount", $mr->amount + 0);
+                    $objSheet->SetCellValue("J$rowCount", $mr->remarks);
+
+                    $rowCount++;
+                }
+
+                $lastRow = $rowCount - 1;
+                $objSheet->getStyle("F5:F$lastRow")->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+                $objSheet->getStyle("I5:I$lastRow")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
+                $objSheet->getStyle("A5:J$lastRow")->applyFromArray($styleArray);
+
+                $objSheet->getColumnDimension('A')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('B')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('C')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('D')->setAutoSize(false)->setWidth(30);
+                $objSheet->getColumnDimension('E')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('F')->setAutoSize(false)->setWidth(20);
+                $objSheet->getColumnDimension('G')->setAutoSize(false)->setWidth(20);
+                $objSheet->getColumnDimension('H')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('I')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('J')->setAutoSize(false)->setWidth(25);
+
+                unset($styleArray);
+                unset($styleThickArray);
+                $six_digit_random_number = mt_rand(100000, 999999);
+                $month_name = ucfirst(date("dmY"));
+
+                $filename =  'LubricantsReport_' . $month_name . '_' . $six_digit_random_number . '.xlsx';
+
+                header('Content-Type: application/vnd.ms-excel');
+                header('Content-Disposition: attachment;filename="' . $filename . '"');
+                header('Cache-Control: max-age=0');
+
+                $objWriter = new PHPExcel_Writer_Excel2007($this->excel);
+                $objWriter->save('./reports/ForestryReports/' . $filename);
+                $objWriter->setPreCalculateFormulas(true);
+                $Return['error'] = '';
+                $Return['result'] = site_url() . 'reports/ForestryReports/' . $filename;
+                $Return['successmessage'] = $this->lang->line('report_downloaded');
+                if ($Return['result'] != '') {
+                    $this->output($Return);
+                }
+            }
+        } else if ($downloadType == "generateothersreport") {
+            $otherReports = $this->Forestry_model->fetch_operations_report_data(6, $originId, $supplierId, $contractId, $fromDate, $toDate);
+
+            if (count($otherReports) == 0) {
+                $Return['error'] = $this->lang->line('no_data_available');
+                $this->output($Return);
+            } else {
+
+                $this->excel->setActiveSheetIndex(0);
+                $objSheet = $this->excel->getActiveSheet();
+                $objSheet->setTitle($this->lang->line('others_report'));
+                $objSheet->getParent()->getDefaultStyle()->getFont()->setName('Calibri')->setSize(10);
+
+                $styleArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                );
+
+                $styleThickArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THICK
+                        )
+                    )
+                );
+
+                $objSheet->SetCellValue('B1', $this->lang->line("others_report"));
+                $objSheet->mergeCells('B1:G2');
+                $objSheet->getStyle("B1")->getFont()->setSize(13)->setBold(true);
+                $objSheet->getStyle("B1:G2")->applyFromArray($styleArray);
+                $objSheet->getStyle("B1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("B1")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $objSheet->SetCellValue("A4", $this->lang->line('assigned_to'));
+                $objSheet->SetCellValue("B4", $this->lang->line('contract_code'));
+                $objSheet->SetCellValue("C4", $this->lang->line('description'));
+                $objSheet->SetCellValue("D4", $this->lang->line('suppliercredit_title'));
+                $objSheet->SetCellValue("E4", $this->lang->line('invoice_number'));
+                $objSheet->SetCellValue("F4", $this->lang->line('expense_date'));
+                $objSheet->SetCellValue("G4", $this->lang->line('amount'));
+                $objSheet->SetCellValue("H4", $this->lang->line('claim_remarks'));
+
+                $objSheet->getStyle("A4:H4")->getFont()->setBold(true);
+                $objSheet->getStyle("A4:H4")->applyFromArray($styleArray);
+                $objSheet->getStyle("A4:H4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                $objSheet->getStyle("A4:H4")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+                $rowCount = 5;
+                foreach ($otherReports as $mr) {
+
+                    $objSheet->SetCellValue("A$rowCount", $mr->supplier_name);
+                    $objSheet->SetCellValue("B$rowCount", $mr->contract_code);
+                    $objSheet->SetCellValue("C$rowCount", $mr->description);
+                    if($mr->purchaser_name != null && $mr->purchaser_name != "") {
+                        $objSheet->SetCellValue("D$rowCount", $mr->purchaser_name . " / " . $mr->company_id);
+                    } else {
+                        $objSheet->SetCellValue("D$rowCount", "");
+                    }
+                    $objSheet->SetCellValue("E$rowCount", $mr->invoice_number);
+
+                    $dateObj = DateTime::createFromFormat('d/m/Y', trim($mr->expense_date));
+
+                    if ($dateObj !== false) {
+                        $dateObj->setTime(0, 0, 0);
+
+                        // FLOOR removes any decimal time fraction
+                        $excelDate = (int) PHPExcel_Shared_Date::PHPToExcel($dateObj);
+
+                        $objSheet->setCellValue('F' . $rowCount, $excelDate);
+                    }
+
+                    $objSheet->SetCellValue("G$rowCount", $mr->amount + 0);
+                    $objSheet->SetCellValue("H$rowCount", $mr->remarks);
+
+                    $rowCount++;
+                }
+
+                $lastRow = $rowCount - 1;
+                $objSheet->getStyle("F5:F$lastRow")->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+                $objSheet->getStyle("G5:G$lastRow")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
+                $objSheet->getStyle("A5:H$lastRow")->applyFromArray($styleArray);
+
+                $objSheet->getColumnDimension('A')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('B')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('C')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('D')->setAutoSize(false)->setWidth(30);
+                $objSheet->getColumnDimension('E')->setAutoSize(false)->setWidth(25);
+                $objSheet->getColumnDimension('F')->setAutoSize(false)->setWidth(20);
+                $objSheet->getColumnDimension('G')->setAutoSize(false)->setWidth(20);
+                $objSheet->getColumnDimension('H')->setAutoSize(false)->setWidth(25);
+
+                unset($styleArray);
+                unset($styleThickArray);
+                $six_digit_random_number = mt_rand(100000, 999999);
+                $month_name = ucfirst(date("dmY"));
+
+                $filename =  'OthersReport_' . $month_name . '_' . $six_digit_random_number . '.xlsx';
+
+                header('Content-Type: application/vnd.ms-excel');
+                header('Content-Disposition: attachment;filename="' . $filename . '"');
+                header('Cache-Control: max-age=0');
+
+                $objWriter = new PHPExcel_Writer_Excel2007($this->excel);
+                $objWriter->save('./reports/ForestryReports/' . $filename);
+                $objWriter->setPreCalculateFormulas(true);
+                $Return['error'] = '';
+                $Return['result'] = site_url() . 'reports/ForestryReports/' . $filename;
+                $Return['successmessage'] = $this->lang->line('report_downloaded');
+                if ($Return['result'] != '') {
+                    $this->output($Return);
+                }
             }
         }
     }

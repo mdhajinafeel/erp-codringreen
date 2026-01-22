@@ -8,7 +8,7 @@ $applicable_origins = $session["applicable_origins"];
     <div class="card-header table-responsive">
         <div class="row flex-between-end">
             <div class="col-auto align-self-center">
-                <h3> <?php echo $this->lang->line('costings'); ?> </h3>
+                <h3> <?php echo $this->lang->line('operational_costs'); ?> </h3>
                 <input type="hidden" id="hdnCsrf" name="hdnCsrf" value="<?php echo $csrfhash; ?>">
             </div>
 
@@ -70,14 +70,14 @@ $applicable_origins = $session["applicable_origins"];
 
                             <div class="tab-pane fade show active" id="nav-maintenance" role="tabpanel" aria-labelledby="nav-maintenance-tab">
 
-                                <!-- <div class="row flex-between-end">
+                                <div class="row flex-between-end">
                                     <div class="col-auto ms-auto">
                                         <button class="btn btn-warning btn-md btn-right-margin" title="<?php echo $this->lang->line('download_reports'); ?>" type="button" id="generate_maintainance_report">
                                             <span class="fas fa-file-excel" data-fa-transform="shrink-3 down-2"></span><span class="ms-1">
                                                 <?php echo $this->lang->line('download_reports'); ?></span>
                                         </button>
                                     </div>
-                                </div> -->
+                                </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-2">
@@ -127,6 +127,14 @@ $applicable_origins = $session["applicable_origins"];
                                     </div>
 
                                     <div class="col-md-2">
+                                        <label for="maintainance_machine_type"><?php echo $this->lang->line("machine_type"); ?><span class="mandatory"> *</span></label>
+                                        <select class="form-control" name="maintainance_machine_type" id="maintainance_machine_type" data-plugin="select_erp">
+                                            <option value="0"><?php echo $this->lang->line("select"); ?></option>
+                                        </select>
+                                        <label id="error-maintainance_machine_type" class="error-text"><?php echo $this->lang->line("error_machine"); ?></label>
+                                    </div>
+
+                                    <div class="col-md-2">
                                         <label for="maintainance_subtotal"><?php echo $this->lang->line("export_subtotal"); ?><span class="mandatory"> *</span></label>
                                         <input type="number" step="any" id="maintainance_subtotal" name="maintainance_subtotal" class="form-control" value="" placeholder="<?php echo $this->lang->line("export_subtotal"); ?>" />
                                         <label id="error-maintainance_subtotal" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
@@ -166,6 +174,7 @@ $applicable_origins = $session["applicable_origins"];
                                                 <th><?php echo $this->lang->line('supplier_name'); ?></th>
                                                 <th><?php echo $this->lang->line('purchase_contract'); ?></th>
                                                 <th><?php echo $this->lang->line('invoice_number'); ?></th>
+                                                <th><?php echo $this->lang->line('machine_type'); ?></th>
                                                 <th><?php echo $this->lang->line('expense_date'); ?></th>
                                                 <th><?php echo $this->lang->line('total_cost'); ?></th>
                                             </tr>
@@ -176,14 +185,14 @@ $applicable_origins = $session["applicable_origins"];
 
                             <div class="tab-pane fade show" id="nav-machinerental" role="tabpanel" aria-labelledby="nav-machinerental-tab">
 
-                                <!-- <div class="row flex-between-end">
+                                <div class="row flex-between-end">
                                     <div class="col-auto ms-auto">
-                                        <button class="btn btn-warning btn-md btn-right-margin" title="<?php echo $this->lang->line('download_reports'); ?>" type="button" id="generate_maintainance_report">
+                                        <button class="btn btn-warning btn-md btn-right-margin" title="<?php echo $this->lang->line('download_reports'); ?>" type="button" id="generate_machinerental_report">
                                             <span class="fas fa-file-excel" data-fa-transform="shrink-3 down-2"></span><span class="ms-1">
                                                 <?php echo $this->lang->line('download_reports'); ?></span>
                                         </button>
                                     </div>
-                                </div> -->
+                                </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-2">
@@ -252,14 +261,14 @@ $applicable_origins = $session["applicable_origins"];
 
                             <div class="tab-pane fade show" id="nav-manuallabour" role="tabpanel" aria-labelledby="nav-manuallabour-tab">
 
-                                <!-- <div class="row flex-between-end">
+                                <div class="row mb-5 flex-between-end">
                                     <div class="col-auto ms-auto">
-                                        <button class="btn btn-warning btn-md btn-right-margin" title="<?php echo $this->lang->line('download_reports'); ?>" type="button" id="generate_maintainance_report">
+                                        <button class="btn btn-warning btn-md btn-right-margin" title="<?php echo $this->lang->line('download_reports'); ?>" type="button" id="generate_manuallabour_report">
                                             <span class="fas fa-file-excel" data-fa-transform="shrink-3 down-2"></span><span class="ms-1">
                                                 <?php echo $this->lang->line('download_reports'); ?></span>
                                         </button>
                                     </div>
-                                </div> -->
+                                </div>
 
                                 <!-- <div class="row mb-3">
                                     <div class="col-md-6 mb-2">
@@ -328,15 +337,14 @@ $applicable_origins = $session["applicable_origins"];
 
                             <div class="tab-pane fade" id="nav-acpm" role="tabpanel" aria-labelledby="nav-acpm-tab">
 
-                                <!-- <div class="row flex-between-end">
-
+                                <div class="row flex-between-end">
                                     <div class="col-auto ms-auto">
                                         <button class="btn btn-warning btn-md btn-right-margin" title="<?php echo $this->lang->line('download_reports'); ?>" type="button" id="generate_acpm_report">
                                             <span class="fas fa-file-excel" data-fa-transform="shrink-3 down-2"></span><span class="ms-1">
                                                 <?php echo $this->lang->line('download_reports'); ?></span>
                                         </button>
                                     </div>
-                                </div> -->
+                                </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-2">
@@ -362,7 +370,7 @@ $applicable_origins = $session["applicable_origins"];
                                         <label id="error-acpm_purchasecontract" class="error-text"><?php echo $this->lang->line("error_purchase_contract"); ?></label>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label for="acpm_purchaser"><?php echo $this->lang->line("suppliercredit_title"); ?></label>
                                         <select class="form-control" name="acpm_purchaser" id="acpm_purchaser" data-plugin="select_erp">
                                             <option value="0"><?php echo $this->lang->line("select"); ?></option>
@@ -370,17 +378,37 @@ $applicable_origins = $session["applicable_origins"];
                                         <label id="error-acpm_purchaser" class="error-text"><?php echo $this->lang->line("error_select_name"); ?></label>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label for="acpm_invoice_number"><?php echo $this->lang->line("invoice_number"); ?></label>
                                         <input type="text" id="acpm_invoice_number" name="acpm_invoice_number" class="form-control" value="" placeholder="<?php echo $this->lang->line("invoice_number"); ?>" />
                                         <label id="error-acpm_invoice_number" class="error-text"><?php echo $this->lang->line("error_invoice_no"); ?></label>
                                     </div>
-                                </div>
-                                <div class="row mb-3">
+
                                     <div class="col-md-2">
                                         <label for="acpm_date"><?php echo $this->lang->line("expense_date"); ?><span class="mandatory"> *</span></label>
                                         <input type="text" id="acpm_date" name="acpm_date" class="form-control text-uppercase" value="" readonly placeholder="<?php echo $this->lang->line("expense_date"); ?>" />
                                         <label id="error-acpm_date" class="error-text"><?php echo $this->lang->line("error_date"); ?></label>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-2">
+                                        <label for="acpm_machine_type"><?php echo $this->lang->line("machine_type"); ?><span class="mandatory"> *</span></label>
+                                        <select class="form-control" name="acpm_machine_type" id="acpm_machine_type" data-plugin="select_erp">
+                                            <option value="0"><?php echo $this->lang->line("select"); ?></option>
+                                        </select>
+                                        <label id="error-acpm_machine_type" class="error-text"><?php echo $this->lang->line("error_machine"); ?></label>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="acpm_clock_start"><?php echo $this->lang->line("clock_start"); ?><span class="mandatory"> *</span></label>
+                                        <input type="number" step="any" id="acpm_clock_start" name="acpm_clock_start" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("clock_start"); ?>" />
+                                        <label id="error-acpm_clock_start" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="acpm_clock_end"><?php echo $this->lang->line("clock_end"); ?><span class="mandatory"> *</span></label>
+                                        <input type="number" step="any" id="acpm_clock_end" name="acpm_clock_end" class="form-control text-uppercase" value="" placeholder="<?php echo $this->lang->line("clock_end"); ?>" />
+                                        <label id="error-acpm_clock_end" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
 
                                     <div class="col-md-2">
@@ -390,7 +418,15 @@ $applicable_origins = $session["applicable_origins"];
                                     </div>
 
                                     <div class="col-md-2">
-                                        <label for="acpm_total_value"><?php echo $this->lang->line("total_value"); ?><span class="mandatory"> *</span></label>
+                                        <div class="d-inline-flex align-items-center" style="margin-bottom: 8px;">
+                                            <label for="flexSwitchCheckChecked" class="mb-0 me-2"><?php echo $this->lang->line("purchase"); ?></label>
+
+                                            <div class="form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" />
+                                            </div>
+
+                                            <label for="flexSwitchCheckChecked" class="mb-0"><?php echo $this->lang->line("spend"); ?></label><span class="mandatory"> *</span></label>
+                                        </div>
                                         <input type="number" step="any" id="acpm_total_value" name="acpm_total_value" class="form-control" value="" placeholder="<?php echo $this->lang->line("total_value"); ?>" />
                                         <label id="error-acpm_total_value" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
@@ -421,6 +457,7 @@ $applicable_origins = $session["applicable_origins"];
                                                     <th><?php echo $this->lang->line('expense_date'); ?></th>
                                                     <th><?php echo $this->lang->line('quantity'); ?></th>
                                                     <th><?php echo $this->lang->line('total_cost'); ?></th>
+                                                    <th><?php echo $this->lang->line('ledger_type'); ?></th>
                                                 </tr>
                                             </thead>
                                         </table>
@@ -435,15 +472,14 @@ $applicable_origins = $session["applicable_origins"];
 
                             <div class="tab-pane fade" id="nav-lubricants" role="tabpanel" aria-labelledby="nav-lubricants-tab">
 
-                                <!-- <div class="row flex-between-end">
-
+                                <div class="row flex-between-end">
                                     <div class="col-auto ms-auto">
-                                        <button class="btn btn-warning btn-md btn-right-margin" title="<?php echo $this->lang->line('download_reports'); ?>" type="button" id="generate_acpm_report">
+                                        <button class="btn btn-warning btn-md btn-right-margin" title="<?php echo $this->lang->line('download_reports'); ?>" type="button" id="generate_lubricants_report">
                                             <span class="fas fa-file-excel" data-fa-transform="shrink-3 down-2"></span><span class="ms-1">
                                                 <?php echo $this->lang->line('download_reports'); ?></span>
                                         </button>
                                     </div>
-                                </div> -->
+                                </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-2">
@@ -497,7 +533,15 @@ $applicable_origins = $session["applicable_origins"];
                                     </div>
 
                                     <div class="col-md-2">
-                                        <label for="lubricants_total_value"><?php echo $this->lang->line("total_value"); ?><span class="mandatory"> *</span></label>
+                                        <div class="d-inline-flex align-items-center" style="margin-bottom: 8px;">
+                                            <label for="flexSwitchCheckCheckedLubricants" class="mb-0 me-2"><?php echo $this->lang->line("purchase"); ?></label>
+
+                                            <div class="form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" id="flexSwitchCheckCheckedLubricants" />
+                                            </div>
+
+                                            <label for="flexSwitchCheckCheckedLubricants" class="mb-0"><?php echo $this->lang->line("spend"); ?></label><span class="mandatory"> *</span></label>
+                                        </div>
                                         <input type="number" step="any" id="lubricants_total_value" name="lubricants_total_value" class="form-control" value="" placeholder="<?php echo $this->lang->line("total_value"); ?>" />
                                         <label id="error-lubricants_total_value" class="error-text"><?php echo $this->lang->line("error_value"); ?></label>
                                     </div>
@@ -528,6 +572,7 @@ $applicable_origins = $session["applicable_origins"];
                                                     <th><?php echo $this->lang->line('expense_date'); ?></th>
                                                     <th><?php echo $this->lang->line('quantity'); ?></th>
                                                     <th><?php echo $this->lang->line('total_cost'); ?></th>
+                                                    <th><?php echo $this->lang->line('ledger_type'); ?></th>
                                                 </tr>
                                             </thead>
                                         </table>
@@ -542,15 +587,14 @@ $applicable_origins = $session["applicable_origins"];
 
                             <div class="tab-pane fade" id="nav-others" role="tabpanel" aria-labelledby="nav-others-tab">
 
-                                <!-- <div class="row flex-between-end">
-
+                                <div class="row flex-between-end">
                                     <div class="col-auto ms-auto">
-                                        <button class="btn btn-warning btn-md btn-right-margin" title="<?php echo $this->lang->line('download_reports'); ?>" type="button" id="generate_acpm_report">
+                                        <button class="btn btn-warning btn-md btn-right-margin" title="<?php echo $this->lang->line('download_reports'); ?>" type="button" id="generate_others_report">
                                             <span class="fas fa-file-excel" data-fa-transform="shrink-3 down-2"></span><span class="ms-1">
                                                 <?php echo $this->lang->line('download_reports'); ?></span>
                                         </button>
                                     </div>
-                                </div> -->
+                                </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6 mb-2">
@@ -666,6 +710,9 @@ $applicable_origins = $session["applicable_origins"];
         $("#error-acpm_purchaser").hide();
         $("#error-acpm_purchasecontract").hide();
         $("#error-acpm_invoice_number").hide();
+        $("#error-acpm_machine_type").hide();
+        $("#error-acpm_clock_start").hide();
+        $("#error-acpm_clock_end").hide();
 
         $("#acpm_date").datepicker({
             dateFormat: "dd/mm/yy"
@@ -682,6 +729,10 @@ $applicable_origins = $session["applicable_origins"];
             var acpm_invoice_number = $("#acpm_invoice_number").val();
             let mode = $("#btnSaveCostingACPM").data('mode') || 'add';
             let costingId = $("#btnSaveCostingACPM").data('costingId') || 0;
+            var flexSwitchCheckChecked = $("#flexSwitchCheckChecked").is(":checked");
+            var acpm_machine_type = $("#acpm_machine_type").val();
+            var acpm_clock_start = $("#acpm_clock_start").val();
+            var acpm_clock_end = $("#acpm_clock_end").val();
 
             var isValid1 = true,
                 isValid2 = true,
@@ -689,7 +740,7 @@ $applicable_origins = $session["applicable_origins"];
                 isValid4 = true,
                 isValid5 = true,
                 isValid6 = true,
-                isValid7 = true;
+                isValid7 = true, isValid8 = true, isValid9 = true, isValid10 = true;
 
             if (acpm_date == "") {
                 $("#error-acpm_date").show();
@@ -711,28 +762,78 @@ $applicable_origins = $session["applicable_origins"];
                 $("#error-acpm_quantity").show();
                 isValid2 = false;
             } else {
-                if (acpm_quantity <= 0) {
-                    $("#error-acpm_quantity").text(error_zero_value);
-                    $("#error-acpm_quantity").show();
-                    isValid2 = false;
-                } else {
+                if (flexSwitchCheckChecked) {
                     $("#error-acpm_quantity").hide();
                     isValid2 = true;
+                } else {
+                    if (acpm_quantity <= 0) {
+                        $("#error-acpm_quantity").text(error_zero_value);
+                        $("#error-acpm_quantity").show();
+                        isValid2 = false;
+                    } else {
+                        $("#error-acpm_quantity").hide();
+                        isValid2 = true;
+                    }
                 }
             }
 
-            if (acpm_total_value == "") {
-                $("#error-acpm_total_value").show();
-                isValid3 = false;
+            if (flexSwitchCheckChecked) {
+                acpm_total_value = 0;
+                isValid3 = true;
+                $("#error-acpm_total_value").hide();
+
+                if(acpm_machine_type == 0) {
+                    isValid8 = false;
+                    $("#error-acpm_machine_type").show();
+                } else {
+                    isValid8 = true;
+                    $("#error-acpm_machine_type").hide();
+                }
+
+                if(acpm_clock_start.length == 0) {
+                    isValid9 = false;
+                    $("#error-acpm_clock_start").show();
+                } else {
+                    isValid9 = true;
+                    $("#error-acpm_clock_start").hide();
+                }
+
+                if(acpm_clock_end.length == 0) {
+                    isValid10 = false;
+                    $("#error-acpm_clock_end").show();
+                } else {
+                    isValid10 = true;
+                    $("#error-acpm_clock_end").hide();
+                }
+
             } else {
-                if (acpm_total_value <= 0) {
-                    $("#error-acpm_total_value").text(error_zero_value);
+
+                if (acpm_total_value == "") {
                     $("#error-acpm_total_value").show();
                     isValid3 = false;
                 } else {
-                    $("#error-acpm_total_value").hide();
-                    isValid3 = true;
+                    if (acpm_total_value <= 0) {
+                        $("#error-acpm_total_value").text(error_zero_value);
+                        $("#error-acpm_total_value").show();
+                        isValid3 = false;
+                    } else {
+                        $("#error-acpm_total_value").hide();
+                        isValid3 = true;
+                    }
                 }
+
+                isValid8 = true;
+                $("#error-acpm_machine_type").hide();
+
+                isValid9 = true;
+                $("#error-acpm_clock_start").hide();
+
+                isValid10 = true;
+                $("#error-acpm_clock_end").hide();
+
+                acpm_clock_start = 0;
+                acpm_clock_end = 0;
+                acpm_machine_type = 0;
             }
 
             if (acpm_suppliers == 0) {
@@ -743,7 +844,12 @@ $applicable_origins = $session["applicable_origins"];
                 isValid4 = true;
             }
 
-            if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6) {
+            var expenseType = 0;
+            if (flexSwitchCheckChecked == true) {
+                expenseType = 1;
+            }
+
+            if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7 && isValid8 && isValid9 && isValid10) {
                 var fd = new FormData();
                 fd.append("originId", $("#origin").val());
                 fd.append("acpmDate", acpm_date);
@@ -754,6 +860,10 @@ $applicable_origins = $session["applicable_origins"];
                 fd.append("acpmPurchaseContract", acpm_purchasecontract);
                 fd.append("acpmPurchaser", acpm_purchaser);
                 fd.append("acpmInvoiceNumber", acpm_invoice_number);
+                fd.append("acpmMachineType", acpm_machine_type);
+                fd.append("acpmClockStart", acpm_clock_start);
+                fd.append("acpmClockEnd", acpm_clock_end);
+                fd.append("isPurchasedSpend", expenseType);
                 fd.append("costType", 4);
                 fd.append("csrf_cgrerp", $("#hdnCsrf").val());
                 fd.append("add_type", "operationalcosting");
@@ -785,6 +895,7 @@ $applicable_origins = $session["applicable_origins"];
                             $("#acpm_quantity").val("");
                             $("#acpm_total_value").val("");
                             $("#acpm_claim_remarks").val("");
+                            $("#flexSwitchCheckChecked").prop("checked", false);
                             $("#error-acpm_date").hide();
                             $("#error-acpm_quantity").hide();
                             $("#error-acpm_total_value").hide();
@@ -800,6 +911,10 @@ $applicable_origins = $session["applicable_origins"];
                             $("#btnSaveCostingACPM").text("<?php echo $this->lang->line('save'); ?>");
                             $("#btnSaveCostingACPM").data('mode', 'add');
                             $("#btnSaveCostingACPM").data('costingId', 0);
+                            $("#acpm_clock_start").val("");
+                            $("#acpm_clock_end").val("");
+                            $('#acpm_machine_type').val('0'); // Set the value
+                            $('#acpm_machine_type').trigger('change'); // Trigger the change event to update Select2
                         }
 
                         $('#xin_table_acpm').DataTable().ajax.reload(null, false);
@@ -819,6 +934,7 @@ $applicable_origins = $session["applicable_origins"];
             $("#acpm_quantity").val("");
             $("#acpm_total_value").val("");
             $("#acpm_claim_remarks").val("");
+            $("#flexSwitchCheckChecked").prop("checked", false);
             $("#error-acpm_date").hide();
             $("#error-acpm_quantity").hide();
             $("#error-acpm_total_value").hide();
@@ -831,10 +947,17 @@ $applicable_origins = $session["applicable_origins"];
             $('#acpm_purchaser').trigger('change'); // Trigger the change event to update Select2
             $('#acpm_purchasecontract').val('0'); // Set the value
             $('#acpm_purchasecontract').trigger('change'); // Trigger the change event to update Select2
+            $('#acpm_machine_type').val('0'); // Set the value
+            $('#acpm_machine_type').trigger('change'); // Trigger the change event to update Select2
             $('#xin_table_acpm').DataTable().ajax.reload(null, false);
             $("#btnSaveCostingACPM").text("<?php echo $this->lang->line('save'); ?>");
             $("#btnSaveCostingACPM").data('mode', 'add');
             $("#btnSaveCostingACPM").data('costingId', 0);
+            $("#acpm_clock_start").val("");
+            $("#acpm_clock_end").val("");
+            $("#error-acpm_machine_type").hide();
+            $("#error-acpm_clock_start").hide();
+            $("#error-acpm_clock_end").hide();
         });
 
         $('#xin_table_acpm').DataTable({
@@ -868,8 +991,10 @@ $applicable_origins = $session["applicable_origins"];
             $("#error-acpm_purchasecontract").hide();
             if ($("#acpm_suppliers").val() == 0) {
                 fetchContracts(0, 0, 0);
+                fetchMachines(0, 0, 0);
             } else {
                 fetchContracts($("#origin").val(), $("#acpm_suppliers").val(), 4);
+                fetchMachines($("#origin").val(), $("#acpm_suppliers").val(), 4);
             }
         });
 
@@ -900,9 +1025,21 @@ $applicable_origins = $session["applicable_origins"];
                     $("#acpm_quantity").val(JSON.result.quantity);
                     $("#acpm_total_value").val(JSON.result.amount);
                     $("#acpm_claim_remarks").val(JSON.result.remarks);
+                    $("#acpm_clock_start").val(JSON.result.clockStart);
+                    $("#acpm_clock_end").val(JSON.result.clockEnd);
 
                     $("#btnSaveCostingACPM").data('mode', 'edit');
                     $("#btnSaveCostingACPM").data('costingId', costingId);
+
+                    if (JSON.result.expenseType == 1) {
+                        $("#flexSwitchCheckChecked").prop("checked", true);
+                        $("#acpm_total_value").val("");
+                        $("#acpm_total_value").attr("disabled", true);
+                    } else {
+                        $("#flexSwitchCheckChecked").prop("checked", false);
+                        $("#acpm_total_value").val(JSON.result.amount);
+                        $("#acpm_total_value").attr("disabled", false);
+                    }
 
                     // ---------- IMPORTANT PART ----------
                     setACPMEditData(JSON.result);
@@ -939,10 +1076,23 @@ $applicable_origins = $session["applicable_origins"];
             $("#acpm_purchasers").val(data.purchaserId).trigger('change');
 
             // // 2. After contracts are loaded
-            $(document).one('acpm_contracts_loaded', function () {
+            $(document).one('acpm_contracts_loaded', function() {
                 $("#acpm_purchasecontract").val(data.contractId);
             });
+
+            $(document).one('acpm_machine_type_loaded', function() {
+                $("#acpm_machine_type").val(data.machineType);
+            });
         }
+
+        $("#flexSwitchCheckChecked").change(function() {
+            if ($(this).is(":checked")) {
+                $("#acpm_total_value").attr("disabled", true);
+                $("#acpm_total_value").val("");
+            } else {
+                $("#acpm_total_value").attr("disabled", false);
+            }
+        });
 
         //END ACPM
 
@@ -956,6 +1106,7 @@ $applicable_origins = $session["applicable_origins"];
         $("#error-maintainance_subtotal").hide();
         $("#error-maintainance_tax").hide();
         $("#error-maintainance_amount").hide();
+        $("#error-maintainance_machine_type").hide();
 
         $("#maintainance_date").datepicker({
             dateFormat: "dd/mm/yy"
@@ -966,6 +1117,7 @@ $applicable_origins = $session["applicable_origins"];
             var maintainance_subtotal = $("#maintainance_subtotal").val();
             var maintainance_tax = $("#maintainance_tax").val();
             var maintainance_amount = $("#maintainance_amount").val();
+            var maintainance_machine_type = $("#maintainance_machine_type").val();
             var maintainance_claim_remarks = $("#maintainance_claim_remarks").val();
             var maintainance_suppliers = $("#maintainance_suppliers").val();
             var maintainance_purchaser = $("#maintainance_purchaser").val();
@@ -981,7 +1133,8 @@ $applicable_origins = $session["applicable_origins"];
                 isValid5 = true,
                 isValid6 = true,
                 isValid7 = true,
-                isValid8 = true;
+                isValid8 = true,
+                isValid9 = true;
 
             if (maintainance_date == "") {
                 $("#error-maintainance_date").show();
@@ -1035,7 +1188,7 @@ $applicable_origins = $session["applicable_origins"];
                 isValid6 = true;
             }
 
-            if (maintainance_suppliers == 0) {
+            if (maintainance_purchasecontract == 0) {
                 $("#error-maintainance_purchasecontract").show();
                 isValid7 = false;
             } else {
@@ -1043,7 +1196,15 @@ $applicable_origins = $session["applicable_origins"];
                 isValid7 = true;
             }
 
-            if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7) {
+            if (maintainance_machine_type == 0) {
+                $("#error-maintainance_machine_type").show();
+                isValid9 = false;
+            } else {
+                $("#error-maintainance_machine_type").hide();
+                isValid9 = true;
+            }
+
+            if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6 && isValid7 && isValid9) {
                 var fd = new FormData();
                 fd.append("originId", $("#origin").val());
                 fd.append("maintainanceDate", maintainance_date);
@@ -1055,6 +1216,7 @@ $applicable_origins = $session["applicable_origins"];
                 fd.append("maintainanceSuppliers", maintainance_suppliers);
                 fd.append("maintainanceInvoiceNumber", maintainance_invoice_number);
                 fd.append("maintainancePurchaser", maintainance_purchaser);
+                fd.append("maintainanceMachineType", maintainance_machine_type);
                 fd.append("costType", 5);
                 fd.append("csrf_cgrerp", $("#hdnCsrf").val());
                 fd.append("add_type", "operationalcosting");
@@ -1191,8 +1353,10 @@ $applicable_origins = $session["applicable_origins"];
             $("#error-maintainance_purchasecontract").hide();
             if ($("#maintainance_suppliers").val() == 0) {
                 fetchContracts(0, 0, 0);
+                fetchMachines(0, 0, 0);
             } else {
                 fetchContracts($("#origin").val(), $("#maintainance_suppliers").val(), 5);
+                fetchMachines($("#origin").val(), $("#maintainance_suppliers").val(), 5);
             }
         });
 
@@ -1263,10 +1427,15 @@ $applicable_origins = $session["applicable_origins"];
             $("#maintainance_purchaser").val(data.purchaserId).trigger('change');
 
             // // 2. After contracts are loaded
-            $(document).one('maintenance_contracts_loaded', function () {
+            $(document).one('maintenance_contracts_loaded', function() {
                 $("#maintainance_purchasecontract").val(data.contractId);
             });
+
+            $(document).one('machine_type_loaded', function() {
+                $("#maintainance_machine_type").val(data.machineType);
+            });
         }
+
 
         //END MACHINE MAINTAINANCE
 
@@ -1515,7 +1684,7 @@ $applicable_origins = $session["applicable_origins"];
             $("#machinerental_suppliers").val(data.supplierId).trigger('change');
 
             // // 2. After contracts are loaded
-            $(document).one('machinerental_contracts_loaded', function () {
+            $(document).one('machinerental_contracts_loaded', function() {
                 $("#machinerental_purchasecontract").val(data.contractId);
             });
         }
@@ -1768,7 +1937,7 @@ $applicable_origins = $session["applicable_origins"];
             $("#manuallabour_suppliers").val(data.supplierId).trigger('change');
 
             // // 2. After contracts are loaded
-            $(document).one('manuallabour_contracts_loaded', function () {
+            $(document).one('manuallabour_contracts_loaded', function() {
                 $("#manuallabour_purchasecontract").val(data.contractId);
             });
         }
@@ -1800,6 +1969,7 @@ $applicable_origins = $session["applicable_origins"];
             var lubricants_invoice_number = $("#lubricants_invoice_number").val();
             let mode = $("#btnSaveCostingLubricants").data('mode') || 'add';
             let costingId = $("#btnSaveCostingLubricants").data('costingId') || 0;
+            var flexSwitchCheckCheckedLubricants = $("#flexSwitchCheckCheckedLubricants").is(":checked");
 
             var isValid1 = true,
                 isValid2 = true,
@@ -1839,17 +2009,23 @@ $applicable_origins = $session["applicable_origins"];
                 }
             }
 
-            if (lubricants_total_value == "") {
-                $("#error-lubricants_total_value").show();
-                isValid3 = false;
+            if (flexSwitchCheckCheckedLubricants) {
+                lubricants_total_value = 0;
+                isValid3 = true;
             } else {
-                if (lubricants_total_value <= 0) {
-                    $("#error-lubricants_total_value").text(error_zero_value);
+
+                if (lubricants_total_value == "") {
                     $("#error-lubricants_total_value").show();
                     isValid3 = false;
                 } else {
-                    $("#error-lubricants_total_value").hide();
-                    isValid3 = true;
+                    if (lubricants_total_value <= 0) {
+                        $("#error-lubricants_total_value").text(error_zero_value);
+                        $("#error-lubricants_total_value").show();
+                        isValid3 = false;
+                    } else {
+                        $("#error-lubricants_total_value").hide();
+                        isValid3 = true;
+                    }
                 }
             }
 
@@ -1859,6 +2035,11 @@ $applicable_origins = $session["applicable_origins"];
             } else {
                 $("#error-lubricants_suppliers").hide();
                 isValid4 = true;
+            }
+
+            var expenseType = 0;
+            if (flexSwitchCheckCheckedLubricants == true) {
+                expenseType = 1;
             }
 
             if (isValid1 && isValid2 && isValid3 && isValid4 && isValid5 && isValid6) {
@@ -1872,6 +2053,7 @@ $applicable_origins = $session["applicable_origins"];
                 fd.append("lubricantsPurchaseContract", lubricants_purchasecontract);
                 fd.append("lubricantsPurchaser", lubricants_purchaser);
                 fd.append("lubricantsInvoiceNumber", lubricants_invoice_number);
+                fd.append("isPurchasedSpend", expenseType);
                 fd.append("costType", 9);
                 fd.append("csrf_cgrerp", $("#hdnCsrf").val());
                 fd.append("add_type", "operationalcosting");
@@ -1903,6 +2085,7 @@ $applicable_origins = $session["applicable_origins"];
                             $("#lubricants_quantity").val("");
                             $("#lubricants_total_value").val("");
                             $("#lubricants_claim_remarks").val("");
+                            $("#flexSwitchCheckCheckedLubricants").prop("checked", false);
                             $("#error-lubricants_date").hide();
                             $("#error-lubricants_quantity").hide();
                             $("#error-lubricants_total_value").hide();
@@ -1937,6 +2120,7 @@ $applicable_origins = $session["applicable_origins"];
             $("#lubricants_quantity").val("");
             $("#lubricants_total_value").val("");
             $("#lubricants_claim_remarks").val("");
+            $("#flexSwitchCheckCheckedLubricants").prop("checked", false);
             $("#error-lubricants_date").hide();
             $("#error-lubricants_quantity").hide();
             $("#error-lubricants_total_value").hide();
@@ -2022,6 +2206,16 @@ $applicable_origins = $session["applicable_origins"];
                     $("#btnSaveCostingLubricants").data('mode', 'edit');
                     $("#btnSaveCostingLubricants").data('costingId', costingId);
 
+                    if (JSON.result.expenseType == 1) {
+                        $("#flexSwitchCheckCheckedLubricants").prop("checked", true);
+                        $("#lubricants_total_value").val("");
+                        $("#lubricants_total_value").attr("disabled", true);
+                    } else {
+                        $("#flexSwitchCheckCheckedLubricants").prop("checked", false);
+                        $("#lubricants_total_value").val(JSON.result.amount);
+                        $("#lubricants_total_value").attr("disabled", false);
+                    }
+
                     // ---------- IMPORTANT PART ----------
                     setLubricantsEditData(JSON.result);
                 }
@@ -2057,10 +2251,19 @@ $applicable_origins = $session["applicable_origins"];
             $("#lubricants_purchaser").val(data.purchaserId).trigger('change');
 
             // // 2. After contracts are loaded
-            $(document).one('lubricants_contracts_loaded', function () {
+            $(document).one('lubricants_contracts_loaded', function() {
                 $("#lubricants_purchasecontract").val(data.contractId);
             });
         }
+
+        $("#flexSwitchCheckCheckedLubricants").change(function() {
+            if ($(this).is(":checked")) {
+                $("#lubricants_total_value").attr("disabled", true);
+                $("#lubricants_total_value").val("");
+            } else {
+                $("#lubricants_total_value").attr("disabled", false);
+            }
+        });
 
         //END LUBRICANTS
 
@@ -2324,7 +2527,7 @@ $applicable_origins = $session["applicable_origins"];
             $("#others_purchaser").val(data.purchaserId).trigger('change');
 
             // // 2. After contracts are loaded
-            $(document).one('others_contracts_loaded', function () {
+            $(document).one('others_contracts_loaded', function() {
                 $("#others_purchasecontract").val(data.contractId);
             });
         }
@@ -2391,7 +2594,7 @@ $applicable_origins = $session["applicable_origins"];
                 $(document).trigger('acpm_contracts_loaded');
                 $(document).trigger('lubricants_contracts_loaded');
                 $(document).trigger('others_contracts_loaded');
-                
+
             }
         });
     }
@@ -2526,6 +2729,43 @@ $applicable_origins = $session["applicable_origins"];
                     });
                     $("#lubricants_purchaser").append(JSON.result);
                 }
+            }
+        });
+    }
+
+    function fetchMachines(originid, supplierid, type) {
+        $("#loading").show();
+        $.ajax({
+            url: BASE_URL_SUBFOLDER + "forestry/operationalcost/fetch_machines?originid=" + originid + "&supplierid=" + supplierid,
+            cache: false,
+            method: "GET",
+            dataType: 'json',
+            success: function(JSON) {
+                $("#loading").hide();
+                if (JSON.redirect == true) {
+                    window.location.replace(login_url);
+                } else if (JSON.result != '') {
+
+                    if (type == 5) {
+                        $("#maintainance_machine_type").empty();
+                        $("#maintainance_machine_type").append(JSON.result);
+                    } else if (type == 4) {
+                        $("#acpm_machine_type").empty();
+                        $("#acpm_machine_type").append(JSON.result);
+                    } else if (type == 9) {
+                        $("#lubricants_machine_type").empty();
+                        $("#lubricants_machine_type").append(JSON.result);
+                    }
+                } else {
+
+                    $("#maintainance_machine_type").empty();
+                    $("#acpm_machine_type").empty();
+                    $("#lubricants_machine_type").empty();
+                }
+
+                $(document).trigger('machine_type_loaded');
+                $(document).trigger('acpm_machine_type_loaded');
+                $(document).trigger('lubricants_machine_type_loaded');
             }
         });
     }

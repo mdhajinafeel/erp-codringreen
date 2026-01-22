@@ -129,15 +129,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
 	</div>
 
 	<div class="row mb-3">
-		<div class="col-md-4 mb-2">
+		<!-- <div class="col-md-4 mb-2">
 			<label for="extraction_cost"><?php echo $this->lang->line('extraction_cost'); ?></label>
 			<input type="number" id="extraction_cost" step="any" maxlength="10" name="extraction_cost" class="form-control" value="<?php echo ($farm_details[0]->extraction_cost + 0); ?>" placeholder="<?php echo $this->lang->line('extraction_cost'); ?>">
-		</div>
-		<div class="col-md-4">
+		</div> -->
+		<div class="col-md-6 mb-2">
 			<label for="loading_cost"><?php echo $this->lang->line('loading_cost'); ?></label>
 			<input type="number" id="loading_cost" step="any" maxlength="10" name="loading_cost" class="form-control" value="<?php echo ($farm_details[0]->loading_cost + 0); ?>" placeholder="<?php echo $this->lang->line('loading_cost'); ?>">
 		</div>
-		<div class="col-md-4">
+		<div class="col-md-6">
 			<label for="unloading_cost"><?php echo $this->lang->line('unloading_cost'); ?></label>
 			<input type="number" id="unloading_cost" step="any" maxlength="10" name="unloading_cost" class="form-control" value="<?php echo ($farm_details[0]->unloading_cost + 0); ?>" placeholder="<?php echo $this->lang->line('unloading_cost'); ?>">
 		</div>
@@ -276,7 +276,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			var farmadjustment = $("#adjustment").val().trim();
 			var adjustrf = $("#adjust_rf").is(':checked');
 			var process = $("#process").val();
-			var extraction_cost = $("#extraction_cost").val();
+			var extraction_cost = "0";
 			var loading_cost = $("#loading_cost").val();
 			var unloading_cost = $("#unloading_cost").val();
 

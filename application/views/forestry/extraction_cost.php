@@ -13,10 +13,11 @@ $wz_lang = $site_lang->session->userdata('site_lang');
 				<h3> <?php echo $this->lang->line('extraction_cost'); ?> </h3>
 			</div>
 			<div class="col-auto ms-auto">
+				<button class="btn btn-primary btn-md" style="margin-right: 10px;" title="<?php echo $this->lang->line('generate'); ?>" type="button" id="btn_dowload_extraction_cost">
+					<span class="fas fa-download" data-fa-transform="shrink-3 down-2"></span><span class="ms-1"><?php echo $this->lang->line('generate_report'); ?></span></button>
 				<button class="btn btn-success btn-md" title="<?php echo $this->lang->line('add'); ?>" type="button" id="btn_add_extraction_cost">
 					<span class="fas fa-plus" data-fa-transform="shrink-3 down-2"></span><span class="ms-1"><?php echo $this->lang->line('add'); ?></span></button>
 			</div>
-
 		</div>
 	</div>
 
