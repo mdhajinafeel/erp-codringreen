@@ -1504,10 +1504,10 @@ class Master_model extends CI_Model
 		}
 	}
 
-	public function fetch_machines($originid, $supplierid)
+	public function fetch_machines($originid)
 	{
 		$query = $this->db->query("SELECT id, machine_type, chassis_no, supplier_id 
-				FROM tbl_master_machines WHERE is_active = 1 AND origin_id = $originid AND supplier_id = $supplierid");
+				FROM tbl_master_machines WHERE is_active = 1 AND origin_id = $originid");
 		return $query->result();
 	}
 }

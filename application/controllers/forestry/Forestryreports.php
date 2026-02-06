@@ -149,22 +149,23 @@ class Forestryreports extends MY_Controller
                     $objSheet->SetCellValue('D4', strtoupper($this->lang->line('purchase_contract')));
                     $objSheet->SetCellValue('E4', strtoupper($this->lang->line('description')));
                     $objSheet->SetCellValue('F4', strtoupper($this->lang->line('pieces')));
-                    $objSheet->SetCellValue('G4', strtoupper($this->lang->line('text_volume')));
-                    $objSheet->SetCellValue('H4', strtoupper($this->lang->line('extraction')));
-                    $objSheet->SetCellValue('I4', strtoupper($this->lang->line('wood_value')));
-                    $objSheet->SetCellValue('J4', strtoupper($this->lang->line('transport')));
-                    $objSheet->SetCellValue('K4', strtoupper($this->lang->line('zona')));
-                    $objSheet->SetCellValue('L4', strtoupper($this->lang->line('loading')));
-                    $objSheet->SetCellValue('M4', strtoupper($this->lang->line('maintenance')));
-                    $objSheet->SetCellValue('N4', strtoupper($this->lang->line('machine_rental')));
-                    $objSheet->SetCellValue('O4', strtoupper($this->lang->line('manual_labours')));
-                    $objSheet->SetCellValue('P4', strtoupper($this->lang->line('acpm')));
-                    $objSheet->SetCellValue('Q4', strtoupper($this->lang->line('lubricants')));
-                    $objSheet->SetCellValue('R4', strtoupper($this->lang->line('miscellaneous')));
-                    $objSheet->SetCellValue('S4', strtoupper($this->lang->line('total_value')));
+                    $objSheet->SetCellValue('G4', strtoupper($this->lang->line('gross_volume')));
+                    $objSheet->SetCellValue('H4', strtoupper($this->lang->line('net_volume')));
+                    $objSheet->SetCellValue('I4', strtoupper($this->lang->line('extraction')));
+                    $objSheet->SetCellValue('J4', strtoupper($this->lang->line('wood_value')));
+                    $objSheet->SetCellValue('K4', strtoupper($this->lang->line('transport')));
+                    $objSheet->SetCellValue('L4', strtoupper($this->lang->line('zona')));
+                    $objSheet->SetCellValue('M4', strtoupper($this->lang->line('loading')));
+                    $objSheet->SetCellValue('N4', strtoupper($this->lang->line('maintenance')));
+                    $objSheet->SetCellValue('O4', strtoupper($this->lang->line('machine_rental')));
+                    $objSheet->SetCellValue('P4', strtoupper($this->lang->line('manual_labours')));
+                    $objSheet->SetCellValue('Q4', strtoupper($this->lang->line('acpm')));
+                    $objSheet->SetCellValue('R4', strtoupper($this->lang->line('lubricants')));
+                    $objSheet->SetCellValue('S4', strtoupper($this->lang->line('miscellaneous')));
+                    $objSheet->SetCellValue('T4', strtoupper($this->lang->line('total_value')));
 
-                    $objSheet->getStyle("A4:S4")->getFont()->setBold(true);
-                    $objSheet->getStyle("A4:S4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    $objSheet->getStyle("A4:T4")->getFont()->setBold(true);
+                    $objSheet->getStyle("A4:T4")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
                     $objSheet->getColumnDimension('A')->setAutoSize(false)->setWidth(20);
                     $objSheet->getColumnDimension('B')->setAutoSize(false)->setWidth(20);
@@ -174,17 +175,18 @@ class Forestryreports extends MY_Controller
                     $objSheet->getColumnDimension('F')->setAutoSize(false)->setWidth(20);
                     $objSheet->getColumnDimension('G')->setAutoSize(false)->setWidth(20);
                     $objSheet->getColumnDimension('H')->setAutoSize(false)->setWidth(20);
-                    $objSheet->getColumnDimension('I')->setAutoSize(false)->setWidth(25);
-                    $objSheet->getColumnDimension('J')->setAutoSize(false)->setWidth(20);
+                    $objSheet->getColumnDimension('I')->setAutoSize(false)->setWidth(20);
+                    $objSheet->getColumnDimension('J')->setAutoSize(false)->setWidth(25);
                     $objSheet->getColumnDimension('K')->setAutoSize(false)->setWidth(20);
                     $objSheet->getColumnDimension('L')->setAutoSize(false)->setWidth(20);
-                    $objSheet->getColumnDimension('M')->setAutoSize(false)->setWidth(25);
-                    $objSheet->getColumnDimension('N')->setAutoSize(false)->setWidth(20);
+                    $objSheet->getColumnDimension('M')->setAutoSize(false)->setWidth(20);
+                    $objSheet->getColumnDimension('N')->setAutoSize(false)->setWidth(25);
                     $objSheet->getColumnDimension('O')->setAutoSize(false)->setWidth(20);
                     $objSheet->getColumnDimension('P')->setAutoSize(false)->setWidth(20);
                     $objSheet->getColumnDimension('Q')->setAutoSize(false)->setWidth(20);
                     $objSheet->getColumnDimension('R')->setAutoSize(false)->setWidth(20);
                     $objSheet->getColumnDimension('S')->setAutoSize(false)->setWidth(20);
+                    $objSheet->getColumnDimension('T')->setAutoSize(false)->setWidth(20);
 
                     $styleArray = array(
                         'borders' => array(
@@ -194,7 +196,7 @@ class Forestryreports extends MY_Controller
                         )
                     );
 
-                    $objSheet->getStyle('A4:S4')->applyFromArray($styleArray);
+                    $objSheet->getStyle('A4:T4')->applyFromArray($styleArray);
 
                     $row = 5;
                     foreach ($forestryReportData as $rdata) {
@@ -207,7 +209,8 @@ class Forestryreports extends MY_Controller
                         // $acpmFormula = '=IFERROR( INDEX(\'' . $acpmSheetName . '\'!$L$5:$L$10000, MATCH(1, INDEX( (A' . $row . '>=\'' . $acpmSheetName . '\'!$A$5:$A$10000) * (A' . $row . '<=\'' . $acpmSheetName .'\'!$B$5:$B$10000), 0), 0) ) * G' . $row . ', 0)';
                         // $othersFormula = '=IFERROR( INDEX(\'' . $othersSheetName . '\'!$L$5:$L$10000, MATCH(1, INDEX( (A' . $row . '>=\'' . $othersSheetName . '\'!$A$5:$A$10000) * (A' . $row . '<=\'' . $othersSheetName .'\'!$B$5:$B$10000), 0), 0) ) * G' . $row . ', 0)';
 
-                        $extractionFormula = '=IFERROR( SUMPRODUCT( (\''.$extractionSheetName.'\'!$L$5:$L$10000) * --(A'.$row.' >= \''.$extractionSheetName.'\'!$A$5:$A$10000) * --(A'.$row.' <= \''.$extractionSheetName.'\'!$B$5:$B$10000) * --(C'.$row.' = \''.$extractionSheetName.'\'!$C$5:$C$10000) * --(D'.$row.' = \''.$extractionSheetName.'\'!$D$5:$D$10000) * --(E'.$row.' = \''.$extractionSheetName.'\'!$E$5:$E$10000) ) * G'.$row.', 0)';
+                        //$extractionFormula = '=IFERROR( SUMPRODUCT( (\''.$extractionSheetName.'\'!$L$5:$L$10000) * --(A'.$row.' >= \''.$extractionSheetName.'\'!$A$5:$A$10000) * --(A'.$row.' <= \''.$extractionSheetName.'\'!$B$5:$B$10000) * --(C'.$row.' = \''.$extractionSheetName.'\'!$C$5:$C$10000) * --(D'.$row.' = \''.$extractionSheetName.'\'!$D$5:$D$10000) * --(E'.$row.' = \''.$extractionSheetName.'\'!$E$5:$E$10000) ) * G'.$row.', 0)';
+                        $extractionFormula = '=IFERROR( SUMIFS( \''.$extractionSheetName.'\'!$I$5:$I$10000, \''.$extractionSheetName.'\'!$C$5:$C$10000, C'.$row.', \''.$extractionSheetName.'\'!$D$5:$D$10000, D'.$row.', \''.$extractionSheetName.'\'!$E$5:$E$10000, E'.$row.' ) / SUMIFS( \''.$extractionSheetName.'\'!$H$5:$H$10000, \''.$extractionSheetName.'\'!$C$5:$C$10000, C'.$row.', \''.$extractionSheetName.'\'!$D$5:$D$10000, D'.$row.', \''.$extractionSheetName.'\'!$E$5:$E$10000, E'.$row.' ) * G'.$row.', 0)';
                         $machineMaintainanceFormula = '=IFERROR( SUMPRODUCT( (\''.$machineMaintainanceSheetName.'\'!$J$5:$J$10000) * --(A'.$row.' >= \''.$machineMaintainanceSheetName.'\'!$A$5:$A$10000) * --(A'.$row.' <= \''.$machineMaintainanceSheetName.'\'!$B$5:$B$10000) * --(C'.$row.' = \''.$machineMaintainanceSheetName.'\'!$C$5:$C$10000) * --(D'.$row.' = \''.$machineMaintainanceSheetName.'\'!$D$5:$D$10000) * --(E'.$row.' = \''.$machineMaintainanceSheetName.'\'!$E$5:$E$10000) ) * G'.$row.', 0)';
                         $machineRentalFormula = '=IFERROR( SUMPRODUCT( (\''.$machineRentalSheetName.'\'!$J$5:$J$10000) * --(A'.$row.' >= \''.$machineRentalSheetName.'\'!$A$5:$A$10000) * --(A'.$row.' <= \''.$machineRentalSheetName.'\'!$B$5:$B$10000) * --(C'.$row.' = \''.$machineRentalSheetName.'\'!$C$5:$C$10000) * --(D'.$row.' = \''.$machineRentalSheetName.'\'!$D$5:$D$10000) * --(E'.$row.' = \''.$machineRentalSheetName.'\'!$E$5:$E$10000) ) * G'.$row.', 0)';
                         $manualLabourFormula = '=IFERROR( SUMPRODUCT( (\''.$manualLabourSheetName.'\'!$J$5:$J$10000) * --(A'.$row.' >= \''.$manualLabourSheetName.'\'!$A$5:$A$10000) * --(A'.$row.' <= \''.$manualLabourSheetName.'\'!$B$5:$B$10000) * --(C'.$row.' = \''.$manualLabourSheetName.'\'!$C$5:$C$10000) * --(D'.$row.' = \''.$manualLabourSheetName.'\'!$D$5:$D$10000) * --(E'.$row.' = \''.$manualLabourSheetName.'\'!$E$5:$E$10000) ) * G'.$row.', 0)';
@@ -231,19 +234,20 @@ class Forestryreports extends MY_Controller
                         $objSheet->SetCellValue('D' . $row, $rdata->contract_code);
                         $objSheet->SetCellValue('E' . $row, $rdata->description);
                         $objSheet->SetCellValue('F' . $row, $rdata->pieces + 0);
-                        $objSheet->SetCellValue('G' . $row, $rdata->net_volume + 0);
-                        $objSheet->SetCellValue('H' . $row, $extractionFormula);
-                        $objSheet->SetCellValue('I' . $row, $rdata->wood_value + 0);
-                        $objSheet->SetCellValue('J' . $row, $rdata->logistic_cost + 0);
-                        $objSheet->SetCellValue('K' . $row, $rdata->service_cost + 0);
-                        $objSheet->SetCellValue('L' . $row, $rdata->loading_cost + 0);
-                        $objSheet->SetCellValue('M' . $row, $machineMaintainanceFormula);
-                        $objSheet->SetCellValue('N' . $row, $machineRentalFormula);
-                        $objSheet->SetCellValue('O' . $row, $manualLabourFormula);
-                        $objSheet->SetCellValue('P' . $row, $acpmFormula);
-                        $objSheet->SetCellValue('Q' . $row, $lubricantsFormula);
-                        $objSheet->SetCellValue('R' . $row, $othersFormula);
-                        $objSheet->SetCellValue('S' . $row, "=SUM(H$row:R$row)");
+                        $objSheet->SetCellValue('G' . $row, $rdata->gross_volume + 0);
+                        $objSheet->SetCellValue('H' . $row, $rdata->net_volume + 0);
+                        $objSheet->SetCellValue('I' . $row, $extractionFormula);
+                        $objSheet->SetCellValue('J' . $row, $rdata->wood_value + 0);
+                        $objSheet->SetCellValue('K' . $row, $rdata->logistic_cost + 0);
+                        $objSheet->SetCellValue('L' . $row, $rdata->service_cost + 0);
+                        $objSheet->SetCellValue('M' . $row, $rdata->loading_cost + 0);
+                        $objSheet->SetCellValue('N' . $row, $machineMaintainanceFormula);
+                        $objSheet->SetCellValue('O' . $row, $machineRentalFormula);
+                        $objSheet->SetCellValue('P' . $row, $manualLabourFormula);
+                        $objSheet->SetCellValue('Q' . $row, $acpmFormula);
+                        $objSheet->SetCellValue('R' . $row, $lubricantsFormula);
+                        $objSheet->SetCellValue('S' . $row, $othersFormula);
+                        $objSheet->SetCellValue('T' . $row, "=SUM(I$row:S$row)");
                         $row++;
                     }
 
@@ -259,15 +263,20 @@ class Forestryreports extends MY_Controller
                     $objSheet->getStyle("G3")->getFont()->setBold(true);
                     $objSheet->getStyle("G3")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
 
-                    $objSheet->SetCellValue('I3', "=SUBTOTAL(9,I5:I$lastRow)");
-                    $objSheet->getStyle('I3')->applyFromArray($styleArray);
-                    $objSheet->getStyle("I3")->getFont()->setBold(true);
-                    $objSheet->getStyle("I3")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
+                    $objSheet->SetCellValue('H3', "=SUBTOTAL(9,H5:H$lastRow)");
+                    $objSheet->getStyle('H3')->applyFromArray($styleArray);
+                    $objSheet->getStyle("H3")->getFont()->setBold(true);
+                    $objSheet->getStyle("H3")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
 
-                    $objSheet->getStyle("A5:S$lastRow")->applyFromArray($styleArray);
+                    $objSheet->SetCellValue('J3', "=SUBTOTAL(9,J5:J$lastRow)");
+                    $objSheet->getStyle('J3')->applyFromArray($styleArray);
+                    $objSheet->getStyle("J3")->getFont()->setBold(true);
+                    $objSheet->getStyle("J3")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
+
+                    $objSheet->getStyle("A5:T$lastRow")->applyFromArray($styleArray);
                     $objSheet->getStyle("F5:F$lastRow")->getNumberFormat()->setFormatCode('_(* #,##0_);_(* (#,##0);_(* "-"??_);_(@_)');
-                    $objSheet->getStyle("G5:G$lastRow")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
-                    $objSheet->getStyle("H5:S$lastRow")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
+                    $objSheet->getStyle("G5:H$lastRow")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
+                    $objSheet->getStyle("I5:T$lastRow")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
 
                     // 🔥 FORCE date-only format for entire column
                     $objSheet->getStyle("A5:A$lastRow")
@@ -283,7 +292,7 @@ class Forestryreports extends MY_Controller
                     $objSheet->freezePane('A5');
 
                     // Auto filter
-                    $objSheet->setAutoFilter("A4:S$lastRow");
+                    $objSheet->setAutoFilter("A4:T$lastRow");
 
                     // Set zoom scale
                     $objSheet->getSheetView()->setZoomScale(95);
@@ -356,15 +365,20 @@ class Forestryreports extends MY_Controller
 
                         $lastRow2 = $row2 - 1;
 
-                        $objSheet2->SetCellValue('G3', "=SUBTOTAL(9,G5:G$lastRow)");
+                        $objSheet2->SetCellValue('G3', "=SUBTOTAL(9,G5:G$lastRow2)");
                         $objSheet2->getStyle('G3')->applyFromArray($styleArray);
                         $objSheet2->getStyle("G3")->getFont()->setBold(true);
                         $objSheet2->getStyle("G3")->getNumberFormat()->setFormatCode('_(* #,##0_);_(* (#,##0);_(* "-"??_);_(@_)');
 
-                        $objSheet2->SetCellValue('H3', "=SUBTOTAL(9,H5:H$lastRow)");
+                        $objSheet2->SetCellValue('H3', "=SUBTOTAL(9,H5:H$lastRow2)");
                         $objSheet2->getStyle('H3')->applyFromArray($styleArray);
                         $objSheet2->getStyle("H3")->getFont()->setBold(true);
                         $objSheet2->getStyle("H3")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
+
+                        $objSheet2->SetCellValue('I3', "=SUBTOTAL(9,I5:I$lastRow2)");
+                        $objSheet2->getStyle('I3')->applyFromArray($styleArray);
+                        $objSheet2->getStyle("I3")->getFont()->setBold(true);
+                        $objSheet2->getStyle("I3")->getNumberFormat()->setFormatCode('_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)');
 
                         $objSheet2->getStyle("A5:L$lastRow2")->applyFromArray($styleArray);
                         $objSheet2->getStyle("F5:G$lastRow2")->getNumberFormat()->setFormatCode('_(* #,##0_);_(* (#,##0);_(* "-"??_);_(@_)');

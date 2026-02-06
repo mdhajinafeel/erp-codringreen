@@ -12,6 +12,7 @@ class Downloadfarmmasters extends MY_Controller
         $this->load->model("Contract_model");
         $this->load->model("Farm_model");
         $this->load->model("Costing_model");
+        $this->load->model("Forestry_model");
         $this->load->library("jwttoken");
         $this->load->helper('url');
     }
@@ -181,6 +182,24 @@ class Downloadfarmmasters extends MY_Controller
                             array_push($return_arr_machines, $row_array_machine);
                         }
                         $row_array_final["machines"] = $return_arr_machines;
+
+                        //MACHINE TRACKING & DATA
+                        $fetchMachineTrackingData = $this->Forestry_model->fetch_machine_tracking_data($originid, $userid);
+                        $return_arr_machinetracking = array();
+                        foreach ($fetchMachineTrackingData as $machinetracking) {
+                            $row_arr_machinetracking["machineTrackingId"] = (int) $machinetracking->id;
+                            $row_arr_machinetracking["tempTrackingId"] = $machinetracking->temp_tracking_id;
+                            $row_arr_machinetracking["supplierId"] = (int) $machinetracking->supplier_id;
+                            $row_arr_machinetracking["contractId"] = (int) $machinetracking->contract_id;
+                            $row_arr_machinetracking["trackingDate"] = $machinetracking->expense_date;
+                            $row_arr_machinetracking["machineId"] = (int) $machinetracking->supplier_id;
+                            $row_arr_machinetracking["clockStart"] = $machinetracking->clock_start + 0;
+                            $row_arr_machinetracking["clockEnd"] = $machinetracking->clock_end + 0;
+
+                            array_push($return_arr_machinetracking, $row_arr_machinetracking);
+                        }
+                        $row_array_final["machineTracking"] = $return_arr_machinetracking;
+
 
                         $Return["status"] = true;
                         $Return["message"] = "";

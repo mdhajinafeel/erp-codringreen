@@ -1233,4 +1233,16 @@ class Export_model extends CI_Model
             return 0;
         }
     }
+
+    public function update_invoice_data_container($exportid, $invoiceid, $data)
+    {
+        $multiClause = array('export_id' => $exportid, 'export_doc_id' => $invoiceid);
+        $this->db->where($multiClause);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        if ($this->db->update('tbl_export_document_container', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

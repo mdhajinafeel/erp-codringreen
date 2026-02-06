@@ -361,15 +361,15 @@ $(document).ready(function () {
                     $("#error-enddate").hide();
                 }
 
-                if (product_type == 0) {
-                    isValid5 = false;
-                    $("#error-producttype").show();
-                    $("#error-producttype").text(error_selectwoodtype);
-                } else {
-                    isValid5 = true;
-                    $("#error-producttype").hide();
-                    $("#error-producttype").text("");
-                }
+                // if (product_type == 0) {
+                //     isValid5 = false;
+                //     $("#error-producttype").show();
+                //     $("#error-producttype").text(error_selectwoodtype);
+                // } else {
+                //     isValid5 = true;
+                //     $("#error-producttype").hide();
+                //     $("#error-producttype").text("");
+                // }
             } else if (report_downloadby == 2) {
                 if (product_type == 0) {
                     isValid5 = false;
@@ -513,15 +513,15 @@ $(document).ready(function () {
                     $("#error-enddate").hide();
                 }
 
-                if (product_type == 0) {
-                    isValid5 = false;
-                    $("#error-producttype").show();
-                    $("#error-producttype").text(error_selectwoodtype);
-                } else {
-                    isValid5 = true;
-                    $("#error-producttype").hide();
-                    $("#error-producttype").text("");
-                }
+                // if (product_type == 0) {
+                //     isValid5 = false;
+                //     $("#error-producttype").show();
+                //     $("#error-producttype").text(error_selectwoodtype);
+                // } else {
+                //     isValid5 = true;
+                //     $("#error-producttype").hide();
+                //     $("#error-producttype").text("");
+                // }
             } else if (report_downloadby == 2) {
                 if (product_type == 0) {
                     isValid5 = false;

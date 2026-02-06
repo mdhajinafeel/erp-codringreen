@@ -152,7 +152,7 @@ class Expenseledgerreport extends MY_Controller
                     $conceptGeneralName = '';
                     $conceptGeneralDisplayId = '';
                     $conceptGeneralAmount = 0;
-                    $ledgerCreditTransactionDetails = $this->Expense_model->get_credit_transaction_details($conceptGeneral, $originId);
+                    $ledgerCreditTransactionDetails = $this->Expense_model->get_credit_transaction_details($conceptGeneral, $originId, $userId);
 
                     if (count($ledgerCreditTransactionDetails) == 1) {
                         $conceptGeneralName = $ledgerCreditTransactionDetails[0]->concept_general;

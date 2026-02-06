@@ -615,12 +615,6 @@ endif;
 																} else {
 																	'false';
 																} ?>" id="financemasters">
-											<!-- <li class="nav-item">
-											<a class="nav-link" href="" aria-expanded="false">
-												<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('currencies_title'); ?></span>
-												</div>
-											</a>
-										</li> -->
 											<li class="nav-item">
 												<a class="nav-link <?php if ($this->router->fetch_class() == "suppliers") {
 																		echo 'active';
@@ -661,59 +655,7 @@ endif;
 													</div>
 												</a>
 											</li>
-											<!-- <li class="nav-item">
-											<a class="nav-link <?php if ($this->router->fetch_class() == "ledgertypes") {
-																	echo 'active';
-																} else {
-																	'';
-																} ?>" href="<?php echo site_url('ledgertypes'); ?>" aria-expanded="false">
-												<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('ledgertype_title'); ?></span>
-												</div>
-											</a>
-										</li> -->
 										</ul>
-
-
-										<!-- <a class="nav-link dropdown-indicator" href="#ledger" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">
-										<div class="d-flex align-items-center"><span class="nav-link-icon"><span class="fas fa-dollar"></span></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('expenseledger_title'); ?></span>
-										</div>
-									</a>
-									<ul class="nav collapse <?php if ($this->router->fetch_class() == "expenseadvanceregistry" || $this->router->fetch_class() == "expenseledger" || $this->router->fetch_class() == "expenseledgerreport") {
-																echo 'show';
-															} else {
-																'false';
-															} ?>" id="ledger">
-										<li class="nav-item">
-											<a class="nav-link <?php if ($this->router->fetch_class() == "expenseadvanceregistry") {
-																	echo 'active';
-																} else {
-																	'';
-																} ?>" href="<?php echo site_url('expenseadvanceregistry'); ?>" aria-expanded="false">
-												<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('advanceregistry_title'); ?></span>
-												</div>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a class="nav-link <?php if ($this->router->fetch_class() == "expenseledger") {
-																	echo 'active';
-																} else {
-																	'';
-																} ?>" href="<?php echo site_url('expenseledger'); ?>" aria-expanded="false">
-												<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('viewledger_title'); ?></span>
-												</div>
-											</a>
-										</li>
-										<li class="nav-item">
-											<a class="nav-link <?php if ($this->router->fetch_class() == "expenseledgerreport") {
-																	echo 'active';
-																} else {
-																	'';
-																} ?>" href="<?php echo site_url('expenseledgerreport'); ?>" aria-expanded="false">
-												<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('ledgerreport_title'); ?></span>
-												</div>
-											</a>
-										</li>
-									</ul> -->
 
 										<a class="nav-link <?php if ($this->router->fetch_class() == "purchasecontracts") {
 																echo 'active';
@@ -981,6 +923,27 @@ endif;
 										</div>
 									</div>
 									<!-- parent pages-->
+									 <a class="nav-link dropdown-indicator" href="#appcenter" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="app_center">
+											<div class="d-flex align-items-center"><span class="nav-link-icon"><i class="fa-brands fa-google-play"></i></span><span class="nav-link-text ps-1"><?php echo $this->lang->line('app_center'); ?></span>
+											</div>
+										</a>
+										<ul class="nav collapse <?php if (
+																	$this->router->fetch_class() == "applists") {
+																	echo 'show';
+																} else {
+																	'false';
+																} ?>" id="appcenter">
+											<li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "applists") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('appcenter/applists'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('app_lists'); ?></span></span>
+													</div>
+												</a>
+											</li>
+										</ul>
 									<a class="nav-link <?php if ($this->router->fetch_class() == "origins") {
 															echo 'active';
 														} else {

@@ -159,14 +159,14 @@ class Expense_model extends CI_Model
         return $query->result();
     }
 
-    public function get_credit_transaction_details($creditTransactionId, $originId)
+    public function get_credit_transaction_details($creditTransactionId, $originId, $userid)
     {
         if($creditTransactionId > 0) {
             $query = $this->db->query("SELECT concept_general, transaction_display_id, amount 
-                FROM tbl_transaction WHERE is_active = 1 AND origin_id = $originId AND transaction_id = $creditTransactionId");
+                FROM tbl_transaction WHERE is_active = 1 AND origin_id = $originId AND transaction_id = $creditTransactionId AND user_id = $userid AND transaction_type = 1");
         } else {
             $query = $this->db->query("SELECT '' as concept_general, '' as transaction_display_id, SUM(amount) AS amount 
-                FROM tbl_transaction WHERE is_active = 1 AND origin_id = $originId");
+                FROM tbl_transaction WHERE is_active = 1 AND origin_id = $originId AND user_id = $userid AND transaction_type = 1");
         }
         return $query->result();
     }

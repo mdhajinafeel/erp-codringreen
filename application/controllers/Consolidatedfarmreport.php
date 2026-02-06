@@ -211,9 +211,13 @@ class Consolidatedfarmreport extends MY_Controller
                             $lastDataRow = $rowCountData - 1;
                             $objSheet->SetCellValue("C$rowCountCalcRow", "=SUM(C$rowCountFirstData:C$lastDataRow)");
                             $objSheet->SetCellValue("D$rowCountCalcRow", "=SUM(D$rowCountFirstData:D$lastDataRow)");
+                            $objSheet->getStyle("C$rowCountCalcRow:D$rowCountCalcRow")->applyFromArray($styleArray);
+                            $objSheet->getStyle("A6:D$lastDataRow")->applyFromArray($styleArray);
+                            $objSheet->getColumnDimension("A")->setAutoSize(true);
+                            $objSheet->getColumnDimension("B")->setAutoSize(true);
+                            $objSheet->getColumnDimension("C")->setAutoSize(true);
+                            $objSheet->getColumnDimension("D")->setAutoSize(true);
                         }
-
-                       
 
                         $sheetNo++;
                     }

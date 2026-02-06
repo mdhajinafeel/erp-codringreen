@@ -1,6 +1,6 @@
 <?php
 
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING);
 ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
@@ -143,15 +143,14 @@ class Farms extends MY_Controller
                 if ($createdFrom == 2) {
                     $this->generate_farm_report_field_purchase($farmId, $contractId, $inventoryOrder);
                 } else {
-                    
+
                     $fetchContractDetails = $this->Contract_model->get_contracts_by_contractid($contractId);
-                    
-                    if($fetchContractDetails[0]->existing_price_condition == 1) {
+
+                    if ($fetchContractDetails[0]->existing_price_condition == 1) {
                         $this->generate_farm_report_existing($farmId, $contractId, $inventoryOrder);
                     } else {
                         $this->generate_farm_report($farmId, $contractId, $inventoryOrder);
                     }
-                    
                 }
             } else if ($this->input->get('type') == "downloadreceipt") {
 
@@ -163,16 +162,15 @@ class Farms extends MY_Controller
                 $fetchContractDetails = $this->Contract_model->get_contracts_by_contractid($contractId);
 
                 if ($createdFrom == 2) {
-                    
-                    if($fetchContractDetails[0]->existing_price_condition == 1) {
+
+                    if ($fetchContractDetails[0]->existing_price_condition == 1) {
                         $this->generate_supplier_receipt_existing($farmId, $contractId, $inventoryOrder);
                     } else {
                         $this->generate_supplier_receipt($farmId, $contractId, $inventoryOrder);
                     }
-                    
                 } else {
-                    
-                    if($fetchContractDetails[0]->existing_price_condition == 1) {
+
+                    if ($fetchContractDetails[0]->existing_price_condition == 1) {
                         $this->generate_supplier_receipt_existing($farmId, $contractId, $inventoryOrder);
                     } else {
                         $this->generate_supplier_receipt($farmId, $contractId, $inventoryOrder);
@@ -187,12 +185,12 @@ class Farms extends MY_Controller
                 $adjustArr = explode(',', $getFarmDetails[0]->adjust_taxes);
                 $getProviders = $this->Farm_model->fetch_payto_providers($getFarmDetails[0]->origin_id, $getFarmDetails[0]->supplier_id);
                 $getSupplierTaxes = $this->Master_model->get_supplier_taxes_by_origin($getFarmDetails[0]->origin_id);
-                
+
                 $formSubmit = 'farms/add';
-                if($getFarmDetails[0]->existing_price_condition == 1) {
+                if ($getFarmDetails[0]->existing_price_condition == 1) {
                     $formSubmit = 'farms/add_existing';
                 }
-                
+
                 $data = array(
                     'pageheading' => $this->lang->line('farm_details'),
                     'pagetype' => 'update',
@@ -576,2863 +574,6 @@ class Farms extends MY_Controller
                     $processType = $this->input->post('processType');
                     $loadingCost = $this->input->post('loadingCost');
                     $unloadingCost = $this->input->post('unloadingCost');
-                    
-                    if($originid == 4) {
-                        $circumferenceallowance = $this->input->post('circumference_allowance');
-                        $lengthallowance = $this->input->post('length_allowance');
-                    } else {
-                        $circumferenceallowance = 0;
-                        $lengthallowance = 0;
-                    }
-                    
-                    
-                    $warehouseid_rounglogs = $this->input->post('warehouseid_rounglogs');
-                    $measurement_system_roundlogs = $this->input->post('measurement_system_roundlogs');
-                    $mandatoryreception = $this->input->post('mandatoryreception');
-
-                    if ($originid == 3) {
-
-                        $getSupplierDetails = $this->Master_model->get_supplier_detail_reception($supplierid, $productid);
-
-                        date_default_timezone_set($session['default_timezone']);
-                        $purchase_date = date('Y-m-d', time());
-                        $receptiondate = date('d/m/Y', time());
-
-                        $farmdataJson = json_decode($farmdata, true);
-
-                        $inventoryOrderCnt = 0;
-                        $totalContainerCnt = 0;
-
-                        foreach ($farmdataJson as $farm) {
-
-                            $containerNumber = $farm["containerNumber"];
-                            $metricTon = $farm["metricTon"];
-                            $length = $farm["length"];
-                            $totalCount = $farm["totalCount"];
-                            $jasVolume = $farm["jasVolume"];
-
-                            if ($totalCount > 0 && $metricTon > 0 && $jasVolume > 0 && count($farm["containerData"]) > 0) {
-                                $totalContainerCnt = $totalContainerCnt + 1;
-
-                                $getInventoryOrderCount = $this->Farm_model->get_inventory_order_count($containerNumber, $originid);
-
-                                if ($getInventoryOrderCount[0]->cnt == 0) {
-                                    $inventoryOrderCnt = $inventoryOrderCnt + 1;
-                                } else {
-                                    $Return['error'] = $containerNumber . ' - ' . $this->lang->line('exist_inventory_order');
-                                    $Return['result'] = "";
-                                    $Return['redirect'] = false;
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                }
-                            }
-                        }
-
-                        if ($totalContainerCnt == $inventoryOrderCnt) {
-
-                            foreach ($farmdataJson as $farm) {
-
-                                $containerNumber = $farm["containerNumber"];
-                                $seal = $farm["seal"];
-                                $metricTon = $farm["metricTon"];
-                                $shortTons = $farm["shortTons"];
-                                $netLbs = $farm["netLbs"];
-                                $diameter = $farm["diameter"];
-                                $length = $farm["length"];
-                                $totalCount = $farm["totalCount"];
-                                $averageDiameter = $farm["averageDiameter"];
-                                $jasVolume = $farm["jasVolume"];
-                                $purchasePrice = $farm["purchasePrice"];
-                                $totalPurchasePrice = $farm["totalPurchasePrice"];
-                                $salesPrice = $farm["salesPrice"];
-                                $totalSalesPrice = $farm["totalSalesPrice"];
-
-                                if ($totalCount > 0 && $metricTon > 0 && $jasVolume > 0 && count($farm["containerData"]) > 0) {
-
-                                    $dataFarm = array(
-                                        "supplier_id" => $supplierid, "contract_id" => $purchasecontractid,
-                                        "product_id" => $productid, "product_type_id" => $producttypeid,
-                                        "inventory_order" => $containerNumber, "plate_number" => "",
-                                        "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                        "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                        "total_volume" => $jasVolume, "total_value" => $totalPurchasePrice, 
-                                        "unit_price" => $purchasePrice, "wood_value" => $totalPurchasePrice,
-                                        "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                        "exchange_rate" => $conversionrate, "is_adjust_rf" => $adjustrf,
-                                        "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
-                                        "origin_id" => $originid, "metric_ton" => $metricTon, "process_type" => $processType,
-                                    );
-
-                                    $insertFarm = $this->Farm_model->add_farm($dataFarm);
-
-                                    if ($insertFarm > 0) {
-                                        $dataFarmData = array();
-
-                                        foreach ($farm["containerData"] as $farmdata) {
-
-                                            $noOfPieces = $farmdata["pieces"];
-                                            $diameterData = $farmdata["diameter"];
-                                            $lengthData = $farmdata["length"];
-                                            $volume = $farmdata["volume"];
-
-                                            if ($noOfPieces > 0) {
-                                                $dataFarmData[] = array(
-                                                    "farm_id" => $insertFarm, "scanned_code" => $noOfPieces,
-                                                    "no_of_pieces" => $noOfPieces, "circumference" => $diameterData,
-                                                    "length" => $lengthData, "width" => 0, "thickness" => 0, "volume" => $volume,
-                                                    "volume_pie" => 0, "grade_id" => 0, "length_export" => 0, "width_export" => 0,
-                                                    "thickness_export" => 0, "volume_bought" => $volume, "created_by" => $session['user_id'],
-                                                    "updated_by" => $session['user_id'], "is_active" => 1,
-                                                    "created_date" => date('Y-m-d H:i:s'), "updated_date" => date('Y-m-d H:i:s')
-                                                );
-                                            }
-                                        }
-
-                                        if (count($dataFarmData) > 0) {
-                                            $insertFarmData = $this->Farm_model->add_farm_data($dataFarmData);
-
-                                            if ($insertFarmData) {
-
-                                                //CONTRACT MAPPING
-
-                                                $dataContractMapping = array(
-                                                    "contract_id" => $purchasecontractid, "supplier_id" => $supplierid,
-                                                    "inventory_order" => $containerNumber, "total_volume" => $metricTon,
-                                                    "invoice_number" => "", "created_by" => $session['user_id'],
-                                                    "updated_by" => $session['user_id'], "is_active" => 1,
-                                                );
-
-                                                $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
-
-                                                //END CONTRACT MAPPING
-
-                                                //ADD INVENTORY LEDGER
-
-                                                $dataInventoryLedger = array(
-                                                    "contract_id" => $purchasecontractid,
-                                                    "inventory_order" => $containerNumber, "ledger_type" => 2,
-                                                    "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                                    "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
-                                                );
-
-                                                if ($totalPurchasePrice != 0) {
-                                                    $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $totalPurchasePrice, 1, $supplierid);
-                                                }
-
-                                                $getContracts = $this->Contract_model->get_contracts_by_contractid($purchasecontractid);
-                                                if (count($getContracts) == 1) {
-                                                    $remainingVolume = $getContracts[0]->remaining_volume - $metricTon;
-
-                                                    $dataRemainingVolume = array(
-                                                        "remaining_volume" => $remainingVolume,
-                                                    );
-
-                                                    $this->Contract_model->update_purchase_contract_volume($dataRemainingVolume, $purchasecontractid, $supplierid);
-                                                }
-
-                                                //END INVENTORY LEDGER
-
-                                                //RECEPTION
-
-                                                if (count($getSupplierDetails) == 1) {
-                                                    $dataReception = array(
-                                                        "warehouse_id" => 10, "supplier_id" => $supplierid,
-                                                        "supplier_code" => $getSupplierDetails[0]->supplier_code, "supplier_product_id" => $getSupplierDetails[0]->product_name,
-                                                        "supplier_product_typeid" => $getSupplierDetails[0]->product_type,  "measurementsystem_id" => 7,
-                                                        "received_date" => $receptiondate, "salvoconducto" => $containerNumber,
-                                                        "total_volume" => $jasVolume, "total_pieces" => $totalCount,
-                                                        "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                        "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'],
-                                                        "captured_timestamp" => 0, "isduplicatecaptured" => 0, "is_contract_added" => 0,
-                                                        "is_special_uploaded" => 1, "origin_id" => $originid, "metric_ton" => $metricTon,
-                                                    );
-
-                                                    $insertReception = $this->Reception_model->add_reception($dataReception);
-
-                                                    if ($insertReception > 0) {
-                                                        $insertReceptionData = $this->Reception_model->add_reception_data_from_farm($insertReception, $containerNumber, $purchaseunit, $session['user_id']);
-
-                                                        if ($insertReceptionData) {
-                                                            //DISPATCH
-
-                                                            $dataDispatch = array(
-                                                                "container_number" => $containerNumber, "warehouse_id" => $warehouseid,
-                                                                "shipping_line" => $shippingline, "product_id" => $productid,
-                                                                "product_type_id" => $producttypeid,  "dispatch_date" => $receptiondate,
-                                                                "seal_number" => $seal, "container_pic_url" => "",
-                                                                "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                                "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'],
-                                                                "is_special_uploaded" => 1, "origin_id" => $originid, "total_gross_volume" => $jasVolume,
-                                                                "total_volume" => $jasVolume, "total_pieces" => $totalCount, "category" => 0, "captured_from_app" => 0,
-                                                                "metric_ton" => $metricTon, "short_ton" => $shortTons, "net_lbs" => $netLbs,
-                                                                "diameter_text" => $diameter, "length_text" => $length, 
-                                                                "unit_price" => $salesPrice, "total_value" => $totalSalesPrice,
-                                                            );
-
-                                                            $insertDispatch = $this->Dispatch_model->add_dispatch($dataDispatch);
-
-                                                            if ($insertDispatch > 0) {
-                                                                $insertDispatchData = $this->Dispatch_model->add_dispatch_data_from_reception($insertReception, $insertDispatch, $containerNumber, $session['user_id'], $receptiondate);
-                                                            }
-
-                                                            //END DISPATCH
-                                                        }
-                                                    }
-                                                }
-
-                                                //END RECEPTION
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            $Return['redirect'] = false;
-                            $Return['result'] = $this->lang->line('data_added');
-                            $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                            $this->output($Return);
-                            exit;
-                        } else {
-                            $Return['error'] = $this->lang->line('error_adding');
-                            $Return['result'] = "";
-                            $Return['redirect'] = false;
-                            $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                            $this->output($Return);
-                            exit;
-                        }
-                    } else {
-                        $getInventoryOrderCount = $this->Farm_model->get_inventory_order_count($inventoryorder, $originid);
-
-                        if ($getInventoryOrderCount[0]->cnt == 0) {
-
-                            if ($servicecost == null || $servicecost == "") {
-                                $servicecost = 0;
-                            }
-
-                            if ($logisticcost == null || $logisticcost == "") {
-                                $logisticcost = 0;
-                            }
-                            
-                            if ($farmadjustment == null || $farmadjustment == "") {
-                                $farmadjustment = 0;
-                            }
-
-                            date_default_timezone_set($session['default_timezone']);
-                            $purchase_date = date('Y-m-d', time());
-                            $receptiondate_roundlogs = date('d/m/Y', time());
-
-                            $farmdataJson = json_decode($farmdata, true);
-
-                            $totalVolume = 0;
-                            $woodValue = 0;
-                            $woodValueWithSupplierTaxes = 0;
-                            $logisticsCostWithTaxes = 0;
-                            $servicesCostWithTaxes = 0;
-                            $totalValueWithTaxes = 0;
-                            $totalValue = 0;
-
-                            $supplierTaxesArr = array();
-                            $providerLogisticTaxesArr = array();
-                            $providerServiceTaxesArr = array();
-                            $supplierLogisticTaxesArr = array();
-                            $supplierServiceTaxesArr = array();
-                            $supplierTaxesAdjustArr = array();
-                            $providerLogisticTaxesAdjustArr = array();
-                            $providerServiceTaxesAdjustArr = array();
-
-                            if ($productid == 4 && ($producttypeid == 1 || $producttypeid == 3)) {
-
-                                foreach ($farmdataJson as $farm) {
-
-                                    $noOfPieces = $farm["noOfPieces"];
-                                    $volumePie = $farm["volumePie"];
-                                    $length = $farm["length"];
-                                    $width = $farm["width"];
-                                    $thickness = $farm["thickness"];
-                                    $lengthExport = $farm["lengthExport"];
-                                    $widthExport = $farm["widthExport"];
-                                    $thicknessExport = $farm["thicknessExport"];
-                                    $grade = $farm["grade"];
-                                    $face = $farm["face"];
-                                    $netVolume = $farm["netVolume"];
-                                    $totalVolume = $totalVolume + $farm["netVolume"];
-
-                                    $getPriceRanges = $this->Farm_model->get_price_for_circumference($face, $purchasecontractid);
-
-                                    if ($noOfPieces > 0) {
-                                        if (count($getPriceRanges) == 1) {
-
-                                            $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $volumePie));
-
-                                            // if ($purchaseunit == 1) {
-                                            //     if ($grade == 1) {
-                                            //         $woodValue = $woodValue + (($getPriceRanges[0]->minrange_grade1 * $volumePie));
-                                            //     } else if ($grade == 2) {
-                                            //         $woodValue = $woodValue + (($getPriceRanges[0]->maxrange_grade2 * $volumePie));
-                                            //     } else if ($grade == 3) {
-                                            //         $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $volumePie));
-                                            //     }
-                                            // } else {
-                                            //     if ($grade == 1) {
-                                            //         $woodValue = $woodValue + (($getPriceRanges[0]->minrange_grade1 * $netVolume));
-                                            //     } else if ($grade == 2) {
-                                            //         $woodValue = $woodValue + (($getPriceRanges[0]->maxrange_grade2 * $netVolume));
-                                            //     } else if ($grade == 3) {
-                                            //         $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $netVolume));
-                                            //     }
-                                            // }
-                                        }
-                                    }
-                                }
-
-                                if ($conversionrate > 0) {
-                                    $woodValue = $woodValue * $conversionrate;
-                                }
-
-                                $woodValue = sprintf('%0.3f', ($woodValue + 0));
-
-                                // WOOD VALUE WITH TAXES
-                                $supplierIvaValue = 0;
-                                $supplierRetenctionValue = 0;
-                                $supplierReticaValue = 0;
-
-                                $getSupplierTaxes = $this->Farm_model->get_supplier_taxes($supplierid);
-
-                                if (count($getSupplierTaxes) == 1) {
-
-                                    if ($getSupplierTaxes[0]->is_iva_enabled == 1) {
-                                        $supplierIvaValue =  $woodValue * ($getSupplierTaxes[0]->iva_value / 100);
-                                    }
-
-                                    if ($getSupplierTaxes[0]->is_retencion_enabled == 1) {
-                                        $supplierRetenctionValue = $woodValue * ($getSupplierTaxes[0]->retencion_value / 100);
-                                    }
-
-                                    if ($getSupplierTaxes[0]->is_reteica_enabled == 1) {
-                                        $supplierReticaValue = $woodValue * ($getSupplierTaxes[0]->reteica_value);
-                                    }
-                                }
-
-                                $woodValueWithSupplierTaxes = $woodValue + ($supplierIvaValue + $supplierRetenctionValue + $supplierReticaValue);
-
-                                // END WOOD VALUE WITH TAXES
-
-                                // LOGISTICS WITH TAXES
-
-                                if ($logisticcost != 0 && $logisticpayto > 0) {
-
-                                    $transportorIvaValue_Logistics = 0;
-                                    $transportorRetenctionValue_Logistics = 0;
-                                    $transportorReticaValue_Logistics = 0;
-
-                                    $getTransportorTaxes_Logistics = $this->Farm_model->get_transportor_taxes($logisticpayto);
-                                    $getTransportorTaxes_Logistics_Supplier = $this->Farm_model->get_supplier_taxes($logisticpayto);
-
-                                    if (count($getTransportorTaxes_Logistics) == 1) {
-
-                                        if ($getTransportorTaxes_Logistics[0]->is_iva_provider_enabled == 1) {
-                                            $transportorIvaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->iva_provider_value / 100);
-                                        } else {
-                                            if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_iva_enabled == 1) {
-                                                $transportorIvaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics_Supplier[0]->iva_value / 100);
-                                            }
-                                        }
-
-                                        if ($getTransportorTaxes_Logistics[0]->is_retencion_provider_enabled == 1) {
-                                            $transportorRetenctionValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->retencion_provider_value / 100);
-                                        } else {
-                                            if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_retencion_enabled == 1) {
-                                                $transportorRetenctionValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics_Supplier[0]->retencion_value / 100);
-                                            }
-                                        }
-
-                                        if ($getTransportorTaxes_Logistics[0]->is_reteica_provider_enabled == 1) {
-                                            $transportorReticaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->reteica_provider_value);
-                                        } else {
-                                            if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_reteica_enabled == 1) {
-                                                $transportorReticaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics_Supplier[0]->reteica_value);
-                                            }
-                                        }
-                                    } else if ($logisticpayto == $supplierid) {
-                                        $getTransportorTaxes_Logistics = $this->Farm_model->get_supplier_taxes($logisticpayto);
-
-                                        if (count($getTransportorTaxes_Logistics) == 1) {
-                                            if ($getTransportorTaxes_Logistics[0]->is_iva_enabled == 1) {
-                                                $transportorIvaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->iva_value / 100);
-                                            }
-
-                                            if ($getTransportorTaxes_Logistics[0]->is_retencion_enabled == 1) {
-                                                $transportorRetenctionValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->retencion_value / 100);
-                                            }
-
-                                            if ($getTransportorTaxes_Logistics[0]->is_reteica_enabled == 1) {
-                                                $transportorReticaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->reteica_value);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                $logisticsCostWithTaxes = $logisticcost + ($transportorIvaValue_Logistics + $transportorRetenctionValue_Logistics + $transportorReticaValue_Logistics);
-
-                                // END LOGISTICS WITH TAXES
-
-                                // SERVICES WITH TAXES
-
-                                if ($servicecost != 0 && $servicepayto > 0) {
-                                    $transportorIvaValue_Service = 0;
-                                    $transportorRetenctionValue_Service = 0;
-                                    $transportorReticaValue_Service = 0;
-
-                                    $getTransportorTaxes_Service = $this->Farm_model->get_transportor_taxes($servicepayto);
-                                    $getTransportorTaxes_Service_Supplier = $this->Farm_model->get_supplier_taxes($servicepayto);
-
-                                    if (count($getTransportorTaxes_Service) == 1) {
-
-                                        if ($getTransportorTaxes_Service[0]->is_iva_provider_enabled == 1) {
-                                            $transportorIvaValue_Service = $servicecost * ($getTransportorTaxes_Service[0]->iva_provider_value / 100);
-                                        } else {
-                                            if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_iva_enabled == 1) {
-                                                $transportorIvaValue_Service = $servicecost * ($getTransportorTaxes_Service_Supplier[0]->iva_value / 100);
-                                            }
-                                        }
-
-                                        if ($getTransportorTaxes_Service[0]->is_retencion_provider_enabled == 1) {
-                                            $transportorRetenctionValue_Service = $servicecost * ($getTransportorTaxes_Service[0]->retencion_provider_value / 100);
-                                        } else {
-                                            if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_retencion_enabled == 1) {
-                                                $transportorRetenctionValue_Service = $servicecost * ($getTransportorTaxes_Service_Supplier[0]->retencion_value / 100);
-                                            }
-                                        }
-
-                                        if ($getTransportorTaxes_Service[0]->is_reteica_provider_enabled == 1) {
-                                            $transportorReticaValue_Service = $servicecost * ($getTransportorTaxes_Service[0]->reteica_provider_value);
-                                        } else {
-                                            if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_reteica_enabled == 1) {
-                                                $transportorReticaValue_Service = $servicecost * ($getTransportorTaxes_Service_Supplier[0]->reteica_value);
-                                            }
-                                        }
-                                    } else if ($servicepayto == $supplierid) {
-
-                                        $getTransportorTaxes_Service = $this->Farm_model->get_supplier_taxes($servicepayto);
-
-                                        if (count($getTransportorTaxes_Service) == 1) {
-                                            if ($getTransportorTaxes_Service[0]->is_iva_enabled == 1) {
-                                                $transportorIvaValue_Service = $logisticcost * ($getTransportorTaxes_Service[0]->iva_value / 100);
-                                            }
-
-                                            if ($getTransportorTaxes_Service[0]->is_retencion_enabled == 1) {
-                                                $transportorRetenctionValue_Service = $logisticcost * ($getTransportorTaxes_Service[0]->retencion_value / 100);
-                                            }
-
-                                            if ($getTransportorTaxes_Service[0]->is_reteica_enabled == 1) {
-                                                $transportorReticaValue_Service = $logisticcost * ($getTransportorTaxes_Service[0]->reteica_value);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                $servicesCostWithTaxes = $servicecost + ($transportorIvaValue_Service + $transportorRetenctionValue_Service + $transportorReticaValue_Service);
-
-                                // END SERVICES WITH TAXES
-
-                                if (count($adjustrf) > 0 || $farmadjustment != 0) {
-                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes - ($supplierRetenctionValue + $transportorRetenctionValue_Logistics + $transportorRetenctionValue_Service);
-                                } else {
-                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
-                                }
-
-                                if ($farmadjustment != 0) {
-                                    $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
-                                }
-
-                                $totalValue = $woodValue + $logisticcost + $servicecost;
-
-                                $dataFarm = array(
-                                    "supplier_id" => $supplierid, "contract_id" => $purchasecontractid,
-                                    "product_id" => $productid, "product_type_id" => $producttypeid,
-                                    "inventory_order" => $inventoryorder, "plate_number" => $truckplatenumber,
-                                    "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                    "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                    "total_volume" => $totalVolume, "total_value" => $totalValue, "wood_value" => $woodValue,
-                                    "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                    "exchange_rate" => $conversionrate, "is_adjust_rf" => $adjustrf,
-                                    "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
-                                    "origin_id" => $originid, "process_type" => $processType, "loading_cost" => $loadingCost, 
-                                    "unloading_cost" => $unloadingCost,
-                                );
-
-                                $insertFarm = $this->Farm_model->add_farm($dataFarm);
-
-                                if ($insertFarm > 0) {
-                                    $dataFarmData = array();
-                                    foreach ($farmdataJson as $farm) {
-
-                                        $noOfPieces = $farm["noOfPieces"];
-                                        $length = $farm["length"];
-                                        $width = $farm["width"];
-                                        $thickness = $farm["thickness"];
-                                        $lengthExport = $farm["lengthExport"];
-                                        $widthExport = $farm["widthExport"];
-                                        $thicknessExport = $farm["thicknessExport"];
-                                        $volumePie = $farm["volumePie"];
-                                        $grossVolume = $farm["grossVolume"];
-                                        $grade = $farm["grade"];
-                                        $face = $farm["face"];
-                                        $netVolume = $farm["netVolume"];
-                                        $scannedCode = $farm["scannedCode"];
-
-                                        if ($noOfPieces > 0) {
-                                            $dataFarmData[] = array(
-                                                "farm_id" => $insertFarm, "scanned_code" => $scannedCode,
-                                                "no_of_pieces" => $noOfPieces, "circumference" => 0,
-                                                "length" => $length, "width" => $width, "thickness" => $thickness, "volume" => $netVolume,
-                                                "volume_pie" => $volumePie, "grade_id" => $grade, "face" => $face, "length_export" => $lengthExport, "width_export" => $widthExport,
-                                                "thickness_export" => $thicknessExport, "volume_bought" => $grossVolume, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
-                                                "created_date" => date('Y-m-d H:i:s'), "updated_date" => date('Y-m-d H:i:s')
-                                            );
-                                        }
-                                    }
-
-                                    if (count($dataFarmData) > 0) {
-                                        $insertFarmData = $this->Farm_model->add_farm_data($dataFarmData);
-
-                                        if ($insertFarmData) {
-                                            //SUPPLIER PRICE
-                                            $this->Farm_model->add_supplier_price(
-                                                $purchasecontractid,
-                                                $supplierid,
-                                                $inventoryorder,
-                                                $session['user_id']
-                                            );
-
-                                            //CONTRACT INVENTORY MAPPING
-                                            $dataContractMapping = array(
-                                                "contract_id" => $purchasecontractid, "supplier_id" => $supplierid,
-                                                "inventory_order" => $inventoryorder, "total_volume" => $totalVolume,
-                                                "invoice_number" => "", "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
-                                            );
-
-                                            $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
-
-                                            $dataInventoryLedger = array(
-                                                "contract_id" => $purchasecontractid,
-                                                "inventory_order" => $inventoryorder, "ledger_type" => 2,
-                                                "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
-                                            );
-
-                                            if ($woodValueWithSupplierTaxes != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
-                                            }
-
-                                            if ($logisticsCostWithTaxes != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
-                                            }
-
-                                            if ($servicesCostWithTaxes != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
-                                            }
-
-                                            if ($farmadjustment != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
-                                            }
-
-                                            $getContracts = $this->Contract_model->get_contracts_by_contractid($purchasecontractid);
-                                            if (count($getContracts) == 1) {
-                                                $remainingVolume = $getContracts[0]->remaining_volume - $totalVolume;
-
-                                                $dataRemainingVolume = array(
-                                                    "remaining_volume" => $remainingVolume,
-                                                );
-
-                                                $this->Contract_model->update_purchase_contract_volume($dataRemainingVolume, $purchasecontractid, $supplierid);
-                                            }
-
-                                            //END
-
-                                            //CREATE RECEPTION
-
-                                            $getSupplierDetails = $this->Master_model->get_supplier_detail_reception($supplierid, $productid);
-
-                                            if (count($getSupplierDetails) == 1) {
-                                                $dataReception = array(
-                                                    "warehouse_id" => $warehouseid, "supplier_id" => $supplierid,
-                                                    "supplier_code" => $getSupplierDetails[0]->supplier_code, "supplier_product_id" => $getSupplierDetails[0]->product_name,
-                                                    "supplier_product_typeid" => $getSupplierDetails[0]->product_type,  "measurementsystem_id" => 1,
-                                                    "received_date" => $receptiondate, "salvoconducto" => $inventoryorder, "total_volume" => $totalVolume,
-                                                    "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                    "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'],
-                                                    "captured_timestamp" => 0, "isduplicatecaptured" => 0, "is_contract_added" => 0,
-                                                    "is_special_uploaded" => 0, "origin_id" => $originid,
-                                                );
-
-                                                $insertReception = $this->Reception_model->add_reception($dataReception);
-
-                                                if ($insertReception > 0) {
-                                                    $this->Reception_model->add_reception_data_from_farm($insertReception, $inventoryorder, $purchaseunit, $session['user_id']);
-                                                }
-                                            }
-
-                                            //END RECEPTION
-                                        }
-
-                                        $Return['result'] = $this->lang->line('data_added');
-                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                        $this->output($Return);
-                                        exit;
-                                    } else {
-                                        $Return['error'] = $this->lang->line('error_adding');
-                                        $Return['result'] = "";
-                                        $Return['redirect'] = false;
-                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                        $this->output($Return);
-                                        exit;
-                                    }
-                                } else {
-                                    $Return['error'] = $this->lang->line('error_adding');
-                                    $Return['result'] = "";
-                                    $Return['redirect'] = false;
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                }
-
-                                $Return['result'] = $woodValue; // $this->lang->line('data_added');
-                                $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                $this->output($Return);
-                                exit;
-                            } else if ($producttypeid == 1 || $producttypeid == 3) {
-
-                                $getPriceRanges = $this->Farm_model->get_price_for_circumference(-1, $purchasecontractid);
-
-                                foreach ($farmdataJson as $farm) {
-
-                                    $noOfPieces = $farm["noOfPieces"];
-                                    $volumePie = $farm["volumePie"];
-                                    $grade = $farm["grade"];
-                                    $netVolume = $farm["netVolume"];
-                                    $totalVolume = $totalVolume + $farm["netVolume"];
-
-                                    if ($noOfPieces > 0) {
-                                        if (count($getPriceRanges) == 1) {
-                                            if ($purchaseunit == 1) {
-                                                if ($grade == 1) {
-                                                    $woodValue = $woodValue + (($getPriceRanges[0]->minrange_grade1 * $volumePie));
-                                                } else if ($grade == 2) {
-                                                    $woodValue = $woodValue + (($getPriceRanges[0]->maxrange_grade2 * $volumePie));
-                                                } else if ($grade == 3) {
-                                                    $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $volumePie));
-                                                }
-                                            } else {
-                                                if ($grade == 1) {
-                                                    $woodValue = $woodValue + (($getPriceRanges[0]->minrange_grade1 * $netVolume));
-                                                } else if ($grade == 2) {
-                                                    $woodValue = $woodValue + (($getPriceRanges[0]->maxrange_grade2 * $netVolume));
-                                                } else if ($grade == 3) {
-                                                    $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $netVolume));
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if ($conversionrate > 0) {
-                                    $woodValue = $woodValue * $conversionrate;
-                                }
-
-                                $woodValue = sprintf('%0.3f', ($woodValue + 0));
-
-                                // WOOD VALUE WITH TAXES
-                                $supplierIvaValue = 0;
-                                $supplierRetenctionValue = 0;
-                                $supplierReticaValue = 0;
-
-                                $getSupplierTaxes = $this->Farm_model->get_supplier_taxes($supplierid);
-
-                                if (count($getSupplierTaxes) == 1) {
-
-                                    if ($getSupplierTaxes[0]->is_iva_enabled == 1) {
-                                        $supplierIvaValue =  $woodValue * ($getSupplierTaxes[0]->iva_value / 100);
-                                    }
-
-                                    if ($getSupplierTaxes[0]->is_retencion_enabled == 1) {
-                                        $supplierRetenctionValue = $woodValue * ($getSupplierTaxes[0]->retencion_value / 100);
-                                    }
-
-                                    if ($getSupplierTaxes[0]->is_reteica_enabled == 1) {
-                                        $supplierReticaValue = $woodValue * ($getSupplierTaxes[0]->reteica_value);
-                                    }
-                                }
-
-                                $woodValueWithSupplierTaxes = $woodValue + ($supplierIvaValue + $supplierRetenctionValue + $supplierReticaValue);
-
-                                // END WOOD VALUE WITH TAXES
-
-                                // LOGISTICS WITH TAXES
-
-                                if ($logisticcost != 0 && $logisticpayto > 0) {
-
-                                    $transportorIvaValue_Logistics = 0;
-                                    $transportorRetenctionValue_Logistics = 0;
-                                    $transportorReticaValue_Logistics = 0;
-
-                                    $getTransportorTaxes_Logistics = $this->Farm_model->get_transportor_taxes($logisticpayto);
-                                    $getTransportorTaxes_Logistics_Supplier = $this->Farm_model->get_supplier_taxes($logisticpayto);
-
-                                    if (count($getTransportorTaxes_Logistics) == 1) {
-
-                                        if ($getTransportorTaxes_Logistics[0]->is_iva_provider_enabled == 1) {
-                                            $transportorIvaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->iva_provider_value / 100);
-                                        } else {
-                                            if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_iva_enabled == 1) {
-                                                $transportorIvaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics_Supplier[0]->iva_value / 100);
-                                            }
-                                        }
-
-                                        if ($getTransportorTaxes_Logistics[0]->is_retencion_provider_enabled == 1) {
-                                            $transportorRetenctionValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->retencion_provider_value / 100);
-                                        } else {
-                                            if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_retencion_enabled == 1) {
-                                                $transportorRetenctionValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics_Supplier[0]->retencion_value / 100);
-                                            }
-                                        }
-
-                                        if ($getTransportorTaxes_Logistics[0]->is_reteica_provider_enabled == 1) {
-                                            $transportorReticaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->reteica_provider_value);
-                                        } else {
-                                            if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_reteica_enabled == 1) {
-                                                $transportorReticaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics_Supplier[0]->reteica_value);
-                                            }
-                                        }
-                                    } else if ($logisticpayto == $supplierid) {
-                                        $getTransportorTaxes_Logistics = $this->Farm_model->get_supplier_taxes($logisticpayto);
-
-                                        if (count($getTransportorTaxes_Logistics) == 1) {
-                                            if ($getTransportorTaxes_Logistics[0]->is_iva_enabled == 1) {
-                                                $transportorIvaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->iva_value / 100);
-                                            }
-
-                                            if ($getTransportorTaxes_Logistics[0]->is_retencion_enabled == 1) {
-                                                $transportorRetenctionValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->retencion_value / 100);
-                                            }
-
-                                            if ($getTransportorTaxes_Logistics[0]->is_reteica_enabled == 1) {
-                                                $transportorReticaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->reteica_value);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                $logisticsCostWithTaxes = $logisticcost + ($transportorIvaValue_Logistics + $transportorRetenctionValue_Logistics + $transportorReticaValue_Logistics);
-
-                                // END LOGISTICS WITH TAXES
-
-                                // SERVICES WITH TAXES
-
-                                if ($servicecost != 0 && $servicepayto > 0) {
-                                    $transportorIvaValue_Service = 0;
-                                    $transportorRetenctionValue_Service = 0;
-                                    $transportorReticaValue_Service = 0;
-
-                                    $getTransportorTaxes_Service = $this->Farm_model->get_transportor_taxes($servicepayto);
-                                    $getTransportorTaxes_Service_Supplier = $this->Farm_model->get_supplier_taxes($servicepayto);
-
-                                    if (count($getTransportorTaxes_Service) == 1) {
-
-                                        if ($getTransportorTaxes_Service[0]->is_iva_provider_enabled == 1) {
-                                            $transportorIvaValue_Service = $servicecost * ($getTransportorTaxes_Service[0]->iva_provider_value / 100);
-                                        } else {
-                                            if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_iva_enabled == 1) {
-                                                $transportorIvaValue_Service = $servicecost * ($getTransportorTaxes_Service_Supplier[0]->iva_value / 100);
-                                            }
-                                        }
-
-                                        if ($getTransportorTaxes_Service[0]->is_retencion_provider_enabled == 1) {
-                                            $transportorRetenctionValue_Service = $servicecost * ($getTransportorTaxes_Service[0]->retencion_provider_value / 100);
-                                        } else {
-                                            if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_retencion_enabled == 1) {
-                                                $transportorRetenctionValue_Service = $servicecost * ($getTransportorTaxes_Service_Supplier[0]->retencion_value / 100);
-                                            }
-                                        }
-
-                                        if ($getTransportorTaxes_Service[0]->is_reteica_provider_enabled == 1) {
-                                            $transportorReticaValue_Service = $servicecost * ($getTransportorTaxes_Service[0]->reteica_provider_value);
-                                        } else {
-                                            if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_reteica_enabled == 1) {
-                                                $transportorReticaValue_Service = $servicecost * ($getTransportorTaxes_Service_Supplier[0]->reteica_value);
-                                            }
-                                        }
-                                    } else if ($servicepayto == $supplierid) {
-
-                                        $getTransportorTaxes_Service = $this->Farm_model->get_supplier_taxes($servicepayto);
-
-                                        if (count($getTransportorTaxes_Service) == 1) {
-                                            if ($getTransportorTaxes_Service[0]->is_iva_enabled == 1) {
-                                                $transportorIvaValue_Service = $logisticcost * ($getTransportorTaxes_Service[0]->iva_value / 100);
-                                            }
-
-                                            if ($getTransportorTaxes_Service[0]->is_retencion_enabled == 1) {
-                                                $transportorRetenctionValue_Service = $logisticcost * ($getTransportorTaxes_Service[0]->retencion_value / 100);
-                                            }
-
-                                            if ($getTransportorTaxes_Service[0]->is_reteica_enabled == 1) {
-                                                $transportorReticaValue_Service = $logisticcost * ($getTransportorTaxes_Service[0]->reteica_value);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                $servicesCostWithTaxes = $servicecost + ($transportorIvaValue_Service + $transportorRetenctionValue_Service + $transportorReticaValue_Service);
-
-                                // END SERVICES WITH TAXES
-
-                                if (count($adjustrf) > 0 || $farmadjustment != 0) {
-                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes - ($supplierRetenctionValue + $transportorRetenctionValue_Logistics + $transportorRetenctionValue_Service);
-                                } else {
-                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
-                                }
-
-                                if ($farmadjustment != 0) {
-                                    $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
-                                }
-
-                                $totalValue = $woodValue + $logisticcost + $servicecost;
-
-                                $dataFarm = array(
-                                    "supplier_id" => $supplierid, "contract_id" => $purchasecontractid,
-                                    "product_id" => $productid, "product_type_id" => $producttypeid,
-                                    "inventory_order" => $inventoryorder, "plate_number" => $truckplatenumber,
-                                    "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                    "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                    "total_volume" => $totalVolume, "total_value" => $totalValue, "wood_value" => $woodValue,
-                                    "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                    "exchange_rate" => $conversionrate, "is_adjust_rf" => $adjustrf,
-                                    "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
-                                    "origin_id" => $originid, "process_type" => $processType, "loading_cost" => $loadingCost, 
-                                    "unloading_cost" => $unloadingCost,
-                                );
-
-                                $insertFarm = $this->Farm_model->add_farm($dataFarm);
-
-                                if ($insertFarm > 0) {
-                                    $dataFarmData = array();
-                                    foreach ($farmdataJson as $farm) {
-
-                                        $noOfPieces = $farm["noOfPieces"];
-                                        $length = $farm["length"];
-                                        $width = $farm["width"];
-                                        $thickness = $farm["thickness"];
-                                        $lengthExport = $farm["lengthExport"];
-                                        $widthExport = $farm["widthExport"];
-                                        $thicknessExport = $farm["thicknessExport"];
-                                        $volumePie = $farm["volumePie"];
-                                        $grossVolume = $farm["grossVolume"];
-                                        $grade = $farm["grade"];
-                                        $netVolume = $farm["netVolume"];
-                                        $scannedCode = $farm["scannedCode"];
-
-                                        if ($noOfPieces > 0) {
-                                            $dataFarmData[] = array(
-                                                "farm_id" => $insertFarm, "scanned_code" => $scannedCode,
-                                                "no_of_pieces" => $noOfPieces, "circumference" => 0,
-                                                "length" => $length, "width" => $width, "thickness" => $thickness, "volume" => $netVolume,
-                                                "volume_pie" => $volumePie, "grade_id" => $grade, "length_export" => $lengthExport, "width_export" => $widthExport,
-                                                "thickness_export" => $thicknessExport, "volume_bought" => $grossVolume, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
-                                                "created_date" => date('Y-m-d H:i:s'), "updated_date" => date('Y-m-d H:i:s')
-                                            );
-                                        }
-                                    }
-
-                                    if (count($dataFarmData) > 0) {
-                                        $insertFarmData = $this->Farm_model->add_farm_data($dataFarmData);
-
-                                        if ($insertFarmData) {
-                                            //SUPPLIER PRICE
-                                            $this->Farm_model->add_supplier_price(
-                                                $purchasecontractid,
-                                                $supplierid,
-                                                $inventoryorder,
-                                                $session['user_id']
-                                            );
-
-                                            //CONTRACT INVENTORY MAPPING
-                                            $dataContractMapping = array(
-                                                "contract_id" => $purchasecontractid, "supplier_id" => $supplierid,
-                                                "inventory_order" => $inventoryorder, "total_volume" => $totalVolume,
-                                                "invoice_number" => "", "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
-                                            );
-
-                                            $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
-
-                                            $dataInventoryLedger = array(
-                                                "contract_id" => $purchasecontractid,
-                                                "inventory_order" => $inventoryorder, "ledger_type" => 2,
-                                                "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
-                                            );
-
-                                            if ($woodValueWithSupplierTaxes != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
-                                            }
-
-                                            if ($logisticsCostWithTaxes != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
-                                            }
-
-                                            if ($servicesCostWithTaxes != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
-                                            }
-
-                                            if ($farmadjustment != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
-                                            }
-
-                                            $getContracts = $this->Contract_model->get_contracts_by_contractid($purchasecontractid);
-                                            if (count($getContracts) == 1) {
-                                                $remainingVolume = $getContracts[0]->remaining_volume - $totalVolume;
-
-                                                $dataRemainingVolume = array(
-                                                    "remaining_volume" => $remainingVolume,
-                                                );
-
-                                                $this->Contract_model->update_purchase_contract_volume($dataRemainingVolume, $purchasecontractid, $supplierid);
-                                            }
-
-                                            //END
-
-                                            //CREATE RECEPTION
-
-                                            $getSupplierDetails = $this->Master_model->get_supplier_detail_reception($supplierid, $productid);
-
-                                            if (count($getSupplierDetails) == 1) {
-                                                $dataReception = array(
-                                                    "warehouse_id" => $warehouseid, "supplier_id" => $supplierid,
-                                                    "supplier_code" => $getSupplierDetails[0]->supplier_code, "supplier_product_id" => $getSupplierDetails[0]->product_name,
-                                                    "supplier_product_typeid" => $getSupplierDetails[0]->product_type,  "measurementsystem_id" => 1,
-                                                    "received_date" => $receptiondate, "salvoconducto" => $inventoryorder,
-                                                    "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                    "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'],
-                                                    "captured_timestamp" => 0, "isduplicatecaptured" => 0, "is_contract_added" => 0,
-                                                    "is_special_uploaded" => 0, "origin_id" => $originid,
-                                                );
-
-                                                $insertReception = $this->Reception_model->add_reception($dataReception);
-
-                                                if ($insertReception > 0) {
-                                                    $this->Reception_model->add_reception_data_from_farm($insertReception, $inventoryorder, $purchaseunit, $session['user_id']);
-                                                }
-                                            }
-
-                                            //END RECEPTION
-                                        }
-
-                                        $Return['result'] = $this->lang->line('data_added');
-                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                        $this->output($Return);
-                                        exit;
-                                    } else {
-                                        $Return['error'] = $this->lang->line('error_adding');
-                                        $Return['result'] = "";
-                                        $Return['redirect'] = false;
-                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                        $this->output($Return);
-                                        exit;
-                                    }
-                                } else {
-                                    $Return['error'] = $this->lang->line('error_adding');
-                                    $Return['result'] = "";
-                                    $Return['redirect'] = false;
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                }
-
-                                // $Return['result'] = $this->lang->line('data_added');
-                                // $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                // $this->output($Return);
-                                // exit;
-                            } else if ($producttypeid == 2 || $producttypeid == 4) {
-
-                                $cProduct = 0;
-                                $totalPiecesFarm = 0;
-                                $totalVolumeFarm = 0;
-                                $totalGrossVolumeFarm = 0;
-                                foreach ($farmdataJson as $farm) {
-
-                                    $circumference = $farm["circumference"];
-                                    $totalVolume = $totalVolume + $farm["netVolume"];
-                                    $noOfPieces = $farm["noOfPieces"];
-
-                                    if ($purchaseunit == 3 || $purchaseunit == 4 || $purchaseunit == 5 || $purchaseunit == 15) {
-
-                                        
-                                        if ($noOfPieces > 0) {
-                                            $getPriceRanges = $this->Farm_model->get_price_for_circumference($circumference, $purchasecontractid);
-
-                                            if (count($getPriceRanges) == 1) {
-                                                if ($purchaseunit == 3) {
-                                                    $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $noOfPieces));
-                                                } else if ($purchaseunit == 4 || $purchaseunit == 5) {
-                                                    $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $farm["netVolume"]));
-                                                } else if($purchaseunit == 15) {
-                                                    $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3));;
-                                                }
-                                            }
-                                        }
-                                    } else if ($purchaseunit == 6 || $purchaseunit == 7 || $purchaseunit == 13) {
-
-                                        $cProduct = $cProduct + ($circumference * $noOfPieces);
-                                        $totalPiecesFarm = $totalPiecesFarm + $noOfPieces;
-                                        $totalVolumeFarm = $totalVolumeFarm + $farm["netVolume"];
-                                    } else if ($purchaseunit == 8 || $purchaseunit == 9 || $purchaseunit == 12 || $purchaseunit == 14) {
-                                        
-                                        $totalVolumeFarm = $totalVolumeFarm + $farm["netVolume"];
-                                        $totalGrossVolumeFarm = $totalGrossVolumeFarm + $farm["grossVolume"];
-                                        $totalPiecesFarm = $totalPiecesFarm + $noOfPieces;
-                                    }
-                                }
-                                
-                                if($originid == 4 && $roundingfactor > 0) {
-                                    
-                                    $precision = (int) $roundingfactor; // Ensure it's an integer
-                                    $totalVolume = number_format($totalVolume, $precision, '.', '');
-                                    $totalVolumeFarm = number_format($totalVolumeFarm, $precision, '.', '');
-                                    $totalGrossVolumeFarm = number_format($totalGrossVolumeFarm, $precision, '.', '');
-                                }
-
-                                if ($purchaseunit == 6 || $purchaseunit == 7 || $purchaseunit == 13) {
-
-                                    $averageGirth = $this->truncate($cProduct / $totalPiecesFarm, 0);
-                                    $getPriceRanges = $this->Farm_model->get_price_for_circumference($averageGirth, $purchasecontractid);
-
-                                    if (count($getPriceRanges) == 1) {
-                                        $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $totalVolumeFarm));
-                                    }
-                                }
-
-                                if ($purchaseunit == 8 || $purchaseunit == 9 || $purchaseunit == 12 || $purchaseunit == 14) {
-
-                                    $cftValue = round($totalGrossVolumeFarm / $totalPiecesFarm * 35.315, 2);
-                                    $getPriceRanges = $this->Farm_model->get_price_for_circumference($cftValue, $purchasecontractid);
-
-                                    if (count($getPriceRanges) == 1) {
-                                        $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $totalVolumeFarm));
-                                    }
-                                }
-
-                                if ($conversionrate > 0) {
-                                    $woodValue = $woodValue * $conversionrate;
-                                }
-                                
-                                if($originid == 4) {
-                                    $woodValue = ($woodValue + 0);
-                                } else {
-                                    $woodValue = sprintf('%0.3f', ($woodValue + 0));
-                                }
-
-                                // WOOD VALUE WITH TAXES
-                                $supplierIvaValue = 0;
-                                $supplierRetenctionValue = 0;
-                                $supplierReticaValue = 0;
-
-                                $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierid);
-
-                                $supplierTaxesValue = 0;
-                                if (count($getSupplierTaxes) > 0) {
-
-                                    $supplierTaxesValue = 0;
-                                    foreach ($getSupplierTaxes as $suppliertax) {
-
-                                        $calcValue = 0;
-                                        $taxId = $suppliertax->tax_id;
-                                        $taxValue = $suppliertax->tax_value;
-                                        $taxFormat = $suppliertax->number_format;
-                                        $taxType = $suppliertax->arithmetic_type;
-
-                                        if ($taxValue > 0) {
-                                            if ($taxType == 2) {
-                                                $taxValue = $taxValue * -1;
-                                            }
-                                            if ($taxFormat == 2) {
-                                                $calcValue = $woodValue * ($taxValue / 100);
-                                            } else {
-                                                $calcValue = $woodValue * ($taxValue);
-                                            }
-                                        }
-
-                                        $supplierTaxesAdjustArr[] = array(
-                                            "taxId" => $taxId,
-                                            "taxValue" => $calcValue,
-                                            "taxVal" => (abs($taxValue) + 0),
-                                        );
-
-                                        array_push($supplierTaxesArr, $taxId);
-
-                                        $supplierTaxesValue = $supplierTaxesValue + $calcValue;
-                                    }
-                                }
-
-                                $woodValueWithSupplierTaxes = $woodValue + $supplierTaxesValue;
-
-                                // END WOOD VALUE WITH TAXES
-
-                                // LOGISTICS WITH TAXES
-
-                                if ($logisticcost != 0 && $logisticpayto > 0) {
-
-                                    $transportorIvaValue_Logistics = 0;
-                                    $transportorRetenctionValue_Logistics = 0;
-                                    $transportorReticaValue_Logistics = 0;
-
-                                    $getTransportorTaxes_Logistics = $this->Master_model->get_provider_taxes($logisticpayto);
-                                    $getTransportorTaxes_Logistics_Supplier = $this->Master_model->get_supplier_taxes($logisticpayto);
-
-                                    $logisticTaxesValue = 0;
-
-                                    if (count($getTransportorTaxes_Logistics) > 0) {
-
-                                        $logisticTaxesValue = 0;
-                                        foreach ($getTransportorTaxes_Logistics as $logistictaxtransportor) {
-
-                                            $calcValue_LTransportor = 0;
-                                            $taxId_LTransportor = $logistictaxtransportor->tax_id;
-                                            $taxValue_LTransportor = $logistictaxtransportor->tax_value;
-                                            $taxFormat_LTransportor = $logistictaxtransportor->number_format;
-                                            $taxType_LTransportor = $logistictaxtransportor->arithmetic_type;
-
-                                            if ($taxValue_LTransportor > 0) {
-                                                if ($taxType_LTransportor == 2) {
-                                                    $taxValue_LTransportor = $taxValue_LTransportor * -1;
-                                                }
-                                                if ($taxFormat_LTransportor == 2) {
-                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor / 100);
-                                                } else {
-                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor);
-                                                }
-                                            }
-
-                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_LTransportor;
-
-                                            $providerLogisticTaxesAdjustArr[] = array(
-                                                "taxId" => $taxId_LTransportor,
-                                                "taxValue" => $calcValue_LTransportor,
-                                                "taxVal" => (abs($taxValue_LTransportor) + 0),
-                                            );
-
-                                            array_push($providerLogisticTaxesArr, $taxId_LTransportor);
-                                        }
-
-                                        if ($logisticTaxesValue == 0) {
-                                            foreach ($getTransportorTaxes_Logistics_Supplier as $logistictaxsupplier) {
-
-                                                $calcValue_STransportor = 0;
-                                                $taxId_STransportor = $logistictaxsupplier->tax_id;
-                                                $taxValue_STransportor = $logistictaxsupplier->tax_value;
-                                                $taxFormat_STransportor = $logistictaxsupplier->number_format;
-                                                $taxType_STransportor = $logistictaxsupplier->arithmetic_type;
-
-                                                if ($taxValue_STransportor > 0) {
-                                                    if ($taxType_STransportor == 2) {
-                                                        $taxValue_STransportor = $taxValue_STransportor * -1;
-                                                    }
-                                                    if ($taxFormat_STransportor == 2) {
-                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor / 100);
-                                                    } else {
-                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor);
-                                                    }
-                                                }
-
-                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_STransportor;
-
-                                                $providerLogisticTaxesAdjustArr[] = array(
-                                                    "taxId" => $taxId_STransportor,
-                                                    "taxValue" => $calcValue_STransportor,
-                                                    "taxVal" => (abs($taxValue_STransportor) + 0),
-                                                );
-
-                                                array_push($supplierLogisticTaxesArr, $taxId_STransportor);
-                                            }
-                                        }
-                                    } else if ($logisticpayto == $supplierid) {
-
-                                        $getTransportorTaxes_Logistics = $this->Master_model->get_supplier_taxes($logisticpayto);
-
-                                        $logisticTaxesValue = 0;
-                                        if (count($getTransportorTaxes_Logistics) > 0) {
-
-                                            foreach ($getTransportorTaxes_Logistics as $transporttax) {
-
-                                                $calcValue_logistic = 0;
-                                                $taxId_logistic = $transporttax->tax_id;
-                                                $taxValue_logistic = $transporttax->tax_value;
-                                                $taxFormat_logistic = $transporttax->number_format;
-                                                $taxType_logistic = $transporttax->arithmetic_type;
-
-                                                if ($taxValue_logistic > 0) {
-                                                    if ($taxType_logistic == 2) {
-                                                        $taxValue_logistic = $taxValue_logistic * -1;
-                                                    }
-                                                    if ($taxFormat_logistic == 2) {
-                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic / 100);
-                                                    } else {
-                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic);
-                                                    }
-                                                }
-
-                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_logistic;
-
-                                                $providerLogisticTaxesAdjustArr[] = array(
-                                                    "taxId" => $taxId_logistic,
-                                                    "taxValue" => $calcValue_logistic,
-                                                    "taxVal" => (abs($taxValue_logistic) + 0),
-                                                );
-
-                                                array_push($supplierLogisticTaxesArr, $taxId_logistic);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                $logisticsCostWithTaxes = $logisticcost + $logisticTaxesValue;
-
-                                // END LOGISTICS WITH TAXES
-
-                                // SERVICES WITH TAXES
-
-                                if ($servicecost != 0 && $servicepayto > 0) {
-                                    $transportorIvaValue_Service = 0;
-                                    $transportorRetenctionValue_Service = 0;
-                                    $transportorReticaValue_Service = 0;
-
-                                    $getTransportorTaxes_Service = $this->Master_model->get_provider_taxes($servicepayto);
-                                    $getTransportorTaxes_Service_Supplier = $this->Master_model->get_supplier_taxes($servicepayto);
-
-                                    $servicesTaxesValue = 0;
-
-                                    if (count($getTransportorTaxes_Service) > 0) {
-
-                                        $servicesTaxesValue = 0;
-                                        foreach ($getTransportorTaxes_Service as $servicetaxtransportor) {
-
-                                            $calcValue_SerTransportor = 0;
-                                            $taxId_SerTransportor = $servicetaxtransportor->tax_id;
-                                            $taxValue_SerTransportor = $servicetaxtransportor->tax_value;
-                                            $taxFormat_SerTransportor = $servicetaxtransportor->number_format;
-                                            $taxType_SerTransportor = $servicetaxtransportor->arithmetic_type;
-
-                                            if ($taxValue_SerTransportor > 0) {
-                                                if ($taxType_SerTransportor == 2) {
-                                                    $taxValue_SerTransportor = $taxValue_SerTransportor * -1;
-                                                }
-                                                if ($taxFormat_SerTransportor == 2) {
-                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor / 100);
-                                                } else {
-                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor);
-                                                }
-                                            }
-
-                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_SerTransportor;
-
-                                            $providerServiceTaxesAdjustArr[] = array(
-                                                "taxId" => $taxId_SerTransportor,
-                                                "taxValue" => $calcValue_SerTransportor,
-                                                "taxVal" => (abs($taxValue_SerTransportor) + 0),
-                                            );
-                                            array_push($providerServiceTaxesArr, $taxId_SerTransportor);
-                                        }
-
-                                        if ($servicesTaxesValue == 0) {
-                                            foreach ($getTransportorTaxes_Service_Supplier as $servicetaxsupplier) {
-
-                                                $calcValue_SSTransportor = 0;
-                                                $taxId_SSTransportor = $servicetaxsupplier->tax_id;
-                                                $taxValue_SSTransportor = $servicetaxsupplier->tax_value;
-                                                $taxFormat_SSTransportor = $servicetaxsupplier->number_format;
-                                                $taxType_SSTransportor = $servicetaxsupplier->arithmetic_type;
-
-                                                if ($taxValue_SSTransportor > 0) {
-                                                    if ($taxType_SSTransportor == 2) {
-                                                        $taxValue_SSTransportor = $taxValue_SSTransportor * -1;
-                                                    }
-                                                    if ($taxFormat_SSTransportor == 2) {
-                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor / 100);
-                                                    } else {
-                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor);
-                                                    }
-                                                }
-
-                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_SSTransportor;
-
-                                                $providerServiceTaxesAdjustArr[] = array(
-                                                    "taxId" => $taxId_SSTransportor,
-                                                    "taxValue" => $calcValue_SSTransportor,
-                                                    "taxVal" => (abs($taxValue_SSTransportor) + 0),
-                                                );
-
-                                                array_push($supplierServiceTaxesArr, $taxId_SSTransportor);
-                                            }
-                                        }
-                                    } else if ($servicepayto == $supplierid) {
-
-                                        $getTransportorTaxes_Services = $this->Master_model->get_supplier_taxes($logisticpayto);
-
-                                        $servicesTaxesValue = 0;
-                                        if (count($getTransportorTaxes_Services) > 0) {
-
-                                            foreach ($getTransportorTaxes_Services as $servicesuppliertax) {
-
-                                                $calcValue_service = 0;
-                                                $taxId_service = $servicesuppliertax->tax_id;
-                                                $taxValue_service = $servicesuppliertax->tax_value;
-                                                $taxFormat_service = $servicesuppliertax->number_format;
-                                                $taxType_service = $servicesuppliertax->arithmetic_type;
-
-                                                if ($taxValue_service > 0) {
-                                                    if ($taxType_service == 2) {
-                                                        $taxValue_service = $taxValue_service * -1;
-                                                    }
-                                                    if ($taxFormat_service == 2) {
-                                                        $calcValue_service = $servicecost * ($taxValue_service / 100);
-                                                    } else {
-                                                        $calcValue_service = $servicecost * ($taxValue_service);
-                                                    }
-                                                }
-
-                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_service;
-
-                                                $providerServiceTaxesAdjustArr[] = array(
-                                                    "taxId" => $taxId_service,
-                                                    "taxValue" => $calcValue_service,
-                                                    "taxVal" => (abs($taxValue_service) + 0),
-                                                );
-
-                                                array_push($supplierServiceTaxesArr, $taxId_service);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                $servicesCostWithTaxes = $servicecost + $servicesTaxesValue;
-
-                                // END SERVICES WITH TAXES
-
-                                $adjust_arr = explode(",", $adjustrf);
-                                $isAdjustEnabled = false;
-                                $adjustmentValues = 0;
-
-                                if (count($adjust_arr) > 0) {
-
-                                    $isAdjustEnabled = true;
-
-                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
-
-                                    foreach ($adjust_arr as $adjust) {
-
-                                        foreach ($supplierTaxesAdjustArr as $suppliertaxestax) {
-                                            if ($suppliertaxestax["taxId"] == $adjust) {
-                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($suppliertaxestax["taxValue"]);
-                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
-                                            }
-                                        }
-
-                                        foreach ($providerServiceTaxesAdjustArr as $providerservicetaxestax) {
-                                            if ($providerservicetaxestax["taxId"] == $adjust) {
-                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerservicetaxestax["taxValue"]);
-                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
-                                            }
-                                        }
-
-                                        foreach ($providerLogisticTaxesAdjustArr as $providerlogistictaxestax) {
-                                            if ($providerlogistictaxestax["taxId"] == $adjust) {
-                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerlogistictaxestax["taxValue"]);
-                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
-                                }
-
-                                if ($farmadjustment != 0) {
-                                    $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
-                                }
-
-                                $totalValue = $woodValue + $logisticcost + $servicecost;
-
-                                $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
-                                $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
-                                $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
-                                $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
-                                $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
-                                
-                                $dataFarm = array(
-                                    "supplier_id" => $supplierid, "contract_id" => $purchasecontractid,
-                                    "product_id" => $productid, "product_type_id" => $producttypeid, "purchase_unit_id" => $purchaseunit,
-                                    "inventory_order" => $inventoryorder, "plate_number" => $truckplatenumber,
-                                    "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                    "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                    "total_volume" => $totalVolume, "total_value" => $totalValue, "wood_value" => $woodValue,
-                                    "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                    "exchange_rate" => $conversionrate,
-                                    "created_by" => $session['user_id'], "updated_by" => $session['user_id'], "is_active" => 1,
-                                    "origin_id" => $originid, "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
-                                    "service_cost_withtaxes" => $servicesCostWithTaxes, "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
-                                    "supplier_taxes" => $supplierTaxesArrList, "logistic_taxes" => $supplierLogisticTaxesArrList,
-                                    "service_taxes" => $supplierServiceTaxesArrList, "adjust_taxes" => $adjustrf,
-                                    "is_adjust_rf" => $isAdjustEnabled, "logistic_provider_taxes" => $providerLogisticTaxesArrList,
-                                    "service_provider_taxes" => $providerServiceTaxesArrList, "adjusted_value" => $adjustmentValues,
-                                    "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
-                                    "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
-                                    "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr), 
-                                    "circ_allowance" => $circumferenceallowance, "length_allowance" => $lengthallowance, "rounding_factor" => $roundingfactor, "process_type" => $processType, 
-                                    "loading_cost" => $loadingCost, 
-                                    "unloading_cost" => $unloadingCost,
-                                );
-
-                                $insertFarm = $this->Farm_model->add_farm($dataFarm);
-
-                                if ($insertFarm > 0) {
-                                    $dataFarmData = array();
-                                    foreach ($farmdataJson as $farm) {
-                                        $circumference = $farm["circumference"];
-                                        $netVolume = $farm["netVolume"];
-                                        $noOfPieces = $farm["noOfPieces"];
-                                        $length = $farm["length"];
-
-                                        if ($noOfPieces > 0) {
-                                            $dataFarmData[] = array(
-                                                "farm_id" => $insertFarm, "scanned_code" => "",
-                                                "no_of_pieces" => $noOfPieces, "circumference" => $circumference,
-                                                "length" => $length, "width" => 0, "thickness" => 0, "volume" => $netVolume,
-                                                "volume_pie" => 0, "grade_id" => 0, "length_export" => 0, "width_export" => 0,
-                                                "thickness_export" => 0, "volume_bought" => 0, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
-                                                "created_date" => date('Y-m-d H:i:s'), "updated_date" => date('Y-m-d H:i:s')
-                                            );
-                                        }
-                                    }
-
-                                    if (count($dataFarmData) > 0) {
-                                        $insertFarmData = $this->Farm_model->add_farm_data($dataFarmData);
-
-                                        if ($insertFarmData) {
-                                            //SUPPLIER PRICE
-                                            $this->Farm_model->add_supplier_price(
-                                                $purchasecontractid,
-                                                $supplierid,
-                                                $inventoryorder,
-                                                $session['user_id']
-                                            );
-
-                                            //CONTRACT INVENTORY MAPPING
-                                            $dataContractMapping = array(
-                                                "contract_id" => $purchasecontractid, "supplier_id" => $supplierid,
-                                                "inventory_order" => $inventoryorder, "total_volume" => $totalVolume,
-                                                "invoice_number" => "", "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1,
-                                            );
-
-                                            $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
-
-                                            $dataInventoryLedger = array(
-                                                "contract_id" => $purchasecontractid,
-                                                "inventory_order" => $inventoryorder, "ledger_type" => 2,
-                                                "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                                "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
-                                            );
-
-                                            if ($woodValueWithSupplierTaxes != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
-                                            }
-
-                                            if ($logisticsCostWithTaxes != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
-                                            }
-
-                                            if ($servicesCostWithTaxes != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
-                                            }
-
-                                            if ($farmadjustment != 0) {
-                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
-                                            }
-
-                                            $getContracts = $this->Contract_model->get_contracts_by_contractid($purchasecontractid);
-                                            if (count($getContracts) == 1) {
-                                                $remainingVolume = $getContracts[0]->remaining_volume - $totalVolume;
-
-                                                $dataRemainingVolume = array(
-                                                    "remaining_volume" => $remainingVolume,
-                                                );
-
-                                                $this->Contract_model->update_purchase_contract_volume($dataRemainingVolume, $purchasecontractid, $supplierid);
-                                            }
-
-                                            //CREATE RECEPTION
-
-                                            if ($warehouseid_rounglogs > 0 && $measurement_system_roundlogs > 0) {
-
-                                                $getFormulae = $this->Master_model->get_formulae_by_measurementsystem($measurement_system_roundlogs, $originid);
-
-                                                if (count($getFormulae) > 0) {
-                                                    foreach ($getFormulae as $formula) {
-                                                        $strFormula = str_replace(array('truncate'), array('$this->truncate'), $formula->calculation_formula);
-
-                                                        if ($formula->context == "CBM_HOPPUS_GROSSVOLUME") {
-                                                            $grossFormula = "return (" . $strFormula . ");";
-                                                        }
-
-                                                        if ($formula->context == "CBM_HOPPUS_NETVOLUME") {
-                                                            $netFormula = "return (" . $strFormula . ");";
-                                                        }
-
-                                                        if ($formula->context == "CBM_GEO_GROSSVOLUME") {
-                                                            $grossFormula = "return (" . $strFormula . ");";
-                                                        }
-
-                                                        if ($formula->context == "CBM_GEO_NETVOLUME") {
-                                                            $netFormula = "return (" . $strFormula . ");";
-                                                        }
-                                                    }
-                                                }
-
-                                                if ($grossFormula != "" && $netFormula != "") {
-
-                                                    $getSupplierDetails = $this->Master_model->get_supplier_detail_reception($supplierid, $productid);
-
-                                                    if (count($getSupplierDetails) == 1) {
-
-                                                        $productTypeId = 2;
-                                                        if ($getSupplierDetails[0]->product_type == 3) {
-                                                            $productTypeId = 4;
-                                                        }
-                                                        
-                                                        if($originid == 4) {
-                                                            $dataReception = array(
-                                                                "warehouse_id" => $warehouseid_rounglogs, "supplier_id" => $supplierid,
-                                                                "supplier_code" => $getSupplierDetails[0]->supplier_code, "supplier_product_id" => $getSupplierDetails[0]->product_name,
-                                                                "supplier_product_typeid" => $productTypeId,  "measurementsystem_id" => $measurement_system_roundlogs,
-                                                                "received_date" => $receptiondate, "salvoconducto" => $inventoryorder,
-                                                                "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                                "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'], "closeddate" => date('Y-m-d H:i:s'),
-                                                                "captured_timestamp" => 0, "isduplicatecaptured" => 0, "is_contract_added" => 0,
-                                                                "is_special_uploaded" => 1, "origin_id" => $originid, "circ_allowance" => $circumferenceallowance, "length_allowance" => $lengthallowance, "rounding_factor" => $roundingfactor
-                                                            ); 
-                                                        } else {
-                                                            $dataReception = array(
-                                                                "warehouse_id" => $warehouseid_rounglogs, "supplier_id" => $supplierid,
-                                                                "supplier_code" => $getSupplierDetails[0]->supplier_code, "supplier_product_id" => $getSupplierDetails[0]->product_name,
-                                                                "supplier_product_typeid" => $productTypeId,  "measurementsystem_id" => $measurement_system_roundlogs,
-                                                                "received_date" => $receptiondate_roundlogs, "salvoconducto" => $inventoryorder,
-                                                                "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                                "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'], "closeddate" => date('Y-m-d H:i:s'),
-                                                                "captured_timestamp" => 0, "isduplicatecaptured" => 0, "is_contract_added" => 0,
-                                                                "is_special_uploaded" => 1, "origin_id" => $originid, "circ_allowance" => $circumferenceallowance, "length_allowance" => $lengthallowance, "rounding_factor" => $roundingfactor
-                                                            );
-                                                        }
-
-                                                        $insertReception = $this->Reception_model->add_reception($dataReception);
-
-                                                        $dataReceptionData = array();
-                                                        if ($insertReception > 0) {
-
-                                                            $dataReceptionTracking = array(
-                                                                "reception_id" => $insertReception, "user_id" => $session['user_id'],
-                                                                "isclosed" => 1, "createdby" => $session['user_id'], "updatedby" => $session['user_id'], "isactive" => 1,
-                                                            );
-
-                                                            $insertReceptionTracking = $this->Reception_model->add_reception_tracking($dataReceptionTracking);
-
-                                                            $totalReceptionVolume = 0;
-                                                            $totalReceptionPieces = 0;
-                                                            $totalReceptionGrossVolume = 0;
-
-                                                            foreach ($farmdataJson as $farm) {
-
-                                                                $circumference = $farm["circumference"];
-                                                                $noOfPieces = $farm["noOfPieces"];
-                                                                $length = $farm["length"];
-                                                                $lengthAllowance = $farm["lengthAllowance"];
-                                                                $circAllowance = $farm["circAllowance"];
-                                                                
-                                                                if($originid == 4) {
-                                                                    $grossFormulaVal = str_replace(array('$ac', '$al', '$l', '$c', '$pcs'), array($circAllowance, $lengthAllowance, $length, $circumference, $noOfPieces), $grossFormula);
-                                                                    $grossVolume = sprintf('%0.3f', eval($grossFormulaVal));
-    
-                                                                    $netFormulaVal = str_replace(array('$ac', '$al', '$l', '$c', '$pcs'), array($circAllowance, $lengthAllowance, $length, $circumference, $noOfPieces), $netFormula);
-                                                                    $netVolume = sprintf('%0.3f', eval($netFormulaVal));
-                                                                } else {
-
-                                                                    $grossFormulaVal = str_replace(array('$l', '$c'), array($length, $circumference), $grossFormula);
-                                                                    $grossVolume = sprintf('%0.3f', eval($grossFormulaVal) * $noOfPieces);
-    
-                                                                    $netFormulaVal = str_replace(array('$l', '$c'), array($length, $circumference), $netFormula);
-                                                                    $netVolume = sprintf('%0.3f', eval($netFormulaVal) * $noOfPieces);
-                                                                }
-
-                                                                $totalReceptionVolume = $totalReceptionVolume + $netVolume;
-                                                                $totalReceptionPieces = $totalReceptionPieces + $noOfPieces;
-                                                                $totalReceptionGrossVolume = $totalReceptionGrossVolume + $grossVolume;
-
-                                                                $dataReceptionData[] = array(
-                                                                    "reception_id" => $insertReception, "salvoconducto" => $inventoryorder,
-                                                                    "scanned_code" => $noOfPieces, "length_bought" => $length,
-                                                                    "width_bought" => 0, "thickness_bought" => 0,
-                                                                    "circumference_bought" => $circumference, "volumepie_bought" => 0,
-                                                                    "cbm_bought" => $grossVolume, "length_export" => 0, "width_export" => 0,
-                                                                    "thickness_export" => 0, "cbm_export" => $netVolume, "grade" => 0,
-                                                                    "createdby" => $session['user_id'], "updatedby" => $session['user_id'], "isactive" => 1,
-                                                                    "isdispatch" => 0, "scanned_timestamp" => 0, "isduplicatescanned" => 0, "is_special" => 1,
-                                                                    "createddate" => date('Y-m-d H:i:s'), "updateddate" => date('Y-m-d H:i:s'), "remaining_stock_count" => $noOfPieces,
-                                                                );
-                                                            }
-
-                                                            $this->Reception_model->add_reception_data($dataReceptionData);
-                                                            
-                                                            if($roundingfactor > 0) {
-                                                                $precision = (int) $roundingfactor; // Ensure it's an integer
-                                                                $totalReceptionVolume = number_format($totalReceptionVolume, $precision, '.', '');
-                                                                $totalReceptionGrossVolume = number_format($totalReceptionGrossVolume, $precision, '.', '');
-                                                            }
-
-                                                            //UPDATE
-                                                            $dataReceptionUpdate = array(
-                                                                "total_volume" => $totalReceptionVolume, "total_pieces" => $totalReceptionPieces,
-                                                                "updatedby" => $session['user_id'],
-                                                            );
-
-                                                            $this->Reception_model->update_reception($insertReception, $inventoryorder, $dataReceptionUpdate);
-
-                                                            //CHECK ALL CLOSED RECEPTION
-                                                            $checkClosedReception = $this->Reception_model->get_reception_closed_status($insertReception);
-                                                            if ($checkClosedReception[0]->isclosed == 1) {
-
-                                                                //SEND MAIL
-                                                                //$getReceptionDetail = $this->Reception_model->get_reception_detail_by_id($insertReception);
-                                                                //$fetchEmailTemplate = $this->Master_model->get_email_template_by_code("RECEPTIONCLOSE");
-
-                                                                //$mailSubject = $fetchEmailTemplate[0]->template_subject . " " . $getReceptionDetail[0]->salvoconducto;
-                                                                //$logo = base_url() . 'assets/img/iconz/cgrlogo_new.png';
-
-                                                                // $woodtype = $this->lang->line($getReceptionDetail[0]->product_type_name);
-                                                                // $netvolume = ($getReceptionDetail[0]->total_volume + 0) . " " . $this->lang->line("volume_unit");
-                                                                // $message = '<div style="background:#f6f6f6;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:12px;margin:0;padding:0;padding: 20px;">
-                                                                // <img width="74px" src="' . $logo . '" title="Codrin Green"><br>' . str_replace(
-                                                                //     array("{var inventorynumber}", "{var suppliername}", "{var woodspecies}", "{var woodtype}", "{var warehouse}", "{var totalpieces}", "{var netvolume}", "{var closedby}", "{var origin}"),
-                                                                //     array(
-                                                                //         $getReceptionDetail[0]->salvoconducto, $getReceptionDetail[0]->supplier_name, $getReceptionDetail[0]->product_name, $woodtype,
-                                                                //         $getReceptionDetail[0]->warehouse_name, $getReceptionDetail[0]->total_pieces, $netvolume,
-                                                                //         $getReceptionDetail[0]->closedby, $getReceptionDetail[0]->origin
-                                                                //     ),
-                                                                //     htmlspecialchars_decode(stripslashes($fetchEmailTemplate[0]->template_message))
-                                                                // ) . '</div>';
-
-                                                                // $config = array(
-                                                                //     'protocol' => 'smtp',
-                                                                //     'smtp_host' => 'smtp.titan.email',
-                                                                //     'smtp_port' => 587,
-                                                                //     'smtp_user' => 'codrinsystems@codringreen.com',
-                                                                //     'smtp_pass' => "Tb]-(g3Bjh&t[,K5",
-                                                                //     'mailtype'  => 'html',
-                                                                //     'charset'   => 'utf-8',
-                                                                //     'wordwrap' => TRUE
-                                                                // );
-
-                                                                // $this->load->library('email', $config);
-                                                                // $this->email->set_newline("\r\n");
-
-                                                                // if ($getReceptionDetail[0]->origin_id == 1) {
-                                                                //     $list = array('priyank@codringroup.com', 'jonathan.batista@codringroup.com', 'nafeel@codringroup.com');
-                                                                // if ($getReceptionDetail[0]->origin_id == 2) {
-                                                                //     $list = array('priyank@codringroup.com', 'selvam@codringroup.com', 'nafeel@codringroup.com');
-                                                                // }
-                                                                // $this->email->to($list);
-                                                                // $this->email->from("codrinsystems@codringreen.com", "Codrin Systems");
-                                                                // $this->email->bcc("nafeel@codringroup.com");
-                                                                // $this->email->subject($mailSubject);
-                                                                // $this->email->message("$message");
-                                                              // $resultSend = $this->email->send();
-                                                            }
-                                                            
-                                                            //DISPATCH
-
-                                                            if($originid == 4) {
-
-                                                                //DISPATCH
-
-                                                                if($productTypeId == 4) {
-                                                                    $productTypeId = 2;
-                                                                }
-
-                                                                $dataDispatch = array(
-                                                                    "container_number" => $inventoryorder, "warehouse_id" => $warehouseid,
-                                                                    "shipping_line" => $shippingline, "product_id" => $getSupplierDetails[0]->product_id_dispatch,
-                                                                    "product_type_id" => $productTypeId,  "dispatch_date" => $receptiondate,
-                                                                    "seal_number" => $sealnumber, "container_pic_url" => "",
-                                                                    "createdby" => $session['user_id'], "updatedby" => $session['user_id'],
-                                                                    "isactive" => 1, "isclosed" => 1, "closedby" => $session['user_id'],
-                                                                    "is_special_uploaded" => 1, "origin_id" => $originid, "total_gross_volume" => $totalReceptionGrossVolume,
-                                                                    "total_volume" => $totalReceptionVolume, "total_pieces" => $totalReceptionPieces, "category" => 0, "captured_from_app" => 0,
-                                                                    "metric_ton" => 0, "short_ton" => 0, "net_lbs" => 0,
-                                                                    "diameter_text" => "", "length_text" => "", 
-                                                                    "unit_price" => 0, "total_value" => 0, "measurement_system_id" => $measurement_system_roundlogs, 
-                                                                    "circ_allowance" => $circumferenceallowance, "length_allowance" => $lengthallowance, "rounding_factor" => $roundingfactor
-                                                                );
-
-                                                                $insertDispatch = $this->Dispatch_model->add_dispatch($dataDispatch);
-
-                                                                if ($insertDispatch > 0) {
-                                                                    $insertDispatchData = $this->Dispatch_model->add_dispatch_data_from_reception($insertReception, $insertDispatch, $inventoryorder, $session['user_id'], $receptiondate);
-                                                                }
-
-                                                                //END DISPATCH
-                                                            }
-
-                                                            //END DISPATCH
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            //END RECEPTION
-                                        }
-
-                                        $Return['error'] = "";
-                                        $Return['result'] = $this->lang->line('data_added');
-                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                        $this->output($Return);
-                                        exit;
-                                    } else {
-                                        $Return['error'] = $this->lang->line('error_adding');
-                                        $Return['result'] = "";
-                                        $Return['redirect'] = false;
-                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                        $this->output($Return);
-                                        exit;
-                                    }
-                                } else {
-                                    $Return['error'] = $this->lang->line('error_adding');
-                                    $Return['result'] = "";
-                                    $Return['redirect'] = false;
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                }
-
-                                $Return['error'] = $this->lang->line('error_adding'); //$totalValueWithTaxes; //
-                                $Return['result'] = "";
-                                $Return['redirect'] = false;
-                                $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                $this->output($Return);
-                                exit;
-                            }
-                        } else {
-                            $Return['error'] = $this->lang->line('exist_inventory_order');
-                            $Return['result'] = "";
-                            $Return['redirect'] = false;
-                            $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                            $this->output($Return);
-                            exit;
-                        }
-                    }
-                } else if ($this->input->post('action_type') == 'update') {
-
-                    $originid = $this->input->post('origin_id');
-                    $farm_id = $this->input->post('farm_id');
-                    $contract_id = $this->input->post('contract_id');
-                    $inventory_order = strtoupper($this->input->post('inventory_order'));
-                    $input_inventory_order = strtoupper($this->input->post('input_inventory_order'));
-                    $input_truck_plate_number = strtoupper($this->input->post('input_truck_plate_number'));
-                    $input_purchase_date = $this->input->post('input_purchase_date');
-                    $input_purchase_date = str_replace('/', '-', $input_purchase_date);
-                    $purchase_date = date("Y-m-d", strtotime($input_purchase_date));
-                    $input_conversion_rate = $this->input->post('conversion_rate');
-                    $currency_id = $this->input->post('currency_id');
-                    $servicecost = $this->input->post('servicecost');
-                    $servicepayto = $this->input->post('servicepayto');
-                    $logisticcost = $this->input->post('logisticcost');
-                    $logisticpayto = $this->input->post('logisticpayto');
-                    $farmadjustment = $this->input->post('farmadjustment');
-                    $adjustrf = $this->input->post('adjustrf');
-                    $processType = $this->input->post('processType');
-                    $loadingCost = $this->input->post('loadingCost');
-                    $unloadingCost = $this->input->post('unloadingCost');
-
-                    if ($input_inventory_order == $inventory_order) {
-
-                        $getFarmDetail = $this->Farm_model->get_farm_details($farm_id, $contract_id, $input_inventory_order);
-                        $productTypeId = $getFarmDetail[0]->product_type_id;
-                        $supplierid = $getFarmDetail[0]->supplier_id;
-                        $purchaseUnitId = $getFarmDetail[0]->unit_of_purchase;
-
-                        if ($servicecost == null || $servicecost == "") {
-                            $servicecost = 0;
-                        }
-
-                        if ($servicecost == 0) {
-                            $servicepayto = 0;
-                        }
-                        
-                        
-
-                        if ($logisticcost == null || $logisticcost == "") {
-                            $logisticcost = 0;
-                        }
-
-                        if ($logisticcost == 0) {
-                            $logisticpayto = 0;
-                        }
-                        
-                        if ($farmadjustment == null || $farmadjustment == "") {
-                            $farmadjustment = 0;
-                        }
-
-                        $totalVolume = 0;
-                        $woodValue = 0;
-                        $woodValueWithSupplierTaxes = 0;
-                        $logisticsCostWithTaxes = 0;
-                        $servicesCostWithTaxes = 0;
-                        $totalValueWithTaxes = 0;
-                        $totalValue = 0;
-
-                        $supplierTaxesArr = array();
-                        $providerLogisticTaxesArr = array();
-                        $providerServiceTaxesArr = array();
-                        $supplierLogisticTaxesArr = array();
-                        $supplierServiceTaxesArr = array();
-                        $supplierTaxesAdjustArr = array();
-                        $providerLogisticTaxesAdjustArr = array();
-                        $providerServiceTaxesAdjustArr = array();
-
-                        if ($productTypeId == 1 || $productTypeId == 3) {
-                        } else if ($productTypeId == 2 || $productTypeId == 4) {
-
-                            // $woodValue = $getFarmDetail[0]->wood_value;
-                            // if ($currency_id == 1) {
-                            //     if ($input_conversion_rate > 0) {
-                            //         $woodValue = $woodValue * $input_conversion_rate;
-                            //     }
-                            // }
-                            
-                            $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 1);
-                            $farmDataSemi = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 2);
-                            $farmDataLongs = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 3);
-
-                            $fetchContractPrice = $this->Farm_model->fetch_contract_prices_for_farm($contract_id);
-                            $finalArray = [];
-                            
-                            if($purchaseUnitId == 15) {
-                                $price = $fetchContractPrice[0]->pricerange_grade3;
-                                $woodValue = $price;
-                            } else {
-
-                                foreach ($farmDataShorts as $shorts) {
-                                    $circumference = $shorts->circumference;
-                                    $length = $shorts->length;
-                                    $netVolume = $shorts->volume;
-                                    $totalVolume = $totalVolume + $netVolume;
-                                    $price = 0;
-    
-                                    foreach ($fetchContractPrice as $range) {
-                                        if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
-                                            $price = $range->pricerange_grade3;
-                                            break;
-                                        }
-                                    }
-    
-                                    $finalArray[] = [
-                                        'circumference' => $circumference,
-                                        'length' => $length,
-                                        'price' => $price,
-                                        'volume' => $netVolume,
-                                        'value' => round($price * $netVolume, 3)
-                                    ];
-                                }
-    
-                                foreach ($farmDataSemi as $semi) {
-                                    $circumference = $semi->circumference;
-                                    $length = $semi->length;
-                                    $netVolume = $semi->volume;
-                                    $totalVolume = $totalVolume + $netVolume;
-                                    $price = 0;
-    
-                                    foreach ($fetchContractPrice as $range) {
-                                        if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
-                                            $price = $range->pricerange_grade3;
-                                            break;
-                                        }
-                                    }
-    
-                                    $finalArray[] = [
-                                        'circumference' => $circumference,
-                                        'length' => $length,
-                                        'price' => $price,
-                                        'volume' => $netVolume,
-                                        'value' => round($price * $netVolume, 3)
-                                    ];
-                                }
-    
-                                foreach ($farmDataLongs as $longs) {
-                                    $circumference = $longs->circumference;
-                                    $length = $longs->length;
-                                    $netVolume = $longs->volume;
-                                    $totalVolume = $totalVolume + $netVolume;
-                                    $price = 0;
-    
-                                    foreach ($fetchContractPrice as $range) {
-                                        if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
-                                            $price = $range->pricerange_grade3;
-                                            break;
-                                        }
-                                    }
-    
-                                    $finalArray[] = [
-                                        'circumference' => $circumference,
-                                        'length' => $length,
-                                        'price' => $price,
-                                        'volume' => $netVolume,
-                                        'value' => round($price * $netVolume, 3)
-                                    ];
-                                }
-                                
-                                foreach ($finalArray as $item) {
-                                    $woodValue = $woodValue + $item['value'];
-                                }
-                            }
-                            
-                            if ($currency_id == 1) {
-                                if ($input_conversion_rate > 0) {
-                                    $woodValue = $woodValue * $input_conversion_rate;
-                                }
-                            }
-
-                            // WOOD VALUE WITH TAXES
-
-                            $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierid);
-
-                            $supplierTaxesValue = 0;
-                            if (count($getSupplierTaxes) > 0) {
-
-                                $supplierTaxesValue = 0;
-                                foreach ($getSupplierTaxes as $suppliertax) {
-
-                                    $calcValue = 0;
-                                    $taxId = $suppliertax->tax_id;
-                                    $taxValue = $suppliertax->tax_value;
-                                    $taxFormat = $suppliertax->number_format;
-                                    $taxType = $suppliertax->arithmetic_type;
-
-                                    if ($taxValue > 0) {
-                                        if ($taxType == 2) {
-                                            $taxValue = $taxValue * -1;
-                                        }
-                                        if ($taxFormat == 2) {
-                                            $calcValue = $woodValue * ($taxValue / 100);
-                                        } else {
-                                            $calcValue = $woodValue * ($taxValue);
-                                        }
-                                    }
-
-                                    $supplierTaxesAdjustArr[] = array(
-                                        "taxId" => $taxId,
-                                        "taxValue" => $calcValue,
-                                        "taxVal" => (abs($taxValue) + 0),
-                                    );
-
-                                    array_push($supplierTaxesArr, $taxId);
-
-                                    $supplierTaxesValue = $supplierTaxesValue + $calcValue;
-                                }
-                            }
-
-                            $woodValueWithSupplierTaxes = $woodValue + $supplierTaxesValue;
-
-                            // END WOOD VALUE WITH TAXES
-
-                            // LOGISTICS WITH TAXES
-
-                            if ($logisticcost != 0 && $logisticpayto > 0) {
-
-                                $transportorIvaValue_Logistics = 0;
-                                $transportorRetenctionValue_Logistics = 0;
-                                $transportorReticaValue_Logistics = 0;
-
-                                $getTransportorTaxes_Logistics = $this->Master_model->get_provider_taxes($logisticpayto);
-                                $getTransportorTaxes_Logistics_Supplier = $this->Master_model->get_supplier_taxes($logisticpayto);
-
-                                $logisticTaxesValue = 0;
-
-                                if (count($getTransportorTaxes_Logistics) > 0) {
-
-                                    $logisticTaxesValue = 0;
-                                    foreach ($getTransportorTaxes_Logistics as $logistictaxtransportor) {
-
-                                        $calcValue_LTransportor = 0;
-                                        $taxId_LTransportor = $logistictaxtransportor->tax_id;
-                                        $taxValue_LTransportor = $logistictaxtransportor->tax_value;
-                                        $taxFormat_LTransportor = $logistictaxtransportor->number_format;
-                                        $taxType_LTransportor = $logistictaxtransportor->arithmetic_type;
-
-                                        if ($taxValue_LTransportor > 0) {
-                                            if ($taxType_LTransportor == 2) {
-                                                $taxValue_LTransportor = $taxValue_LTransportor * -1;
-                                            }
-                                            if ($taxFormat_LTransportor == 2) {
-                                                $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor / 100);
-                                            } else {
-                                                $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor);
-                                            }
-                                        }
-
-                                        $logisticTaxesValue = $logisticTaxesValue + $calcValue_LTransportor;
-
-                                        $providerLogisticTaxesAdjustArr[] = array(
-                                            "taxId" => $taxId_LTransportor,
-                                            "taxValue" => $calcValue_LTransportor,
-                                            "taxVal" => (abs($taxValue_LTransportor) + 0),
-                                        );
-
-                                        array_push($providerLogisticTaxesArr, $taxId_LTransportor);
-                                    }
-
-                                    if ($logisticTaxesValue == 0) {
-                                        foreach ($getTransportorTaxes_Logistics_Supplier as $logistictaxsupplier) {
-
-                                            $calcValue_STransportor = 0;
-                                            $taxId_STransportor = $logistictaxsupplier->tax_id;
-                                            $taxValue_STransportor = $logistictaxsupplier->tax_value;
-                                            $taxFormat_STransportor = $logistictaxsupplier->number_format;
-                                            $taxType_STransportor = $logistictaxsupplier->arithmetic_type;
-
-                                            if ($taxValue_STransportor > 0) {
-                                                if ($taxType_STransportor == 2) {
-                                                    $taxValue_STransportor = $taxValue_STransportor * -1;
-                                                }
-                                                if ($taxFormat_STransportor == 2) {
-                                                    $calcValue_STransportor = $logisticcost * ($taxValue_STransportor / 100);
-                                                } else {
-                                                    $calcValue_STransportor = $logisticcost * ($taxValue_STransportor);
-                                                }
-                                            }
-
-                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_STransportor;
-
-                                            $providerLogisticTaxesAdjustArr[] = array(
-                                                "taxId" => $taxId_STransportor,
-                                                "taxValue" => $calcValue_STransportor,
-                                                "taxVal" => (abs($taxValue_STransportor) + 0),
-                                            );
-
-                                            array_push($supplierLogisticTaxesArr, $taxId_STransportor);
-                                        }
-                                    }
-                                } else if ($logisticpayto == $supplierid) {
-
-                                    $getTransportorTaxes_Logistics = $this->Master_model->get_supplier_taxes($logisticpayto);
-
-                                    $logisticTaxesValue = 0;
-                                    if (count($getTransportorTaxes_Logistics) > 0) {
-
-                                        foreach ($getTransportorTaxes_Logistics as $transporttax) {
-
-                                            $calcValue_logistic = 0;
-                                            $taxId_logistic = $transporttax->tax_id;
-                                            $taxValue_logistic = $transporttax->tax_value;
-                                            $taxFormat_logistic = $transporttax->number_format;
-                                            $taxType_logistic = $transporttax->arithmetic_type;
-
-                                            if ($taxValue_logistic > 0) {
-                                                if ($taxType_logistic == 2) {
-                                                    $taxValue_logistic = $taxValue_logistic * -1;
-                                                }
-                                                if ($taxFormat_logistic == 2) {
-                                                    $calcValue_logistic = $logisticcost * ($taxValue_logistic / 100);
-                                                } else {
-                                                    $calcValue_logistic = $logisticcost * ($taxValue_logistic);
-                                                }
-                                            }
-
-                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_logistic;
-
-                                            $providerLogisticTaxesAdjustArr[] = array(
-                                                "taxId" => $taxId_logistic,
-                                                "taxValue" => $calcValue_logistic,
-                                                "taxVal" => (abs($taxValue_logistic) + 0),
-                                            );
-
-                                            array_push($supplierLogisticTaxesArr, $taxId_logistic);
-                                        }
-                                    }
-                                }
-                            }
-
-                            $logisticsCostWithTaxes = $logisticcost + $logisticTaxesValue;
-
-                            // END LOGISTICS WITH TAXES
-
-                            // SERVICES WITH TAXES
-
-                            if ($servicecost != 0 && $servicepayto > 0) {
-                                $transportorIvaValue_Service = 0;
-                                $transportorRetenctionValue_Service = 0;
-                                $transportorReticaValue_Service = 0;
-
-                                $getTransportorTaxes_Service = $this->Master_model->get_provider_taxes($servicepayto);
-                                $getTransportorTaxes_Service_Supplier = $this->Master_model->get_supplier_taxes($servicepayto);
-
-                                $servicesTaxesValue = 0;
-
-                                if (count($getTransportorTaxes_Service) > 0) {
-
-                                    $servicesTaxesValue = 0;
-                                    foreach ($getTransportorTaxes_Service as $servicetaxtransportor) {
-
-                                        $calcValue_SerTransportor = 0;
-                                        $taxId_SerTransportor = $servicetaxtransportor->tax_id;
-                                        $taxValue_SerTransportor = $servicetaxtransportor->tax_value;
-                                        $taxFormat_SerTransportor = $servicetaxtransportor->number_format;
-                                        $taxType_SerTransportor = $servicetaxtransportor->arithmetic_type;
-
-                                        if ($taxValue_SerTransportor > 0) {
-                                            if ($taxType_SerTransportor == 2) {
-                                                $taxValue_SerTransportor = $taxValue_SerTransportor * -1;
-                                            }
-                                            if ($taxFormat_SerTransportor == 2) {
-                                                $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor / 100);
-                                            } else {
-                                                $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor);
-                                            }
-                                        }
-
-                                        $servicesTaxesValue = $servicesTaxesValue + $calcValue_SerTransportor;
-
-                                        $providerServiceTaxesAdjustArr[] = array(
-                                            "taxId" => $taxId_SerTransportor,
-                                            "taxValue" => $calcValue_SerTransportor,
-                                            "taxVal" => (abs($taxValue_SerTransportor) + 0),
-                                        );
-                                        array_push($providerServiceTaxesArr, $taxId_SerTransportor);
-                                    }
-
-                                    if ($servicesTaxesValue == 0) {
-                                        foreach ($getTransportorTaxes_Service_Supplier as $servicetaxsupplier) {
-
-                                            $calcValue_SSTransportor = 0;
-                                            $taxId_SSTransportor = $servicetaxsupplier->tax_id;
-                                            $taxValue_SSTransportor = $servicetaxsupplier->tax_value;
-                                            $taxFormat_SSTransportor = $servicetaxsupplier->number_format;
-                                            $taxType_SSTransportor = $servicetaxsupplier->arithmetic_type;
-
-                                            if ($taxValue_SSTransportor > 0) {
-                                                if ($taxType_SSTransportor == 2) {
-                                                    $taxValue_SSTransportor = $taxValue_SSTransportor * -1;
-                                                }
-                                                if ($taxFormat_SSTransportor == 2) {
-                                                    $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor / 100);
-                                                } else {
-                                                    $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor);
-                                                }
-                                            }
-
-                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_SSTransportor;
-
-                                            $providerServiceTaxesAdjustArr[] = array(
-                                                "taxId" => $taxId_SSTransportor,
-                                                "taxValue" => $calcValue_SSTransportor,
-                                                "taxVal" => (abs($taxValue_SSTransportor) + 0),
-                                            );
-
-                                            array_push($supplierServiceTaxesArr, $taxId_SSTransportor);
-                                        }
-                                    }
-                                } else if ($servicepayto == $supplierid) {
-
-                                    $getTransportorTaxes_Services = $this->Master_model->get_supplier_taxes($logisticpayto);
-
-                                    $servicesTaxesValue = 0;
-                                    if (count($getTransportorTaxes_Services) > 0) {
-
-                                        foreach ($getTransportorTaxes_Services as $servicesuppliertax) {
-
-                                            $calcValue_service = 0;
-                                            $taxId_service = $servicesuppliertax->tax_id;
-                                            $taxValue_service = $servicesuppliertax->tax_value;
-                                            $taxFormat_service = $servicesuppliertax->number_format;
-                                            $taxType_service = $servicesuppliertax->arithmetic_type;
-
-                                            if ($taxValue_service > 0) {
-                                                if ($taxType_service == 2) {
-                                                    $taxValue_service = $taxValue_service * -1;
-                                                }
-                                                if ($taxFormat_service == 2) {
-                                                    $calcValue_service = $servicecost * ($taxValue_service / 100);
-                                                } else {
-                                                    $calcValue_service = $servicecost * ($taxValue_service);
-                                                }
-                                            }
-
-                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_service;
-
-                                            $providerServiceTaxesAdjustArr[] = array(
-                                                "taxId" => $taxId_service,
-                                                "taxValue" => $calcValue_service,
-                                                "taxVal" => (abs($taxValue_service) + 0),
-                                            );
-
-                                            array_push($supplierServiceTaxesArr, $taxId_service);
-                                        }
-                                    }
-                                }
-                            }
-
-                            $servicesCostWithTaxes = $servicecost + $servicesTaxesValue;
-
-                            // END SERVICES WITH TAXES
-
-                            $adjust_arr = explode(",", $adjustrf);
-                            $isAdjustEnabled = false;
-                            $adjustmentValues = 0;
-
-                            if (count($adjust_arr) > 0) {
-
-                                $isAdjustEnabled = true;
-
-                                $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
-
-                                foreach ($adjust_arr as $adjust) {
-
-                                    foreach ($supplierTaxesAdjustArr as $suppliertaxestax) {
-                                        if ($suppliertaxestax["taxId"] == $adjust) {
-                                            $totalValueWithTaxes = $totalValueWithTaxes - abs($suppliertaxestax["taxValue"]);
-                                            $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
-                                        }
-                                    }
-
-                                    foreach ($providerServiceTaxesAdjustArr as $providerservicetaxestax) {
-                                        if ($providerservicetaxestax["taxId"] == $adjust) {
-                                            $totalValueWithTaxes = $totalValueWithTaxes - abs($providerservicetaxestax["taxValue"]);
-                                            $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
-                                        }
-                                    }
-
-                                    foreach ($providerLogisticTaxesAdjustArr as $providerlogistictaxestax) {
-                                        if ($providerlogistictaxestax["taxId"] == $adjust) {
-                                            $totalValueWithTaxes = $totalValueWithTaxes - abs($providerlogistictaxestax["taxValue"]);
-                                            $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
-                                        }
-                                    }
-                                }
-                            } else {
-                                $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
-                            }
-
-                            if ($farmadjustment != 0) {
-                                $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
-                            }
-
-                            $totalValue = $woodValue + $logisticcost + $servicecost;
-
-                            $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
-                            $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
-                            $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
-                            $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
-                            $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
-
-                            $dataFarm = array(
-                                "inventory_order" => $input_inventory_order, "plate_number" => $input_truck_plate_number,
-                                "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                "wood_value" => $woodValue, "total_value" => $totalValue,
-                                "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                "exchange_rate" => $input_conversion_rate, "updated_by" => $session['user_id'], "is_active" => 1,
-                                "origin_id" => $originid, "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
-                                "service_cost_withtaxes" => $servicesCostWithTaxes, "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
-                                "supplier_taxes" => $supplierTaxesArrList, "logistic_taxes" => $supplierLogisticTaxesArrList,
-                                "service_taxes" => $supplierServiceTaxesArrList, "adjust_taxes" => $adjustrf,
-                                "is_adjust_rf" => $isAdjustEnabled, "logistic_provider_taxes" => $providerLogisticTaxesArrList,
-                                "service_provider_taxes" => $providerServiceTaxesArrList, "adjusted_value" => $adjustmentValues,
-                                "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
-                                "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
-                                "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                "process_type" => $processType, "loading_cost" => $loadingCost,
-                                "unloading_cost" => $unloadingCost,
-                            );
-
-                            $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
-
-                            if ($updateFarm == true) {
-
-                                $dataInventoryLedgerUpdate = array(
-                                    "amount" => 0, "updated_by" => $session['user_id'], "is_active" => 0,
-                                );
-
-                                $updateInventoryLedger = $this->Farm_model->update_inventory_ledger($inventory_order, $contract_id, $dataInventoryLedgerUpdate);
-
-                                if ($updateInventoryLedger == true) {
-
-                                    $dataInventoryLedger = array(
-                                        "contract_id" => $contract_id,
-                                        "inventory_order" => $input_inventory_order, "ledger_type" => 2,
-                                        "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                        "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
-                                    );
-
-                                    if ($woodValueWithSupplierTaxes != 0) {
-                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
-                                    }
-
-                                    if ($logisticsCostWithTaxes != 0) {
-                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
-                                    }
-
-                                    if ($servicesCostWithTaxes != 0) {
-                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
-                                    }
-
-                                    if ($farmadjustment != 0) {
-                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
-                                    }
-
-                                    $Return['result'] = $this->lang->line('data_updated');
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                } else {
-                                    $Return['error'] = $this->lang->line('error_updating');
-                                    $Return['result'] = "";
-                                    $Return['redirect'] = false;
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                }
-                            } else {
-                                $Return['error'] = $this->lang->line('error_updating');
-                                $Return['result'] = "";
-                                $Return['redirect'] = false;
-                                $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                $this->output($Return);
-                                exit;
-                            }
-                        }
-                    } else {
-
-                        $getInventoryOrderCount = $this->Farm_model->get_inventory_order_count($input_inventory_order, $originid);
-
-                        if ($getInventoryOrderCount[0]->cnt == 0) {
-
-                            $getFarmDetail = $this->Farm_model->get_farm_details($farm_id, $contract_id, $inventory_order);
-                            $productTypeId = $getFarmDetail[0]->product_type_id;
-                            $supplierid = $getFarmDetail[0]->supplier_id;
-                            $purchaseUnitId = $getFarmDetail[0]->unit_of_purchase;
-
-                            if ($servicecost == null || $servicecost == "") {
-                                $servicecost = 0;
-                            }
-
-                            if ($logisticcost == null || $logisticcost == "") {
-                                $logisticcost = 0;
-                            }
-                            
-                            if ($farmadjustment == null || $farmadjustment == "") {
-                                $farmadjustment = 0;
-                            }
-
-                            $totalVolume = 0;
-                            $woodValue = 0;
-                            $woodValueWithSupplierTaxes = 0;
-                            $logisticsCostWithTaxes = 0;
-                            $servicesCostWithTaxes = 0;
-                            $totalValueWithTaxes = 0;
-                            $totalValue = 0;
-
-                            $supplierTaxesArr = array();
-                            $providerLogisticTaxesArr = array();
-                            $providerServiceTaxesArr = array();
-                            $supplierLogisticTaxesArr = array();
-                            $supplierServiceTaxesArr = array();
-                            $supplierTaxesAdjustArr = array();
-                            $providerLogisticTaxesAdjustArr = array();
-                            $providerServiceTaxesAdjustArr = array();
-
-                            if ($productTypeId == 1 || $productTypeId == 3) {
-                            } else if ($productTypeId == 2 || $productTypeId == 4) {
-
-                                $woodValue = $getFarmDetail[0]->wood_value;
-                                if ($currency_id == 1) {
-                                    if ($input_conversion_rate > 0) {
-                                        $woodValue = $woodValue * $input_conversion_rate;
-                                    }
-                                }
-
-                                // WOOD VALUE WITH TAXES
-
-                                $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierid);
-
-                                $supplierTaxesValue = 0;
-                                if (count($getSupplierTaxes) > 0) {
-
-                                    $supplierTaxesValue = 0;
-                                    foreach ($getSupplierTaxes as $suppliertax) {
-
-                                        $calcValue = 0;
-                                        $taxId = $suppliertax->tax_id;
-                                        $taxValue = $suppliertax->tax_value;
-                                        $taxFormat = $suppliertax->number_format;
-                                        $taxType = $suppliertax->arithmetic_type;
-
-                                        if ($taxValue > 0) {
-                                            if ($taxType == 2) {
-                                                $taxValue = $taxValue * -1;
-                                            }
-                                            if ($taxFormat == 2) {
-                                                $calcValue = $woodValue * ($taxValue / 100);
-                                            } else {
-                                                $calcValue = $woodValue * ($taxValue);
-                                            }
-                                        }
-
-                                        $supplierTaxesAdjustArr[] = array(
-                                            "taxId" => $taxId,
-                                            "taxValue" => $calcValue,
-                                            "taxVal" => (abs($taxValue) + 0),
-                                        );
-
-                                        array_push($supplierTaxesArr, $taxId);
-
-                                        $supplierTaxesValue = $supplierTaxesValue + $calcValue;
-                                    }
-                                }
-
-                                $woodValueWithSupplierTaxes = $woodValue + $supplierTaxesValue;
-
-                                // END WOOD VALUE WITH TAXES
-
-                                // LOGISTICS WITH TAXES
-
-                                if ($logisticcost != 0 && $logisticpayto > 0) {
-
-                                    $transportorIvaValue_Logistics = 0;
-                                    $transportorRetenctionValue_Logistics = 0;
-                                    $transportorReticaValue_Logistics = 0;
-
-                                    $getTransportorTaxes_Logistics = $this->Master_model->get_provider_taxes($logisticpayto);
-                                    $getTransportorTaxes_Logistics_Supplier = $this->Master_model->get_supplier_taxes($logisticpayto);
-
-                                    $logisticTaxesValue = 0;
-
-                                    if (count($getTransportorTaxes_Logistics) > 0) {
-
-                                        $logisticTaxesValue = 0;
-                                        foreach ($getTransportorTaxes_Logistics as $logistictaxtransportor) {
-
-                                            $calcValue_LTransportor = 0;
-                                            $taxId_LTransportor = $logistictaxtransportor->tax_id;
-                                            $taxValue_LTransportor = $logistictaxtransportor->tax_value;
-                                            $taxFormat_LTransportor = $logistictaxtransportor->number_format;
-                                            $taxType_LTransportor = $logistictaxtransportor->arithmetic_type;
-
-                                            if ($taxValue_LTransportor > 0) {
-                                                if ($taxType_LTransportor == 2) {
-                                                    $taxValue_LTransportor = $taxValue_LTransportor * -1;
-                                                }
-                                                if ($taxFormat_LTransportor == 2) {
-                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor / 100);
-                                                } else {
-                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor);
-                                                }
-                                            }
-
-                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_LTransportor;
-
-                                            $providerLogisticTaxesAdjustArr[] = array(
-                                                "taxId" => $taxId_LTransportor,
-                                                "taxValue" => $calcValue_LTransportor,
-                                                "taxVal" => (abs($taxValue_LTransportor) + 0),
-                                            );
-
-                                            array_push($providerLogisticTaxesArr, $taxId_LTransportor);
-                                        }
-
-                                        if ($logisticTaxesValue == 0) {
-                                            foreach ($getTransportorTaxes_Logistics_Supplier as $logistictaxsupplier) {
-
-                                                $calcValue_STransportor = 0;
-                                                $taxId_STransportor = $logistictaxsupplier->tax_id;
-                                                $taxValue_STransportor = $logistictaxsupplier->tax_value;
-                                                $taxFormat_STransportor = $logistictaxsupplier->number_format;
-                                                $taxType_STransportor = $logistictaxsupplier->arithmetic_type;
-
-                                                if ($taxValue_STransportor > 0) {
-                                                    if ($taxType_STransportor == 2) {
-                                                        $taxValue_STransportor = $taxValue_STransportor * -1;
-                                                    }
-                                                    if ($taxFormat_STransportor == 2) {
-                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor / 100);
-                                                    } else {
-                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor);
-                                                    }
-                                                }
-
-                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_STransportor;
-
-                                                $providerLogisticTaxesAdjustArr[] = array(
-                                                    "taxId" => $taxId_STransportor,
-                                                    "taxValue" => $calcValue_STransportor,
-                                                    "taxVal" => (abs($taxValue_STransportor) + 0),
-                                                );
-
-                                                array_push($supplierLogisticTaxesArr, $taxId_STransportor);
-                                            }
-                                        }
-                                    } else if ($logisticpayto == $supplierid) {
-
-                                        $getTransportorTaxes_Logistics = $this->Master_model->get_supplier_taxes($logisticpayto);
-
-                                        $logisticTaxesValue = 0;
-                                        if (count($getTransportorTaxes_Logistics) > 0) {
-
-                                            foreach ($getTransportorTaxes_Logistics as $transporttax) {
-
-                                                $calcValue_logistic = 0;
-                                                $taxId_logistic = $transporttax->tax_id;
-                                                $taxValue_logistic = $transporttax->tax_value;
-                                                $taxFormat_logistic = $transporttax->number_format;
-                                                $taxType_logistic = $transporttax->arithmetic_type;
-
-                                                if ($taxValue_logistic > 0) {
-                                                    if ($taxType_logistic == 2) {
-                                                        $taxValue_logistic = $taxValue_logistic * -1;
-                                                    }
-                                                    if ($taxFormat_logistic == 2) {
-                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic / 100);
-                                                    } else {
-                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic);
-                                                    }
-                                                }
-
-                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_logistic;
-
-                                                $providerLogisticTaxesAdjustArr[] = array(
-                                                    "taxId" => $taxId_logistic,
-                                                    "taxValue" => $calcValue_logistic,
-                                                    "taxVal" => (abs($taxValue_logistic) + 0),
-                                                );
-
-                                                array_push($supplierLogisticTaxesArr, $taxId_logistic);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                $logisticsCostWithTaxes = $logisticcost + $logisticTaxesValue;
-
-                                // END LOGISTICS WITH TAXES
-
-                                // SERVICES WITH TAXES
-
-                                if ($servicecost != 0 && $servicepayto > 0) {
-                                    $transportorIvaValue_Service = 0;
-                                    $transportorRetenctionValue_Service = 0;
-                                    $transportorReticaValue_Service = 0;
-
-                                    $getTransportorTaxes_Service = $this->Master_model->get_provider_taxes($servicepayto);
-                                    $getTransportorTaxes_Service_Supplier = $this->Master_model->get_supplier_taxes($servicepayto);
-
-                                    $servicesTaxesValue = 0;
-
-                                    if (count($getTransportorTaxes_Service) > 0) {
-
-                                        $servicesTaxesValue = 0;
-                                        foreach ($getTransportorTaxes_Service as $servicetaxtransportor) {
-
-                                            $calcValue_SerTransportor = 0;
-                                            $taxId_SerTransportor = $servicetaxtransportor->tax_id;
-                                            $taxValue_SerTransportor = $servicetaxtransportor->tax_value;
-                                            $taxFormat_SerTransportor = $servicetaxtransportor->number_format;
-                                            $taxType_SerTransportor = $servicetaxtransportor->arithmetic_type;
-
-                                            if ($taxValue_SerTransportor > 0) {
-                                                if ($taxType_SerTransportor == 2) {
-                                                    $taxValue_SerTransportor = $taxValue_SerTransportor * -1;
-                                                }
-                                                if ($taxFormat_SerTransportor == 2) {
-                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor / 100);
-                                                } else {
-                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor);
-                                                }
-                                            }
-
-                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_SerTransportor;
-
-                                            $providerServiceTaxesAdjustArr[] = array(
-                                                "taxId" => $taxId_SerTransportor,
-                                                "taxValue" => $calcValue_SerTransportor,
-                                                "taxVal" => (abs($taxValue_SerTransportor) + 0),
-                                            );
-                                            array_push($providerServiceTaxesArr, $taxId_SerTransportor);
-                                        }
-
-                                        if ($servicesTaxesValue == 0) {
-                                            foreach ($getTransportorTaxes_Service_Supplier as $servicetaxsupplier) {
-
-                                                $calcValue_SSTransportor = 0;
-                                                $taxId_SSTransportor = $servicetaxsupplier->tax_id;
-                                                $taxValue_SSTransportor = $servicetaxsupplier->tax_value;
-                                                $taxFormat_SSTransportor = $servicetaxsupplier->number_format;
-                                                $taxType_SSTransportor = $servicetaxsupplier->arithmetic_type;
-
-                                                if ($taxValue_SSTransportor > 0) {
-                                                    if ($taxType_SSTransportor == 2) {
-                                                        $taxValue_SSTransportor = $taxValue_SSTransportor * -1;
-                                                    }
-                                                    if ($taxFormat_SSTransportor == 2) {
-                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor / 100);
-                                                    } else {
-                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor);
-                                                    }
-                                                }
-
-                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_SSTransportor;
-
-                                                $providerServiceTaxesAdjustArr[] = array(
-                                                    "taxId" => $taxId_SSTransportor,
-                                                    "taxValue" => $calcValue_SSTransportor,
-                                                    "taxVal" => (abs($taxValue_SSTransportor) + 0),
-                                                );
-
-                                                array_push($supplierServiceTaxesArr, $taxId_SSTransportor);
-                                            }
-                                        }
-                                    } else if ($servicepayto == $supplierid) {
-
-                                        $getTransportorTaxes_Services = $this->Master_model->get_supplier_taxes($logisticpayto);
-
-                                        $servicesTaxesValue = 0;
-                                        if (count($getTransportorTaxes_Services) > 0) {
-
-                                            foreach ($getTransportorTaxes_Services as $servicesuppliertax) {
-
-                                                $calcValue_service = 0;
-                                                $taxId_service = $servicesuppliertax->tax_id;
-                                                $taxValue_service = $servicesuppliertax->tax_value;
-                                                $taxFormat_service = $servicesuppliertax->number_format;
-                                                $taxType_service = $servicesuppliertax->arithmetic_type;
-
-                                                if ($taxValue_service > 0) {
-                                                    if ($taxType_service == 2) {
-                                                        $taxValue_service = $taxValue_service * -1;
-                                                    }
-                                                    if ($taxFormat_service == 2) {
-                                                        $calcValue_service = $servicecost * ($taxValue_service / 100);
-                                                    } else {
-                                                        $calcValue_service = $servicecost * ($taxValue_service);
-                                                    }
-                                                }
-
-                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_service;
-
-                                                $providerServiceTaxesAdjustArr[] = array(
-                                                    "taxId" => $taxId_service,
-                                                    "taxValue" => $calcValue_service,
-                                                    "taxVal" => (abs($taxValue_service) + 0),
-                                                );
-
-                                                array_push($supplierServiceTaxesArr, $taxId_service);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                $servicesCostWithTaxes = $servicecost + $servicesTaxesValue;
-
-                                // END SERVICES WITH TAXES
-
-                                $adjust_arr = explode(",", $adjustrf);
-                                $isAdjustEnabled = false;
-                                $adjustmentValues = 0;
-
-                                if (count($adjust_arr) > 0) {
-
-                                    $isAdjustEnabled = true;
-
-                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
-
-                                    foreach ($adjust_arr as $adjust) {
-
-                                        foreach ($supplierTaxesAdjustArr as $suppliertaxestax) {
-                                            if ($suppliertaxestax["taxId"] == $adjust) {
-                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($suppliertaxestax["taxValue"]);
-                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
-                                            }
-                                        }
-
-                                        foreach ($providerServiceTaxesAdjustArr as $providerservicetaxestax) {
-                                            if ($providerservicetaxestax["taxId"] == $adjust) {
-                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerservicetaxestax["taxValue"]);
-                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
-                                            }
-                                        }
-
-                                        foreach ($providerLogisticTaxesAdjustArr as $providerlogistictaxestax) {
-                                            if ($providerlogistictaxestax["taxId"] == $adjust) {
-                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerlogistictaxestax["taxValue"]);
-                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
-                                }
-
-                                if ($farmadjustment != 0) {
-                                    $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
-                                }
-
-                                $totalValue = $woodValue + $logisticcost + $servicecost;
-
-                                $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
-                                $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
-                                $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
-                                $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
-                                $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
-
-                                $dataFarm = array(
-                                    "inventory_order" => $input_inventory_order, "plate_number" => $input_truck_plate_number,
-                                    "purchase_date" => $purchase_date, "service_cost" => $servicecost,
-                                    "logistic_cost" => $logisticcost, "adjustment" => $farmadjustment,
-                                    "pay_service_to" => $servicepayto, "pay_logistics_to" => $logisticpayto,
-                                    "exchange_rate" => $input_conversion_rate, "updated_by" => $session['user_id'], "is_active" => 1,
-                                    "origin_id" => $originid, "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
-                                    "service_cost_withtaxes" => $servicesCostWithTaxes, "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
-                                    "supplier_taxes" => $supplierTaxesArrList, "logistic_taxes" => $supplierLogisticTaxesArrList,
-                                    "service_taxes" => $supplierServiceTaxesArrList, "adjust_taxes" => $adjustrf,
-                                    "is_adjust_rf" => $isAdjustEnabled, "logistic_provider_taxes" => $providerLogisticTaxesArrList,
-                                    "service_provider_taxes" => $providerServiceTaxesArrList, "adjusted_value" => $adjustmentValues,
-                                    "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
-                                    "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
-                                    "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
-                                    "process_type" => $processType, "loading_cost" => $loadingCost,
-                                "unloading_cost" => $unloadingCost,
-                                );
-
-                                $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
-
-                                if ($updateFarm == true) {
-
-                                    $dataInventoryLedgerUpdate = array(
-                                        "amount" => 0, "updated_by" => $session['user_id'], "is_active" => 0,
-                                    );
-
-                                    $updateInventoryLedger = $this->Farm_model->update_inventory_ledger($inventory_order, $contract_id, $dataInventoryLedgerUpdate);
-
-                                    if ($updateInventoryLedger == true) {
-
-                                        $dataInventoryLedger = array(
-                                            "contract_id" => $contract_id,
-                                            "inventory_order" => $input_inventory_order, "ledger_type" => 2,
-                                            "expense_date" => $purchase_date, "created_by" => $session['user_id'],
-                                            "updated_by" => $session['user_id'], "is_active" => 1, "is_advance_app" => 0,
-                                        );
-
-                                        if ($woodValueWithSupplierTaxes != 0) {
-                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
-                                        }
-
-                                        if ($logisticsCostWithTaxes != 0) {
-                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
-                                        }
-
-                                        if ($servicesCostWithTaxes != 0) {
-                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
-                                        }
-
-                                        if ($farmadjustment != 0) {
-                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
-                                        }
-
-                                        $Return['result'] = $this->lang->line('data_updated');
-                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                        $this->output($Return);
-                                        exit;
-                                    } else {
-                                        $Return['error'] = $this->lang->line('error_updating');
-                                        $Return['result'] = "";
-                                        $Return['redirect'] = false;
-                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                        $this->output($Return);
-                                        exit;
-                                    }
-                                } else {
-                                    $Return['error'] = $this->lang->line('error_updating');
-                                    $Return['result'] = "";
-                                    $Return['redirect'] = false;
-                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                                    $this->output($Return);
-                                    exit;
-                                }
-                            }
-                        } else {
-                            $Return['error'] = $this->lang->line('exist_inventory_order');
-                            $Return['result'] = "";
-                            $Return['redirect'] = false;
-                            $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                            $this->output($Return);
-                            exit;
-                        }
-                    }
-                } else {
-                    $Return['error'] = $this->lang->line('invalid_request');
-                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
-                    $this->output($Return);
-                }
-            } else {
-                redirect("/logout");
-            }
-        } else {
-            $Return['error'] = $this->lang->line('invalid_request');
-            $Return['csrf_hash'] = $this->security->get_csrf_hash();
-            $this->output($Return);
-        }
-    }
-    
-    public function add()
-    {
-        $Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
-        $session = $this->session->userdata('fullname');
-        if ($this->input->post('add_type') == 'farm') {
-            if (!empty($session)) {
-                if ($this->input->post('action_type') == 'add') {
-
-                    $originid = $this->input->post('originid');
-                    $supplierid = $this->input->post('supplierid');
-                    $productid = $this->input->post('productid');
-                    $producttypeid = $this->input->post('producttypeid');
-                    $purchasecontractid = $this->input->post('purchasecontractid');
-                    $inventoryorder = strtoupper($this->input->post('inventoryorder'));
-                    $truckplatenumber = strtoupper($this->input->post('truckplatenumber'));
-                    $servicecost = $this->input->post('servicecost');
-                    $servicepayto = $this->input->post('servicepayto');
-                    $logisticcost = $this->input->post('logisticcost');
-                    $logisticpayto = $this->input->post('logisticpayto');
-                    $farmadjustment = $this->input->post('farmadjustment');
-                    $conversionrate = $this->input->post('conversionrate');
-                    $adjustrf = $this->input->post('adjustrf');
-                    $warehouseid = $this->input->post('warehouseid');
-                    $receptiondate = $this->input->post('receptiondate');
-                    $purchaseunit = $this->input->post('purchaseunit');
-                    $farmdata = $this->input->post('farmdata');
-                    $shippingline = $this->input->post('shippingline');
-                    $sealnumber = $this->input->post('sealnumber');
-                    $roundingfactor = $this->input->post('roundingfactor');
-                    $processType = $this->input->post('processType');
-                    $loadingCost = $this->input->post('loadingCost');
-                    $unloadingCost = $this->input->post('unloadingCost');
-                    date_default_timezone_set($session['default_timezone']);
 
                     if ($originid == 4) {
                         $circumferenceallowance = $this->input->post('circumference_allowance');
@@ -3441,6 +582,7 @@ class Farms extends MY_Controller
                         $circumferenceallowance = 0;
                         $lengthallowance = 0;
                     }
+
 
                     $warehouseid_rounglogs = $this->input->post('warehouseid_rounglogs');
                     $measurement_system_roundlogs = $this->input->post('measurement_system_roundlogs');
@@ -3529,7 +671,8 @@ class Farms extends MY_Controller
                                         "updated_by" => $session['user_id'],
                                         "is_active" => 1,
                                         "origin_id" => $originid,
-                                        "metric_ton" => $metricTon, "process_type" => $processType,
+                                        "metric_ton" => $metricTon,
+                                        "process_type" => $processType,
                                     );
 
                                     $insertFarm = $this->Farm_model->add_farm($dataFarm);
@@ -3718,7 +861,6 @@ class Farms extends MY_Controller
                             exit;
                         }
                     } else {
-
                         $getInventoryOrderCount = $this->Farm_model->get_inventory_order_count($inventoryorder, $originid);
 
                         if ($getInventoryOrderCount[0]->cnt == 0) {
@@ -3742,8 +884,6 @@ class Farms extends MY_Controller
                             $farmdataJson = json_decode($farmdata, true);
 
                             $totalVolume = 0;
-                            $totalGrossVolume = 0;
-                            $totalPieces = 0;
                             $woodValue = 0;
                             $woodValueWithSupplierTaxes = 0;
                             $logisticsCostWithTaxes = 0;
@@ -3969,7 +1109,9 @@ class Farms extends MY_Controller
                                     "created_by" => $session['user_id'],
                                     "updated_by" => $session['user_id'],
                                     "is_active" => 1,
-                                    "origin_id" => $originid, "process_type" => $processType, "loading_cost" => $loadingCost, 
+                                    "origin_id" => $originid,
+                                    "process_type" => $processType,
+                                    "loading_cost" => $loadingCost, 
                                     "unloading_cost" => $unloadingCost,
                                 );
 
@@ -4365,7 +1507,3345 @@ class Farms extends MY_Controller
                                     "created_by" => $session['user_id'],
                                     "updated_by" => $session['user_id'],
                                     "is_active" => 1,
-                                    "origin_id" => $originid, "process_type" => $processType, "loading_cost" => $loadingCost, 
+                                    "origin_id" => $originid,
+                                    "process_type" => $processType,
+                                    "loading_cost" => $loadingCost, 
+                                    "unloading_cost" => $unloadingCost,
+                                );
+
+                                $insertFarm = $this->Farm_model->add_farm($dataFarm);
+
+                                if ($insertFarm > 0) {
+                                    $dataFarmData = array();
+                                    foreach ($farmdataJson as $farm) {
+
+                                        $noOfPieces = $farm["noOfPieces"];
+                                        $length = $farm["length"];
+                                        $width = $farm["width"];
+                                        $thickness = $farm["thickness"];
+                                        $lengthExport = $farm["lengthExport"];
+                                        $widthExport = $farm["widthExport"];
+                                        $thicknessExport = $farm["thicknessExport"];
+                                        $volumePie = $farm["volumePie"];
+                                        $grossVolume = $farm["grossVolume"];
+                                        $grade = $farm["grade"];
+                                        $netVolume = $farm["netVolume"];
+                                        $scannedCode = $farm["scannedCode"];
+
+                                        if ($noOfPieces > 0) {
+                                            $dataFarmData[] = array(
+                                                "farm_id" => $insertFarm,
+                                                "scanned_code" => $scannedCode,
+                                                "no_of_pieces" => $noOfPieces,
+                                                "circumference" => 0,
+                                                "length" => $length,
+                                                "width" => $width,
+                                                "thickness" => $thickness,
+                                                "volume" => $netVolume,
+                                                "volume_pie" => $volumePie,
+                                                "grade_id" => $grade,
+                                                "length_export" => $lengthExport,
+                                                "width_export" => $widthExport,
+                                                "thickness_export" => $thicknessExport,
+                                                "volume_bought" => $grossVolume,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "created_date" => date('Y-m-d H:i:s'),
+                                                "updated_date" => date('Y-m-d H:i:s')
+                                            );
+                                        }
+                                    }
+
+                                    if (count($dataFarmData) > 0) {
+                                        $insertFarmData = $this->Farm_model->add_farm_data($dataFarmData);
+
+                                        if ($insertFarmData) {
+                                            //SUPPLIER PRICE
+                                            $this->Farm_model->add_supplier_price(
+                                                $purchasecontractid,
+                                                $supplierid,
+                                                $inventoryorder,
+                                                $session['user_id']
+                                            );
+
+                                            //CONTRACT INVENTORY MAPPING
+                                            $dataContractMapping = array(
+                                                "contract_id" => $purchasecontractid,
+                                                "supplier_id" => $supplierid,
+                                                "inventory_order" => $inventoryorder,
+                                                "total_volume" => $totalVolume,
+                                                "invoice_number" => "",
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                            );
+
+                                            $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
+
+                                            $dataInventoryLedger = array(
+                                                "contract_id" => $purchasecontractid,
+                                                "inventory_order" => $inventoryorder,
+                                                "ledger_type" => 2,
+                                                "expense_date" => $purchase_date,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "is_advance_app" => 0,
+                                            );
+
+                                            if ($woodValueWithSupplierTaxes != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
+                                            }
+
+                                            if ($logisticsCostWithTaxes != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
+                                            }
+
+                                            if ($servicesCostWithTaxes != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
+                                            }
+
+                                            if ($farmadjustment != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
+                                            }
+
+                                            $getContracts = $this->Contract_model->get_contracts_by_contractid($purchasecontractid);
+                                            if (count($getContracts) == 1) {
+                                                $remainingVolume = $getContracts[0]->remaining_volume - $totalVolume;
+
+                                                $dataRemainingVolume = array(
+                                                    "remaining_volume" => $remainingVolume,
+                                                );
+
+                                                $this->Contract_model->update_purchase_contract_volume($dataRemainingVolume, $purchasecontractid, $supplierid);
+                                            }
+
+                                            //END
+
+                                            //CREATE RECEPTION
+
+                                            $getSupplierDetails = $this->Master_model->get_supplier_detail_reception($supplierid, $productid);
+
+                                            if (count($getSupplierDetails) == 1) {
+                                                $dataReception = array(
+                                                    "warehouse_id" => $warehouseid,
+                                                    "supplier_id" => $supplierid,
+                                                    "supplier_code" => $getSupplierDetails[0]->supplier_code,
+                                                    "supplier_product_id" => $getSupplierDetails[0]->product_name,
+                                                    "supplier_product_typeid" => $getSupplierDetails[0]->product_type,
+                                                    "measurementsystem_id" => 1,
+                                                    "received_date" => $receptiondate,
+                                                    "salvoconducto" => $inventoryorder,
+                                                    "createdby" => $session['user_id'],
+                                                    "updatedby" => $session['user_id'],
+                                                    "isactive" => 1,
+                                                    "isclosed" => 1,
+                                                    "closedby" => $session['user_id'],
+                                                    "captured_timestamp" => 0,
+                                                    "isduplicatecaptured" => 0,
+                                                    "is_contract_added" => 0,
+                                                    "is_special_uploaded" => 0,
+                                                    "origin_id" => $originid,
+                                                );
+
+                                                $insertReception = $this->Reception_model->add_reception($dataReception);
+
+                                                if ($insertReception > 0) {
+                                                    $this->Reception_model->add_reception_data_from_farm($insertReception, $inventoryorder, $purchaseunit, $session['user_id']);
+                                                }
+                                            }
+
+                                            //END RECEPTION
+                                        }
+
+                                        $Return['result'] = $this->lang->line('data_added');
+                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                        $this->output($Return);
+                                        exit;
+                                    } else {
+                                        $Return['error'] = $this->lang->line('error_adding');
+                                        $Return['result'] = "";
+                                        $Return['redirect'] = false;
+                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                        $this->output($Return);
+                                        exit;
+                                    }
+                                } else {
+                                    $Return['error'] = $this->lang->line('error_adding');
+                                    $Return['result'] = "";
+                                    $Return['redirect'] = false;
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                }
+
+                                // $Return['result'] = $this->lang->line('data_added');
+                                // $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                // $this->output($Return);
+                                // exit;
+                            } else if ($producttypeid == 2 || $producttypeid == 4) {
+
+                                $cProduct = 0;
+                                $totalPiecesFarm = 0;
+                                $totalVolumeFarm = 0;
+                                $totalGrossVolumeFarm = 0;
+                                foreach ($farmdataJson as $farm) {
+
+                                    $circumference = $farm["circumference"];
+                                    $totalVolume = $totalVolume + $farm["netVolume"];
+                                    $noOfPieces = $farm["noOfPieces"];
+
+                                    if ($purchaseunit == 3 || $purchaseunit == 4 || $purchaseunit == 5 || $purchaseunit == 15) {
+
+
+                                        if ($noOfPieces > 0) {
+                                            $getPriceRanges = $this->Farm_model->get_price_for_circumference($circumference, $purchasecontractid);
+
+                                            if (count($getPriceRanges) == 1) {
+                                                if ($purchaseunit == 3) {
+                                                    $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $noOfPieces));
+                                                } else if ($purchaseunit == 4 || $purchaseunit == 5) {
+                                                    $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $farm["netVolume"]));
+                                                } else if ($purchaseunit == 15) {
+                                                    $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3));;
+                                                }
+                                            }
+                                        }
+                                    } else if ($purchaseunit == 6 || $purchaseunit == 7 || $purchaseunit == 13) {
+
+                                        $cProduct = $cProduct + ($circumference * $noOfPieces);
+                                        $totalPiecesFarm = $totalPiecesFarm + $noOfPieces;
+                                        $totalVolumeFarm = $totalVolumeFarm + $farm["netVolume"];
+                                    } else if ($purchaseunit == 8 || $purchaseunit == 9 || $purchaseunit == 12 || $purchaseunit == 14) {
+
+                                        $totalVolumeFarm = $totalVolumeFarm + $farm["netVolume"];
+                                        $totalGrossVolumeFarm = $totalGrossVolumeFarm + $farm["grossVolume"];
+                                        $totalPiecesFarm = $totalPiecesFarm + $noOfPieces;
+                                    }
+                                }
+
+                                if ($originid == 4 && $roundingfactor > 0) {
+
+                                    $precision = (int) $roundingfactor; // Ensure it's an integer
+                                    $totalVolume = number_format($totalVolume, $precision, '.', '');
+                                    $totalVolumeFarm = number_format($totalVolumeFarm, $precision, '.', '');
+                                    $totalGrossVolumeFarm = number_format($totalGrossVolumeFarm, $precision, '.', '');
+                                }
+
+                                if ($purchaseunit == 6 || $purchaseunit == 7 || $purchaseunit == 13) {
+
+                                    $averageGirth = $this->truncate($cProduct / $totalPiecesFarm, 0);
+                                    $getPriceRanges = $this->Farm_model->get_price_for_circumference($averageGirth, $purchasecontractid);
+
+                                    if (count($getPriceRanges) == 1) {
+                                        $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $totalVolumeFarm));
+                                    }
+                                }
+
+                                if ($purchaseunit == 8 || $purchaseunit == 9 || $purchaseunit == 12 || $purchaseunit == 14) {
+
+                                    $cftValue = round($totalGrossVolumeFarm / $totalPiecesFarm * 35.315, 2);
+                                    $getPriceRanges = $this->Farm_model->get_price_for_circumference($cftValue, $purchasecontractid);
+
+                                    if (count($getPriceRanges) == 1) {
+                                        $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $totalVolumeFarm));
+                                    }
+                                }
+
+                                if ($conversionrate > 0) {
+                                    $woodValue = $woodValue * $conversionrate;
+                                }
+
+                                if ($originid == 4) {
+                                    $woodValue = ($woodValue + 0);
+                                } else {
+                                    $woodValue = sprintf('%0.3f', ($woodValue + 0));
+                                }
+
+                                // WOOD VALUE WITH TAXES
+                                $supplierIvaValue = 0;
+                                $supplierRetenctionValue = 0;
+                                $supplierReticaValue = 0;
+
+                                $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierid);
+
+                                $supplierTaxesValue = 0;
+                                if (count($getSupplierTaxes) > 0) {
+
+                                    $supplierTaxesValue = 0;
+                                    foreach ($getSupplierTaxes as $suppliertax) {
+
+                                        $calcValue = 0;
+                                        $taxId = $suppliertax->tax_id;
+                                        $taxValue = $suppliertax->tax_value;
+                                        $taxFormat = $suppliertax->number_format;
+                                        $taxType = $suppliertax->arithmetic_type;
+
+                                        if ($taxValue > 0) {
+                                            if ($taxType == 2) {
+                                                $taxValue = $taxValue * -1;
+                                            }
+                                            if ($taxFormat == 2) {
+                                                $calcValue = $woodValue * ($taxValue / 100);
+                                            } else {
+                                                $calcValue = $woodValue * ($taxValue);
+                                            }
+                                        }
+
+                                        $supplierTaxesAdjustArr[] = array(
+                                            "taxId" => $taxId,
+                                            "taxValue" => $calcValue,
+                                            "taxVal" => (abs($taxValue) + 0),
+                                        );
+
+                                        array_push($supplierTaxesArr, $taxId);
+
+                                        $supplierTaxesValue = $supplierTaxesValue + $calcValue;
+                                    }
+                                }
+
+                                $woodValueWithSupplierTaxes = $woodValue + $supplierTaxesValue;
+
+                                // END WOOD VALUE WITH TAXES
+
+                                // LOGISTICS WITH TAXES
+
+                                if ($logisticcost != 0 && $logisticpayto > 0) {
+
+                                    $transportorIvaValue_Logistics = 0;
+                                    $transportorRetenctionValue_Logistics = 0;
+                                    $transportorReticaValue_Logistics = 0;
+
+                                    $getTransportorTaxes_Logistics = $this->Master_model->get_provider_taxes($logisticpayto);
+                                    $getTransportorTaxes_Logistics_Supplier = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                    $logisticTaxesValue = 0;
+
+                                    if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                        $logisticTaxesValue = 0;
+                                        foreach ($getTransportorTaxes_Logistics as $logistictaxtransportor) {
+
+                                            $calcValue_LTransportor = 0;
+                                            $taxId_LTransportor = $logistictaxtransportor->tax_id;
+                                            $taxValue_LTransportor = $logistictaxtransportor->tax_value;
+                                            $taxFormat_LTransportor = $logistictaxtransportor->number_format;
+                                            $taxType_LTransportor = $logistictaxtransportor->arithmetic_type;
+
+                                            if ($taxValue_LTransportor > 0) {
+                                                if ($taxType_LTransportor == 2) {
+                                                    $taxValue_LTransportor = $taxValue_LTransportor * -1;
+                                                }
+                                                if ($taxFormat_LTransportor == 2) {
+                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor / 100);
+                                                } else {
+                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor);
+                                                }
+                                            }
+
+                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_LTransportor;
+
+                                            $providerLogisticTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_LTransportor,
+                                                "taxValue" => $calcValue_LTransportor,
+                                                "taxVal" => (abs($taxValue_LTransportor) + 0),
+                                            );
+
+                                            array_push($providerLogisticTaxesArr, $taxId_LTransportor);
+                                        }
+
+                                        if ($logisticTaxesValue == 0) {
+                                            foreach ($getTransportorTaxes_Logistics_Supplier as $logistictaxsupplier) {
+
+                                                $calcValue_STransportor = 0;
+                                                $taxId_STransportor = $logistictaxsupplier->tax_id;
+                                                $taxValue_STransportor = $logistictaxsupplier->tax_value;
+                                                $taxFormat_STransportor = $logistictaxsupplier->number_format;
+                                                $taxType_STransportor = $logistictaxsupplier->arithmetic_type;
+
+                                                if ($taxValue_STransportor > 0) {
+                                                    if ($taxType_STransportor == 2) {
+                                                        $taxValue_STransportor = $taxValue_STransportor * -1;
+                                                    }
+                                                    if ($taxFormat_STransportor == 2) {
+                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor / 100);
+                                                    } else {
+                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor);
+                                                    }
+                                                }
+
+                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_STransportor;
+
+                                                $providerLogisticTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_STransportor,
+                                                    "taxValue" => $calcValue_STransportor,
+                                                    "taxVal" => (abs($taxValue_STransportor) + 0),
+                                                );
+
+                                                array_push($supplierLogisticTaxesArr, $taxId_STransportor);
+                                            }
+                                        }
+                                    } else if ($logisticpayto == $supplierid) {
+
+                                        $getTransportorTaxes_Logistics = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                        $logisticTaxesValue = 0;
+                                        if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                            foreach ($getTransportorTaxes_Logistics as $transporttax) {
+
+                                                $calcValue_logistic = 0;
+                                                $taxId_logistic = $transporttax->tax_id;
+                                                $taxValue_logistic = $transporttax->tax_value;
+                                                $taxFormat_logistic = $transporttax->number_format;
+                                                $taxType_logistic = $transporttax->arithmetic_type;
+
+                                                if ($taxValue_logistic > 0) {
+                                                    if ($taxType_logistic == 2) {
+                                                        $taxValue_logistic = $taxValue_logistic * -1;
+                                                    }
+                                                    if ($taxFormat_logistic == 2) {
+                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic / 100);
+                                                    } else {
+                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic);
+                                                    }
+                                                }
+
+                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_logistic;
+
+                                                $providerLogisticTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_logistic,
+                                                    "taxValue" => $calcValue_logistic,
+                                                    "taxVal" => (abs($taxValue_logistic) + 0),
+                                                );
+
+                                                array_push($supplierLogisticTaxesArr, $taxId_logistic);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $logisticsCostWithTaxes = $logisticcost + $logisticTaxesValue;
+
+                                // END LOGISTICS WITH TAXES
+
+                                // SERVICES WITH TAXES
+
+                                if ($servicecost != 0 && $servicepayto > 0) {
+                                    $transportorIvaValue_Service = 0;
+                                    $transportorRetenctionValue_Service = 0;
+                                    $transportorReticaValue_Service = 0;
+
+                                    $getTransportorTaxes_Service = $this->Master_model->get_provider_taxes($servicepayto);
+                                    $getTransportorTaxes_Service_Supplier = $this->Master_model->get_supplier_taxes($servicepayto);
+
+                                    $servicesTaxesValue = 0;
+
+                                    if (count($getTransportorTaxes_Service) > 0) {
+
+                                        $servicesTaxesValue = 0;
+                                        foreach ($getTransportorTaxes_Service as $servicetaxtransportor) {
+
+                                            $calcValue_SerTransportor = 0;
+                                            $taxId_SerTransportor = $servicetaxtransportor->tax_id;
+                                            $taxValue_SerTransportor = $servicetaxtransportor->tax_value;
+                                            $taxFormat_SerTransportor = $servicetaxtransportor->number_format;
+                                            $taxType_SerTransportor = $servicetaxtransportor->arithmetic_type;
+
+                                            if ($taxValue_SerTransportor > 0) {
+                                                if ($taxType_SerTransportor == 2) {
+                                                    $taxValue_SerTransportor = $taxValue_SerTransportor * -1;
+                                                }
+                                                if ($taxFormat_SerTransportor == 2) {
+                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor / 100);
+                                                } else {
+                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor);
+                                                }
+                                            }
+
+                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_SerTransportor;
+
+                                            $providerServiceTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_SerTransportor,
+                                                "taxValue" => $calcValue_SerTransportor,
+                                                "taxVal" => (abs($taxValue_SerTransportor) + 0),
+                                            );
+                                            array_push($providerServiceTaxesArr, $taxId_SerTransportor);
+                                        }
+
+                                        if ($servicesTaxesValue == 0) {
+                                            foreach ($getTransportorTaxes_Service_Supplier as $servicetaxsupplier) {
+
+                                                $calcValue_SSTransportor = 0;
+                                                $taxId_SSTransportor = $servicetaxsupplier->tax_id;
+                                                $taxValue_SSTransportor = $servicetaxsupplier->tax_value;
+                                                $taxFormat_SSTransportor = $servicetaxsupplier->number_format;
+                                                $taxType_SSTransportor = $servicetaxsupplier->arithmetic_type;
+
+                                                if ($taxValue_SSTransportor > 0) {
+                                                    if ($taxType_SSTransportor == 2) {
+                                                        $taxValue_SSTransportor = $taxValue_SSTransportor * -1;
+                                                    }
+                                                    if ($taxFormat_SSTransportor == 2) {
+                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor / 100);
+                                                    } else {
+                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor);
+                                                    }
+                                                }
+
+                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_SSTransportor;
+
+                                                $providerServiceTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_SSTransportor,
+                                                    "taxValue" => $calcValue_SSTransportor,
+                                                    "taxVal" => (abs($taxValue_SSTransportor) + 0),
+                                                );
+
+                                                array_push($supplierServiceTaxesArr, $taxId_SSTransportor);
+                                            }
+                                        }
+                                    } else if ($servicepayto == $supplierid) {
+
+                                        $getTransportorTaxes_Services = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                        $servicesTaxesValue = 0;
+                                        if (count($getTransportorTaxes_Services) > 0) {
+
+                                            foreach ($getTransportorTaxes_Services as $servicesuppliertax) {
+
+                                                $calcValue_service = 0;
+                                                $taxId_service = $servicesuppliertax->tax_id;
+                                                $taxValue_service = $servicesuppliertax->tax_value;
+                                                $taxFormat_service = $servicesuppliertax->number_format;
+                                                $taxType_service = $servicesuppliertax->arithmetic_type;
+
+                                                if ($taxValue_service > 0) {
+                                                    if ($taxType_service == 2) {
+                                                        $taxValue_service = $taxValue_service * -1;
+                                                    }
+                                                    if ($taxFormat_service == 2) {
+                                                        $calcValue_service = $servicecost * ($taxValue_service / 100);
+                                                    } else {
+                                                        $calcValue_service = $servicecost * ($taxValue_service);
+                                                    }
+                                                }
+
+                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_service;
+
+                                                $providerServiceTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_service,
+                                                    "taxValue" => $calcValue_service,
+                                                    "taxVal" => (abs($taxValue_service) + 0),
+                                                );
+
+                                                array_push($supplierServiceTaxesArr, $taxId_service);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $servicesCostWithTaxes = $servicecost + $servicesTaxesValue;
+
+                                // END SERVICES WITH TAXES
+
+                                $adjust_arr = explode(",", $adjustrf);
+                                $isAdjustEnabled = false;
+                                $adjustmentValues = 0;
+
+                                if (count($adjust_arr) > 0) {
+
+                                    $isAdjustEnabled = true;
+
+                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+
+                                    foreach ($adjust_arr as $adjust) {
+
+                                        foreach ($supplierTaxesAdjustArr as $suppliertaxestax) {
+                                            if ($suppliertaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($suppliertaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+
+                                        foreach ($providerServiceTaxesAdjustArr as $providerservicetaxestax) {
+                                            if ($providerservicetaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerservicetaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+
+                                        foreach ($providerLogisticTaxesAdjustArr as $providerlogistictaxestax) {
+                                            if ($providerlogistictaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerlogistictaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+                                }
+
+                                if ($farmadjustment != 0) {
+                                    $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
+                                }
+
+                                $totalValue = $woodValue + $logisticcost + $servicecost;
+
+                                $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
+                                $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
+                                $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
+                                $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
+                                $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
+
+                                $dataFarm = array(
+                                    "supplier_id" => $supplierid,
+                                    "contract_id" => $purchasecontractid,
+                                    "product_id" => $productid,
+                                    "product_type_id" => $producttypeid,
+                                    "purchase_unit_id" => $purchaseunit,
+                                    "inventory_order" => $inventoryorder,
+                                    "plate_number" => $truckplatenumber,
+                                    "purchase_date" => $purchase_date,
+                                    "service_cost" => $servicecost,
+                                    "logistic_cost" => $logisticcost,
+                                    "adjustment" => $farmadjustment,
+                                    "total_volume" => $totalVolume,
+                                    "total_value" => $totalValue,
+                                    "wood_value" => $woodValue,
+                                    "pay_service_to" => $servicepayto,
+                                    "pay_logistics_to" => $logisticpayto,
+                                    "exchange_rate" => $conversionrate,
+                                    "created_by" => $session['user_id'],
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 1,
+                                    "origin_id" => $originid,
+                                    "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
+                                    "service_cost_withtaxes" => $servicesCostWithTaxes,
+                                    "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
+                                    "supplier_taxes" => $supplierTaxesArrList,
+                                    "logistic_taxes" => $supplierLogisticTaxesArrList,
+                                    "service_taxes" => $supplierServiceTaxesArrList,
+                                    "adjust_taxes" => $adjustrf,
+                                    "is_adjust_rf" => $isAdjustEnabled,
+                                    "logistic_provider_taxes" => $providerLogisticTaxesArrList,
+                                    "service_provider_taxes" => $providerServiceTaxesArrList,
+                                    "adjusted_value" => $adjustmentValues,
+                                    "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
+                                    "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
+                                    "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                    "circ_allowance" => $circumferenceallowance,
+                                    "length_allowance" => $lengthallowance,
+                                    "rounding_factor" => $roundingfactor,
+                                    "process_type" => $processType,
+                                    "loading_cost" => $loadingCost, 
+                                    "unloading_cost" => $unloadingCost,
+                                );
+
+                                $insertFarm = $this->Farm_model->add_farm($dataFarm);
+
+                                if ($insertFarm > 0) {
+                                    $dataFarmData = array();
+                                    foreach ($farmdataJson as $farm) {
+                                        $circumference = $farm["circumference"];
+                                        $netVolume = $farm["netVolume"];
+                                        $noOfPieces = $farm["noOfPieces"];
+                                        $length = $farm["length"];
+
+                                        if ($noOfPieces > 0) {
+                                            $dataFarmData[] = array(
+                                                "farm_id" => $insertFarm,
+                                                "scanned_code" => "",
+                                                "no_of_pieces" => $noOfPieces,
+                                                "circumference" => $circumference,
+                                                "length" => $length,
+                                                "width" => 0,
+                                                "thickness" => 0,
+                                                "volume" => $netVolume,
+                                                "volume_pie" => 0,
+                                                "grade_id" => 0,
+                                                "length_export" => 0,
+                                                "width_export" => 0,
+                                                "thickness_export" => 0,
+                                                "volume_bought" => 0,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "created_date" => date('Y-m-d H:i:s'),
+                                                "updated_date" => date('Y-m-d H:i:s')
+                                            );
+                                        }
+                                    }
+
+                                    if (count($dataFarmData) > 0) {
+                                        $insertFarmData = $this->Farm_model->add_farm_data($dataFarmData);
+
+                                        if ($insertFarmData) {
+                                            //SUPPLIER PRICE
+                                            $this->Farm_model->add_supplier_price(
+                                                $purchasecontractid,
+                                                $supplierid,
+                                                $inventoryorder,
+                                                $session['user_id']
+                                            );
+
+                                            //CONTRACT INVENTORY MAPPING
+                                            $dataContractMapping = array(
+                                                "contract_id" => $purchasecontractid,
+                                                "supplier_id" => $supplierid,
+                                                "inventory_order" => $inventoryorder,
+                                                "total_volume" => $totalVolume,
+                                                "invoice_number" => "",
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                            );
+
+                                            $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
+
+                                            $dataInventoryLedger = array(
+                                                "contract_id" => $purchasecontractid,
+                                                "inventory_order" => $inventoryorder,
+                                                "ledger_type" => 2,
+                                                "expense_date" => $purchase_date,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "is_advance_app" => 0,
+                                            );
+
+                                            if ($woodValueWithSupplierTaxes != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
+                                            }
+
+                                            if ($logisticsCostWithTaxes != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
+                                            }
+
+                                            if ($servicesCostWithTaxes != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
+                                            }
+
+                                            if ($farmadjustment != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
+                                            }
+
+                                            $getContracts = $this->Contract_model->get_contracts_by_contractid($purchasecontractid);
+                                            if (count($getContracts) == 1) {
+                                                $remainingVolume = $getContracts[0]->remaining_volume - $totalVolume;
+
+                                                $dataRemainingVolume = array(
+                                                    "remaining_volume" => $remainingVolume,
+                                                );
+
+                                                $this->Contract_model->update_purchase_contract_volume($dataRemainingVolume, $purchasecontractid, $supplierid);
+                                            }
+
+                                            //CREATE RECEPTION
+
+                                            if ($warehouseid_rounglogs > 0 && $measurement_system_roundlogs > 0) {
+
+                                                $getFormulae = $this->Master_model->get_formulae_by_measurementsystem($measurement_system_roundlogs, $originid);
+
+                                                if (count($getFormulae) > 0) {
+                                                    foreach ($getFormulae as $formula) {
+                                                        $strFormula = str_replace(array('truncate'), array('$this->truncate'), $formula->calculation_formula);
+
+                                                        if ($formula->context == "CBM_HOPPUS_GROSSVOLUME") {
+                                                            $grossFormula = "return (" . $strFormula . ");";
+                                                        }
+
+                                                        if ($formula->context == "CBM_HOPPUS_NETVOLUME") {
+                                                            $netFormula = "return (" . $strFormula . ");";
+                                                        }
+
+                                                        if ($formula->context == "CBM_GEO_GROSSVOLUME") {
+                                                            $grossFormula = "return (" . $strFormula . ");";
+                                                        }
+
+                                                        if ($formula->context == "CBM_GEO_NETVOLUME") {
+                                                            $netFormula = "return (" . $strFormula . ");";
+                                                        }
+                                                    }
+                                                }
+
+                                                if ($grossFormula != "" && $netFormula != "") {
+
+                                                    $getSupplierDetails = $this->Master_model->get_supplier_detail_reception($supplierid, $productid);
+
+                                                    if (count($getSupplierDetails) == 1) {
+
+                                                        $productTypeId = 2;
+                                                        if ($getSupplierDetails[0]->product_type == 3) {
+                                                            $productTypeId = 4;
+                                                        }
+
+                                                        if ($originid == 4) {
+                                                            $dataReception = array(
+                                                                "warehouse_id" => $warehouseid_rounglogs,
+                                                                "supplier_id" => $supplierid,
+                                                                "supplier_code" => $getSupplierDetails[0]->supplier_code,
+                                                                "supplier_product_id" => $getSupplierDetails[0]->product_name,
+                                                                "supplier_product_typeid" => $productTypeId,
+                                                                "measurementsystem_id" => $measurement_system_roundlogs,
+                                                                "received_date" => $receptiondate,
+                                                                "salvoconducto" => $inventoryorder,
+                                                                "createdby" => $session['user_id'],
+                                                                "updatedby" => $session['user_id'],
+                                                                "isactive" => 1,
+                                                                "isclosed" => 1,
+                                                                "closedby" => $session['user_id'],
+                                                                "closeddate" => date('Y-m-d H:i:s'),
+                                                                "captured_timestamp" => 0,
+                                                                "isduplicatecaptured" => 0,
+                                                                "is_contract_added" => 0,
+                                                                "is_special_uploaded" => 1,
+                                                                "origin_id" => $originid,
+                                                                "circ_allowance" => $circumferenceallowance,
+                                                                "length_allowance" => $lengthallowance,
+                                                                "rounding_factor" => $roundingfactor
+                                                            );
+                                                        } else {
+                                                            $dataReception = array(
+                                                                "warehouse_id" => $warehouseid_rounglogs,
+                                                                "supplier_id" => $supplierid,
+                                                                "supplier_code" => $getSupplierDetails[0]->supplier_code,
+                                                                "supplier_product_id" => $getSupplierDetails[0]->product_name,
+                                                                "supplier_product_typeid" => $productTypeId,
+                                                                "measurementsystem_id" => $measurement_system_roundlogs,
+                                                                "received_date" => $receptiondate_roundlogs,
+                                                                "salvoconducto" => $inventoryorder,
+                                                                "createdby" => $session['user_id'],
+                                                                "updatedby" => $session['user_id'],
+                                                                "isactive" => 1,
+                                                                "isclosed" => 1,
+                                                                "closedby" => $session['user_id'],
+                                                                "closeddate" => date('Y-m-d H:i:s'),
+                                                                "captured_timestamp" => 0,
+                                                                "isduplicatecaptured" => 0,
+                                                                "is_contract_added" => 0,
+                                                                "is_special_uploaded" => 1,
+                                                                "origin_id" => $originid,
+                                                                "circ_allowance" => $circumferenceallowance,
+                                                                "length_allowance" => $lengthallowance,
+                                                                "rounding_factor" => $roundingfactor
+                                                            );
+                                                        }
+
+                                                        $insertReception = $this->Reception_model->add_reception($dataReception);
+
+                                                        $dataReceptionData = array();
+                                                        if ($insertReception > 0) {
+
+                                                            $dataReceptionTracking = array(
+                                                                "reception_id" => $insertReception,
+                                                                "user_id" => $session['user_id'],
+                                                                "isclosed" => 1,
+                                                                "createdby" => $session['user_id'],
+                                                                "updatedby" => $session['user_id'],
+                                                                "isactive" => 1,
+                                                            );
+
+                                                            $insertReceptionTracking = $this->Reception_model->add_reception_tracking($dataReceptionTracking);
+
+                                                            $totalReceptionVolume = 0;
+                                                            $totalReceptionPieces = 0;
+                                                            $totalReceptionGrossVolume = 0;
+
+                                                            foreach ($farmdataJson as $farm) {
+
+                                                                $circumference = $farm["circumference"];
+                                                                $noOfPieces = $farm["noOfPieces"];
+                                                                $length = $farm["length"];
+                                                                $lengthAllowance = $farm["lengthAllowance"];
+                                                                $circAllowance = $farm["circAllowance"];
+
+                                                                if ($originid == 4) {
+                                                                    $grossFormulaVal = str_replace(array('$ac', '$al', '$l', '$c', '$pcs'), array($circAllowance, $lengthAllowance, $length, $circumference, $noOfPieces), $grossFormula);
+                                                                    $grossVolume = sprintf('%0.3f', eval($grossFormulaVal));
+
+                                                                    $netFormulaVal = str_replace(array('$ac', '$al', '$l', '$c', '$pcs'), array($circAllowance, $lengthAllowance, $length, $circumference, $noOfPieces), $netFormula);
+                                                                    $netVolume = sprintf('%0.3f', eval($netFormulaVal));
+                                                                } else {
+
+                                                                    $grossFormulaVal = str_replace(array('$l', '$c'), array($length, $circumference), $grossFormula);
+                                                                    $grossVolume = sprintf('%0.3f', eval($grossFormulaVal) * $noOfPieces);
+
+                                                                    $netFormulaVal = str_replace(array('$l', '$c'), array($length, $circumference), $netFormula);
+                                                                    $netVolume = sprintf('%0.3f', eval($netFormulaVal) * $noOfPieces);
+                                                                }
+
+                                                                $totalReceptionVolume = $totalReceptionVolume + $netVolume;
+                                                                $totalReceptionPieces = $totalReceptionPieces + $noOfPieces;
+                                                                $totalReceptionGrossVolume = $totalReceptionGrossVolume + $grossVolume;
+
+                                                                $dataReceptionData[] = array(
+                                                                    "reception_id" => $insertReception,
+                                                                    "salvoconducto" => $inventoryorder,
+                                                                    "scanned_code" => $noOfPieces,
+                                                                    "length_bought" => $length,
+                                                                    "width_bought" => 0,
+                                                                    "thickness_bought" => 0,
+                                                                    "circumference_bought" => $circumference,
+                                                                    "volumepie_bought" => 0,
+                                                                    "cbm_bought" => $grossVolume,
+                                                                    "length_export" => 0,
+                                                                    "width_export" => 0,
+                                                                    "thickness_export" => 0,
+                                                                    "cbm_export" => $netVolume,
+                                                                    "grade" => 0,
+                                                                    "createdby" => $session['user_id'],
+                                                                    "updatedby" => $session['user_id'],
+                                                                    "isactive" => 1,
+                                                                    "isdispatch" => 0,
+                                                                    "scanned_timestamp" => 0,
+                                                                    "isduplicatescanned" => 0,
+                                                                    "is_special" => 1,
+                                                                    "createddate" => date('Y-m-d H:i:s'),
+                                                                    "updateddate" => date('Y-m-d H:i:s'),
+                                                                    "remaining_stock_count" => $noOfPieces,
+                                                                );
+                                                            }
+
+                                                            $this->Reception_model->add_reception_data($dataReceptionData);
+
+                                                            if ($roundingfactor > 0) {
+                                                                $precision = (int) $roundingfactor; // Ensure it's an integer
+                                                                $totalReceptionVolume = number_format($totalReceptionVolume, $precision, '.', '');
+                                                                $totalReceptionGrossVolume = number_format($totalReceptionGrossVolume, $precision, '.', '');
+                                                            }
+
+                                                            //UPDATE
+                                                            $dataReceptionUpdate = array(
+                                                                "total_volume" => $totalReceptionVolume,
+                                                                "total_pieces" => $totalReceptionPieces,
+                                                                "updatedby" => $session['user_id'],
+                                                            );
+
+                                                            $this->Reception_model->update_reception($insertReception, $inventoryorder, $dataReceptionUpdate);
+
+                                                            //CHECK ALL CLOSED RECEPTION
+                                                            $checkClosedReception = $this->Reception_model->get_reception_closed_status($insertReception);
+                                                            if ($checkClosedReception[0]->isclosed == 1) {
+
+                                                                //SEND MAIL
+                                                                //$getReceptionDetail = $this->Reception_model->get_reception_detail_by_id($insertReception);
+                                                                //$fetchEmailTemplate = $this->Master_model->get_email_template_by_code("RECEPTIONCLOSE");
+
+                                                                //$mailSubject = $fetchEmailTemplate[0]->template_subject . " " . $getReceptionDetail[0]->salvoconducto;
+                                                                //$logo = base_url() . 'assets/img/iconz/cgrlogo_new.png';
+
+                                                                // $woodtype = $this->lang->line($getReceptionDetail[0]->product_type_name);
+                                                                // $netvolume = ($getReceptionDetail[0]->total_volume + 0) . " " . $this->lang->line("volume_unit");
+                                                                // $message = '<div style="background:#f6f6f6;font-family:Verdana,Arial,Helvetica,sans-serif;font-size:12px;margin:0;padding:0;padding: 20px;">
+                                                                // <img width="74px" src="' . $logo . '" title="Codrin Green"><br>' . str_replace(
+                                                                //     array("{var inventorynumber}", "{var suppliername}", "{var woodspecies}", "{var woodtype}", "{var warehouse}", "{var totalpieces}", "{var netvolume}", "{var closedby}", "{var origin}"),
+                                                                //     array(
+                                                                //         $getReceptionDetail[0]->salvoconducto, $getReceptionDetail[0]->supplier_name, $getReceptionDetail[0]->product_name, $woodtype,
+                                                                //         $getReceptionDetail[0]->warehouse_name, $getReceptionDetail[0]->total_pieces, $netvolume,
+                                                                //         $getReceptionDetail[0]->closedby, $getReceptionDetail[0]->origin
+                                                                //     ),
+                                                                //     htmlspecialchars_decode(stripslashes($fetchEmailTemplate[0]->template_message))
+                                                                // ) . '</div>';
+
+                                                                // $config = array(
+                                                                //     'protocol' => 'smtp',
+                                                                //     'smtp_host' => 'smtp.titan.email',
+                                                                //     'smtp_port' => 587,
+                                                                //     'smtp_user' => 'codrinsystems@codringreen.com',
+                                                                //     'smtp_pass' => "Tb]-(g3Bjh&t[,K5",
+                                                                //     'mailtype'  => 'html',
+                                                                //     'charset'   => 'utf-8',
+                                                                //     'wordwrap' => TRUE
+                                                                // );
+
+                                                                // $this->load->library('email', $config);
+                                                                // $this->email->set_newline("\r\n");
+
+                                                                // if ($getReceptionDetail[0]->origin_id == 1) {
+                                                                //     $list = array('priyank@codringroup.com', 'jonathan.batista@codringroup.com', 'nafeel@codringroup.com');
+                                                                // if ($getReceptionDetail[0]->origin_id == 2) {
+                                                                //     $list = array('priyank@codringroup.com', 'selvam@codringroup.com', 'nafeel@codringroup.com');
+                                                                // }
+                                                                // $this->email->to($list);
+                                                                // $this->email->from("codrinsystems@codringreen.com", "Codrin Systems");
+                                                                // $this->email->bcc("nafeel@codringroup.com");
+                                                                // $this->email->subject($mailSubject);
+                                                                // $this->email->message("$message");
+                                                                // $resultSend = $this->email->send();
+                                                            }
+
+                                                            //DISPATCH
+
+                                                            if ($originid == 4) {
+
+                                                                //DISPATCH
+
+                                                                if ($productTypeId == 4) {
+                                                                    $productTypeId = 2;
+                                                                }
+
+                                                                $dataDispatch = array(
+                                                                    "container_number" => $inventoryorder,
+                                                                    "warehouse_id" => $warehouseid,
+                                                                    "shipping_line" => $shippingline,
+                                                                    "product_id" => $getSupplierDetails[0]->product_id_dispatch,
+                                                                    "product_type_id" => $productTypeId,
+                                                                    "dispatch_date" => $receptiondate,
+                                                                    "seal_number" => $sealnumber,
+                                                                    "container_pic_url" => "",
+                                                                    "createdby" => $session['user_id'],
+                                                                    "updatedby" => $session['user_id'],
+                                                                    "isactive" => 1,
+                                                                    "isclosed" => 1,
+                                                                    "closedby" => $session['user_id'],
+                                                                    "is_special_uploaded" => 1,
+                                                                    "origin_id" => $originid,
+                                                                    "total_gross_volume" => $totalReceptionGrossVolume,
+                                                                    "total_volume" => $totalReceptionVolume,
+                                                                    "total_pieces" => $totalReceptionPieces,
+                                                                    "category" => 0,
+                                                                    "captured_from_app" => 0,
+                                                                    "metric_ton" => 0,
+                                                                    "short_ton" => 0,
+                                                                    "net_lbs" => 0,
+                                                                    "diameter_text" => "",
+                                                                    "length_text" => "",
+                                                                    "unit_price" => 0,
+                                                                    "total_value" => 0,
+                                                                    "measurement_system_id" => $measurement_system_roundlogs,
+                                                                    "circ_allowance" => $circumferenceallowance,
+                                                                    "length_allowance" => $lengthallowance,
+                                                                    "rounding_factor" => $roundingfactor
+                                                                );
+
+                                                                $insertDispatch = $this->Dispatch_model->add_dispatch($dataDispatch);
+
+                                                                if ($insertDispatch > 0) {
+                                                                    $insertDispatchData = $this->Dispatch_model->add_dispatch_data_from_reception($insertReception, $insertDispatch, $inventoryorder, $session['user_id'], $receptiondate);
+                                                                }
+
+                                                                //END DISPATCH
+                                                            }
+
+                                                            //END DISPATCH
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            //END RECEPTION
+                                        }
+
+                                        $Return['error'] = "";
+                                        $Return['result'] = $this->lang->line('data_added');
+                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                        $this->output($Return);
+                                        exit;
+                                    } else {
+                                        $Return['error'] = $this->lang->line('error_adding');
+                                        $Return['result'] = "";
+                                        $Return['redirect'] = false;
+                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                        $this->output($Return);
+                                        exit;
+                                    }
+                                } else {
+                                    $Return['error'] = $this->lang->line('error_adding');
+                                    $Return['result'] = "";
+                                    $Return['redirect'] = false;
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                }
+
+                                $Return['error'] = $this->lang->line('error_adding'); //$totalValueWithTaxes; //
+                                $Return['result'] = "";
+                                $Return['redirect'] = false;
+                                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                $this->output($Return);
+                                exit;
+                            }
+                        } else {
+                            $Return['error'] = $this->lang->line('exist_inventory_order');
+                            $Return['result'] = "";
+                            $Return['redirect'] = false;
+                            $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                            $this->output($Return);
+                            exit;
+                        }
+                    }
+                } else if ($this->input->post('action_type') == 'update') {
+
+                    $originid = $this->input->post('origin_id');
+                    $farm_id = $this->input->post('farm_id');
+                    $contract_id = $this->input->post('contract_id');
+                    $inventory_order = strtoupper($this->input->post('inventory_order'));
+                    $input_inventory_order = strtoupper($this->input->post('input_inventory_order'));
+                    $input_truck_plate_number = strtoupper($this->input->post('input_truck_plate_number'));
+                    $input_purchase_date = $this->input->post('input_purchase_date');
+                    $input_purchase_date = str_replace('/', '-', $input_purchase_date);
+                    $purchase_date = date("Y-m-d", strtotime($input_purchase_date));
+                    $input_conversion_rate = $this->input->post('conversion_rate');
+                    $currency_id = $this->input->post('currency_id');
+                    $servicecost = $this->input->post('servicecost');
+                    $servicepayto = $this->input->post('servicepayto');
+                    $logisticcost = $this->input->post('logisticcost');
+                    $logisticpayto = $this->input->post('logisticpayto');
+                    $farmadjustment = $this->input->post('farmadjustment');
+                    $adjustrf = $this->input->post('adjustrf');
+                    $processType = $this->input->post('processType');
+                    $loadingCost = $this->input->post('loadingCost');
+                    $unloadingCost = $this->input->post('unloadingCost');
+
+                    if ($input_inventory_order == $inventory_order) {
+
+                        $getFarmDetail = $this->Farm_model->get_farm_details($farm_id, $contract_id, $input_inventory_order);
+                        $productTypeId = $getFarmDetail[0]->product_type_id;
+                        $supplierid = $getFarmDetail[0]->supplier_id;
+                        $purchaseUnitId = $getFarmDetail[0]->unit_of_purchase;
+
+                        if ($servicecost == null || $servicecost == "") {
+                            $servicecost = 0;
+                        }
+
+                        if ($servicecost == 0) {
+                            $servicepayto = 0;
+                        }
+
+
+
+                        if ($logisticcost == null || $logisticcost == "") {
+                            $logisticcost = 0;
+                        }
+
+                        if ($logisticcost == 0) {
+                            $logisticpayto = 0;
+                        }
+
+                        if ($farmadjustment == null || $farmadjustment == "") {
+                            $farmadjustment = 0;
+                        }
+
+                        $totalVolume = 0;
+                        $woodValue = 0;
+                        $woodValueWithSupplierTaxes = 0;
+                        $logisticsCostWithTaxes = 0;
+                        $servicesCostWithTaxes = 0;
+                        $totalValueWithTaxes = 0;
+                        $totalValue = 0;
+
+                        $supplierTaxesArr = array();
+                        $providerLogisticTaxesArr = array();
+                        $providerServiceTaxesArr = array();
+                        $supplierLogisticTaxesArr = array();
+                        $supplierServiceTaxesArr = array();
+                        $supplierTaxesAdjustArr = array();
+                        $providerLogisticTaxesAdjustArr = array();
+                        $providerServiceTaxesAdjustArr = array();
+
+                        if ($productTypeId == 1 || $productTypeId == 3) {
+                        } else if ($productTypeId == 2 || $productTypeId == 4) {
+
+                            // $woodValue = $getFarmDetail[0]->wood_value;
+                            // if ($currency_id == 1) {
+                            //     if ($input_conversion_rate > 0) {
+                            //         $woodValue = $woodValue * $input_conversion_rate;
+                            //     }
+                            // }
+
+                            $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 1);
+                            $farmDataSemi = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 2);
+                            $farmDataLongs = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 3);
+
+                            $fetchContractPrice = $this->Farm_model->fetch_contract_prices_for_farm($contract_id);
+                            $finalArray = [];
+
+                            if($purchaseUnitId == 15) {
+                                $price = $fetchContractPrice[0]->pricerange_grade3;
+                                $woodValue = $price;
+                            } else {
+
+                                foreach ($farmDataShorts as $shorts) {
+                                    $circumference = $shorts->circumference;
+                                    $length = $shorts->length;
+                                    $netVolume = $shorts->volume;
+                                    $totalVolume = $totalVolume + $netVolume;
+                                    $price = 0;
+
+                                    foreach ($fetchContractPrice as $range) {
+                                        if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
+                                            $price = $range->pricerange_grade3;
+                                            break;
+                                        }
+                                    }
+
+                                    $finalArray[] = [
+                                        'circumference' => $circumference,
+                                        'length' => $length,
+                                        'price' => $price,
+                                        'volume' => $netVolume,
+                                        'value' => round($price * $netVolume, 3)
+                                    ];
+                                }
+
+                                foreach ($farmDataSemi as $semi) {
+                                    $circumference = $semi->circumference;
+                                    $length = $semi->length;
+                                    $netVolume = $semi->volume;
+                                    $totalVolume = $totalVolume + $netVolume;
+                                    $price = 0;
+
+                                    foreach ($fetchContractPrice as $range) {
+                                        if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
+                                            $price = $range->pricerange_grade3;
+                                            break;
+                                        }
+                                    }
+
+                                    $finalArray[] = [
+                                        'circumference' => $circumference,
+                                        'length' => $length,
+                                        'price' => $price,
+                                        'volume' => $netVolume,
+                                        'value' => round($price * $netVolume, 3)
+                                    ];
+                                }
+
+                                foreach ($farmDataLongs as $longs) {
+                                    $circumference = $longs->circumference;
+                                    $length = $longs->length;
+                                    $netVolume = $longs->volume;
+                                    $totalVolume = $totalVolume + $netVolume;
+                                    $price = 0;
+
+                                    foreach ($fetchContractPrice as $range) {
+                                        if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
+                                            $price = $range->pricerange_grade3;
+                                            break;
+                                        }
+                                    }
+
+                                    $finalArray[] = [
+                                        'circumference' => $circumference,
+                                        'length' => $length,
+                                        'price' => $price,
+                                        'volume' => $netVolume,
+                                        'value' => round($price * $netVolume, 3)
+                                    ];
+                                }
+
+                                foreach ($finalArray as $item) {
+                                    $woodValue = $woodValue + $item['value'];
+                                }
+                            }
+
+                            if ($currency_id == 1) {
+                                if ($input_conversion_rate > 0) {
+                                    $woodValue = $woodValue * $input_conversion_rate;
+                                }
+                            }
+
+                            // WOOD VALUE WITH TAXES
+
+                            $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierid);
+
+                            $supplierTaxesValue = 0;
+                            if (count($getSupplierTaxes) > 0) {
+
+                                $supplierTaxesValue = 0;
+                                foreach ($getSupplierTaxes as $suppliertax) {
+
+                                    $calcValue = 0;
+                                    $taxId = $suppliertax->tax_id;
+                                    $taxValue = $suppliertax->tax_value;
+                                    $taxFormat = $suppliertax->number_format;
+                                    $taxType = $suppliertax->arithmetic_type;
+
+                                    if ($taxValue > 0) {
+                                        if ($taxType == 2) {
+                                            $taxValue = $taxValue * -1;
+                                        }
+                                        if ($taxFormat == 2) {
+                                            $calcValue = $woodValue * ($taxValue / 100);
+                                        } else {
+                                            $calcValue = $woodValue * ($taxValue);
+                                        }
+                                    }
+
+                                    $supplierTaxesAdjustArr[] = array(
+                                        "taxId" => $taxId,
+                                        "taxValue" => $calcValue,
+                                        "taxVal" => (abs($taxValue) + 0),
+                                    );
+
+                                    array_push($supplierTaxesArr, $taxId);
+
+                                    $supplierTaxesValue = $supplierTaxesValue + $calcValue;
+                                }
+                            }
+
+                            $woodValueWithSupplierTaxes = $woodValue + $supplierTaxesValue;
+
+                            // END WOOD VALUE WITH TAXES
+
+                            // LOGISTICS WITH TAXES
+
+                            if ($logisticcost != 0 && $logisticpayto > 0) {
+
+                                $transportorIvaValue_Logistics = 0;
+                                $transportorRetenctionValue_Logistics = 0;
+                                $transportorReticaValue_Logistics = 0;
+
+                                $getTransportorTaxes_Logistics = $this->Master_model->get_provider_taxes($logisticpayto);
+                                $getTransportorTaxes_Logistics_Supplier = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                $logisticTaxesValue = 0;
+
+                                if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                    $logisticTaxesValue = 0;
+                                    foreach ($getTransportorTaxes_Logistics as $logistictaxtransportor) {
+
+                                        $calcValue_LTransportor = 0;
+                                        $taxId_LTransportor = $logistictaxtransportor->tax_id;
+                                        $taxValue_LTransportor = $logistictaxtransportor->tax_value;
+                                        $taxFormat_LTransportor = $logistictaxtransportor->number_format;
+                                        $taxType_LTransportor = $logistictaxtransportor->arithmetic_type;
+
+                                        if ($taxValue_LTransportor > 0) {
+                                            if ($taxType_LTransportor == 2) {
+                                                $taxValue_LTransportor = $taxValue_LTransportor * -1;
+                                            }
+                                            if ($taxFormat_LTransportor == 2) {
+                                                $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor / 100);
+                                            } else {
+                                                $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor);
+                                            }
+                                        }
+
+                                        $logisticTaxesValue = $logisticTaxesValue + $calcValue_LTransportor;
+
+                                        $providerLogisticTaxesAdjustArr[] = array(
+                                            "taxId" => $taxId_LTransportor,
+                                            "taxValue" => $calcValue_LTransportor,
+                                            "taxVal" => (abs($taxValue_LTransportor) + 0),
+                                        );
+
+                                        array_push($providerLogisticTaxesArr, $taxId_LTransportor);
+                                    }
+
+                                    if ($logisticTaxesValue == 0) {
+                                        foreach ($getTransportorTaxes_Logistics_Supplier as $logistictaxsupplier) {
+
+                                            $calcValue_STransportor = 0;
+                                            $taxId_STransportor = $logistictaxsupplier->tax_id;
+                                            $taxValue_STransportor = $logistictaxsupplier->tax_value;
+                                            $taxFormat_STransportor = $logistictaxsupplier->number_format;
+                                            $taxType_STransportor = $logistictaxsupplier->arithmetic_type;
+
+                                            if ($taxValue_STransportor > 0) {
+                                                if ($taxType_STransportor == 2) {
+                                                    $taxValue_STransportor = $taxValue_STransportor * -1;
+                                                }
+                                                if ($taxFormat_STransportor == 2) {
+                                                    $calcValue_STransportor = $logisticcost * ($taxValue_STransportor / 100);
+                                                } else {
+                                                    $calcValue_STransportor = $logisticcost * ($taxValue_STransportor);
+                                                }
+                                            }
+
+                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_STransportor;
+
+                                            $providerLogisticTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_STransportor,
+                                                "taxValue" => $calcValue_STransportor,
+                                                "taxVal" => (abs($taxValue_STransportor) + 0),
+                                            );
+
+                                            array_push($supplierLogisticTaxesArr, $taxId_STransportor);
+                                        }
+                                    }
+                                } else if ($logisticpayto == $supplierid) {
+
+                                    $getTransportorTaxes_Logistics = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                    $logisticTaxesValue = 0;
+                                    if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                        foreach ($getTransportorTaxes_Logistics as $transporttax) {
+
+                                            $calcValue_logistic = 0;
+                                            $taxId_logistic = $transporttax->tax_id;
+                                            $taxValue_logistic = $transporttax->tax_value;
+                                            $taxFormat_logistic = $transporttax->number_format;
+                                            $taxType_logistic = $transporttax->arithmetic_type;
+
+                                            if ($taxValue_logistic > 0) {
+                                                if ($taxType_logistic == 2) {
+                                                    $taxValue_logistic = $taxValue_logistic * -1;
+                                                }
+                                                if ($taxFormat_logistic == 2) {
+                                                    $calcValue_logistic = $logisticcost * ($taxValue_logistic / 100);
+                                                } else {
+                                                    $calcValue_logistic = $logisticcost * ($taxValue_logistic);
+                                                }
+                                            }
+
+                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_logistic;
+
+                                            $providerLogisticTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_logistic,
+                                                "taxValue" => $calcValue_logistic,
+                                                "taxVal" => (abs($taxValue_logistic) + 0),
+                                            );
+
+                                            array_push($supplierLogisticTaxesArr, $taxId_logistic);
+                                        }
+                                    }
+                                }
+                            }
+
+                            $logisticsCostWithTaxes = $logisticcost + $logisticTaxesValue;
+
+                            // END LOGISTICS WITH TAXES
+
+                            // SERVICES WITH TAXES
+
+                            if ($servicecost != 0 && $servicepayto > 0) {
+                                $transportorIvaValue_Service = 0;
+                                $transportorRetenctionValue_Service = 0;
+                                $transportorReticaValue_Service = 0;
+
+                                $getTransportorTaxes_Service = $this->Master_model->get_provider_taxes($servicepayto);
+                                $getTransportorTaxes_Service_Supplier = $this->Master_model->get_supplier_taxes($servicepayto);
+
+                                $servicesTaxesValue = 0;
+
+                                if (count($getTransportorTaxes_Service) > 0) {
+
+                                    $servicesTaxesValue = 0;
+                                    foreach ($getTransportorTaxes_Service as $servicetaxtransportor) {
+
+                                        $calcValue_SerTransportor = 0;
+                                        $taxId_SerTransportor = $servicetaxtransportor->tax_id;
+                                        $taxValue_SerTransportor = $servicetaxtransportor->tax_value;
+                                        $taxFormat_SerTransportor = $servicetaxtransportor->number_format;
+                                        $taxType_SerTransportor = $servicetaxtransportor->arithmetic_type;
+
+                                        if ($taxValue_SerTransportor > 0) {
+                                            if ($taxType_SerTransportor == 2) {
+                                                $taxValue_SerTransportor = $taxValue_SerTransportor * -1;
+                                            }
+                                            if ($taxFormat_SerTransportor == 2) {
+                                                $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor / 100);
+                                            } else {
+                                                $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor);
+                                            }
+                                        }
+
+                                        $servicesTaxesValue = $servicesTaxesValue + $calcValue_SerTransportor;
+
+                                        $providerServiceTaxesAdjustArr[] = array(
+                                            "taxId" => $taxId_SerTransportor,
+                                            "taxValue" => $calcValue_SerTransportor,
+                                            "taxVal" => (abs($taxValue_SerTransportor) + 0),
+                                        );
+                                        array_push($providerServiceTaxesArr, $taxId_SerTransportor);
+                                    }
+
+                                    if ($servicesTaxesValue == 0) {
+                                        foreach ($getTransportorTaxes_Service_Supplier as $servicetaxsupplier) {
+
+                                            $calcValue_SSTransportor = 0;
+                                            $taxId_SSTransportor = $servicetaxsupplier->tax_id;
+                                            $taxValue_SSTransportor = $servicetaxsupplier->tax_value;
+                                            $taxFormat_SSTransportor = $servicetaxsupplier->number_format;
+                                            $taxType_SSTransportor = $servicetaxsupplier->arithmetic_type;
+
+                                            if ($taxValue_SSTransportor > 0) {
+                                                if ($taxType_SSTransportor == 2) {
+                                                    $taxValue_SSTransportor = $taxValue_SSTransportor * -1;
+                                                }
+                                                if ($taxFormat_SSTransportor == 2) {
+                                                    $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor / 100);
+                                                } else {
+                                                    $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor);
+                                                }
+                                            }
+
+                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_SSTransportor;
+
+                                            $providerServiceTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_SSTransportor,
+                                                "taxValue" => $calcValue_SSTransportor,
+                                                "taxVal" => (abs($taxValue_SSTransportor) + 0),
+                                            );
+
+                                            array_push($supplierServiceTaxesArr, $taxId_SSTransportor);
+                                        }
+                                    }
+                                } else if ($servicepayto == $supplierid) {
+
+                                    $getTransportorTaxes_Services = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                    $servicesTaxesValue = 0;
+                                    if (count($getTransportorTaxes_Services) > 0) {
+
+                                        foreach ($getTransportorTaxes_Services as $servicesuppliertax) {
+
+                                            $calcValue_service = 0;
+                                            $taxId_service = $servicesuppliertax->tax_id;
+                                            $taxValue_service = $servicesuppliertax->tax_value;
+                                            $taxFormat_service = $servicesuppliertax->number_format;
+                                            $taxType_service = $servicesuppliertax->arithmetic_type;
+
+                                            if ($taxValue_service > 0) {
+                                                if ($taxType_service == 2) {
+                                                    $taxValue_service = $taxValue_service * -1;
+                                                }
+                                                if ($taxFormat_service == 2) {
+                                                    $calcValue_service = $servicecost * ($taxValue_service / 100);
+                                                } else {
+                                                    $calcValue_service = $servicecost * ($taxValue_service);
+                                                }
+                                            }
+
+                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_service;
+
+                                            $providerServiceTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_service,
+                                                "taxValue" => $calcValue_service,
+                                                "taxVal" => (abs($taxValue_service) + 0),
+                                            );
+
+                                            array_push($supplierServiceTaxesArr, $taxId_service);
+                                        }
+                                    }
+                                }
+                            }
+
+                            $servicesCostWithTaxes = $servicecost + $servicesTaxesValue;
+
+                            // END SERVICES WITH TAXES
+
+                            $adjust_arr = explode(",", $adjustrf);
+                            $isAdjustEnabled = false;
+                            $adjustmentValues = 0;
+
+                            if (count($adjust_arr) > 0) {
+
+                                $isAdjustEnabled = true;
+
+                                $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+
+                                foreach ($adjust_arr as $adjust) {
+
+                                    foreach ($supplierTaxesAdjustArr as $suppliertaxestax) {
+                                        if ($suppliertaxestax["taxId"] == $adjust) {
+                                            $totalValueWithTaxes = $totalValueWithTaxes - abs($suppliertaxestax["taxValue"]);
+                                            $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                        }
+                                    }
+
+                                    foreach ($providerServiceTaxesAdjustArr as $providerservicetaxestax) {
+                                        if ($providerservicetaxestax["taxId"] == $adjust) {
+                                            $totalValueWithTaxes = $totalValueWithTaxes - abs($providerservicetaxestax["taxValue"]);
+                                            $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                        }
+                                    }
+
+                                    foreach ($providerLogisticTaxesAdjustArr as $providerlogistictaxestax) {
+                                        if ($providerlogistictaxestax["taxId"] == $adjust) {
+                                            $totalValueWithTaxes = $totalValueWithTaxes - abs($providerlogistictaxestax["taxValue"]);
+                                            $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                        }
+                                    }
+                                }
+                            } else {
+                                $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+                            }
+
+                            if ($farmadjustment != 0) {
+                                $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
+                            }
+
+                            $totalValue = $woodValue + $logisticcost + $servicecost;
+
+                            $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
+                            $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
+                            $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
+                            $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
+                            $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
+
+                            $dataFarm = array(
+                                "inventory_order" => $input_inventory_order,
+                                "plate_number" => $input_truck_plate_number,
+                                "purchase_date" => $purchase_date,
+                                "service_cost" => $servicecost,
+                                "logistic_cost" => $logisticcost,
+                                "adjustment" => $farmadjustment,
+                                "wood_value" => $woodValue,
+                                "total_value" => $totalValue,
+                                "pay_service_to" => $servicepayto,
+                                "pay_logistics_to" => $logisticpayto,
+                                "exchange_rate" => $input_conversion_rate,
+                                "updated_by" => $session['user_id'],
+                                "is_active" => 1,
+                                "origin_id" => $originid,
+                                "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
+                                "service_cost_withtaxes" => $servicesCostWithTaxes,
+                                "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
+                                "supplier_taxes" => $supplierTaxesArrList,
+                                "logistic_taxes" => $supplierLogisticTaxesArrList,
+                                "service_taxes" => $supplierServiceTaxesArrList,
+                                "adjust_taxes" => $adjustrf,
+                                "is_adjust_rf" => $isAdjustEnabled,
+                                "logistic_provider_taxes" => $providerLogisticTaxesArrList,
+                                "service_provider_taxes" => $providerServiceTaxesArrList,
+                                "adjusted_value" => $adjustmentValues,
+                                "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
+                                "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
+                                "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                "process_type" => $processType,
+                                "loading_cost" => $loadingCost,
+                                "unloading_cost" => $unloadingCost,
+                            );
+
+                            $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
+
+                            if ($updateFarm == true) {
+
+                                $dataInventoryLedgerUpdate = array(
+                                    "amount" => 0,
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 0,
+                                );
+
+                                $updateInventoryLedger = $this->Farm_model->update_inventory_ledger($inventory_order, $contract_id, $dataInventoryLedgerUpdate);
+
+                                if ($updateInventoryLedger == true) {
+
+                                    $dataInventoryLedger = array(
+                                        "contract_id" => $contract_id,
+                                        "inventory_order" => $input_inventory_order,
+                                        "ledger_type" => 2,
+                                        "expense_date" => $purchase_date,
+                                        "created_by" => $session['user_id'],
+                                        "updated_by" => $session['user_id'],
+                                        "is_active" => 1,
+                                        "is_advance_app" => 0,
+                                    );
+
+                                    if ($woodValueWithSupplierTaxes != 0) {
+                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
+                                    }
+
+                                    if ($logisticsCostWithTaxes != 0) {
+                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
+                                    }
+
+                                    if ($servicesCostWithTaxes != 0) {
+                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
+                                    }
+
+                                    if ($farmadjustment != 0) {
+                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
+                                    }
+
+                                    $Return['result'] = $this->lang->line('data_updated');
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                } else {
+                                    $Return['error'] = $this->lang->line('error_updating');
+                                    $Return['result'] = "";
+                                    $Return['redirect'] = false;
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                }
+                            } else {
+                                $Return['error'] = $this->lang->line('error_updating');
+                                $Return['result'] = "";
+                                $Return['redirect'] = false;
+                                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                $this->output($Return);
+                                exit;
+                            }
+                        }
+                    } else {
+
+                        $getInventoryOrderCount = $this->Farm_model->get_inventory_order_count($input_inventory_order, $originid);
+
+                        if ($getInventoryOrderCount[0]->cnt == 0) {
+
+                            $getFarmDetail = $this->Farm_model->get_farm_details($farm_id, $contract_id, $inventory_order);
+                            $productTypeId = $getFarmDetail[0]->product_type_id;
+                            $supplierid = $getFarmDetail[0]->supplier_id;
+
+                            if ($servicecost == null || $servicecost == "") {
+                                $servicecost = 0;
+                            }
+
+                            if ($logisticcost == null || $logisticcost == "") {
+                                $logisticcost = 0;
+                            }
+
+                            if ($farmadjustment == null || $farmadjustment == "") {
+                                $farmadjustment = 0;
+                            }
+
+                            $totalVolume = 0;
+                            $woodValue = 0;
+                            $woodValueWithSupplierTaxes = 0;
+                            $logisticsCostWithTaxes = 0;
+                            $servicesCostWithTaxes = 0;
+                            $totalValueWithTaxes = 0;
+                            $totalValue = 0;
+
+                            $supplierTaxesArr = array();
+                            $providerLogisticTaxesArr = array();
+                            $providerServiceTaxesArr = array();
+                            $supplierLogisticTaxesArr = array();
+                            $supplierServiceTaxesArr = array();
+                            $supplierTaxesAdjustArr = array();
+                            $providerLogisticTaxesAdjustArr = array();
+                            $providerServiceTaxesAdjustArr = array();
+
+                            if ($productTypeId == 1 || $productTypeId == 3) {
+                            } else if ($productTypeId == 2 || $productTypeId == 4) {
+
+                                $woodValue = $getFarmDetail[0]->wood_value;
+                                if ($currency_id == 1) {
+                                    if ($input_conversion_rate > 0) {
+                                        $woodValue = $woodValue * $input_conversion_rate;
+                                    }
+                                }
+
+                                // WOOD VALUE WITH TAXES
+
+                                $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierid);
+
+                                $supplierTaxesValue = 0;
+                                if (count($getSupplierTaxes) > 0) {
+
+                                    $supplierTaxesValue = 0;
+                                    foreach ($getSupplierTaxes as $suppliertax) {
+
+                                        $calcValue = 0;
+                                        $taxId = $suppliertax->tax_id;
+                                        $taxValue = $suppliertax->tax_value;
+                                        $taxFormat = $suppliertax->number_format;
+                                        $taxType = $suppliertax->arithmetic_type;
+
+                                        if ($taxValue > 0) {
+                                            if ($taxType == 2) {
+                                                $taxValue = $taxValue * -1;
+                                            }
+                                            if ($taxFormat == 2) {
+                                                $calcValue = $woodValue * ($taxValue / 100);
+                                            } else {
+                                                $calcValue = $woodValue * ($taxValue);
+                                            }
+                                        }
+
+                                        $supplierTaxesAdjustArr[] = array(
+                                            "taxId" => $taxId,
+                                            "taxValue" => $calcValue,
+                                            "taxVal" => (abs($taxValue) + 0),
+                                        );
+
+                                        array_push($supplierTaxesArr, $taxId);
+
+                                        $supplierTaxesValue = $supplierTaxesValue + $calcValue;
+                                    }
+                                }
+
+                                $woodValueWithSupplierTaxes = $woodValue + $supplierTaxesValue;
+
+                                // END WOOD VALUE WITH TAXES
+
+                                // LOGISTICS WITH TAXES
+
+                                if ($logisticcost != 0 && $logisticpayto > 0) {
+
+                                    $transportorIvaValue_Logistics = 0;
+                                    $transportorRetenctionValue_Logistics = 0;
+                                    $transportorReticaValue_Logistics = 0;
+
+                                    $getTransportorTaxes_Logistics = $this->Master_model->get_provider_taxes($logisticpayto);
+                                    $getTransportorTaxes_Logistics_Supplier = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                    $logisticTaxesValue = 0;
+
+                                    if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                        $logisticTaxesValue = 0;
+                                        foreach ($getTransportorTaxes_Logistics as $logistictaxtransportor) {
+
+                                            $calcValue_LTransportor = 0;
+                                            $taxId_LTransportor = $logistictaxtransportor->tax_id;
+                                            $taxValue_LTransportor = $logistictaxtransportor->tax_value;
+                                            $taxFormat_LTransportor = $logistictaxtransportor->number_format;
+                                            $taxType_LTransportor = $logistictaxtransportor->arithmetic_type;
+
+                                            if ($taxValue_LTransportor > 0) {
+                                                if ($taxType_LTransportor == 2) {
+                                                    $taxValue_LTransportor = $taxValue_LTransportor * -1;
+                                                }
+                                                if ($taxFormat_LTransportor == 2) {
+                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor / 100);
+                                                } else {
+                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor);
+                                                }
+                                            }
+
+                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_LTransportor;
+
+                                            $providerLogisticTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_LTransportor,
+                                                "taxValue" => $calcValue_LTransportor,
+                                                "taxVal" => (abs($taxValue_LTransportor) + 0),
+                                            );
+
+                                            array_push($providerLogisticTaxesArr, $taxId_LTransportor);
+                                        }
+
+                                        if ($logisticTaxesValue == 0) {
+                                            foreach ($getTransportorTaxes_Logistics_Supplier as $logistictaxsupplier) {
+
+                                                $calcValue_STransportor = 0;
+                                                $taxId_STransportor = $logistictaxsupplier->tax_id;
+                                                $taxValue_STransportor = $logistictaxsupplier->tax_value;
+                                                $taxFormat_STransportor = $logistictaxsupplier->number_format;
+                                                $taxType_STransportor = $logistictaxsupplier->arithmetic_type;
+
+                                                if ($taxValue_STransportor > 0) {
+                                                    if ($taxType_STransportor == 2) {
+                                                        $taxValue_STransportor = $taxValue_STransportor * -1;
+                                                    }
+                                                    if ($taxFormat_STransportor == 2) {
+                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor / 100);
+                                                    } else {
+                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor);
+                                                    }
+                                                }
+
+                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_STransportor;
+
+                                                $providerLogisticTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_STransportor,
+                                                    "taxValue" => $calcValue_STransportor,
+                                                    "taxVal" => (abs($taxValue_STransportor) + 0),
+                                                );
+
+                                                array_push($supplierLogisticTaxesArr, $taxId_STransportor);
+                                            }
+                                        }
+                                    } else if ($logisticpayto == $supplierid) {
+
+                                        $getTransportorTaxes_Logistics = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                        $logisticTaxesValue = 0;
+                                        if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                            foreach ($getTransportorTaxes_Logistics as $transporttax) {
+
+                                                $calcValue_logistic = 0;
+                                                $taxId_logistic = $transporttax->tax_id;
+                                                $taxValue_logistic = $transporttax->tax_value;
+                                                $taxFormat_logistic = $transporttax->number_format;
+                                                $taxType_logistic = $transporttax->arithmetic_type;
+
+                                                if ($taxValue_logistic > 0) {
+                                                    if ($taxType_logistic == 2) {
+                                                        $taxValue_logistic = $taxValue_logistic * -1;
+                                                    }
+                                                    if ($taxFormat_logistic == 2) {
+                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic / 100);
+                                                    } else {
+                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic);
+                                                    }
+                                                }
+
+                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_logistic;
+
+                                                $providerLogisticTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_logistic,
+                                                    "taxValue" => $calcValue_logistic,
+                                                    "taxVal" => (abs($taxValue_logistic) + 0),
+                                                );
+
+                                                array_push($supplierLogisticTaxesArr, $taxId_logistic);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $logisticsCostWithTaxes = $logisticcost + $logisticTaxesValue;
+
+                                // END LOGISTICS WITH TAXES
+
+                                // SERVICES WITH TAXES
+
+                                if ($servicecost != 0 && $servicepayto > 0) {
+                                    $transportorIvaValue_Service = 0;
+                                    $transportorRetenctionValue_Service = 0;
+                                    $transportorReticaValue_Service = 0;
+
+                                    $getTransportorTaxes_Service = $this->Master_model->get_provider_taxes($servicepayto);
+                                    $getTransportorTaxes_Service_Supplier = $this->Master_model->get_supplier_taxes($servicepayto);
+
+                                    $servicesTaxesValue = 0;
+
+                                    if (count($getTransportorTaxes_Service) > 0) {
+
+                                        $servicesTaxesValue = 0;
+                                        foreach ($getTransportorTaxes_Service as $servicetaxtransportor) {
+
+                                            $calcValue_SerTransportor = 0;
+                                            $taxId_SerTransportor = $servicetaxtransportor->tax_id;
+                                            $taxValue_SerTransportor = $servicetaxtransportor->tax_value;
+                                            $taxFormat_SerTransportor = $servicetaxtransportor->number_format;
+                                            $taxType_SerTransportor = $servicetaxtransportor->arithmetic_type;
+
+                                            if ($taxValue_SerTransportor > 0) {
+                                                if ($taxType_SerTransportor == 2) {
+                                                    $taxValue_SerTransportor = $taxValue_SerTransportor * -1;
+                                                }
+                                                if ($taxFormat_SerTransportor == 2) {
+                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor / 100);
+                                                } else {
+                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor);
+                                                }
+                                            }
+
+                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_SerTransportor;
+
+                                            $providerServiceTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_SerTransportor,
+                                                "taxValue" => $calcValue_SerTransportor,
+                                                "taxVal" => (abs($taxValue_SerTransportor) + 0),
+                                            );
+                                            array_push($providerServiceTaxesArr, $taxId_SerTransportor);
+                                        }
+
+                                        if ($servicesTaxesValue == 0) {
+                                            foreach ($getTransportorTaxes_Service_Supplier as $servicetaxsupplier) {
+
+                                                $calcValue_SSTransportor = 0;
+                                                $taxId_SSTransportor = $servicetaxsupplier->tax_id;
+                                                $taxValue_SSTransportor = $servicetaxsupplier->tax_value;
+                                                $taxFormat_SSTransportor = $servicetaxsupplier->number_format;
+                                                $taxType_SSTransportor = $servicetaxsupplier->arithmetic_type;
+
+                                                if ($taxValue_SSTransportor > 0) {
+                                                    if ($taxType_SSTransportor == 2) {
+                                                        $taxValue_SSTransportor = $taxValue_SSTransportor * -1;
+                                                    }
+                                                    if ($taxFormat_SSTransportor == 2) {
+                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor / 100);
+                                                    } else {
+                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor);
+                                                    }
+                                                }
+
+                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_SSTransportor;
+
+                                                $providerServiceTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_SSTransportor,
+                                                    "taxValue" => $calcValue_SSTransportor,
+                                                    "taxVal" => (abs($taxValue_SSTransportor) + 0),
+                                                );
+
+                                                array_push($supplierServiceTaxesArr, $taxId_SSTransportor);
+                                            }
+                                        }
+                                    } else if ($servicepayto == $supplierid) {
+
+                                        $getTransportorTaxes_Services = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                        $servicesTaxesValue = 0;
+                                        if (count($getTransportorTaxes_Services) > 0) {
+
+                                            foreach ($getTransportorTaxes_Services as $servicesuppliertax) {
+
+                                                $calcValue_service = 0;
+                                                $taxId_service = $servicesuppliertax->tax_id;
+                                                $taxValue_service = $servicesuppliertax->tax_value;
+                                                $taxFormat_service = $servicesuppliertax->number_format;
+                                                $taxType_service = $servicesuppliertax->arithmetic_type;
+
+                                                if ($taxValue_service > 0) {
+                                                    if ($taxType_service == 2) {
+                                                        $taxValue_service = $taxValue_service * -1;
+                                                    }
+                                                    if ($taxFormat_service == 2) {
+                                                        $calcValue_service = $servicecost * ($taxValue_service / 100);
+                                                    } else {
+                                                        $calcValue_service = $servicecost * ($taxValue_service);
+                                                    }
+                                                }
+
+                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_service;
+
+                                                $providerServiceTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_service,
+                                                    "taxValue" => $calcValue_service,
+                                                    "taxVal" => (abs($taxValue_service) + 0),
+                                                );
+
+                                                array_push($supplierServiceTaxesArr, $taxId_service);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $servicesCostWithTaxes = $servicecost + $servicesTaxesValue;
+
+                                // END SERVICES WITH TAXES
+
+                                $adjust_arr = explode(",", $adjustrf);
+                                $isAdjustEnabled = false;
+                                $adjustmentValues = 0;
+
+                                if (count($adjust_arr) > 0) {
+
+                                    $isAdjustEnabled = true;
+
+                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+
+                                    foreach ($adjust_arr as $adjust) {
+
+                                        foreach ($supplierTaxesAdjustArr as $suppliertaxestax) {
+                                            if ($suppliertaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($suppliertaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+
+                                        foreach ($providerServiceTaxesAdjustArr as $providerservicetaxestax) {
+                                            if ($providerservicetaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerservicetaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+
+                                        foreach ($providerLogisticTaxesAdjustArr as $providerlogistictaxestax) {
+                                            if ($providerlogistictaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerlogistictaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+                                }
+
+                                if ($farmadjustment != 0) {
+                                    $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
+                                }
+
+                                $totalValue = $woodValue + $logisticcost + $servicecost;
+
+                                $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
+                                $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
+                                $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
+                                $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
+                                $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
+
+                                $dataFarm = array(
+                                    "inventory_order" => $input_inventory_order,
+                                    "plate_number" => $input_truck_plate_number,
+                                    "purchase_date" => $purchase_date,
+                                    "service_cost" => $servicecost,
+                                    "logistic_cost" => $logisticcost,
+                                    "adjustment" => $farmadjustment,
+                                    "pay_service_to" => $servicepayto,
+                                    "pay_logistics_to" => $logisticpayto,
+                                    "exchange_rate" => $input_conversion_rate,
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 1,
+                                    "origin_id" => $originid,
+                                    "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
+                                    "service_cost_withtaxes" => $servicesCostWithTaxes,
+                                    "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
+                                    "supplier_taxes" => $supplierTaxesArrList,
+                                    "logistic_taxes" => $supplierLogisticTaxesArrList,
+                                    "service_taxes" => $supplierServiceTaxesArrList,
+                                    "adjust_taxes" => $adjustrf,
+                                    "is_adjust_rf" => $isAdjustEnabled,
+                                    "logistic_provider_taxes" => $providerLogisticTaxesArrList,
+                                    "service_provider_taxes" => $providerServiceTaxesArrList,
+                                    "adjusted_value" => $adjustmentValues,
+                                    "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
+                                    "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
+                                    "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                    "process_type" => $processType,
+                                    "loading_cost" => $loadingCost,
+                                    "unloading_cost" => $unloadingCost,
+                                );
+
+                                $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
+
+                                if ($updateFarm == true) {
+
+                                    $dataInventoryLedgerUpdate = array(
+                                        "amount" => 0,
+                                        "updated_by" => $session['user_id'],
+                                        "is_active" => 0,
+                                    );
+
+                                    $updateInventoryLedger = $this->Farm_model->update_inventory_ledger($inventory_order, $contract_id, $dataInventoryLedgerUpdate);
+
+                                    if ($updateInventoryLedger == true) {
+
+                                        $dataInventoryLedger = array(
+                                            "contract_id" => $contract_id,
+                                            "inventory_order" => $input_inventory_order,
+                                            "ledger_type" => 2,
+                                            "expense_date" => $purchase_date,
+                                            "created_by" => $session['user_id'],
+                                            "updated_by" => $session['user_id'],
+                                            "is_active" => 1,
+                                            "is_advance_app" => 0,
+                                        );
+
+                                        if ($woodValueWithSupplierTaxes != 0) {
+                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
+                                        }
+
+                                        if ($logisticsCostWithTaxes != 0) {
+                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
+                                        }
+
+                                        if ($servicesCostWithTaxes != 0) {
+                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
+                                        }
+
+                                        if ($farmadjustment != 0) {
+                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
+                                        }
+
+                                        $Return['result'] = $this->lang->line('data_updated');
+                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                        $this->output($Return);
+                                        exit;
+                                    } else {
+                                        $Return['error'] = $this->lang->line('error_updating');
+                                        $Return['result'] = "";
+                                        $Return['redirect'] = false;
+                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                        $this->output($Return);
+                                        exit;
+                                    }
+                                } else {
+                                    $Return['error'] = $this->lang->line('error_updating');
+                                    $Return['result'] = "";
+                                    $Return['redirect'] = false;
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                }
+                            }
+                        } else {
+                            $Return['error'] = $this->lang->line('exist_inventory_order');
+                            $Return['result'] = "";
+                            $Return['redirect'] = false;
+                            $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                            $this->output($Return);
+                            exit;
+                        }
+                    }
+                } else {
+                    $Return['error'] = $this->lang->line('invalid_request');
+                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                    $this->output($Return);
+                }
+            } else {
+                redirect("/logout");
+            }
+        } else {
+            $Return['error'] = $this->lang->line('invalid_request');
+            $Return['csrf_hash'] = $this->security->get_csrf_hash();
+            $this->output($Return);
+        }
+    }
+
+    public function add()
+    {
+        $Return = array('result' => '', 'error' => '', 'csrf_hash' => '');
+        $session = $this->session->userdata('fullname');
+        if ($this->input->post('add_type') == 'farm') {
+            if (!empty($session)) {
+                if ($this->input->post('action_type') == 'add') {
+
+                    $originid = $this->input->post('originid');
+                    $supplierid = $this->input->post('supplierid');
+                    $productid = $this->input->post('productid');
+                    $producttypeid = $this->input->post('producttypeid');
+                    $purchasecontractid = $this->input->post('purchasecontractid');
+                    $inventoryorder = strtoupper($this->input->post('inventoryorder'));
+                    $truckplatenumber = strtoupper($this->input->post('truckplatenumber'));
+                    $servicecost = $this->input->post('servicecost');
+                    $servicepayto = $this->input->post('servicepayto');
+                    $logisticcost = $this->input->post('logisticcost');
+                    $logisticpayto = $this->input->post('logisticpayto');
+                    $farmadjustment = $this->input->post('farmadjustment');
+                    $conversionrate = $this->input->post('conversionrate');
+                    $adjustrf = $this->input->post('adjustrf');
+                    $warehouseid = $this->input->post('warehouseid');
+                    $receptiondate = $this->input->post('receptiondate');
+                    $purchaseunit = $this->input->post('purchaseunit');
+                    $farmdata = $this->input->post('farmdata');
+                    $shippingline = $this->input->post('shippingline');
+                    $sealnumber = $this->input->post('sealnumber');
+                    $roundingfactor = $this->input->post('roundingfactor');
+                    $processType = $this->input->post('processType');
+                    $loadingCost = $this->input->post('loadingCost');
+                    $unloadingCost = $this->input->post('unloadingCost');
+                    date_default_timezone_set($session['default_timezone']);
+
+                    if ($originid == 4) {
+                        $circumferenceallowance = $this->input->post('circumference_allowance');
+                        $lengthallowance = $this->input->post('length_allowance');
+                    } else {
+                        $circumferenceallowance = 0;
+                        $lengthallowance = 0;
+                    }
+
+                    $warehouseid_rounglogs = $this->input->post('warehouseid_rounglogs');
+                    $measurement_system_roundlogs = $this->input->post('measurement_system_roundlogs');
+                    $mandatoryreception = $this->input->post('mandatoryreception');
+
+                    if ($originid == 3) {
+
+                        $getSupplierDetails = $this->Master_model->get_supplier_detail_reception($supplierid, $productid);
+
+                        date_default_timezone_set($session['default_timezone']);
+                        $purchase_date = date('Y-m-d', time());
+                        $receptiondate = date('d/m/Y', time());
+
+                        $farmdataJson = json_decode($farmdata, true);
+
+                        $inventoryOrderCnt = 0;
+                        $totalContainerCnt = 0;
+
+                        foreach ($farmdataJson as $farm) {
+
+                            $containerNumber = $farm["containerNumber"];
+                            $metricTon = $farm["metricTon"];
+                            $length = $farm["length"];
+                            $totalCount = $farm["totalCount"];
+                            $jasVolume = $farm["jasVolume"];
+
+                            if ($totalCount > 0 && $metricTon > 0 && $jasVolume > 0 && count($farm["containerData"]) > 0) {
+                                $totalContainerCnt = $totalContainerCnt + 1;
+
+                                $getInventoryOrderCount = $this->Farm_model->get_inventory_order_count($containerNumber, $originid);
+
+                                if ($getInventoryOrderCount[0]->cnt == 0) {
+                                    $inventoryOrderCnt = $inventoryOrderCnt + 1;
+                                } else {
+                                    $Return['error'] = $containerNumber . ' - ' . $this->lang->line('exist_inventory_order');
+                                    $Return['result'] = "";
+                                    $Return['redirect'] = false;
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                }
+                            }
+                        }
+
+                        if ($totalContainerCnt == $inventoryOrderCnt) {
+
+                            foreach ($farmdataJson as $farm) {
+
+                                $containerNumber = $farm["containerNumber"];
+                                $seal = $farm["seal"];
+                                $metricTon = $farm["metricTon"];
+                                $shortTons = $farm["shortTons"];
+                                $netLbs = $farm["netLbs"];
+                                $diameter = $farm["diameter"];
+                                $length = $farm["length"];
+                                $totalCount = $farm["totalCount"];
+                                $averageDiameter = $farm["averageDiameter"];
+                                $jasVolume = $farm["jasVolume"];
+                                $purchasePrice = $farm["purchasePrice"];
+                                $totalPurchasePrice = $farm["totalPurchasePrice"];
+                                $salesPrice = $farm["salesPrice"];
+                                $totalSalesPrice = $farm["totalSalesPrice"];
+
+                                if ($totalCount > 0 && $metricTon > 0 && $jasVolume > 0 && count($farm["containerData"]) > 0) {
+
+                                    $dataFarm = array(
+                                        "supplier_id" => $supplierid,
+                                        "contract_id" => $purchasecontractid,
+                                        "product_id" => $productid,
+                                        "product_type_id" => $producttypeid,
+                                        "inventory_order" => $containerNumber,
+                                        "plate_number" => "",
+                                        "purchase_date" => $purchase_date,
+                                        "service_cost" => $servicecost,
+                                        "logistic_cost" => $logisticcost,
+                                        "adjustment" => $farmadjustment,
+                                        "total_volume" => $jasVolume,
+                                        "total_value" => $totalPurchasePrice,
+                                        "unit_price" => $purchasePrice,
+                                        "wood_value" => $totalPurchasePrice,
+                                        "pay_service_to" => $servicepayto,
+                                        "pay_logistics_to" => $logisticpayto,
+                                        "exchange_rate" => $conversionrate,
+                                        "is_adjust_rf" => $adjustrf,
+                                        "created_by" => $session['user_id'],
+                                        "updated_by" => $session['user_id'],
+                                        "is_active" => 1,
+                                        "origin_id" => $originid,
+                                        "metric_ton" => $metricTon,
+                                        "process_type" => $processType,
+                                    );
+
+                                    $insertFarm = $this->Farm_model->add_farm($dataFarm);
+
+                                    if ($insertFarm > 0) {
+                                        $dataFarmData = array();
+
+                                        foreach ($farm["containerData"] as $farmdata) {
+
+                                            $noOfPieces = $farmdata["pieces"];
+                                            $diameterData = $farmdata["diameter"];
+                                            $lengthData = $farmdata["length"];
+                                            $volume = $farmdata["volume"];
+
+                                            if ($noOfPieces > 0) {
+                                                $dataFarmData[] = array(
+                                                    "farm_id" => $insertFarm,
+                                                    "scanned_code" => $noOfPieces,
+                                                    "no_of_pieces" => $noOfPieces,
+                                                    "circumference" => $diameterData,
+                                                    "length" => $lengthData,
+                                                    "width" => 0,
+                                                    "thickness" => 0,
+                                                    "volume" => $volume,
+                                                    "volume_pie" => 0,
+                                                    "grade_id" => 0,
+                                                    "length_export" => 0,
+                                                    "width_export" => 0,
+                                                    "thickness_export" => 0,
+                                                    "volume_bought" => $volume,
+                                                    "created_by" => $session['user_id'],
+                                                    "updated_by" => $session['user_id'],
+                                                    "is_active" => 1,
+                                                    "created_date" => date('Y-m-d H:i:s'),
+                                                    "updated_date" => date('Y-m-d H:i:s')
+                                                );
+                                            }
+                                        }
+
+                                        if (count($dataFarmData) > 0) {
+                                            $insertFarmData = $this->Farm_model->add_farm_data($dataFarmData);
+
+                                            if ($insertFarmData) {
+
+                                                //CONTRACT MAPPING
+
+                                                $dataContractMapping = array(
+                                                    "contract_id" => $purchasecontractid,
+                                                    "supplier_id" => $supplierid,
+                                                    "inventory_order" => $containerNumber,
+                                                    "total_volume" => $metricTon,
+                                                    "invoice_number" => "",
+                                                    "created_by" => $session['user_id'],
+                                                    "updated_by" => $session['user_id'],
+                                                    "is_active" => 1,
+                                                );
+
+                                                $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
+
+                                                //END CONTRACT MAPPING
+
+                                                //ADD INVENTORY LEDGER
+
+                                                $dataInventoryLedger = array(
+                                                    "contract_id" => $purchasecontractid,
+                                                    "inventory_order" => $containerNumber,
+                                                    "ledger_type" => 2,
+                                                    "expense_date" => $purchase_date,
+                                                    "created_by" => $session['user_id'],
+                                                    "updated_by" => $session['user_id'],
+                                                    "is_active" => 1,
+                                                    "is_advance_app" => 0,
+                                                );
+
+                                                if ($totalPurchasePrice != 0) {
+                                                    $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $totalPurchasePrice, 1, $supplierid);
+                                                }
+
+                                                $getContracts = $this->Contract_model->get_contracts_by_contractid($purchasecontractid);
+                                                if (count($getContracts) == 1) {
+                                                    $remainingVolume = $getContracts[0]->remaining_volume - $metricTon;
+
+                                                    $dataRemainingVolume = array(
+                                                        "remaining_volume" => $remainingVolume,
+                                                    );
+
+                                                    $this->Contract_model->update_purchase_contract_volume($dataRemainingVolume, $purchasecontractid, $supplierid);
+                                                }
+
+                                                //END INVENTORY LEDGER
+
+                                                //RECEPTION
+
+                                                if (count($getSupplierDetails) == 1) {
+                                                    $dataReception = array(
+                                                        "warehouse_id" => 10,
+                                                        "supplier_id" => $supplierid,
+                                                        "supplier_code" => $getSupplierDetails[0]->supplier_code,
+                                                        "supplier_product_id" => $getSupplierDetails[0]->product_name,
+                                                        "supplier_product_typeid" => $getSupplierDetails[0]->product_type,
+                                                        "measurementsystem_id" => 7,
+                                                        "received_date" => $receptiondate,
+                                                        "salvoconducto" => $containerNumber,
+                                                        "total_volume" => $jasVolume,
+                                                        "total_pieces" => $totalCount,
+                                                        "createdby" => $session['user_id'],
+                                                        "updatedby" => $session['user_id'],
+                                                        "isactive" => 1,
+                                                        "isclosed" => 1,
+                                                        "closedby" => $session['user_id'],
+                                                        "captured_timestamp" => 0,
+                                                        "isduplicatecaptured" => 0,
+                                                        "is_contract_added" => 0,
+                                                        "is_special_uploaded" => 1,
+                                                        "origin_id" => $originid,
+                                                        "metric_ton" => $metricTon,
+                                                    );
+
+                                                    $insertReception = $this->Reception_model->add_reception($dataReception);
+
+                                                    if ($insertReception > 0) {
+                                                        $insertReceptionData = $this->Reception_model->add_reception_data_from_farm($insertReception, $containerNumber, $purchaseunit, $session['user_id']);
+
+                                                        if ($insertReceptionData) {
+                                                            //DISPATCH
+
+                                                            $dataDispatch = array(
+                                                                "container_number" => $containerNumber,
+                                                                "warehouse_id" => $warehouseid,
+                                                                "shipping_line" => $shippingline,
+                                                                "product_id" => $productid,
+                                                                "product_type_id" => $producttypeid,
+                                                                "dispatch_date" => $receptiondate,
+                                                                "seal_number" => $seal,
+                                                                "container_pic_url" => "",
+                                                                "createdby" => $session['user_id'],
+                                                                "updatedby" => $session['user_id'],
+                                                                "isactive" => 1,
+                                                                "isclosed" => 1,
+                                                                "closedby" => $session['user_id'],
+                                                                "is_special_uploaded" => 1,
+                                                                "origin_id" => $originid,
+                                                                "total_gross_volume" => $jasVolume,
+                                                                "total_volume" => $jasVolume,
+                                                                "total_pieces" => $totalCount,
+                                                                "category" => 0,
+                                                                "captured_from_app" => 0,
+                                                                "metric_ton" => $metricTon,
+                                                                "short_ton" => $shortTons,
+                                                                "net_lbs" => $netLbs,
+                                                                "diameter_text" => $diameter,
+                                                                "length_text" => $length,
+                                                                "unit_price" => $salesPrice,
+                                                                "total_value" => $totalSalesPrice,
+                                                            );
+
+                                                            $insertDispatch = $this->Dispatch_model->add_dispatch($dataDispatch);
+
+                                                            if ($insertDispatch > 0) {
+                                                                $insertDispatchData = $this->Dispatch_model->add_dispatch_data_from_reception($insertReception, $insertDispatch, $containerNumber, $session['user_id'], $receptiondate);
+                                                            }
+
+                                                            //END DISPATCH
+                                                        }
+                                                    }
+                                                }
+
+                                                //END RECEPTION
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            $Return['redirect'] = false;
+                            $Return['result'] = $this->lang->line('data_added');
+                            $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                            $this->output($Return);
+                            exit;
+                        } else {
+                            $Return['error'] = $this->lang->line('error_adding');
+                            $Return['result'] = "";
+                            $Return['redirect'] = false;
+                            $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                            $this->output($Return);
+                            exit;
+                        }
+                    } else {
+
+                        $getInventoryOrderCount = $this->Farm_model->get_inventory_order_count($inventoryorder, $originid);
+
+                        if ($getInventoryOrderCount[0]->cnt == 0) {
+
+                            if ($servicecost == null || $servicecost == "") {
+                                $servicecost = 0;
+                            }
+
+                            if ($logisticcost == null || $logisticcost == "") {
+                                $logisticcost = 0;
+                            }
+
+                            if ($farmadjustment == null || $farmadjustment == "") {
+                                $farmadjustment = 0;
+                            }
+
+                            date_default_timezone_set($session['default_timezone']);
+                            $purchase_date = date('Y-m-d', time());
+                            $receptiondate_roundlogs = date('d/m/Y', time());
+
+                            $farmdataJson = json_decode($farmdata, true);
+
+                            $totalVolume = 0;
+                            $totalGrossVolume = 0;
+                            $totalPieces = 0;
+                            $woodValue = 0;
+                            $woodValueWithSupplierTaxes = 0;
+                            $logisticsCostWithTaxes = 0;
+                            $servicesCostWithTaxes = 0;
+                            $totalValueWithTaxes = 0;
+                            $totalValue = 0;
+
+                            $supplierTaxesArr = array();
+                            $providerLogisticTaxesArr = array();
+                            $providerServiceTaxesArr = array();
+                            $supplierLogisticTaxesArr = array();
+                            $supplierServiceTaxesArr = array();
+                            $supplierTaxesAdjustArr = array();
+                            $providerLogisticTaxesAdjustArr = array();
+                            $providerServiceTaxesAdjustArr = array();
+
+                            if ($productid == 4 && ($producttypeid == 1 || $producttypeid == 3)) {
+
+                                foreach ($farmdataJson as $farm) {
+
+                                    $noOfPieces = $farm["noOfPieces"];
+                                    $volumePie = $farm["volumePie"];
+                                    $length = $farm["length"];
+                                    $width = $farm["width"];
+                                    $thickness = $farm["thickness"];
+                                    $lengthExport = $farm["lengthExport"];
+                                    $widthExport = $farm["widthExport"];
+                                    $thicknessExport = $farm["thicknessExport"];
+                                    $grade = $farm["grade"];
+                                    $face = $farm["face"];
+                                    $netVolume = $farm["netVolume"];
+                                    $totalVolume = $totalVolume + $farm["netVolume"];
+
+                                    $getPriceRanges = $this->Farm_model->get_price_for_circumference($face, $purchasecontractid);
+
+                                    if ($noOfPieces > 0) {
+                                        if (count($getPriceRanges) == 1) {
+                                            $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $volumePie));
+                                        }
+                                    }
+                                }
+
+                                if ($conversionrate > 0) {
+                                    $woodValue = $woodValue * $conversionrate;
+                                }
+
+                                $woodValue = sprintf('%0.3f', ($woodValue + 0));
+
+                                // WOOD VALUE WITH TAXES
+                                $supplierIvaValue = 0;
+                                $supplierRetenctionValue = 0;
+                                $supplierReticaValue = 0;
+
+                                $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierid);
+
+                                $supplierTaxesValue = 0;
+                                if (count($getSupplierTaxes) > 0) {
+
+                                    $supplierTaxesValue = 0;
+                                    foreach ($getSupplierTaxes as $suppliertax) {
+
+                                        $calcValue = 0;
+                                        $taxId = $suppliertax->tax_id;
+                                        $taxValue = $suppliertax->tax_value;
+                                        $taxFormat = $suppliertax->number_format;
+                                        $taxType = $suppliertax->arithmetic_type;
+
+                                        if ($taxValue > 0) {
+                                            if ($taxType == 2) {
+                                                $taxValue = $taxValue * -1;
+                                            }
+                                            if ($taxFormat == 2) {
+                                                $calcValue = $woodValue * ($taxValue / 100);
+                                            } else {
+                                                $calcValue = $woodValue * ($taxValue);
+                                            }
+                                        }
+
+                                        $supplierTaxesAdjustArr[] = array(
+                                            "taxId" => $taxId,
+                                            "taxValue" => $calcValue,
+                                            "taxVal" => (abs($taxValue) + 0),
+                                        );
+
+                                        array_push($supplierTaxesArr, $taxId);
+
+                                        $supplierTaxesValue = $supplierTaxesValue + $calcValue;
+                                    }
+                                }
+
+                                $woodValueWithSupplierTaxes = $woodValue + $supplierTaxesValue;
+
+                                // END WOOD VALUE WITH TAXES
+
+                                // LOGISTICS WITH TAXES
+
+                                if ($logisticcost != 0 && $logisticpayto > 0) {
+
+                                    $transportorIvaValue_Logistics = 0;
+                                    $transportorRetenctionValue_Logistics = 0;
+                                    $transportorReticaValue_Logistics = 0;
+
+                                    $getTransportorTaxes_Logistics = $this->Master_model->get_provider_taxes($logisticpayto);
+                                    $getTransportorTaxes_Logistics_Supplier = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                    $logisticTaxesValue = 0;
+
+                                    if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                        $logisticTaxesValue = 0;
+                                        foreach ($getTransportorTaxes_Logistics as $logistictaxtransportor) {
+
+                                            $calcValue_LTransportor = 0;
+                                            $taxId_LTransportor = $logistictaxtransportor->tax_id;
+                                            $taxValue_LTransportor = $logistictaxtransportor->tax_value;
+                                            $taxFormat_LTransportor = $logistictaxtransportor->number_format;
+                                            $taxType_LTransportor = $logistictaxtransportor->arithmetic_type;
+
+                                            if ($taxValue_LTransportor > 0) {
+                                                if ($taxType_LTransportor == 2) {
+                                                    $taxValue_LTransportor = $taxValue_LTransportor * -1;
+                                                }
+                                                if ($taxFormat_LTransportor == 2) {
+                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor / 100);
+                                                } else {
+                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor);
+                                                }
+                                            }
+
+                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_LTransportor;
+
+                                            $providerLogisticTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_LTransportor,
+                                                "taxValue" => $calcValue_LTransportor,
+                                                "taxVal" => (abs($taxValue_LTransportor) + 0),
+                                            );
+
+                                            array_push($providerLogisticTaxesArr, $taxId_LTransportor);
+                                        }
+
+                                        if ($logisticTaxesValue == 0) {
+                                            foreach ($getTransportorTaxes_Logistics_Supplier as $logistictaxsupplier) {
+
+                                                $calcValue_STransportor = 0;
+                                                $taxId_STransportor = $logistictaxsupplier->tax_id;
+                                                $taxValue_STransportor = $logistictaxsupplier->tax_value;
+                                                $taxFormat_STransportor = $logistictaxsupplier->number_format;
+                                                $taxType_STransportor = $logistictaxsupplier->arithmetic_type;
+
+                                                if ($taxValue_STransportor > 0) {
+                                                    if ($taxType_STransportor == 2) {
+                                                        $taxValue_STransportor = $taxValue_STransportor * -1;
+                                                    }
+                                                    if ($taxFormat_STransportor == 2) {
+                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor / 100);
+                                                    } else {
+                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor);
+                                                    }
+                                                }
+
+                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_STransportor;
+
+                                                $providerLogisticTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_STransportor,
+                                                    "taxValue" => $calcValue_STransportor,
+                                                    "taxVal" => (abs($taxValue_STransportor) + 0),
+                                                );
+
+                                                array_push($supplierLogisticTaxesArr, $taxId_STransportor);
+                                            }
+                                        }
+                                    } else if ($logisticpayto == $supplierid) {
+
+                                        $getTransportorTaxes_Logistics = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                        $logisticTaxesValue = 0;
+                                        if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                            foreach ($getTransportorTaxes_Logistics as $transporttax) {
+
+                                                $calcValue_logistic = 0;
+                                                $taxId_logistic = $transporttax->tax_id;
+                                                $taxValue_logistic = $transporttax->tax_value;
+                                                $taxFormat_logistic = $transporttax->number_format;
+                                                $taxType_logistic = $transporttax->arithmetic_type;
+
+                                                if ($taxValue_logistic > 0) {
+                                                    if ($taxType_logistic == 2) {
+                                                        $taxValue_logistic = $taxValue_logistic * -1;
+                                                    }
+                                                    if ($taxFormat_logistic == 2) {
+                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic / 100);
+                                                    } else {
+                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic);
+                                                    }
+                                                }
+
+                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_logistic;
+
+                                                $providerLogisticTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_logistic,
+                                                    "taxValue" => $calcValue_logistic,
+                                                    "taxVal" => (abs($taxValue_logistic) + 0),
+                                                );
+
+                                                array_push($supplierLogisticTaxesArr, $taxId_logistic);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $logisticsCostWithTaxes = $logisticcost + $logisticTaxesValue;
+
+                                // END LOGISTICS WITH TAXES
+
+                                // SERVICES WITH TAXES
+
+                                if ($servicecost != 0 && $servicepayto > 0) {
+                                    $transportorIvaValue_Service = 0;
+                                    $transportorRetenctionValue_Service = 0;
+                                    $transportorReticaValue_Service = 0;
+
+                                    $getTransportorTaxes_Service = $this->Master_model->get_provider_taxes($servicepayto);
+                                    $getTransportorTaxes_Service_Supplier = $this->Master_model->get_supplier_taxes($servicepayto);
+
+                                    $servicesTaxesValue = 0;
+
+                                    if (count($getTransportorTaxes_Service) > 0) {
+
+                                        $servicesTaxesValue = 0;
+                                        foreach ($getTransportorTaxes_Service as $servicetaxtransportor) {
+
+                                            $calcValue_SerTransportor = 0;
+                                            $taxId_SerTransportor = $servicetaxtransportor->tax_id;
+                                            $taxValue_SerTransportor = $servicetaxtransportor->tax_value;
+                                            $taxFormat_SerTransportor = $servicetaxtransportor->number_format;
+                                            $taxType_SerTransportor = $servicetaxtransportor->arithmetic_type;
+
+                                            if ($taxValue_SerTransportor > 0) {
+                                                if ($taxType_SerTransportor == 2) {
+                                                    $taxValue_SerTransportor = $taxValue_SerTransportor * -1;
+                                                }
+                                                if ($taxFormat_SerTransportor == 2) {
+                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor / 100);
+                                                } else {
+                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor);
+                                                }
+                                            }
+
+                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_SerTransportor;
+
+                                            $providerServiceTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_SerTransportor,
+                                                "taxValue" => $calcValue_SerTransportor,
+                                                "taxVal" => (abs($taxValue_SerTransportor) + 0),
+                                            );
+                                            array_push($providerServiceTaxesArr, $taxId_SerTransportor);
+                                        }
+
+                                        if ($servicesTaxesValue == 0) {
+                                            foreach ($getTransportorTaxes_Service_Supplier as $servicetaxsupplier) {
+
+                                                $calcValue_SSTransportor = 0;
+                                                $taxId_SSTransportor = $servicetaxsupplier->tax_id;
+                                                $taxValue_SSTransportor = $servicetaxsupplier->tax_value;
+                                                $taxFormat_SSTransportor = $servicetaxsupplier->number_format;
+                                                $taxType_SSTransportor = $servicetaxsupplier->arithmetic_type;
+
+                                                if ($taxValue_SSTransportor > 0) {
+                                                    if ($taxType_SSTransportor == 2) {
+                                                        $taxValue_SSTransportor = $taxValue_SSTransportor * -1;
+                                                    }
+                                                    if ($taxFormat_SSTransportor == 2) {
+                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor / 100);
+                                                    } else {
+                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor);
+                                                    }
+                                                }
+
+                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_SSTransportor;
+
+                                                $providerServiceTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_SSTransportor,
+                                                    "taxValue" => $calcValue_SSTransportor,
+                                                    "taxVal" => (abs($taxValue_SSTransportor) + 0),
+                                                );
+
+                                                array_push($supplierServiceTaxesArr, $taxId_SSTransportor);
+                                            }
+                                        }
+                                    } else if ($servicepayto == $supplierid) {
+
+                                        $getTransportorTaxes_Services = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                        $servicesTaxesValue = 0;
+                                        if (count($getTransportorTaxes_Services) > 0) {
+
+                                            foreach ($getTransportorTaxes_Services as $servicesuppliertax) {
+
+                                                $calcValue_service = 0;
+                                                $taxId_service = $servicesuppliertax->tax_id;
+                                                $taxValue_service = $servicesuppliertax->tax_value;
+                                                $taxFormat_service = $servicesuppliertax->number_format;
+                                                $taxType_service = $servicesuppliertax->arithmetic_type;
+
+                                                if ($taxValue_service > 0) {
+                                                    if ($taxType_service == 2) {
+                                                        $taxValue_service = $taxValue_service * -1;
+                                                    }
+                                                    if ($taxFormat_service == 2) {
+                                                        $calcValue_service = $servicecost * ($taxValue_service / 100);
+                                                    } else {
+                                                        $calcValue_service = $servicecost * ($taxValue_service);
+                                                    }
+                                                }
+
+                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_service;
+
+                                                $providerServiceTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_service,
+                                                    "taxValue" => $calcValue_service,
+                                                    "taxVal" => (abs($taxValue_service) + 0),
+                                                );
+
+                                                array_push($supplierServiceTaxesArr, $taxId_service);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $servicesCostWithTaxes = $servicecost + $servicesTaxesValue;
+
+                                // END SERVICES WITH TAXES
+
+                                $adjust_arr = explode(",", $adjustrf);
+                                $isAdjustEnabled = false;
+                                $adjustmentValues = 0;
+
+                                if (count($adjust_arr) > 0) {
+
+                                    $isAdjustEnabled = true;
+
+                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+
+                                    foreach ($adjust_arr as $adjust) {
+
+                                        foreach ($supplierTaxesAdjustArr as $suppliertaxestax) {
+                                            if ($suppliertaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($suppliertaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+
+                                        foreach ($providerServiceTaxesAdjustArr as $providerservicetaxestax) {
+                                            if ($providerservicetaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerservicetaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+
+                                        foreach ($providerLogisticTaxesAdjustArr as $providerlogistictaxestax) {
+                                            if ($providerlogistictaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerlogistictaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+                                }
+
+                                if ($farmadjustment != 0) {
+                                    $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
+                                }
+
+                                $totalValue = $woodValue + $logisticcost + $servicecost;
+
+                                $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
+                                $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
+                                $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
+                                $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
+                                $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
+
+                                $closedDate = date('d/m/Y');
+                                $dataFarm = array(
+                                    "supplier_id" => $supplierid,
+                                    "contract_id" => $purchasecontractid,
+                                    "product_id" => $productid,
+                                    "product_type_id" => $producttypeid,
+                                    "purchase_unit_id" => $purchaseunit,
+                                    "inventory_order" => $inventoryorder,
+                                    "plate_number" => $truckplatenumber,
+                                    "purchase_date" => $purchase_date,
+                                    "service_cost" => $servicecost,
+                                    "logistic_cost" => $logisticcost,
+                                    "adjustment" => $farmadjustment,
+                                    "total_volume" => $totalVolume,
+                                    "total_value" => $totalValue,
+                                    "wood_value" => $woodValue,
+                                    "pay_service_to" => $servicepayto,
+                                    "pay_logistics_to" => $logisticpayto,
+                                    "exchange_rate" => $conversionrate,
+                                    "created_by" => $session['user_id'],
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 1,
+                                    "origin_id" => $originid,
+                                    "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
+                                    "service_cost_withtaxes" => $servicesCostWithTaxes,
+                                    "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
+                                    "supplier_taxes" => $supplierTaxesArrList,
+                                    "logistic_taxes" => $supplierLogisticTaxesArrList,
+                                    "service_taxes" => $supplierServiceTaxesArrList,
+                                    "adjust_taxes" => $adjustrf,
+                                    "is_adjust_rf" => $isAdjustEnabled,
+                                    "logistic_provider_taxes" => $providerLogisticTaxesArrList,
+                                    "service_provider_taxes" => $providerServiceTaxesArrList,
+                                    "adjusted_value" => $adjustmentValues,
+                                    "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
+                                    "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
+                                    "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                    "circ_allowance" => $circumferenceallowance,
+                                    "length_allowance" => $lengthallowance,
+                                    "rounding_factor" => $roundingfactor,
+                                    "total_gross_volume" => $totalGrossVolume,
+                                    "total_pieces" => $totalPieces,
+                                    "is_closed" => 1,
+                                    "closed_by" => $session['user_id'],
+                                    "closed_date" => $closedDate,
+                                    "process_type" => $processType,
+                                    "loading_cost" => $loadingCost, 
+                                    "unloading_cost" => $unloadingCost,
+                                );
+
+                                $insertFarm = $this->Farm_model->add_farm($dataFarm);
+
+                                if ($insertFarm > 0) {
+                                    $dataFarmData = array();
+                                    foreach ($farmdataJson as $farm) {
+
+                                        $noOfPieces = $farm["noOfPieces"];
+                                        $length = $farm["length"];
+                                        $width = $farm["width"];
+                                        $thickness = $farm["thickness"];
+                                        $lengthExport = $farm["lengthExport"];
+                                        $widthExport = $farm["widthExport"];
+                                        $thicknessExport = $farm["thicknessExport"];
+                                        $volumePie = $farm["volumePie"];
+                                        $grossVolume = $farm["grossVolume"];
+                                        $grade = $farm["grade"];
+                                        $face = $farm["face"];
+                                        $netVolume = $farm["netVolume"];
+                                        $scannedCode = $farm["scannedCode"];
+
+                                        if ($noOfPieces > 0) {
+                                            $dataFarmData[] = array(
+                                                "farm_id" => $insertFarm,
+                                                "scanned_code" => $scannedCode,
+                                                "no_of_pieces" => $noOfPieces,
+                                                "circumference" => 0,
+                                                "length" => $length,
+                                                "width" => $width,
+                                                "thickness" => $thickness,
+                                                "volume" => $netVolume,
+                                                "volume_pie" => $volumePie,
+                                                "grade_id" => $grade,
+                                                "face" => $face,
+                                                "length_export" => $lengthExport,
+                                                "width_export" => $widthExport,
+                                                "thickness_export" => $thicknessExport,
+                                                "volume_bought" => $grossVolume,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "created_date" => date('Y-m-d H:i:s'),
+                                                "updated_date" => date('Y-m-d H:i:s')
+                                            );
+                                        }
+                                    }
+
+                                    if (count($dataFarmData) > 0) {
+                                        $insertFarmData = $this->Farm_model->add_farm_data($dataFarmData);
+
+                                        if ($insertFarmData) {
+                                            //SUPPLIER PRICE
+                                            $this->Farm_model->add_supplier_price(
+                                                $purchasecontractid,
+                                                $supplierid,
+                                                $inventoryorder,
+                                                $session['user_id']
+                                            );
+
+                                            //CONTRACT INVENTORY MAPPING
+                                            $dataContractMapping = array(
+                                                "contract_id" => $purchasecontractid,
+                                                "supplier_id" => $supplierid,
+                                                "inventory_order" => $inventoryorder,
+                                                "total_volume" => $totalVolume,
+                                                "invoice_number" => "",
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                            );
+
+                                            $this->Farm_model->add_contract_inventory_mapping($dataContractMapping);
+
+                                            $dataInventoryLedger = array(
+                                                "contract_id" => $purchasecontractid,
+                                                "inventory_order" => $inventoryorder,
+                                                "ledger_type" => 2,
+                                                "expense_date" => $purchase_date,
+                                                "created_by" => $session['user_id'],
+                                                "updated_by" => $session['user_id'],
+                                                "is_active" => 1,
+                                                "is_advance_app" => 0,
+                                            );
+
+                                            if ($woodValueWithSupplierTaxes != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
+                                            }
+
+                                            if ($logisticsCostWithTaxes != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
+                                            }
+
+                                            if ($servicesCostWithTaxes != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
+                                            }
+
+                                            if ($farmadjustment != 0) {
+                                                $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
+                                            }
+
+                                            $getContracts = $this->Contract_model->get_contracts_by_contractid($purchasecontractid);
+                                            if (count($getContracts) == 1) {
+                                                $remainingVolume = $getContracts[0]->remaining_volume - $totalVolume;
+
+                                                $dataRemainingVolume = array(
+                                                    "remaining_volume" => $remainingVolume,
+                                                );
+
+                                                $this->Contract_model->update_purchase_contract_volume($dataRemainingVolume, $purchasecontractid, $supplierid);
+                                            }
+
+                                            //END
+
+                                            //CREATE RECEPTION
+
+                                            $getSupplierDetails = $this->Master_model->get_supplier_detail_reception($supplierid, $productid);
+
+                                            if (count($getSupplierDetails) == 1) {
+                                                $dataReception = array(
+                                                    "warehouse_id" => $warehouseid,
+                                                    "supplier_id" => $supplierid,
+                                                    "supplier_code" => $getSupplierDetails[0]->supplier_code,
+                                                    "supplier_product_id" => $getSupplierDetails[0]->product_name,
+                                                    "supplier_product_typeid" => $getSupplierDetails[0]->product_type,
+                                                    "measurementsystem_id" => 1,
+                                                    "received_date" => $receptiondate,
+                                                    "salvoconducto" => $inventoryorder,
+                                                    "total_volume" => $totalVolume,
+                                                    "createdby" => $session['user_id'],
+                                                    "updatedby" => $session['user_id'],
+                                                    "isactive" => 1,
+                                                    "isclosed" => 1,
+                                                    "closedby" => $session['user_id'],
+                                                    "captured_timestamp" => 0,
+                                                    "isduplicatecaptured" => 0,
+                                                    "is_contract_added" => 0,
+                                                    "is_special_uploaded" => 0,
+                                                    "origin_id" => $originid,
+                                                );
+
+                                                $insertReception = $this->Reception_model->add_reception($dataReception);
+
+                                                if ($insertReception > 0) {
+                                                    $this->Reception_model->add_reception_data_from_farm($insertReception, $inventoryorder, $purchaseunit, $session['user_id']);
+                                                }
+                                            }
+
+                                            //END RECEPTION
+                                        }
+
+                                        $Return['result'] = $this->lang->line('data_added');
+                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                        $this->output($Return);
+                                        exit;
+                                    } else {
+                                        $Return['error'] = $this->lang->line('error_adding');
+                                        $Return['result'] = "";
+                                        $Return['redirect'] = false;
+                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                        $this->output($Return);
+                                        exit;
+                                    }
+                                } else {
+                                    $Return['error'] = $this->lang->line('error_adding');
+                                    $Return['result'] = "";
+                                    $Return['redirect'] = false;
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                }
+
+                                $Return['result'] = $woodValue; // $this->lang->line('data_added');
+                                $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                $this->output($Return);
+                                exit;
+                            } else if ($producttypeid == 1 || $producttypeid == 3) {
+
+                                $getPriceRanges = $this->Farm_model->get_price_for_circumference(-1, $purchasecontractid);
+
+                                foreach ($farmdataJson as $farm) {
+
+                                    $noOfPieces = $farm["noOfPieces"];
+                                    $volumePie = $farm["volumePie"];
+                                    $grade = $farm["grade"];
+                                    $netVolume = $farm["netVolume"];
+                                    $totalVolume = $totalVolume + $farm["netVolume"];
+
+                                    if ($noOfPieces > 0) {
+                                        if (count($getPriceRanges) == 1) {
+                                            if ($purchaseunit == 1) {
+                                                if ($grade == 1) {
+                                                    $woodValue = $woodValue + (($getPriceRanges[0]->minrange_grade1 * $volumePie));
+                                                } else if ($grade == 2) {
+                                                    $woodValue = $woodValue + (($getPriceRanges[0]->maxrange_grade2 * $volumePie));
+                                                } else if ($grade == 3) {
+                                                    $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $volumePie));
+                                                }
+                                            } else {
+                                                if ($grade == 1) {
+                                                    $woodValue = $woodValue + (($getPriceRanges[0]->minrange_grade1 * $netVolume));
+                                                } else if ($grade == 2) {
+                                                    $woodValue = $woodValue + (($getPriceRanges[0]->maxrange_grade2 * $netVolume));
+                                                } else if ($grade == 3) {
+                                                    $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $netVolume));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if ($conversionrate > 0) {
+                                    $woodValue = $woodValue * $conversionrate;
+                                }
+
+                                $woodValue = sprintf('%0.3f', ($woodValue + 0));
+
+                                // WOOD VALUE WITH TAXES
+                                $supplierIvaValue = 0;
+                                $supplierRetenctionValue = 0;
+                                $supplierReticaValue = 0;
+
+                                $getSupplierTaxes = $this->Farm_model->get_supplier_taxes($supplierid);
+
+                                if (count($getSupplierTaxes) == 1) {
+
+                                    if ($getSupplierTaxes[0]->is_iva_enabled == 1) {
+                                        $supplierIvaValue =  $woodValue * ($getSupplierTaxes[0]->iva_value / 100);
+                                    }
+
+                                    if ($getSupplierTaxes[0]->is_retencion_enabled == 1) {
+                                        $supplierRetenctionValue = $woodValue * ($getSupplierTaxes[0]->retencion_value / 100);
+                                    }
+
+                                    if ($getSupplierTaxes[0]->is_reteica_enabled == 1) {
+                                        $supplierReticaValue = $woodValue * ($getSupplierTaxes[0]->reteica_value);
+                                    }
+                                }
+
+                                $woodValueWithSupplierTaxes = $woodValue + ($supplierIvaValue + $supplierRetenctionValue + $supplierReticaValue);
+
+                                // END WOOD VALUE WITH TAXES
+
+                                // LOGISTICS WITH TAXES
+
+                                if ($logisticcost != 0 && $logisticpayto > 0) {
+
+                                    $transportorIvaValue_Logistics = 0;
+                                    $transportorRetenctionValue_Logistics = 0;
+                                    $transportorReticaValue_Logistics = 0;
+
+                                    $getTransportorTaxes_Logistics = $this->Farm_model->get_transportor_taxes($logisticpayto);
+                                    $getTransportorTaxes_Logistics_Supplier = $this->Farm_model->get_supplier_taxes($logisticpayto);
+
+                                    if (count($getTransportorTaxes_Logistics) == 1) {
+
+                                        if ($getTransportorTaxes_Logistics[0]->is_iva_provider_enabled == 1) {
+                                            $transportorIvaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->iva_provider_value / 100);
+                                        } else {
+                                            if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_iva_enabled == 1) {
+                                                $transportorIvaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics_Supplier[0]->iva_value / 100);
+                                            }
+                                        }
+
+                                        if ($getTransportorTaxes_Logistics[0]->is_retencion_provider_enabled == 1) {
+                                            $transportorRetenctionValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->retencion_provider_value / 100);
+                                        } else {
+                                            if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_retencion_enabled == 1) {
+                                                $transportorRetenctionValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics_Supplier[0]->retencion_value / 100);
+                                            }
+                                        }
+
+                                        if ($getTransportorTaxes_Logistics[0]->is_reteica_provider_enabled == 1) {
+                                            $transportorReticaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->reteica_provider_value);
+                                        } else {
+                                            if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_reteica_enabled == 1) {
+                                                $transportorReticaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics_Supplier[0]->reteica_value);
+                                            }
+                                        }
+                                    } else if ($logisticpayto == $supplierid) {
+                                        $getTransportorTaxes_Logistics = $this->Farm_model->get_supplier_taxes($logisticpayto);
+
+                                        if (count($getTransportorTaxes_Logistics) == 1) {
+                                            if ($getTransportorTaxes_Logistics[0]->is_iva_enabled == 1) {
+                                                $transportorIvaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->iva_value / 100);
+                                            }
+
+                                            if ($getTransportorTaxes_Logistics[0]->is_retencion_enabled == 1) {
+                                                $transportorRetenctionValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->retencion_value / 100);
+                                            }
+
+                                            if ($getTransportorTaxes_Logistics[0]->is_reteica_enabled == 1) {
+                                                $transportorReticaValue_Logistics = $logisticcost * ($getTransportorTaxes_Logistics[0]->reteica_value);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $logisticsCostWithTaxes = $logisticcost + ($transportorIvaValue_Logistics + $transportorRetenctionValue_Logistics + $transportorReticaValue_Logistics);
+
+                                // END LOGISTICS WITH TAXES
+
+                                // SERVICES WITH TAXES
+
+                                if ($servicecost != 0 && $servicepayto > 0) {
+                                    $transportorIvaValue_Service = 0;
+                                    $transportorRetenctionValue_Service = 0;
+                                    $transportorReticaValue_Service = 0;
+
+                                    $getTransportorTaxes_Service = $this->Farm_model->get_transportor_taxes($servicepayto);
+                                    $getTransportorTaxes_Service_Supplier = $this->Farm_model->get_supplier_taxes($servicepayto);
+
+                                    if (count($getTransportorTaxes_Service) == 1) {
+
+                                        if ($getTransportorTaxes_Service[0]->is_iva_provider_enabled == 1) {
+                                            $transportorIvaValue_Service = $servicecost * ($getTransportorTaxes_Service[0]->iva_provider_value / 100);
+                                        } else {
+                                            if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_iva_enabled == 1) {
+                                                $transportorIvaValue_Service = $servicecost * ($getTransportorTaxes_Service_Supplier[0]->iva_value / 100);
+                                            }
+                                        }
+
+                                        if ($getTransportorTaxes_Service[0]->is_retencion_provider_enabled == 1) {
+                                            $transportorRetenctionValue_Service = $servicecost * ($getTransportorTaxes_Service[0]->retencion_provider_value / 100);
+                                        } else {
+                                            if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_retencion_enabled == 1) {
+                                                $transportorRetenctionValue_Service = $servicecost * ($getTransportorTaxes_Service_Supplier[0]->retencion_value / 100);
+                                            }
+                                        }
+
+                                        if ($getTransportorTaxes_Service[0]->is_reteica_provider_enabled == 1) {
+                                            $transportorReticaValue_Service = $servicecost * ($getTransportorTaxes_Service[0]->reteica_provider_value);
+                                        } else {
+                                            if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_reteica_enabled == 1) {
+                                                $transportorReticaValue_Service = $servicecost * ($getTransportorTaxes_Service_Supplier[0]->reteica_value);
+                                            }
+                                        }
+                                    } else if ($servicepayto == $supplierid) {
+
+                                        $getTransportorTaxes_Service = $this->Farm_model->get_supplier_taxes($servicepayto);
+
+                                        if (count($getTransportorTaxes_Service) == 1) {
+                                            if ($getTransportorTaxes_Service[0]->is_iva_enabled == 1) {
+                                                $transportorIvaValue_Service = $logisticcost * ($getTransportorTaxes_Service[0]->iva_value / 100);
+                                            }
+
+                                            if ($getTransportorTaxes_Service[0]->is_retencion_enabled == 1) {
+                                                $transportorRetenctionValue_Service = $logisticcost * ($getTransportorTaxes_Service[0]->retencion_value / 100);
+                                            }
+
+                                            if ($getTransportorTaxes_Service[0]->is_reteica_enabled == 1) {
+                                                $transportorReticaValue_Service = $logisticcost * ($getTransportorTaxes_Service[0]->reteica_value);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $servicesCostWithTaxes = $servicecost + ($transportorIvaValue_Service + $transportorRetenctionValue_Service + $transportorReticaValue_Service);
+
+                                // END SERVICES WITH TAXES
+
+                                if (count($adjustrf) > 0 || $farmadjustment != 0) {
+                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes - ($supplierRetenctionValue + $transportorRetenctionValue_Logistics + $transportorRetenctionValue_Service);
+                                } else {
+                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+                                }
+
+                                if ($farmadjustment != 0) {
+                                    $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
+                                }
+
+                                $totalValue = $woodValue + $logisticcost + $servicecost;
+
+                                $dataFarm = array(
+                                    "supplier_id" => $supplierid,
+                                    "contract_id" => $purchasecontractid,
+                                    "product_id" => $productid,
+                                    "product_type_id" => $producttypeid,
+                                    "inventory_order" => $inventoryorder,
+                                    "plate_number" => $truckplatenumber,
+                                    "purchase_date" => $purchase_date,
+                                    "service_cost" => $servicecost,
+                                    "logistic_cost" => $logisticcost,
+                                    "adjustment" => $farmadjustment,
+                                    "total_volume" => $totalVolume,
+                                    "total_value" => $totalValue,
+                                    "wood_value" => $woodValue,
+                                    "pay_service_to" => $servicepayto,
+                                    "pay_logistics_to" => $logisticpayto,
+                                    "exchange_rate" => $conversionrate,
+                                    "is_adjust_rf" => $adjustrf,
+                                    "created_by" => $session['user_id'],
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 1,
+                                    "origin_id" => $originid,
+                                    "process_type" => $processType,
+                                    "loading_cost" => $loadingCost, 
                                     "unloading_cost" => $unloadingCost,
                                 );
 
@@ -4999,7 +5479,9 @@ class Farms extends MY_Controller
                                     "total_pieces" => $totalPieces,
                                     "is_closed" => 1,
                                     "closed_by" => $session['user_id'],
-                                    "closed_date" => $closedDate, "process_type" => $processType, "loading_cost" => $loadingCost, 
+                                    "closed_date" => $closedDate,
+                                    "process_type" => $processType,
+                                    "loading_cost" => $loadingCost, 
                                     "unloading_cost" => $unloadingCost,
                                 );
 
@@ -5452,8 +5934,475 @@ class Farms extends MY_Controller
                         $providerLogisticTaxesAdjustArr = array();
                         $providerServiceTaxesAdjustArr = array();
 
-                        if ($productTypeId == 1 || $productTypeId == 3) {
-                            //NEED TO BE IMPLEMENTED
+                        if ($getFarmDetail[0]->product_id == 4 && ($productTypeId == 1 || $productTypeId == 3)) {
+
+                            $finalArray = [];
+
+                            $farmData = $this->Farm_model->get_farm_data_by_farm_id_detailed($farm_id);
+
+                            foreach ($farmData as $data) {
+                                $noOfPieces = $data->no_of_pieces;
+                                $volumePie = $data->volume_pie;
+                                $length = $data->length;
+                                $width = $data->width;
+                                $thickness = $data->thickness;
+                                $lengthExport = $data->length_export;
+                                $widthExport = $data->width_export;
+                                $thicknessExport = $data->thickness_export;
+                                $face = $data->face;
+                                $netVolume = $data->volume;
+                                $totalVolume = $data->volume;
+
+
+                                if ($noOfPieces > 0) {
+                                    $getPriceRanges = $this->Farm_model->get_price_for_circumference($face, $contract_id);
+                                    if (count($getPriceRanges) == 1) {
+                                        $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $volumePie));
+                                    }
+                                }
+                            }
+
+                            if ($input_conversion_rate > 0) {
+                                $woodValue = $woodValue * $input_conversion_rate;
+                            }
+
+                            $woodValue = sprintf('%0.3f', ($woodValue + 0));
+
+                            // WOOD VALUE WITH TAXES
+                            $supplierIvaValue = 0;
+                            $supplierRetenctionValue = 0;
+                            $supplierReticaValue = 0;
+
+                            $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierid);
+
+                            $supplierTaxesValue = 0;
+                            if (count($getSupplierTaxes) > 0) {
+
+                                $supplierTaxesValue = 0;
+                                foreach ($getSupplierTaxes as $suppliertax) {
+
+                                    $calcValue = 0;
+                                    $taxId = $suppliertax->tax_id;
+                                    $taxValue = $suppliertax->tax_value;
+                                    $taxFormat = $suppliertax->number_format;
+                                    $taxType = $suppliertax->arithmetic_type;
+
+                                    if ($taxValue > 0) {
+                                        if ($taxType == 2) {
+                                            $taxValue = $taxValue * -1;
+                                        }
+                                        if ($taxFormat == 2) {
+                                            $calcValue = $woodValue * ($taxValue / 100);
+                                        } else {
+                                            $calcValue = $woodValue * ($taxValue);
+                                        }
+                                    }
+
+                                    $supplierTaxesAdjustArr[] = array(
+                                        "taxId" => $taxId,
+                                        "taxValue" => $calcValue,
+                                        "taxVal" => (abs($taxValue) + 0),
+                                    );
+
+                                    array_push($supplierTaxesArr, $taxId);
+
+                                    $supplierTaxesValue = $supplierTaxesValue + $calcValue;
+                                }
+                            }
+
+                            $woodValueWithSupplierTaxes = $woodValue + $supplierTaxesValue;
+
+                            // END WOOD VALUE WITH TAXES
+
+                            // LOGISTICS WITH TAXES
+
+                            if ($logisticcost != 0 && $logisticpayto > 0) {
+
+                                $transportorIvaValue_Logistics = 0;
+                                $transportorRetenctionValue_Logistics = 0;
+                                $transportorReticaValue_Logistics = 0;
+
+                                $getTransportorTaxes_Logistics = $this->Master_model->get_provider_taxes($logisticpayto);
+                                $getTransportorTaxes_Logistics_Supplier = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                $logisticTaxesValue = 0;
+
+                                if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                    $logisticTaxesValue = 0;
+                                    foreach ($getTransportorTaxes_Logistics as $logistictaxtransportor) {
+
+                                        $calcValue_LTransportor = 0;
+                                        $taxId_LTransportor = $logistictaxtransportor->tax_id;
+                                        $taxValue_LTransportor = $logistictaxtransportor->tax_value;
+                                        $taxFormat_LTransportor = $logistictaxtransportor->number_format;
+                                        $taxType_LTransportor = $logistictaxtransportor->arithmetic_type;
+
+                                        if ($taxValue_LTransportor > 0) {
+                                            if ($taxType_LTransportor == 2) {
+                                                $taxValue_LTransportor = $taxValue_LTransportor * -1;
+                                            }
+                                            if ($taxFormat_LTransportor == 2) {
+                                                $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor / 100);
+                                            } else {
+                                                $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor);
+                                            }
+                                        }
+
+                                        $logisticTaxesValue = $logisticTaxesValue + $calcValue_LTransportor;
+
+                                        $providerLogisticTaxesAdjustArr[] = array(
+                                            "taxId" => $taxId_LTransportor,
+                                            "taxValue" => $calcValue_LTransportor,
+                                            "taxVal" => (abs($taxValue_LTransportor) + 0),
+                                        );
+
+                                        array_push($providerLogisticTaxesArr, $taxId_LTransportor);
+                                    }
+
+                                    if ($logisticTaxesValue == 0) {
+                                        foreach ($getTransportorTaxes_Logistics_Supplier as $logistictaxsupplier) {
+
+                                            $calcValue_STransportor = 0;
+                                            $taxId_STransportor = $logistictaxsupplier->tax_id;
+                                            $taxValue_STransportor = $logistictaxsupplier->tax_value;
+                                            $taxFormat_STransportor = $logistictaxsupplier->number_format;
+                                            $taxType_STransportor = $logistictaxsupplier->arithmetic_type;
+
+                                            if ($taxValue_STransportor > 0) {
+                                                if ($taxType_STransportor == 2) {
+                                                    $taxValue_STransportor = $taxValue_STransportor * -1;
+                                                }
+                                                if ($taxFormat_STransportor == 2) {
+                                                    $calcValue_STransportor = $logisticcost * ($taxValue_STransportor / 100);
+                                                } else {
+                                                    $calcValue_STransportor = $logisticcost * ($taxValue_STransportor);
+                                                }
+                                            }
+
+                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_STransportor;
+
+                                            $providerLogisticTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_STransportor,
+                                                "taxValue" => $calcValue_STransportor,
+                                                "taxVal" => (abs($taxValue_STransportor) + 0),
+                                            );
+
+                                            array_push($supplierLogisticTaxesArr, $taxId_STransportor);
+                                        }
+                                    }
+                                } else if ($logisticpayto == $supplierid) {
+
+                                    $getTransportorTaxes_Logistics = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                    $logisticTaxesValue = 0;
+                                    if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                        foreach ($getTransportorTaxes_Logistics as $transporttax) {
+
+                                            $calcValue_logistic = 0;
+                                            $taxId_logistic = $transporttax->tax_id;
+                                            $taxValue_logistic = $transporttax->tax_value;
+                                            $taxFormat_logistic = $transporttax->number_format;
+                                            $taxType_logistic = $transporttax->arithmetic_type;
+
+                                            if ($taxValue_logistic > 0) {
+                                                if ($taxType_logistic == 2) {
+                                                    $taxValue_logistic = $taxValue_logistic * -1;
+                                                }
+                                                if ($taxFormat_logistic == 2) {
+                                                    $calcValue_logistic = $logisticcost * ($taxValue_logistic / 100);
+                                                } else {
+                                                    $calcValue_logistic = $logisticcost * ($taxValue_logistic);
+                                                }
+                                            }
+
+                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_logistic;
+
+                                            $providerLogisticTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_logistic,
+                                                "taxValue" => $calcValue_logistic,
+                                                "taxVal" => (abs($taxValue_logistic) + 0),
+                                            );
+
+                                            array_push($supplierLogisticTaxesArr, $taxId_logistic);
+                                        }
+                                    }
+                                }
+                            }
+
+                            $logisticsCostWithTaxes = $logisticcost + $logisticTaxesValue;
+
+                            // END LOGISTICS WITH TAXES
+
+                            // SERVICES WITH TAXES
+
+                            if ($servicecost != 0 && $servicepayto > 0) {
+                                $transportorIvaValue_Service = 0;
+                                $transportorRetenctionValue_Service = 0;
+                                $transportorReticaValue_Service = 0;
+
+                                $getTransportorTaxes_Service = $this->Master_model->get_provider_taxes($servicepayto);
+                                $getTransportorTaxes_Service_Supplier = $this->Master_model->get_supplier_taxes($servicepayto);
+
+                                $servicesTaxesValue = 0;
+
+                                if (count($getTransportorTaxes_Service) > 0) {
+
+                                    $servicesTaxesValue = 0;
+                                    foreach ($getTransportorTaxes_Service as $servicetaxtransportor) {
+
+                                        $calcValue_SerTransportor = 0;
+                                        $taxId_SerTransportor = $servicetaxtransportor->tax_id;
+                                        $taxValue_SerTransportor = $servicetaxtransportor->tax_value;
+                                        $taxFormat_SerTransportor = $servicetaxtransportor->number_format;
+                                        $taxType_SerTransportor = $servicetaxtransportor->arithmetic_type;
+
+                                        if ($taxValue_SerTransportor > 0) {
+                                            if ($taxType_SerTransportor == 2) {
+                                                $taxValue_SerTransportor = $taxValue_SerTransportor * -1;
+                                            }
+                                            if ($taxFormat_SerTransportor == 2) {
+                                                $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor / 100);
+                                            } else {
+                                                $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor);
+                                            }
+                                        }
+
+                                        $servicesTaxesValue = $servicesTaxesValue + $calcValue_SerTransportor;
+
+                                        $providerServiceTaxesAdjustArr[] = array(
+                                            "taxId" => $taxId_SerTransportor,
+                                            "taxValue" => $calcValue_SerTransportor,
+                                            "taxVal" => (abs($taxValue_SerTransportor) + 0),
+                                        );
+                                        array_push($providerServiceTaxesArr, $taxId_SerTransportor);
+                                    }
+
+                                    if ($servicesTaxesValue == 0) {
+                                        foreach ($getTransportorTaxes_Service_Supplier as $servicetaxsupplier) {
+
+                                            $calcValue_SSTransportor = 0;
+                                            $taxId_SSTransportor = $servicetaxsupplier->tax_id;
+                                            $taxValue_SSTransportor = $servicetaxsupplier->tax_value;
+                                            $taxFormat_SSTransportor = $servicetaxsupplier->number_format;
+                                            $taxType_SSTransportor = $servicetaxsupplier->arithmetic_type;
+
+                                            if ($taxValue_SSTransportor > 0) {
+                                                if ($taxType_SSTransportor == 2) {
+                                                    $taxValue_SSTransportor = $taxValue_SSTransportor * -1;
+                                                }
+                                                if ($taxFormat_SSTransportor == 2) {
+                                                    $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor / 100);
+                                                } else {
+                                                    $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor);
+                                                }
+                                            }
+
+                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_SSTransportor;
+
+                                            $providerServiceTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_SSTransportor,
+                                                "taxValue" => $calcValue_SSTransportor,
+                                                "taxVal" => (abs($taxValue_SSTransportor) + 0),
+                                            );
+
+                                            array_push($supplierServiceTaxesArr, $taxId_SSTransportor);
+                                        }
+                                    }
+                                } else if ($servicepayto == $supplierid) {
+
+                                    $getTransportorTaxes_Services = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                    $servicesTaxesValue = 0;
+                                    if (count($getTransportorTaxes_Services) > 0) {
+
+                                        foreach ($getTransportorTaxes_Services as $servicesuppliertax) {
+
+                                            $calcValue_service = 0;
+                                            $taxId_service = $servicesuppliertax->tax_id;
+                                            $taxValue_service = $servicesuppliertax->tax_value;
+                                            $taxFormat_service = $servicesuppliertax->number_format;
+                                            $taxType_service = $servicesuppliertax->arithmetic_type;
+
+                                            if ($taxValue_service > 0) {
+                                                if ($taxType_service == 2) {
+                                                    $taxValue_service = $taxValue_service * -1;
+                                                }
+                                                if ($taxFormat_service == 2) {
+                                                    $calcValue_service = $servicecost * ($taxValue_service / 100);
+                                                } else {
+                                                    $calcValue_service = $servicecost * ($taxValue_service);
+                                                }
+                                            }
+
+                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_service;
+
+                                            $providerServiceTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_service,
+                                                "taxValue" => $calcValue_service,
+                                                "taxVal" => (abs($taxValue_service) + 0),
+                                            );
+
+                                            array_push($supplierServiceTaxesArr, $taxId_service);
+                                        }
+                                    }
+                                }
+                            }
+
+                            $servicesCostWithTaxes = $servicecost + $servicesTaxesValue;
+
+                            // END SERVICES WITH TAXES
+
+                            $adjust_arr = explode(",", $adjustrf);
+                            $isAdjustEnabled = false;
+                            $adjustmentValues = 0;
+
+                            if (count($adjust_arr) > 0) {
+
+                                $isAdjustEnabled = true;
+
+                                $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+
+                                foreach ($adjust_arr as $adjust) {
+
+                                    foreach ($supplierTaxesAdjustArr as $suppliertaxestax) {
+                                        if ($suppliertaxestax["taxId"] == $adjust) {
+                                            $totalValueWithTaxes = $totalValueWithTaxes - abs($suppliertaxestax["taxValue"]);
+                                            $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                        }
+                                    }
+
+                                    foreach ($providerServiceTaxesAdjustArr as $providerservicetaxestax) {
+                                        if ($providerservicetaxestax["taxId"] == $adjust) {
+                                            $totalValueWithTaxes = $totalValueWithTaxes - abs($providerservicetaxestax["taxValue"]);
+                                            $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                        }
+                                    }
+
+                                    foreach ($providerLogisticTaxesAdjustArr as $providerlogistictaxestax) {
+                                        if ($providerlogistictaxestax["taxId"] == $adjust) {
+                                            $totalValueWithTaxes = $totalValueWithTaxes - abs($providerlogistictaxestax["taxValue"]);
+                                            $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                        }
+                                    }
+                                }
+                            } else {
+                                $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+                            }
+
+                            if ($farmadjustment != 0) {
+                                $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
+                            }
+
+                            $totalValue = $woodValue + $logisticcost + $servicecost;
+
+                            $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
+                            $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
+                            $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
+                            $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
+                            $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
+
+                            $dataFarm = array(
+                                "inventory_order" => $input_inventory_order,
+                                "plate_number" => $input_truck_plate_number,
+                                "purchase_date" => $purchase_date,
+                                "service_cost" => $servicecost,
+                                "logistic_cost" => $logisticcost,
+                                "adjustment" => $farmadjustment,
+                                "pay_service_to" => $servicepayto,
+                                "pay_logistics_to" => $logisticpayto,
+                                "exchange_rate" => $input_conversion_rate,
+                                "updated_by" => $session['user_id'],
+                                "is_active" => 1,
+                                "origin_id" => $originid,
+                                "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
+                                "service_cost_withtaxes" => $servicesCostWithTaxes,
+                                "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
+                                "supplier_taxes" => $supplierTaxesArrList,
+                                "logistic_taxes" => $supplierLogisticTaxesArrList,
+                                "service_taxes" => $supplierServiceTaxesArrList,
+                                "adjust_taxes" => $adjustrf,
+                                "is_adjust_rf" => $isAdjustEnabled,
+                                "logistic_provider_taxes" => $providerLogisticTaxesArrList,
+                                "service_provider_taxes" => $providerServiceTaxesArrList,
+                                "adjusted_value" => $adjustmentValues,
+                                "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
+                                "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
+                                "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                "process_type" => $processType,
+                                "extraction_cost" => $extractionCost,
+                                "loading_cost" => $loadingCost,
+                                "unloading_cost" => $unloadingCost,
+                            );
+
+                            $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
+
+                            if ($updateFarm == true) {
+
+                                //DELETE EXISTING DATA
+
+                                $dataInventoryLedgerUpdate = array(
+                                    "amount" => 0,
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 0,
+                                );
+
+                                $updateInventoryLedger = $this->Farm_model->update_inventory_ledger($inventory_order, $contract_id, $dataInventoryLedgerUpdate);
+
+                                $dataContractPriceUpdate = array(
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 0,
+                                );
+
+                                $updateContractPrice = $this->Farm_model->update_contract_price($inventory_order, $contract_id, $dataContractPriceUpdate);
+
+                                if ($updateContractPrice == true) {
+                                    $this->Farm_model->add_supplier_price(
+                                        $contract_id,
+                                        $supplierid,
+                                        $inventory_order,
+                                        $session['user_id']
+                                    );
+                                }
+
+                                //END DELETE EXISTING DATA
+
+                                if ($updateInventoryLedger == true) {
+
+                                    $dataInventoryLedger = array(
+                                        "contract_id" => $contract_id,
+                                        "inventory_order" => $input_inventory_order,
+                                        "ledger_type" => 2,
+                                        "expense_date" => $purchase_date,
+                                        "created_by" => $session['user_id'],
+                                        "updated_by" => $session['user_id'],
+                                        "is_active" => 1,
+                                        "is_advance_app" => 0,
+                                    );
+
+                                    if ($woodValueWithSupplierTaxes != 0) {
+                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
+                                    }
+
+                                    if ($logisticsCostWithTaxes != 0) {
+                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
+                                    }
+
+                                    if ($servicesCostWithTaxes != 0) {
+                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
+                                    }
+
+                                    if ($farmadjustment != 0) {
+                                        $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
+                                    }
+
+                                    $Return['result'] = $this->lang->line('data_updated');
+                                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                    $this->output($Return);
+                                    exit;
+                                }
+                            }
                         } else if ($productTypeId == 2 || $productTypeId == 4) {
 
                             //CALCULATE WOOD VALUE & TAXES
@@ -6022,8 +6971,475 @@ class Farms extends MY_Controller
                             $providerLogisticTaxesAdjustArr = array();
                             $providerServiceTaxesAdjustArr = array();
 
-                            if ($productTypeId == 1 || $productTypeId == 3) {
-                                //NEED TO BE IMPLEMENTED
+                            if ($getFarmDetail[0]->product_id == 4 && ($productTypeId == 1 || $productTypeId == 3)) {
+
+                                $finalArray = [];
+
+                                $farmData = $this->Farm_model->get_farm_data_by_farm_id_detailed($farm_id);
+
+                                foreach ($farmData as $data) {
+                                    $noOfPieces = $data->no_of_pieces;
+                                    $volumePie = $data->volume_pie;
+                                    $length = $data->length;
+                                    $width = $data->width;
+                                    $thickness = $data->thickness;
+                                    $lengthExport = $data->length_export;
+                                    $widthExport = $data->width_export;
+                                    $thicknessExport = $data->thickness_export;
+                                    $face = $data->face;
+                                    $netVolume = $data->volume;
+                                    $totalVolume = $data->volume;
+
+
+                                    if ($noOfPieces > 0) {
+                                        $getPriceRanges = $this->Farm_model->get_price_for_circumference($face, $contract_id);
+                                        if (count($getPriceRanges) == 1) {
+                                            $woodValue = $woodValue + (($getPriceRanges[0]->pricerange_grade3 * $volumePie));
+                                        }
+                                    }
+                                }
+
+                                if ($input_conversion_rate > 0) {
+                                    $woodValue = $woodValue * $input_conversion_rate;
+                                }
+
+                                $woodValue = sprintf('%0.3f', ($woodValue + 0));
+
+                                // WOOD VALUE WITH TAXES
+                                $supplierIvaValue = 0;
+                                $supplierRetenctionValue = 0;
+                                $supplierReticaValue = 0;
+
+                                $getSupplierTaxes = $this->Master_model->get_supplier_taxes($supplierid);
+
+                                $supplierTaxesValue = 0;
+                                if (count($getSupplierTaxes) > 0) {
+
+                                    $supplierTaxesValue = 0;
+                                    foreach ($getSupplierTaxes as $suppliertax) {
+
+                                        $calcValue = 0;
+                                        $taxId = $suppliertax->tax_id;
+                                        $taxValue = $suppliertax->tax_value;
+                                        $taxFormat = $suppliertax->number_format;
+                                        $taxType = $suppliertax->arithmetic_type;
+
+                                        if ($taxValue > 0) {
+                                            if ($taxType == 2) {
+                                                $taxValue = $taxValue * -1;
+                                            }
+                                            if ($taxFormat == 2) {
+                                                $calcValue = $woodValue * ($taxValue / 100);
+                                            } else {
+                                                $calcValue = $woodValue * ($taxValue);
+                                            }
+                                        }
+
+                                        $supplierTaxesAdjustArr[] = array(
+                                            "taxId" => $taxId,
+                                            "taxValue" => $calcValue,
+                                            "taxVal" => (abs($taxValue) + 0),
+                                        );
+
+                                        array_push($supplierTaxesArr, $taxId);
+
+                                        $supplierTaxesValue = $supplierTaxesValue + $calcValue;
+                                    }
+                                }
+
+                                $woodValueWithSupplierTaxes = $woodValue + $supplierTaxesValue;
+
+                                // END WOOD VALUE WITH TAXES
+
+                                // LOGISTICS WITH TAXES
+
+                                if ($logisticcost != 0 && $logisticpayto > 0) {
+
+                                    $transportorIvaValue_Logistics = 0;
+                                    $transportorRetenctionValue_Logistics = 0;
+                                    $transportorReticaValue_Logistics = 0;
+
+                                    $getTransportorTaxes_Logistics = $this->Master_model->get_provider_taxes($logisticpayto);
+                                    $getTransportorTaxes_Logistics_Supplier = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                    $logisticTaxesValue = 0;
+
+                                    if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                        $logisticTaxesValue = 0;
+                                        foreach ($getTransportorTaxes_Logistics as $logistictaxtransportor) {
+
+                                            $calcValue_LTransportor = 0;
+                                            $taxId_LTransportor = $logistictaxtransportor->tax_id;
+                                            $taxValue_LTransportor = $logistictaxtransportor->tax_value;
+                                            $taxFormat_LTransportor = $logistictaxtransportor->number_format;
+                                            $taxType_LTransportor = $logistictaxtransportor->arithmetic_type;
+
+                                            if ($taxValue_LTransportor > 0) {
+                                                if ($taxType_LTransportor == 2) {
+                                                    $taxValue_LTransportor = $taxValue_LTransportor * -1;
+                                                }
+                                                if ($taxFormat_LTransportor == 2) {
+                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor / 100);
+                                                } else {
+                                                    $calcValue_LTransportor = $logisticcost * ($taxValue_LTransportor);
+                                                }
+                                            }
+
+                                            $logisticTaxesValue = $logisticTaxesValue + $calcValue_LTransportor;
+
+                                            $providerLogisticTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_LTransportor,
+                                                "taxValue" => $calcValue_LTransportor,
+                                                "taxVal" => (abs($taxValue_LTransportor) + 0),
+                                            );
+
+                                            array_push($providerLogisticTaxesArr, $taxId_LTransportor);
+                                        }
+
+                                        if ($logisticTaxesValue == 0) {
+                                            foreach ($getTransportorTaxes_Logistics_Supplier as $logistictaxsupplier) {
+
+                                                $calcValue_STransportor = 0;
+                                                $taxId_STransportor = $logistictaxsupplier->tax_id;
+                                                $taxValue_STransportor = $logistictaxsupplier->tax_value;
+                                                $taxFormat_STransportor = $logistictaxsupplier->number_format;
+                                                $taxType_STransportor = $logistictaxsupplier->arithmetic_type;
+
+                                                if ($taxValue_STransportor > 0) {
+                                                    if ($taxType_STransportor == 2) {
+                                                        $taxValue_STransportor = $taxValue_STransportor * -1;
+                                                    }
+                                                    if ($taxFormat_STransportor == 2) {
+                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor / 100);
+                                                    } else {
+                                                        $calcValue_STransportor = $logisticcost * ($taxValue_STransportor);
+                                                    }
+                                                }
+
+                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_STransportor;
+
+                                                $providerLogisticTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_STransportor,
+                                                    "taxValue" => $calcValue_STransportor,
+                                                    "taxVal" => (abs($taxValue_STransportor) + 0),
+                                                );
+
+                                                array_push($supplierLogisticTaxesArr, $taxId_STransportor);
+                                            }
+                                        }
+                                    } else if ($logisticpayto == $supplierid) {
+
+                                        $getTransportorTaxes_Logistics = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                        $logisticTaxesValue = 0;
+                                        if (count($getTransportorTaxes_Logistics) > 0) {
+
+                                            foreach ($getTransportorTaxes_Logistics as $transporttax) {
+
+                                                $calcValue_logistic = 0;
+                                                $taxId_logistic = $transporttax->tax_id;
+                                                $taxValue_logistic = $transporttax->tax_value;
+                                                $taxFormat_logistic = $transporttax->number_format;
+                                                $taxType_logistic = $transporttax->arithmetic_type;
+
+                                                if ($taxValue_logistic > 0) {
+                                                    if ($taxType_logistic == 2) {
+                                                        $taxValue_logistic = $taxValue_logistic * -1;
+                                                    }
+                                                    if ($taxFormat_logistic == 2) {
+                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic / 100);
+                                                    } else {
+                                                        $calcValue_logistic = $logisticcost * ($taxValue_logistic);
+                                                    }
+                                                }
+
+                                                $logisticTaxesValue = $logisticTaxesValue + $calcValue_logistic;
+
+                                                $providerLogisticTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_logistic,
+                                                    "taxValue" => $calcValue_logistic,
+                                                    "taxVal" => (abs($taxValue_logistic) + 0),
+                                                );
+
+                                                array_push($supplierLogisticTaxesArr, $taxId_logistic);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $logisticsCostWithTaxes = $logisticcost + $logisticTaxesValue;
+
+                                // END LOGISTICS WITH TAXES
+
+                                // SERVICES WITH TAXES
+
+                                if ($servicecost != 0 && $servicepayto > 0) {
+                                    $transportorIvaValue_Service = 0;
+                                    $transportorRetenctionValue_Service = 0;
+                                    $transportorReticaValue_Service = 0;
+
+                                    $getTransportorTaxes_Service = $this->Master_model->get_provider_taxes($servicepayto);
+                                    $getTransportorTaxes_Service_Supplier = $this->Master_model->get_supplier_taxes($servicepayto);
+
+                                    $servicesTaxesValue = 0;
+
+                                    if (count($getTransportorTaxes_Service) > 0) {
+
+                                        $servicesTaxesValue = 0;
+                                        foreach ($getTransportorTaxes_Service as $servicetaxtransportor) {
+
+                                            $calcValue_SerTransportor = 0;
+                                            $taxId_SerTransportor = $servicetaxtransportor->tax_id;
+                                            $taxValue_SerTransportor = $servicetaxtransportor->tax_value;
+                                            $taxFormat_SerTransportor = $servicetaxtransportor->number_format;
+                                            $taxType_SerTransportor = $servicetaxtransportor->arithmetic_type;
+
+                                            if ($taxValue_SerTransportor > 0) {
+                                                if ($taxType_SerTransportor == 2) {
+                                                    $taxValue_SerTransportor = $taxValue_SerTransportor * -1;
+                                                }
+                                                if ($taxFormat_SerTransportor == 2) {
+                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor / 100);
+                                                } else {
+                                                    $calcValue_SerTransportor = $servicecost * ($taxValue_SerTransportor);
+                                                }
+                                            }
+
+                                            $servicesTaxesValue = $servicesTaxesValue + $calcValue_SerTransportor;
+
+                                            $providerServiceTaxesAdjustArr[] = array(
+                                                "taxId" => $taxId_SerTransportor,
+                                                "taxValue" => $calcValue_SerTransportor,
+                                                "taxVal" => (abs($taxValue_SerTransportor) + 0),
+                                            );
+                                            array_push($providerServiceTaxesArr, $taxId_SerTransportor);
+                                        }
+
+                                        if ($servicesTaxesValue == 0) {
+                                            foreach ($getTransportorTaxes_Service_Supplier as $servicetaxsupplier) {
+
+                                                $calcValue_SSTransportor = 0;
+                                                $taxId_SSTransportor = $servicetaxsupplier->tax_id;
+                                                $taxValue_SSTransportor = $servicetaxsupplier->tax_value;
+                                                $taxFormat_SSTransportor = $servicetaxsupplier->number_format;
+                                                $taxType_SSTransportor = $servicetaxsupplier->arithmetic_type;
+
+                                                if ($taxValue_SSTransportor > 0) {
+                                                    if ($taxType_SSTransportor == 2) {
+                                                        $taxValue_SSTransportor = $taxValue_SSTransportor * -1;
+                                                    }
+                                                    if ($taxFormat_SSTransportor == 2) {
+                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor / 100);
+                                                    } else {
+                                                        $calcValue_SSTransportor = $servicecost * ($taxValue_SSTransportor);
+                                                    }
+                                                }
+
+                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_SSTransportor;
+
+                                                $providerServiceTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_SSTransportor,
+                                                    "taxValue" => $calcValue_SSTransportor,
+                                                    "taxVal" => (abs($taxValue_SSTransportor) + 0),
+                                                );
+
+                                                array_push($supplierServiceTaxesArr, $taxId_SSTransportor);
+                                            }
+                                        }
+                                    } else if ($servicepayto == $supplierid) {
+
+                                        $getTransportorTaxes_Services = $this->Master_model->get_supplier_taxes($logisticpayto);
+
+                                        $servicesTaxesValue = 0;
+                                        if (count($getTransportorTaxes_Services) > 0) {
+
+                                            foreach ($getTransportorTaxes_Services as $servicesuppliertax) {
+
+                                                $calcValue_service = 0;
+                                                $taxId_service = $servicesuppliertax->tax_id;
+                                                $taxValue_service = $servicesuppliertax->tax_value;
+                                                $taxFormat_service = $servicesuppliertax->number_format;
+                                                $taxType_service = $servicesuppliertax->arithmetic_type;
+
+                                                if ($taxValue_service > 0) {
+                                                    if ($taxType_service == 2) {
+                                                        $taxValue_service = $taxValue_service * -1;
+                                                    }
+                                                    if ($taxFormat_service == 2) {
+                                                        $calcValue_service = $servicecost * ($taxValue_service / 100);
+                                                    } else {
+                                                        $calcValue_service = $servicecost * ($taxValue_service);
+                                                    }
+                                                }
+
+                                                $servicesTaxesValue = $servicesTaxesValue + $calcValue_service;
+
+                                                $providerServiceTaxesAdjustArr[] = array(
+                                                    "taxId" => $taxId_service,
+                                                    "taxValue" => $calcValue_service,
+                                                    "taxVal" => (abs($taxValue_service) + 0),
+                                                );
+
+                                                array_push($supplierServiceTaxesArr, $taxId_service);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $servicesCostWithTaxes = $servicecost + $servicesTaxesValue;
+
+                                // END SERVICES WITH TAXES
+
+                                $adjust_arr = explode(",", $adjustrf);
+                                $isAdjustEnabled = false;
+                                $adjustmentValues = 0;
+
+                                if (count($adjust_arr) > 0) {
+
+                                    $isAdjustEnabled = true;
+
+                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+
+                                    foreach ($adjust_arr as $adjust) {
+
+                                        foreach ($supplierTaxesAdjustArr as $suppliertaxestax) {
+                                            if ($suppliertaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($suppliertaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+
+                                        foreach ($providerServiceTaxesAdjustArr as $providerservicetaxestax) {
+                                            if ($providerservicetaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerservicetaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+
+                                        foreach ($providerLogisticTaxesAdjustArr as $providerlogistictaxestax) {
+                                            if ($providerlogistictaxestax["taxId"] == $adjust) {
+                                                $totalValueWithTaxes = $totalValueWithTaxes - abs($providerlogistictaxestax["taxValue"]);
+                                                $adjustmentValues = $adjustmentValues + abs($suppliertaxestax["taxValue"]);
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    $totalValueWithTaxes = $woodValueWithSupplierTaxes + $logisticsCostWithTaxes + $servicesCostWithTaxes;
+                                }
+
+                                if ($farmadjustment != 0) {
+                                    $totalValueWithTaxes = $totalValueWithTaxes - $farmadjustment;
+                                }
+
+                                $totalValue = $woodValue + $logisticcost + $servicecost;
+
+                                $supplierTaxesArrList = implode(', ', $supplierTaxesArr);
+                                $providerLogisticTaxesArrList = implode(', ', $providerLogisticTaxesArr);
+                                $providerServiceTaxesArrList = implode(', ', $providerServiceTaxesArr);
+                                $supplierLogisticTaxesArrList = implode(', ', $supplierLogisticTaxesArr);
+                                $supplierServiceTaxesArrList = implode(', ', $supplierServiceTaxesArr);
+
+                                $dataFarm = array(
+                                    "inventory_order" => $input_inventory_order,
+                                    "plate_number" => $input_truck_plate_number,
+                                    "purchase_date" => $purchase_date,
+                                    "service_cost" => $servicecost,
+                                    "logistic_cost" => $logisticcost,
+                                    "adjustment" => $farmadjustment,
+                                    "pay_service_to" => $servicepayto,
+                                    "pay_logistics_to" => $logisticpayto,
+                                    "exchange_rate" => $input_conversion_rate,
+                                    "updated_by" => $session['user_id'],
+                                    "is_active" => 1,
+                                    "origin_id" => $originid,
+                                    "wood_value_withtaxes" => $woodValueWithSupplierTaxes,
+                                    "service_cost_withtaxes" => $servicesCostWithTaxes,
+                                    "logistic_cost_withtaxes" => $logisticsCostWithTaxes,
+                                    "supplier_taxes" => $supplierTaxesArrList,
+                                    "logistic_taxes" => $supplierLogisticTaxesArrList,
+                                    "service_taxes" => $supplierServiceTaxesArrList,
+                                    "adjust_taxes" => $adjustrf,
+                                    "is_adjust_rf" => $isAdjustEnabled,
+                                    "logistic_provider_taxes" => $providerLogisticTaxesArrList,
+                                    "service_provider_taxes" => $providerServiceTaxesArrList,
+                                    "adjusted_value" => $adjustmentValues,
+                                    "supplier_taxes_array" => json_encode($supplierTaxesAdjustArr),
+                                    "logistics_taxes_array" => json_encode($providerLogisticTaxesAdjustArr),
+                                    "service_taxes_array" => json_encode($providerServiceTaxesAdjustArr),
+                                    "process_type" => $processType,
+                                    "extraction_cost" => $extractionCost,
+                                    "loading_cost" => $loadingCost,
+                                    "unloading_cost" => $unloadingCost,
+                                );
+
+                                $updateFarm = $this->Farm_model->update_farm($farm_id, $inventory_order, $contract_id, $dataFarm);
+
+                                if ($updateFarm == true) {
+
+                                    //DELETE EXISTING DATA
+
+                                    $dataInventoryLedgerUpdate = array(
+                                        "amount" => 0,
+                                        "updated_by" => $session['user_id'],
+                                        "is_active" => 0,
+                                    );
+
+                                    $updateInventoryLedger = $this->Farm_model->update_inventory_ledger($inventory_order, $contract_id, $dataInventoryLedgerUpdate);
+
+                                    $dataContractPriceUpdate = array(
+                                        "updated_by" => $session['user_id'],
+                                        "is_active" => 0,
+                                    );
+
+                                    $updateContractPrice = $this->Farm_model->update_contract_price($inventory_order, $contract_id, $dataContractPriceUpdate);
+
+                                    if ($updateContractPrice == true) {
+                                        $this->Farm_model->add_supplier_price(
+                                            $contract_id,
+                                            $supplierid,
+                                            $inventory_order,
+                                            $session['user_id']
+                                        );
+                                    }
+
+                                    //END DELETE EXISTING DATA
+
+                                    if ($updateInventoryLedger == true) {
+
+                                        $dataInventoryLedger = array(
+                                            "contract_id" => $contract_id,
+                                            "inventory_order" => $input_inventory_order,
+                                            "ledger_type" => 2,
+                                            "expense_date" => $purchase_date,
+                                            "created_by" => $session['user_id'],
+                                            "updated_by" => $session['user_id'],
+                                            "is_active" => 1,
+                                            "is_advance_app" => 0,
+                                        );
+
+                                        if ($woodValueWithSupplierTaxes != 0) {
+                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $woodValueWithSupplierTaxes, 1, $supplierid);
+                                        }
+
+                                        if ($logisticsCostWithTaxes != 0) {
+                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $logisticsCostWithTaxes, 2, $logisticpayto);
+                                        }
+
+                                        if ($servicesCostWithTaxes != 0) {
+                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $servicesCostWithTaxes, 3, $servicepayto);
+                                        }
+
+                                        if ($farmadjustment != 0) {
+                                            $this->Farm_model->add_inventory_ledger($dataInventoryLedger, $farmadjustment, 4, $supplierid);
+                                        }
+
+                                        $Return['result'] = $this->lang->line('data_updated');
+                                        $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                                        $this->output($Return);
+                                        exit;
+                                    }
+                                }
                             } else if ($productTypeId == 2 || $productTypeId == 4) {
 
                                 //CALCULATE WOOD VALUE & TAXES
@@ -6501,6 +7917,15 @@ class Farms extends MY_Controller
 
                                     $updateContractPrice = $this->Farm_model->update_contract_price($inventory_order, $contract_id, $dataContractPriceUpdate);
 
+                                    if ($updateContractPrice == true) {
+                                        $this->Farm_model->add_supplier_price(
+                                            $contract_id,
+                                            $supplierid,
+                                            $inventory_order,
+                                            $session['user_id']
+                                        );
+                                    }
+
                                     //END DELETE EXISTING DATA
 
                                     if ($updateInventoryLedger == true) {
@@ -6577,8 +8002,13 @@ class Farms extends MY_Controller
             $session = $this->session->userdata('fullname');
 
             $Return = array(
-                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
-                'warning' => '', 'success' => '', 'datatable' => false,
+                'result' => '',
+                'error' => '',
+                'redirect' => false,
+                'csrf_hash' => '',
+                'warning' => '',
+                'success' => '',
+                'datatable' => false,
             );
 
             if (!empty($session)) {
@@ -6759,7 +8189,7 @@ class Farms extends MY_Controller
                                                 $salesValue = 0;
                                                 $totalSalesValue = 0;
 
-                                                if($salesPriceVal != 0) {
+                                                if ($salesPriceVal != 0) {
                                                     $salesValue = $salesPriceVal;
                                                     $totalSalesValue = $salesPriceVal * $metricTonVal;
                                                 }
@@ -6768,7 +8198,6 @@ class Farms extends MY_Controller
 
                                                     $woodValue = $purchasePriceVal;
                                                     $totalPurchaseValue = $purchasePriceVal * $metricTonVal;
-
                                                 } else {
 
                                                     preg_match_all('/\d*\.?\d+/', $diameterVal, $matches);
@@ -6784,7 +8213,7 @@ class Farms extends MY_Controller
                                                         }
                                                     }
                                                 }
-                                                
+
                                                 $farmData[] = array(
                                                     'containerNumber' => $containerVal,
                                                     'seal' => $sealVal,
@@ -6911,7 +8340,7 @@ class Farms extends MY_Controller
                                     // }
 
 
-                                    if (($productTypeId == 1 || $productTypeId == 3)) {
+                                    if ($productId == 4 && ($productTypeId == 1 || $productTypeId == 3)) {
 
                                         $createArray = array('INVENTORY ORDER', 'SCANNED CODE', 'LENGTH', 'THICKNESS', 'WIDTH');
                                         $makeArray = array('INVENTORYORDER' => 'INVENTORY ORDER', 'SCANNEDCODE' => 'SCANNED CODE', 'LENGTH' => 'LENGTH', 'THICKNESS' => 'THICKNESS', 'WIDTH' => 'WIDTH');
@@ -6964,9 +8393,9 @@ class Farms extends MY_Controller
                                                         $lengthExport = $this->truncate($lengthVal * 0.3048, 2);
                                                         $widthExport = $this->truncate($widthVal * 2.54, 2);
                                                         $thicknessExport = $this->truncate($thicknessVal * 2.54, 2);
-                                                        $volumePie = $this->truncate(($lengthVal * $widthVal * $thicknessVal / 12) * $scannedCode, 0);
+                                                        $volumePie = $this->truncate(($lengthVal * $widthVal * $thicknessVal / 12), 2) * $scannedCode;
                                                         $face = $thicknessVal * $widthVal;
-                                                        $netVolume = round($widthExport * $thicknessExport * $lengthExport / 10000, 3) * $scannedCode;
+                                                        $netVolume = $this->truncate($widthExport * $thicknessExport * $lengthExport / 10000, 3) * $scannedCode;
 
                                                         $farmData[] = array(
                                                             'noOfPieces' => $scannedCode,
@@ -7007,7 +8436,13 @@ class Farms extends MY_Controller
                                                 //     $totalVolume = $totalNetVolume;
                                                 // }
 
-                                                $totalVolume = $totalNetVolume;
+
+
+                                                if ($purchaseUnit == 1) {
+                                                    $totalVolume = $totalVolumePie;
+                                                } else {
+                                                    $totalVolume = $totalNetVolume;
+                                                }
 
                                                 $dataUploaded = array(
                                                     "farmData" => $farmData,
@@ -7261,8 +8696,8 @@ class Farms extends MY_Controller
                                                         $grossVolume = 0;
                                                         if (count($getFormulae) > 0) {
                                                             foreach ($getFormulae as $formula) {
-                                                                
-                                                                if($originId == 4) {
+
+                                                                if ($originId == 4) {
                                                                     $strFormula = str_replace(array('$ac', '$al', '$l', '$c', 'truncate', '$pcs'), array($circumferenceAllowance, $lengthAllowance, $lengthVal, $circumferenceVal, '$this->truncate', $noOfPiecesVal), $formula->formula_context);
                                                                     $strFormula = "return (" . $strFormula . ");";
 
@@ -7274,14 +8709,14 @@ class Farms extends MY_Controller
                                                                         $grossVolume = eval($strFormula);
                                                                     }
                                                                 } else {
-                                                                
+
                                                                     $strFormula = str_replace(array('$ac', '$al', '$l', '$c', 'truncate'), array($circumferenceAllowance, $lengthAllowance, $lengthVal, $circumferenceVal, '$this->truncate'), $formula->formula_context);
                                                                     $strFormula = "return (" . $strFormula . ");";
-    
+
                                                                     if ($formula->type == "netvolume") {
                                                                         $netVolume = sprintf('%0.3f', eval($strFormula)) * $noOfPiecesVal;
                                                                     }
-    
+
                                                                     if ($formula->type == "grossvolume") {
                                                                         $grossVolume = sprintf('%0.3f', eval($strFormula)) * $noOfPiecesVal;
                                                                     }
@@ -7321,19 +8756,19 @@ class Farms extends MY_Controller
                                                                     'length' => ($lengthVal + 0),
                                                                     'netVolume' => sprintf('%0.3f', $netVolume),
                                                                     'grossVolume' => sprintf('%0.3f', $grossVolume),
-                                                                    'circAllowance' => $circumferenceAllowance, 
+                                                                    'circAllowance' => $circumferenceAllowance,
                                                                     'lengthAllowance' => $lengthAllowance
                                                                 );
                                                             }
                                                         } else {
-                                                            if($originId == 4) {
+                                                            if ($originId == 4) {
                                                                 $farmData[] = array(
                                                                     'noOfPieces' => ($noOfPiecesVal + 0),
                                                                     'circumference' => ($circumferenceVal + 0),
                                                                     'length' => ($lengthVal + 0),
                                                                     'netVolume' => $netVolume,
                                                                     'grossVolume' => $grossVolume,
-                                                                    'circAllowance' => $circumferenceAllowance, 
+                                                                    'circAllowance' => $circumferenceAllowance,
                                                                     'lengthAllowance' => $lengthAllowance
                                                                 );
                                                             } else {
@@ -7343,7 +8778,7 @@ class Farms extends MY_Controller
                                                                     'length' => ($lengthVal + 0),
                                                                     'netVolume' => sprintf('%0.3f', $netVolume),
                                                                     'grossVolume' => sprintf('%0.3f', $grossVolume),
-                                                                    'circAllowance' => $circumferenceAllowance, 
+                                                                    'circAllowance' => $circumferenceAllowance,
                                                                     'lengthAllowance' => $lengthAllowance
                                                                 );
                                                             }
@@ -7362,14 +8797,14 @@ class Farms extends MY_Controller
                                                 exit;
                                             } else {
 
-                                                if($originId == 4) {
-                                                    
-                                                    if($roundingfactorInput > 0) {
+                                                if ($originId == 4) {
+
+                                                    if ($roundingfactorInput > 0) {
                                                         $precision = (int) $roundingfactorInput; // Ensure it's an integer
                                                         $totalNetVolume = number_format($totalNetVolume, $precision, '.', '');
                                                         $totalGrossVolume = number_format($totalGrossVolume, $precision, '.', '');
                                                     }
-                                                    
+
                                                     $dataUploaded = array(
                                                         "farmData" => $farmData,
                                                         "totalPieces" => $totalPieces,
@@ -7462,7 +8897,10 @@ class Farms extends MY_Controller
             $session = $this->session->userdata('fullname');
 
             $Return = array(
-                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
+                'result' => '',
+                'error' => '',
+                'redirect' => false,
+                'csrf_hash' => '',
                 'successmessage' => ''
             );
 
@@ -7956,7 +9394,7 @@ class Farms extends MY_Controller
                     } else if (
                         $getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 4 || $getFarmDetails[0]->unit_of_purchase == 5
                         || $getFarmDetails[0]->unit_of_purchase == 6 || $getFarmDetails[0]->unit_of_purchase == 7
-                        || $getFarmDetails[0]->unit_of_purchase == 8 || $getFarmDetails[0]->unit_of_purchase == 9 || $getFarmDetails[0]->unit_of_purchase == 12 || $getFarmDetails[0]->unit_of_purchase == 13 || $getFarmDetails[0]->unit_of_purchase == 14 
+                        || $getFarmDetails[0]->unit_of_purchase == 8 || $getFarmDetails[0]->unit_of_purchase == 9 || $getFarmDetails[0]->unit_of_purchase == 12 || $getFarmDetails[0]->unit_of_purchase == 13 || $getFarmDetails[0]->unit_of_purchase == 14
                         || $getFarmDetails[0]->unit_of_purchase == 15
                     ) {
 
@@ -8169,69 +9607,69 @@ class Farms extends MY_Controller
 
                             foreach ($getFormulae as $formula) {
                                 if ($formula->type == "netvolume") {
-                                    
-                                    if($getFarmDetails[0]->origin_id == 4) {
+
+                                    if ($getFarmDetails[0]->origin_id == 4) {
                                         $netVolumeFormula = str_replace(
-                                        array('$ac', '$al', '$l', '$c', 'truncate', 'pow', 'round', '$pcs'),
-                                        array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, 'B' . $rowCountData, 'A' . $rowCountData, "TRUNC", "POWER", "ROUND", 'C'.$rowCountData),
-                                        $formula->formula_context
+                                            array('$ac', '$al', '$l', '$c', 'truncate', 'pow', 'round', '$pcs'),
+                                            array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, 'B' . $rowCountData, 'A' . $rowCountData, "TRUNC", "POWER", "ROUND", 'C' . $rowCountData),
+                                            $formula->formula_context
                                         );
-    
+
                                         $strFormula = str_replace(
                                             array('$ac', '$al', '$l', '$c', 'truncate', '$pcs'),
                                             array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, $farmdata->length, $farmdata->circumference, '$this->truncate', $farmdata->no_of_pieces),
                                             $formula->formula_context
                                         );
-    
+
                                         $strFormula = "return (" . $strFormula . ");";
                                     } else {
                                         $netVolumeFormula = str_replace(
-                                        array('$ac', '$al', '$l', '$c', 'truncate', 'pow', 'round'),
-                                        array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, 'B' . $rowCountData, 'A' . $rowCountData, "TRUNC", "POWER", "ROUND"),
-                                        $formula->formula_context
+                                            array('$ac', '$al', '$l', '$c', 'truncate', 'pow', 'round'),
+                                            array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, 'B' . $rowCountData, 'A' . $rowCountData, "TRUNC", "POWER", "ROUND"),
+                                            $formula->formula_context
                                         );
-    
+
                                         $strFormula = str_replace(
                                             array('$ac', '$al', '$l', '$c', 'truncate'),
                                             array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, $farmdata->length, $farmdata->circumference, '$this->truncate'),
                                             $formula->formula_context
                                         );
-    
+
                                         $strFormula = "return (" . $strFormula . ");";
                                     }
                                 }
 
                                 if ($formula->type == "grossvolume") {
 
-                                    if($getFarmDetails[0]->origin_id == 4) {
+                                    if ($getFarmDetails[0]->origin_id == 4) {
 
                                         $strFormulaGross = str_replace(
                                             array('$ac', '$al', '$l', '$c', 'truncate', '$pcs'),
                                             array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, $farmdata->length, $farmdata->circumference, '$this->truncate', $farmdata->no_of_pieces),
                                             $formula->formula_context
                                         );
-    
+
                                         $strFormulaGross = "return (" . $strFormulaGross . ");";
                                     } else {
                                         $strFormulaGross = str_replace(
-                                        array('$ac', '$al', '$l', '$c', 'truncate'),
-                                        array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, $farmdata->length, $farmdata->circumference, '$this->truncate'),
-                                        $formula->formula_context
+                                            array('$ac', '$al', '$l', '$c', 'truncate'),
+                                            array($getFarmDetails[0]->purchase_allowance, $getFarmDetails[0]->purchase_allowance_length, $farmdata->length, $farmdata->circumference, '$this->truncate'),
+                                            $formula->formula_context
                                         );
-    
+
                                         $strFormulaGross = "return (" . $strFormulaGross . ");";
                                     }
                                 }
                             }
-                            
-                            if($getFarmDetails[0]->origin_id == 4) {
+
+                            if ($getFarmDetails[0]->origin_id == 4) {
                                 $objSheet->SetCellValue('D' . $rowCountData, "=$netVolumeFormula");
                                 if ($strFormula != "") {
                                     $row_array_farmdata['netvolume'] = (eval($strFormula));
                                 } else {
-                                        $row_array_farmdata['netvolume'] = 0;
+                                    $row_array_farmdata['netvolume'] = 0;
                                 }
-        
+
                                 if ($strFormulaGross != "") {
                                     $grossVolumeTotal = $grossVolumeTotal + ((eval($strFormulaGross)));
                                 } else {
@@ -8242,22 +9680,22 @@ class Farms extends MY_Controller
                                 if ($strFormula != "") {
                                     $row_array_farmdata['netvolume'] = (eval($strFormula) * $farmdata->no_of_pieces);
                                 } else {
-                                        $row_array_farmdata['netvolume'] = 0;
+                                    $row_array_farmdata['netvolume'] = 0;
                                 }
-        
+
                                 if ($strFormulaGross != "") {
                                     $grossVolumeTotal = $grossVolumeTotal + ((eval($strFormulaGross) * $farmdata->no_of_pieces));
                                 } else {
                                     $grossVolumeTotal = $grossVolumeTotal + 0;
                                 }
                             }
-                             
+
                             $objSheet->getStyle("D$rowCountData")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
 
                             $objSheet->getStyle("A$rowCountData:D$rowCountData")->applyFromArray($styleArray);
 
                             $row_array_farmdata['circumference'] = round($farmdata->circumference, 2);
-                            
+
 
                             array_push($return_arr_farmdata, $row_array_farmdata);
 
@@ -8266,15 +9704,15 @@ class Farms extends MY_Controller
 
                         $calcLastRow = $rowCountData - 1;
                         $objSheet->SetCellValue("D2", "=SUM(C$calcStartRow:C$calcLastRow)");
-                        
-                        if($getFarmDetails[0]->rounding_factor > 0) {
+
+                        if ($getFarmDetails[0]->rounding_factor > 0) {
                             $roundingfactorVal = $getFarmDetails[0]->rounding_factor;
                             $objSheet->SetCellValue("D3", "=ROUND(SUM(D$calcStartRow:D$calcLastRow), $roundingfactorVal)");
                         } else {
                             $objSheet->SetCellValue("D3", "=SUM(D$calcStartRow:D$calcLastRow)");
                         }
-                        
-                        
+
+
 
                         if ($getFarmDetails[0]->unit_of_purchase == 6 || $getFarmDetails[0]->unit_of_purchase == 7 || $getFarmDetails[0]->unit_of_purchase == 13) {
                             $objSheet->SetCellValue("C$summaryHeaderLastRow", $this->lang->line('average_girth'));
@@ -8385,13 +9823,12 @@ class Farms extends MY_Controller
                                 } else if ($getFarmDetails[0]->unit_of_purchase == 6 || $getFarmDetails[0]->unit_of_purchase == 7 || $getFarmDetails[0]->unit_of_purchase == 9 || $getFarmDetails[0]->unit_of_purchase == 12 || $getFarmDetails[0]->unit_of_purchase == 13 || $getFarmDetails[0]->unit_of_purchase == 14) {
                                     $objSheet->SetCellValue("J$rowCountDataSummary", "=H$rowCountDataSummary*I$rowCountDataSummary");
                                 } else {
-                                    
-                                    if($getFarmDetails[0]->unit_of_purchase == 15) {
+
+                                    if ($getFarmDetails[0]->unit_of_purchase == 15) {
                                         $objSheet->SetCellValue("J$rowCountDataSummary", ($priceRange + 0));
                                     } else {
                                         $objSheet->SetCellValue("J$rowCountDataSummary", ($priceRange * $farmdatasummary->pieces_farm + 0));
                                     }
-                                    
                                 }
 
                                 $objSheet->getStyle("I$rowCountDataSummary:J$rowCountDataSummary")
@@ -8520,8 +9957,13 @@ class Farms extends MY_Controller
                                 $strFormula = str_replace(
                                     array('$l', '$w', '$t', '$vp', 'truncate', '$ew', '$et', '$el'),
                                     array(
-                                        'B' . $rowCountData, 'C' . $rowCountData, 'D' . $rowCountData,
-                                        'E' . $rowCountData, 'TRUNC', 'H' . $rowCountData, 'I' . $rowCountData,
+                                        'B' . $rowCountData,
+                                        'C' . $rowCountData,
+                                        'D' . $rowCountData,
+                                        'E' . $rowCountData,
+                                        'TRUNC',
+                                        'H' . $rowCountData,
+                                        'I' . $rowCountData,
                                         'G' . $rowCountData
                                     ),
                                     $formula->formula_context
@@ -8927,7 +10369,7 @@ class Farms extends MY_Controller
             exit;
         }
     }
-    
+
     public function generate_farm_report($farmId, $contractId, $inventoryOrder)
     {
         try {
@@ -8980,8 +10422,10 @@ class Farms extends MY_Controller
                     }
                     $objSheet->SetCellValue('C4', $this->lang->line('measuremet_system'));
 
-                    if ($getFarmDetails[0]->product_id == 4 && ($getFarmDetails[0]->product_type_id == 1 || $getFarmDetails[0]->product_type_id == 3)
-                        && ($getFarmDetails[0]->unit_of_purchase == 1 || $getFarmDetails[0]->unit_of_purchase == 2) ) {
+                    if (
+                        $getFarmDetails[0]->product_id == 4 && ($getFarmDetails[0]->product_type_id == 1 || $getFarmDetails[0]->product_type_id == 3)
+                        && ($getFarmDetails[0]->unit_of_purchase == 1 || $getFarmDetails[0]->unit_of_purchase == 2)
+                    ) {
                         $objSheet->SetCellValue('C5', $this->lang->line('total_gross_volume'));
                         $objSheet->SetCellValue('C6', $this->lang->line('total_net_volume'));
                     }
@@ -8992,14 +10436,14 @@ class Farms extends MY_Controller
                     $objSheet->SetCellValue('B5', $getFarmDetails[0]->product_name . ' - ' . $this->lang->line($getFarmDetails[0]->product_type_name));
                     $objSheet->SetCellValue('B6', $getFarmDetails[0]->purchase_date);
                     $objSheet->SetCellValue('B7', $getFarmDetails[0]->origin);
-                    
-                    if($getFarmDetails[0]->driver_name != null && $getFarmDetails[0]->driver_name != "") {
+
+                    if ($getFarmDetails[0]->driver_name != null && $getFarmDetails[0]->driver_name != "") {
                         $objSheet->SetCellValue('B8', $getFarmDetails[0]->plate_number . " / " . $getFarmDetails[0]->driver_name);
                     } else {
                         $objSheet->SetCellValue('B8', $getFarmDetails[0]->plate_number);
                     }
-                    
-                    
+
+
                     $objSheet->SetCellValue('D4', $this->lang->line($getFarmDetails[0]->purchase_unit));
 
                     $rowCount = 5;
@@ -9051,12 +10495,12 @@ class Farms extends MY_Controller
 
                     $getFormulae = $this->Master_model->get_formulae_by_purchase_unit($getFarmDetails[0]->unit_of_purchase, $getFarmDetails[0]->origin_id);
 
-                    if ($getFarmDetails[0]->product_id == 4 && ($getFarmDetails[0]->product_type_id == 1 || $getFarmDetails[0]->product_type_id == 3)
-                        && ($getFarmDetails[0]->unit_of_purchase == 1 || $getFarmDetails[0]->unit_of_purchase == 2)) {
+                    if ($getFarmDetails[0]->product_id == 4 && ($getFarmDetails[0]->product_type_id == 1 
+                        || $getFarmDetails[0]->product_type_id == 3) && ($getFarmDetails[0]->unit_of_purchase == 1 || $getFarmDetails[0]->unit_of_purchase == 2)) {
 
                         $rowCount = 10;
 
-                        $objSheet->SetCellValue('A' . $rowCount, $this->lang->line('scanned_code'));
+                        $objSheet->SetCellValue('A' . $rowCount, $this->lang->line('pieces'));
                         $objSheet->SetCellValue('B' . $rowCount, $this->lang->line('length') . ' ' . $this->lang->line('feet'));
                         $objSheet->SetCellValue('C' . $rowCount, $this->lang->line('width') . ' ' . $this->lang->line('inch'));
                         $objSheet->SetCellValue('D' . $rowCount, $this->lang->line('thickness') . ' ' . $this->lang->line('inch'));
@@ -9148,12 +10592,7 @@ class Farms extends MY_Controller
                         $objSheet->getColumnDimension("P")->setAutoSize(false)->setWidth(18);
 
                         $rowCountData = 11;
-
-                        $txtFeet = '"ft"';
-                        $txtMeter = '"m"';
-                        $txtInch = '"in"';
-                        $txtCm = '"cm"';
-
+                        
                         foreach ($getFarmDataDetails as $farmdata) {
                             $objSheet->SetCellValue('A' . $rowCountData, $farmdata->scanned_code);
 
@@ -9161,15 +10600,26 @@ class Farms extends MY_Controller
                             $objSheet->SetCellValue('C' . $rowCountData, ($farmdata->width + 0));
                             $objSheet->SetCellValue('D' . $rowCountData, ($farmdata->thickness + 0));
 
-                            $objSheet->SetCellValue('E' . $rowCountData, "=IFERROR(TRUNC((B$rowCountData*C$rowCountData*D$rowCountData/12)*A$rowCountData,0),0)");
-                            $objSheet->SetCellValue('F' . $rowCountData, "=ROUND(((CONVERT(B$rowCountData,$txtFeet,$txtMeter))*(CONVERT(C$rowCountData,$txtInch,$txtMeter))*(CONVERT(D$rowCountData,$txtInch,$txtMeter))),3) * A$rowCountData");
+                            $objSheet->SetCellValue('E' . $rowCountData, "=IFERROR(TRUNC((B$rowCountData*C$rowCountData*D$rowCountData/12),2)*A$rowCountData,0)");
+                            $objSheet->SetCellValue('F' . $rowCountData, "=TRUNC(E$rowCountData/424, 3)");
 
-                            $objSheet->SetCellValue('G' . $rowCountData, "=TRUNC(CONVERT(B$rowCountData,$txtFeet,$txtMeter),2)");
-                            $objSheet->SetCellValue('H' . $rowCountData, "=TRUNC(CONVERT(C$rowCountData,$txtInch,$txtCm),2)");
-                            $objSheet->SetCellValue('I' . $rowCountData, "=TRUNC(CONVERT(D$rowCountData,$txtInch,$txtCm),2)");
+                            // Ensure numeric values
+                            $feet  = (float)$objSheet->getCell('B' . $rowCountData)->getValue();
+                            $inchC = (float)$objSheet->getCell('C' . $rowCountData)->getValue();
+                            $inchD = (float)$objSheet->getCell('D' . $rowCountData)->getValue();
+
+                            // Convert in PHP
+                            $meter = $this->truncate($feet * 0.3048, 2);
+                            $cmC   = $this->truncate($inchC * 2.54, 0);
+                            $cmD   = $this->truncate($inchD * 2.54, 0);
+
+                            // Set values (numeric)
+                            $objSheet->setCellValueExplicit('G' . $rowCountData, $meter, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            $objSheet->setCellValueExplicit('H' . $rowCountData, $cmC, PHPExcel_Cell_DataType::TYPE_NUMERIC);
+                            $objSheet->setCellValueExplicit('I' . $rowCountData, $cmD, PHPExcel_Cell_DataType::TYPE_NUMERIC);
 
                             $objSheet->SetCellValue('J' . $rowCountData, "=C$rowCountData*D$rowCountData");
-                            $objSheet->SetCellValue('K' . $rowCountData, "=ROUND(G$rowCountData*H$rowCountData*I$rowCountData/10000,3)*A$rowCountData");
+                            $objSheet->SetCellValue('K' . $rowCountData, "=TRUNC(G$rowCountData*H$rowCountData*I$rowCountData/10000,3)*A$rowCountData");
 
                             $objSheet->SetCellValue("L$rowCountData", "=IFERROR(LOOKUP(J$rowCountData,N11:O100,P11:P100)*E$rowCountData,0)");
                             $objSheet->getStyle('L' . $rowCountData)
@@ -9179,6 +10629,8 @@ class Farms extends MY_Controller
 
                             $rowCountData++;
                         }
+
+                        $lastRowData = $rowCountData - 1;
 
                         $objSheet->getStyle("L9")->applyFromArray($styleArray);
                         $objSheet->SetCellValue('L9', "=SUM(L11:L$rowCountData)");
@@ -9191,258 +10643,173 @@ class Farms extends MY_Controller
                         $objSheet->SetCellValue('K7', $this->lang->line('service_cost'));
                         $objSheet->SetCellValue('K8', $this->lang->line('adjustment'));
 
-                        // WOOD VALUE WITH TAXES
-
-                        $getSupplierTaxes = $this->Farm_model->get_supplier_taxes($getFarmDetails[0]->supplier_id);
-
-                        $ivaFormula = "";
-                        $retencionFormula = "";
-                        $reteicaFormula = "";
-                        if (count($getSupplierTaxes) == 1) {
-                            if ($getSupplierTaxes[0]->is_iva_enabled == 1) {
-                                $ivaFormula = $ivaFormula . "(L9*" . ($getSupplierTaxes[0]->iva_value + 0) . "%)";
-                            }
-
-                            if ($getSupplierTaxes[0]->is_retencion_enabled == 1) {
-                                $retencionFormula = $retencionFormula . "(L9*" . ($getSupplierTaxes[0]->retencion_value + 0) . "%)";
-                            }
-
-                            if ($getSupplierTaxes[0]->is_reteica_enabled == 1) {
-                                $reteicaFormula = $reteicaFormula . "(L9*" . ($getSupplierTaxes[0]->reteica_value + 0) . ")";
-                            }
+                        if (count($getSupplierTaxes) >= 3) {
+                            $rowCount = 2;
+                        } else {
+                            $rowCount = 6;
                         }
+                        $totalStartRow = $rowCount;
 
-                        // END WOOD VALUE WITH TAXES
+                        $objSheet->SetCellValue("D2", "=SUM(A11:A$lastRowData)");
+                        $objSheet->SetCellValue("D3", "=SUM(E11:E$lastRowData)");
+                        $objSheet->SetCellValue("D5", "=SUM(F11:F$lastRowData)");
+                        $objSheet->SetCellValue("D6", "=SUM(K11:K$lastRowData)");
 
-                        // LOGISTICS WITH TAXES
+                        $taxCellsArray = array();
 
-                        if ($getFarmDetails[0]->logistic_cost > 0 && $getFarmDetails[0]->pay_logistics_to > 0) {
+                        $objSheet->SetCellValue("K$rowCount", $this->lang->line('total_payment'));
+                        $totalPaymentRow = $rowCount;
+                        $rowCount++;
 
-                            $objSheet->SetCellValue('L3', ($getFarmDetails[0]->logistic_cost + 0));
+                        $objSheet->SetCellValue("K$rowCount", $this->lang->line('logistic_cost'));
+                        $objSheet->SetCellValue("L$rowCount", $getFarmDetails[0]->logistic_cost);
+                        $objSheet->getStyle("L$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                        $logisticCostRow = "$rowCount";
+                        $rowCount++;
 
-                            $getTransportorTaxes_Logistics = $this->Farm_model->get_transportor_taxes($getFarmDetails[0]->pay_logistics_to);
-                            $getTransportorTaxes_Logistics_Supplier = $this->Farm_model->get_supplier_taxes($getFarmDetails[0]->pay_logistics_to);
+                        foreach ($getSupplierTaxes as $suppliertax) {
 
-                            if (count($getTransportorTaxes_Logistics) == 1) {
-                                if ($getTransportorTaxes_Logistics[0]->is_iva_provider_enabled == 1) {
-                                    if ($ivaFormula != "") {
-                                        $ivaFormula = $ivaFormula . "+(L3*" . ($getTransportorTaxes_Logistics[0]->iva_provider_value + 0) . "%)";
-                                    } else {
-                                        $ivaFormula = $ivaFormula . "(L3*" . ($getTransportorTaxes_Logistics[0]->iva_provider_value + 0) . "%)";
-                                    }
-                                } else {
-                                    if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_iva_enabled == 1) {
-                                        if ($ivaFormula != "") {
-                                            $ivaFormula = $ivaFormula . "+(L3*" . ($getTransportorTaxes_Logistics_Supplier[0]->iva_value + 0) . "%)";
-                                        } else {
-                                            $ivaFormula = $ivaFormula . "(L3*" . ($getTransportorTaxes_Logistics_Supplier[0]->iva_value + 0) . "%)";
-                                        }
-                                    }
-                                }
-
-                                if ($getTransportorTaxes_Logistics[0]->is_retencion_provider_enabled == 1) {
-                                    if ($retencionFormula != "") {
-                                        $retencionFormula = $retencionFormula . "+(L3*" . ($getTransportorTaxes_Logistics[0]->retencion_provider_value + 0) . "%)";
-                                    } else {
-                                        $retencionFormula = $retencionFormula . "(L3*" . ($getTransportorTaxes_Logistics[0]->retencion_provider_value + 0) . "%)";
-                                    }
-                                } else {
-                                    if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_retencion_enabled == 1) {
-                                        if ($retencionFormula != "") {
-                                            $retencionFormula = $retencionFormula . "+(L3*" . ($getTransportorTaxes_Logistics_Supplier[0]->retencion_value + 0) . "%)";
-                                        } else {
-                                            $retencionFormula = $retencionFormula . "(L3*" . ($getTransportorTaxes_Logistics_Supplier[0]->retencion_value + 0) . "%)";
-                                        }
-                                    }
-                                }
-
-                                if ($getTransportorTaxes_Logistics[0]->is_reteica_provider_enabled == 1) {
-                                    if ($reteicaFormula != "") {
-                                        $reteicaFormula = $reteicaFormula . "+(L3*" . ($getTransportorTaxes_Logistics[0]->reteica_provider_value + 0) . ")";
-                                    } else {
-                                        $reteicaFormula = $reteicaFormula . "(L3*" . ($getTransportorTaxes_Logistics[0]->reteica_provider_value + 0) . ")";
-                                    }
-                                } else {
-                                    if (count($getTransportorTaxes_Logistics_Supplier) == 1 && $getTransportorTaxes_Logistics_Supplier[0]->is_reteica_enabled == 1) {
-                                        if ($reteicaFormula != "") {
-                                            $reteicaFormula = $reteicaFormula . "+(L3*" . ($getTransportorTaxes_Logistics_Supplier[0]->reteica_value + 0) . ")";
-                                        } else {
-                                            $reteicaFormula = $reteicaFormula . "(L3*" . ($getTransportorTaxes_Logistics_Supplier[0]->reteica_value + 0) . ")";
-                                        }
-                                    }
-                                }
-                            } else if ($getFarmDetails[0]->pay_logistics_to == $getFarmDetails[0]->supplier_id) {
-
-                                $getTransportorTaxes_Logistics = $this->Farm_model->get_supplier_taxes($getFarmDetails[0]->pay_logistics_to);
-
-                                if (count($getTransportorTaxes_Logistics) == 1) {
-
-                                    if ($getTransportorTaxes_Logistics[0]->is_iva_enabled == 1) {
-                                        if ($ivaFormula != "") {
-                                            $ivaFormula = $ivaFormula . "+(L3*" . ($getTransportorTaxes_Logistics[0]->iva_value + 0) . "%)";
-                                        } else {
-                                            $ivaFormula = $ivaFormula . "(L3*" . ($getTransportorTaxes_Logistics[0]->iva_value + 0) . "%)";
-                                        }
-                                    }
-
-                                    if ($getTransportorTaxes_Logistics[0]->is_retencion_enabled == 1) {
-                                        if ($retencionFormula != "") {
-                                            $retencionFormula = $retencionFormula . "+(L3*" . ($getTransportorTaxes_Logistics[0]->retencion_value + 0) . "%)";
-                                        } else {
-                                            $retencionFormula = $retencionFormula . "(L3*" . ($getTransportorTaxes_Logistics[0]->retencion_value + 0) . "%)";
-                                        }
-                                    }
-
-                                    if ($getTransportorTaxes_Logistics[0]->is_reteica_enabled == 1) {
-                                        if ($reteicaFormula != "") {
-                                            $reteicaFormula = $reteicaFormula . "+(L3*" . ($getTransportorTaxes_Logistics[0]->reteica_value + 0) . ")";
-                                        } else {
-                                            $reteicaFormula = $reteicaFormula . "(L3*" . ($getTransportorTaxes_Logistics[0]->reteica_value + 0) . ")";
-                                        }
-                                    }
-                                }
+                            if ($suppliertax->number_format == 2) {
+                                $suppliertax->tax_name = $suppliertax->tax_name . " (%)";
                             }
-                        }
+                            $objSheet->SetCellValue("K$rowCount", $suppliertax->tax_name);
 
-                        // END LOGISTICS WITH TAXES
+                            if ($suppliertax->arithmetic_type == 2) {
+                                $objSheet->getStyle("K$rowCount")->getFont()->getColor()->setRGB("FF0000");
+                            }
 
-                        // SERVICES WITH TAXES
+                            $supplierTaxesArr = json_decode($getFarmDetails[0]->supplier_taxes_array, true);
+                            $logisticsTaxesArray = json_decode($getFarmDetails[0]->logistics_taxes_array, true);
+                            $serviceTaxesArray = json_decode($getFarmDetails[0]->service_taxes_array, true);
 
-                        if ($getFarmDetails[0]->service_cost > 0 && $getFarmDetails[0]->pay_service_to > 0) {
+                            if (count($supplierTaxesArr) > 0) {
+                                $formula = "";
 
-                            $objSheet->SetCellValue('L7', ($getFarmDetails[0]->service_cost + 0));
+                                foreach ($supplierTaxesArr as $tax) {
 
-                            $getTransportorTaxes_Service = $this->Farm_model->get_transportor_taxes($getFarmDetails[0]->pay_service_to);
-                            $getTransportorTaxes_Service_Supplier = $this->Farm_model->get_supplier_taxes($getFarmDetails[0]->pay_service_to);
-
-                            if (count($getTransportorTaxes_Service) == 1) {
-
-                                if ($getTransportorTaxes_Service[0]->is_iva_provider_enabled == 1) {
-                                    if ($ivaFormula != "") {
-                                        $ivaFormula = $ivaFormula . "+(L7*" . ($getTransportorTaxes_Service[0]->iva_provider_value + 0) . "%)";
-                                    } else {
-                                        $ivaFormula = $ivaFormula . "(L7*" . ($getTransportorTaxes_Service[0]->iva_provider_value + 0) . "%)";
-                                    }
-                                } else {
-                                    if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_iva_enabled == 1) {
-                                        if ($ivaFormula != "") {
-                                            $ivaFormula = $ivaFormula . "+(L7*" . ($getTransportorTaxes_Service_Supplier[0]->iva_value + 0) . "%)";
+                                    if ($tax["taxId"] == $suppliertax->id) {
+                                        if ($suppliertax->arithmetic_type == 2) {
+                                            $taxval = $tax['taxVal'] * -1;
                                         } else {
-                                            $ivaFormula = $ivaFormula . "(L7*" . ($getTransportorTaxes_Service_Supplier[0]->iva_value + 0) . "%)";
+                                            $taxval = $tax['taxVal'];
                                         }
+                                        if ($suppliertax->number_format == 2) {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L$$$*$taxval%)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L$$$*$taxval%)";
+                                            }
+                                        } else {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L$$$*$taxval)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L$$$*$taxval)";
+                                            }
+                                        }
+
+                                        $taxCellsArray[] = array(
+                                            "rowCell" => "L$rowCount",
+                                            "formula" => $formula,
+                                        );
                                     }
                                 }
 
-                                if ($getTransportorTaxes_Service[0]->is_retencion_provider_enabled == 1) {
-                                    if ($retencionFormula != "") {
-                                        $retencionFormula = $retencionFormula . "+(L7*" . ($getTransportorTaxes_Service[0]->retencion_provider_value + 0) . "%)";
-                                    } else {
-                                        $retencionFormula = $retencionFormula . "(L7*" . ($getTransportorTaxes_Service[0]->retencion_provider_value + 0) . "%)";
-                                    }
-                                } else {
-                                    if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_retencion_enabled == 1) {
-                                        if ($retencionFormula != "") {
-                                            $retencionFormula = $retencionFormula . "+(L7*" . ($getTransportorTaxes_Service_Supplier[0]->retencion_value + 0) . "%)";
+                                foreach ($logisticsTaxesArray as $logistictax) {
+
+                                    if ($logistictax["taxId"] == $suppliertax->id) {
+                                        if ($suppliertax->arithmetic_type == 2) {
+                                            $ltaxval = $logistictax['taxVal'] * -1;
                                         } else {
-                                            $retencionFormula = $retencionFormula . "(L7*" . ($getTransportorTaxes_Service_Supplier[0]->retencion_value + 0) . "%)";
+                                            $ltaxval = $logistictax['taxVal'];
                                         }
+                                        if ($suppliertax->number_format == 2) {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L###*$ltaxval%)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L###*$ltaxval%)";
+                                            }
+                                        } else {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L###*$ltaxval)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L###*$ltaxval)";
+                                            }
+                                        }
+
+                                        $taxCellsArray[] = array(
+                                            "rowCell" => "L$rowCount",
+                                            "formula" => $formula,
+                                        );
                                     }
                                 }
 
-                                if ($getTransportorTaxes_Service[0]->is_reteica_provider_enabled == 1) {
-                                    if ($reteicaFormula != "") {
-                                        $reteicaFormula = $reteicaFormula . "+(L7*" . ($getTransportorTaxes_Service[0]->reteica_provider_value + 0) . ")";
-                                    } else {
-                                        $reteicaFormula = $reteicaFormula . "(L7*" . ($getTransportorTaxes_Service[0]->reteica_provider_value + 0) . ")";
-                                    }
-                                } else {
-                                    if (count($getTransportorTaxes_Service_Supplier) == 1 && $getTransportorTaxes_Service_Supplier[0]->is_reteica_enabled == 1) {
-                                        if ($reteicaFormula != "") {
-                                            $reteicaFormula = $reteicaFormula . "+(L7*" . ($getTransportorTaxes_Service_Supplier[0]->reteica_value + 0) . ")";
+                                foreach ($serviceTaxesArray as $servicetax) {
+
+                                    if ($servicetax["taxId"] == $suppliertax->id) {
+                                        if ($suppliertax->arithmetic_type == 2) {
+                                            $staxval = $servicetax['taxVal'] * -1;
                                         } else {
-                                            $reteicaFormula = $reteicaFormula . "(L7*" . ($getTransportorTaxes_Service_Supplier[0]->reteica_value + 0) . ")";
+                                            $staxval = $servicetax['taxVal'];
                                         }
-                                    }
-                                }
-                            } else {
-
-                                $getTransportorTaxes_Service = $this->Farm_model->get_supplier_taxes($getFarmDetails[0]->pay_service_to);
-
-                                if (count($getTransportorTaxes_Service) == 1) {
-
-                                    if ($getTransportorTaxes_Service[0]->is_iva_enabled == 1) {
-                                        if ($ivaFormula != "") {
-                                            $ivaFormula = $ivaFormula . "+(L7*" . ($getTransportorTaxes_Service[0]->iva_provider_value + 0) . "%)";
+                                        if ($suppliertax->number_format == 2) {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L&&&*$staxval%)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L&&&*$staxval%)";
+                                            }
                                         } else {
-                                            $ivaFormula = $ivaFormula . "(L7*" . ($getTransportorTaxes_Service[0]->iva_provider_value + 0) . "%)";
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L&&&*$staxval)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L&&&*$staxval)";
+                                            }
                                         }
-                                    }
 
-                                    if ($getTransportorTaxes_Service[0]->is_retencion_enabled == 1) {
-                                        if ($retencionFormula != "") {
-                                            $retencionFormula = $retencionFormula . "+(L7*" . ($getTransportorTaxes_Service[0]->retencion_provider_value + 0) . "%)";
-                                        } else {
-                                            $retencionFormula = $retencionFormula . "(L7*" . ($getTransportorTaxes_Service[0]->retencion_provider_value + 0) . "%)";
-                                        }
-                                    }
-
-                                    if ($getTransportorTaxes_Service[0]->is_reteica_enabled == 1) {
-                                        if ($reteicaFormula != "") {
-                                            $reteicaFormula = $reteicaFormula . "+(L7*" . ($getTransportorTaxes_Service[0]->reteica_provider_value + 0) . ")";
-                                        } else {
-                                            $reteicaFormula = $reteicaFormula . "(L7*" . ($getTransportorTaxes_Service[0]->reteica_provider_value + 0) . ")";
-                                        }
+                                        $taxCellsArray[] = array(
+                                            "rowCell" => "L$rowCount",
+                                            "formula" => $formula,
+                                        );
                                     }
                                 }
                             }
+
+                            $rowCount++;
                         }
 
-                        // END SERVICES WITH TAXES
+                        $objSheet->SetCellValue("K$rowCount", $this->lang->line('service_cost'));
+                        $objSheet->SetCellValue("L$rowCount", $getFarmDetails[0]->service_cost);
+                        $objSheet->getStyle("L$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                        $serviceCostRow = "$rowCount";
+                        $rowCount++;
 
-                        if ($getFarmDetails[0]->adjustment > 0) {
-                            $objSheet->SetCellValue('L8', $getFarmDetails[0]->adjustment);
+                        $objSheet->SetCellValue("K$rowCount", $this->lang->line('adjustment'));
+                        $objSheet->getStyle("K$totalStartRow:L$rowCount")->applyFromArray($styleArray);
+                        $objSheet->getStyle("L$totalStartRow:L$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                        $rowCount++;
+                        
+                        $objSheet->getStyle("L$totalStartRow:L$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+
+                        $calcRow = $rowCount;
+
+                        $totalPaymentRow1 = $totalPaymentRow + 1;
+                        $objSheet->SetCellValue("L$totalPaymentRow", "=SUM(L$totalPaymentRow1:L$calcRow)");
+                        $objSheet->getStyle("L$totalPaymentRow")->applyFromArray($styleArray);
+
+                        if (count($taxCellsArray) > 0) {
+                            foreach ($taxCellsArray as $taxcell) {
+                                $taxCells = $taxcell["rowCell"];
+                                $objSheet->SetCellValue("$taxCells", str_replace(
+                                    array("$$$", "###", "&&&"),
+                                    array("$calcRow", "$logisticCostRow", "$serviceCostRow"),
+                                    $taxcell["formula"]
+                                ));
+                            }
                         }
-
-                        $objSheet->SetCellValue('L2', "=SUM(L3:L9)");
-
-                        if ($ivaFormula != "") {
-                            $objSheet->SetCellValue("L6", "=$ivaFormula");
-                        }
-
-                        if ($retencionFormula != "") {
-                            $objSheet->SetCellValue("L5", "=$retencionFormula");
-                        }
-
-                        if ($reteicaFormula != "") {
-                            $objSheet->SetCellValue("L4", "=$reteicaFormula");
-                        }
-
-                        $objSheet->getStyle("K2:L8")->applyFromArray($styleArray);
-
-                        $objSheet->getStyle("K4:L5")
-                            ->getFont()
-                            ->getColor()
-                            ->setRGB('FF0000');
-
-                        $objSheet->SetCellValue('D2', "=SUM(A11:A$rowCountData)");
-                        if ($getFarmDetails[0]->unit_of_purchase == 1) {
-                            $objSheet->SetCellValue('D3', "=SUM(E11:E$rowCountData)");
-                        } else if ($getFarmDetails[0]->unit_of_purchase == 2) {
-                            $objSheet->SetCellValue('D3', "=SUM(K11:K$rowCountData)");
-                        }
-
-                        $objSheet->SetCellValue("D5", "=SUM(F11:F$rowCountData)");
-                        $objSheet->SetCellValue("D6", "=SUM(K11:K$rowCountData)");
-
-                        $objSheet->getStyle("L2:L9")
-                            ->getNumberFormat()
-                            ->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                    } else if (
-                        $getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 4 || $getFarmDetails[0]->unit_of_purchase == 5
+                        
+                    } else if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 4 || $getFarmDetails[0]->unit_of_purchase == 5
                         || $getFarmDetails[0]->unit_of_purchase == 6 || $getFarmDetails[0]->unit_of_purchase == 7
                         || $getFarmDetails[0]->unit_of_purchase == 8 || $getFarmDetails[0]->unit_of_purchase == 9 || $getFarmDetails[0]->unit_of_purchase == 12 || $getFarmDetails[0]->unit_of_purchase == 13 || $getFarmDetails[0]->unit_of_purchase == 14
-                        || $getFarmDetails[0]->unit_of_purchase == 15
-                    ) {
+                        || $getFarmDetails[0]->unit_of_purchase == 15) {
 
                         if (count($getSupplierTaxes) >= 3) {
                             $rowCount = 2;
@@ -9453,278 +10820,140 @@ class Farms extends MY_Controller
 
                         $taxCellsArray = array();
 
-                        // if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
+                        $objSheet->SetCellValue("K$rowCount", $this->lang->line('total_payment'));
+                        $totalPaymentRow = $rowCount;
+                        $rowCount++;
 
-                        //     $objSheet->SetCellValue("J$rowCount", $this->lang->line('total_payment'));
-                        //     $totalPaymentRow = $rowCount;
-                        //     $rowCount++;
+                        $objSheet->SetCellValue("K$rowCount", $this->lang->line('logistic_cost'));
+                        $objSheet->SetCellValue("L$rowCount", $getFarmDetails[0]->logistic_cost);
+                        $objSheet->getStyle("L$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                        $logisticCostRow = "$rowCount";
+                        $rowCount++;
 
-                        //     $objSheet->SetCellValue("J$rowCount", $this->lang->line('logistic_cost'));
-                        //     $objSheet->SetCellValue("K$rowCount", $getFarmDetails[0]->logistic_cost);
-                        //     $objSheet->getStyle("K$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                        //     $logisticCostRow = "$rowCount";
-                        //     $rowCount++;
+                        foreach ($getSupplierTaxes as $suppliertax) {
 
-                        //     foreach ($getSupplierTaxes as $suppliertax) {
+                            if ($suppliertax->number_format == 2) {
+                                $suppliertax->tax_name = $suppliertax->tax_name . " (%)";
+                            }
+                            $objSheet->SetCellValue("K$rowCount", $suppliertax->tax_name);
 
-                        //         if ($suppliertax->number_format == 2) {
-                        //             $suppliertax->tax_name = $suppliertax->tax_name . " (%)";
-                        //         }
-                        //         $objSheet->SetCellValue("J$rowCount", $suppliertax->tax_name);
-
-                        //         if ($suppliertax->arithmetic_type == 2) {
-                        //             $objSheet->getStyle("J$rowCount")->getFont()->getColor()->setRGB("FF0000");
-                        //         }
-
-                        //         $supplierTaxesArr = json_decode($getFarmDetails[0]->supplier_taxes_array, true);
-                        //         $logisticsTaxesArray = json_decode($getFarmDetails[0]->logistics_taxes_array, true);
-                        //         $serviceTaxesArray = json_decode($getFarmDetails[0]->service_taxes_array, true);
-
-                        //         if (count($supplierTaxesArr) > 0) {
-                        //             $formula = "";
-
-                        //             foreach ($supplierTaxesArr as $tax) {
-
-                        //                 if ($tax["taxId"] == $suppliertax->id) {
-                        //                     if ($suppliertax->arithmetic_type == 2) {
-                        //                         $taxval = $tax['taxVal'] * -1;
-                        //                     } else {
-                        //                         $taxval = $tax['taxVal'];
-                        //                     }
-                        //                     if ($suppliertax->number_format == 2) {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K$$$*$taxval%)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K$$$*$taxval%)";
-                        //                         }
-                        //                     } else {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K$$$*$taxval)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K$$$*$taxval)";
-                        //                         }
-                        //                     }
-
-                        //                     $taxCellsArray[] = array(
-                        //                         "rowCell" => "K$rowCount",
-                        //                         "formula" => $formula,
-                        //                     );
-                        //                 }
-                        //             }
-
-                        //             foreach ($logisticsTaxesArray as $logistictax) {
-
-                        //                 if ($logistictax["taxId"] == $suppliertax->id) {
-                        //                     if ($suppliertax->arithmetic_type == 2) {
-                        //                         $ltaxval = $logistictax['taxVal'] * -1;
-                        //                     } else {
-                        //                         $ltaxval = $logistictax['taxVal'];
-                        //                     }
-                        //                     if ($suppliertax->number_format == 2) {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K###*$ltaxval%)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K###*$ltaxval%)";
-                        //                         }
-                        //                     } else {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K###*$ltaxval)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K###*$ltaxval)";
-                        //                         }
-                        //                     }
-
-                        //                     $taxCellsArray[] = array(
-                        //                         "rowCell" => "K$rowCount",
-                        //                         "formula" => $formula,
-                        //                     );
-                        //                 }
-                        //             }
-
-                        //             foreach ($serviceTaxesArray as $servicetax) {
-
-                        //                 if ($servicetax["taxId"] == $suppliertax->id) {
-                        //                     if ($suppliertax->arithmetic_type == 2) {
-                        //                         $staxval = $servicetax['taxVal'] * -1;
-                        //                     } else {
-                        //                         $staxval = $servicetax['taxVal'];
-                        //                     }
-                        //                     if ($suppliertax->number_format == 2) {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K&&&*$staxval%)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K&&&*$staxval%)";
-                        //                         }
-                        //                     } else {
-                        //                         if ($formula == "") {
-                        //                             $formula = $formula . "=SUM(K&&&*$staxval)";
-                        //                         } else {
-                        //                             $formula = $formula . "+SUM(K&&&*$staxval)";
-                        //                         }
-                        //                     }
-
-                        //                     $taxCellsArray[] = array(
-                        //                         "rowCell" => "K$rowCount",
-                        //                         "formula" => $formula,
-                        //                     );
-                        //                 }
-                        //             }
-                        //         }
-
-                        //         $rowCount++;
-                        //     }
-
-                        //     $objSheet->SetCellValue("J$rowCount", $this->lang->line('service_cost'));
-                        //     $objSheet->SetCellValue("K$rowCount", $getFarmDetails[0]->service_cost);
-                        //     $objSheet->getStyle("K$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                        //     $serviceCostRow = "$rowCount";
-                        //     $rowCount++;
-
-                        //     $objSheet->SetCellValue("J$rowCount", $this->lang->line('adjustment'));
-                        //     $objSheet->getStyle("J$totalStartRow:K$rowCount")->applyFromArray($styleArray);
-                        //     $objSheet->getStyle("K$totalStartRow:K$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                        //     $rowCount++;
-
-                        //     $calcRow = $rowCount;
-
-                        //     $totalPaymentRow1 = $totalPaymentRow + 1;
-                        //     $objSheet->SetCellValue("K$totalPaymentRow", "=SUM(K$totalPaymentRow1:K$calcRow)");
-                        // } else {
-                            $objSheet->SetCellValue("K$rowCount", $this->lang->line('total_payment'));
-                            $totalPaymentRow = $rowCount;
-                            $rowCount++;
-
-                            $objSheet->SetCellValue("K$rowCount", $this->lang->line('logistic_cost'));
-                            $objSheet->SetCellValue("L$rowCount", $getFarmDetails[0]->logistic_cost);
-                            $objSheet->getStyle("L$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                            $logisticCostRow = "$rowCount";
-                            $rowCount++;
-
-                            foreach ($getSupplierTaxes as $suppliertax) {
-
-                                if ($suppliertax->number_format == 2) {
-                                    $suppliertax->tax_name = $suppliertax->tax_name . " (%)";
-                                }
-                                $objSheet->SetCellValue("K$rowCount", $suppliertax->tax_name);
-
-                                if ($suppliertax->arithmetic_type == 2) {
-                                    $objSheet->getStyle("K$rowCount")->getFont()->getColor()->setRGB("FF0000");
-                                }
-
-                                $supplierTaxesArr = json_decode($getFarmDetails[0]->supplier_taxes_array, true);
-                                $logisticsTaxesArray = json_decode($getFarmDetails[0]->logistics_taxes_array, true);
-                                $serviceTaxesArray = json_decode($getFarmDetails[0]->service_taxes_array, true);
-
-                                if (count($supplierTaxesArr) > 0) {
-                                    $formula = "";
-
-                                    foreach ($supplierTaxesArr as $tax) {
-
-                                        if ($tax["taxId"] == $suppliertax->id) {
-                                            if ($suppliertax->arithmetic_type == 2) {
-                                                $taxval = $tax['taxVal'] * -1;
-                                            } else {
-                                                $taxval = $tax['taxVal'];
-                                            }
-                                            if ($suppliertax->number_format == 2) {
-                                                if ($formula == "") {
-                                                    $formula = $formula . "=SUM(L$$$*$taxval%)";
-                                                } else {
-                                                    $formula = $formula . "+SUM(L$$$*$taxval%)";
-                                                }
-                                            } else {
-                                                if ($formula == "") {
-                                                    $formula = $formula . "=SUM(L$$$*$taxval)";
-                                                } else {
-                                                    $formula = $formula . "+SUM(L$$$*$taxval)";
-                                                }
-                                            }
-
-                                            $taxCellsArray[] = array(
-                                                "rowCell" => "L$rowCount",
-                                                "formula" => $formula,
-                                            );
-                                        }
-                                    }
-
-                                    foreach ($logisticsTaxesArray as $logistictax) {
-
-                                        if ($logistictax["taxId"] == $suppliertax->id) {
-                                            if ($suppliertax->arithmetic_type == 2) {
-                                                $ltaxval = $logistictax['taxVal'] * -1;
-                                            } else {
-                                                $ltaxval = $logistictax['taxVal'];
-                                            }
-                                            if ($suppliertax->number_format == 2) {
-                                                if ($formula == "") {
-                                                    $formula = $formula . "=SUM(L###*$ltaxval%)";
-                                                } else {
-                                                    $formula = $formula . "+SUM(L###*$ltaxval%)";
-                                                }
-                                            } else {
-                                                if ($formula == "") {
-                                                    $formula = $formula . "=SUM(L###*$ltaxval)";
-                                                } else {
-                                                    $formula = $formula . "+SUM(L###*$ltaxval)";
-                                                }
-                                            }
-
-                                            $taxCellsArray[] = array(
-                                                "rowCell" => "L$rowCount",
-                                                "formula" => $formula,
-                                            );
-                                        }
-                                    }
-
-                                    foreach ($serviceTaxesArray as $servicetax) {
-
-                                        if ($servicetax["taxId"] == $suppliertax->id) {
-                                            if ($suppliertax->arithmetic_type == 2) {
-                                                $staxval = $servicetax['taxVal'] * -1;
-                                            } else {
-                                                $staxval = $servicetax['taxVal'];
-                                            }
-                                            if ($suppliertax->number_format == 2) {
-                                                if ($formula == "") {
-                                                    $formula = $formula . "=SUM(L&&&*$staxval%)";
-                                                } else {
-                                                    $formula = $formula . "+SUM(L&&&*$staxval%)";
-                                                }
-                                            } else {
-                                                if ($formula == "") {
-                                                    $formula = $formula . "=SUM(L&&&*$staxval)";
-                                                } else {
-                                                    $formula = $formula . "+SUM(L&&&*$staxval)";
-                                                }
-                                            }
-
-                                            $taxCellsArray[] = array(
-                                                "rowCell" => "L$rowCount",
-                                                "formula" => $formula,
-                                            );
-                                        }
-                                    }
-                                }
-
-                                $rowCount++;
+                            if ($suppliertax->arithmetic_type == 2) {
+                                $objSheet->getStyle("K$rowCount")->getFont()->getColor()->setRGB("FF0000");
                             }
 
-                            $objSheet->SetCellValue("K$rowCount", $this->lang->line('service_cost'));
-                            $objSheet->SetCellValue("L$rowCount", $getFarmDetails[0]->service_cost);
-                            $objSheet->getStyle("L$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                            $serviceCostRow = "$rowCount";
+                            $supplierTaxesArr = json_decode($getFarmDetails[0]->supplier_taxes_array, true);
+                            $logisticsTaxesArray = json_decode($getFarmDetails[0]->logistics_taxes_array, true);
+                            $serviceTaxesArray = json_decode($getFarmDetails[0]->service_taxes_array, true);
+
+                            if (count($supplierTaxesArr) > 0) {
+                                $formula = "";
+
+                                foreach ($supplierTaxesArr as $tax) {
+
+                                    if ($tax["taxId"] == $suppliertax->id) {
+                                        if ($suppliertax->arithmetic_type == 2) {
+                                            $taxval = $tax['taxVal'] * -1;
+                                        } else {
+                                            $taxval = $tax['taxVal'];
+                                        }
+                                        if ($suppliertax->number_format == 2) {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L$$$*$taxval%)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L$$$*$taxval%)";
+                                            }
+                                        } else {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L$$$*$taxval)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L$$$*$taxval)";
+                                            }
+                                        }
+
+                                        $taxCellsArray[] = array(
+                                            "rowCell" => "L$rowCount",
+                                            "formula" => $formula,
+                                        );
+                                    }
+                                }
+
+                                foreach ($logisticsTaxesArray as $logistictax) {
+
+                                    if ($logistictax["taxId"] == $suppliertax->id) {
+                                        if ($suppliertax->arithmetic_type == 2) {
+                                            $ltaxval = $logistictax['taxVal'] * -1;
+                                        } else {
+                                            $ltaxval = $logistictax['taxVal'];
+                                        }
+                                        if ($suppliertax->number_format == 2) {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L###*$ltaxval%)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L###*$ltaxval%)";
+                                            }
+                                        } else {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L###*$ltaxval)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L###*$ltaxval)";
+                                            }
+                                        }
+
+                                        $taxCellsArray[] = array(
+                                            "rowCell" => "L$rowCount",
+                                            "formula" => $formula,
+                                        );
+                                    }
+                                }
+
+                                foreach ($serviceTaxesArray as $servicetax) {
+
+                                    if ($servicetax["taxId"] == $suppliertax->id) {
+                                        if ($suppliertax->arithmetic_type == 2) {
+                                            $staxval = $servicetax['taxVal'] * -1;
+                                        } else {
+                                            $staxval = $servicetax['taxVal'];
+                                        }
+                                        if ($suppliertax->number_format == 2) {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L&&&*$staxval%)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L&&&*$staxval%)";
+                                            }
+                                        } else {
+                                            if ($formula == "") {
+                                                $formula = $formula . "=SUM(L&&&*$staxval)";
+                                            } else {
+                                                $formula = $formula . "+SUM(L&&&*$staxval)";
+                                            }
+                                        }
+
+                                        $taxCellsArray[] = array(
+                                            "rowCell" => "L$rowCount",
+                                            "formula" => $formula,
+                                        );
+                                    }
+                                }
+                            }
+
                             $rowCount++;
+                        }
 
-                            $objSheet->SetCellValue("K$rowCount", $this->lang->line('adjustment'));
-                            $objSheet->getStyle("K$totalStartRow:L$rowCount")->applyFromArray($styleArray);
-                            $objSheet->getStyle("L$totalStartRow:L$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                            $rowCount++;
+                        $objSheet->SetCellValue("K$rowCount", $this->lang->line('service_cost'));
+                        $objSheet->SetCellValue("L$rowCount", $getFarmDetails[0]->service_cost);
+                        $objSheet->getStyle("L$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                        $serviceCostRow = "$rowCount";
+                        $rowCount++;
 
-                            $calcRow = $rowCount;
+                        $objSheet->SetCellValue("K$rowCount", $this->lang->line('adjustment'));
+                        $objSheet->getStyle("K$totalStartRow:L$rowCount")->applyFromArray($styleArray);
+                        $objSheet->getStyle("L$totalStartRow:L$rowCount")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                        $rowCount++;
 
-                            $totalPaymentRow1 = $totalPaymentRow + 1;
-                            $objSheet->SetCellValue("L$totalPaymentRow", "=SUM(L$totalPaymentRow1:L$calcRow)");
-                        //}
+                        $calcRow = $rowCount;
+
+                        $totalPaymentRow1 = $totalPaymentRow + 1;
+                        $objSheet->SetCellValue("L$totalPaymentRow", "=SUM(L$totalPaymentRow1:L$calcRow)");
 
                         if (count($taxCellsArray) > 0) {
                             foreach ($taxCellsArray as $taxcell) {
@@ -9903,7 +11132,7 @@ class Farms extends MY_Controller
                             $objSheet->mergeCells("G$rowCountSummary:H$rowCountSummary");
 
                             if (
-                                $getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15 || 
+                                $getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15 ||
                                 $getFarmDetails[0]->unit_of_purchase == 4 || $getFarmDetails[0]->unit_of_purchase == 5
                                 || $getFarmDetails[0]->unit_of_purchase == 6 || $getFarmDetails[0]->unit_of_purchase == 7
                             ) {
@@ -9921,7 +11150,7 @@ class Farms extends MY_Controller
                                 $objSheet->getStyle("G$rowCountSummary:O$rowCountSummary")->getFont()->setBold(true);
                                 $objSheet->getStyle("G$rowCountSummary:O$rowCountSummary")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                                 $objSheet->getStyle("G$rowCountSummary:O$rowCountSummary")->applyFromArray($styleArray);
-                            } 
+                            }
                             // else {
                             //     $objSheet->SetCellValue("I$rowCountSummary", $this->lang->line("pieces_farm"));
                             //     $objSheet->SetCellValue("J$rowCountSummary", $this->lang->line("volume_per_piece"));
@@ -9961,13 +11190,12 @@ class Farms extends MY_Controller
                                 // } else if ($getFarmDetails[0]->unit_of_purchase == 3) {
                                 //     $objSheet->SetCellValue("J$rowCountDataSummary", "=$priceRangeShorts");
                                 // } else {
-                                    $objSheet->SetCellValue("I$rowCountDataSummary", ($priceRangeShorts + 0));
-                                    $objSheet->SetCellValue("J$rowCountDataSummary", ($priceRangeSemi + 0));
-                                    $objSheet->SetCellValue("K$rowCountDataSummary", ($priceRangeLongs + 0));
+                                $objSheet->SetCellValue("I$rowCountDataSummary", ($priceRangeShorts + 0));
+                                $objSheet->SetCellValue("J$rowCountDataSummary", ($priceRangeSemi + 0));
+                                $objSheet->SetCellValue("K$rowCountDataSummary", ($priceRangeLongs + 0));
                                 //}
 
-                                //if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
-                                if ($getFarmDetails[0]->unit_of_purchase == 15) {
+                                if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
                                     $objSheet->SetCellValue("I$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary)");
 
                                     $objSheet->SetCellValue("K$rowCountDataSummary", "=(I$rowCountDataSummary*J$rowCountDataSummary)");
@@ -9975,26 +11203,15 @@ class Farms extends MY_Controller
                                     $objSheet->getStyle("J$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
                                     $objSheet->getStyle("K$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
                                 } else {
-                                    if ($getFarmDetails[0]->unit_of_purchase == 3) {
-                                        $objSheet->SetCellValue("M$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,M10)");
-                                        $objSheet->SetCellValue("N$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,N10)");
-                                        $objSheet->SetCellValue("O$rowCountDataSummary", "=SUMIFS(" . '$C$' . "$farmDataFirstRow" . ':$C$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,O10)");
 
-                                        $objSheet->SetCellValue("L$rowCountDataSummary", "=(I$rowCountDataSummary*M$rowCountDataSummary)+(J$rowCountDataSummary*N$rowCountDataSummary)+(K$rowCountDataSummary*O$rowCountDataSummary)");
+                                    $objSheet->SetCellValue("M$rowCountDataSummary", "=SUMIFS(" . '$D$' . "$farmDataFirstRow" . ':$D$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,M10)");
+                                    $objSheet->SetCellValue("N$rowCountDataSummary", "=SUMIFS(" . '$D$' . "$farmDataFirstRow" . ':$D$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,N10)");
+                                    $objSheet->SetCellValue("O$rowCountDataSummary", "=SUMIFS(" . '$D$' . "$farmDataFirstRow" . ':$D$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,O10)");
 
-                                        $objSheet->getStyle("I$rowCountDataSummary:L$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                                        $objSheet->getStyle("M$rowCountDataSummary:O$rowCountDataSummary")->getNumberFormat()->setFormatCode('0');
-                                    } else {
+                                    $objSheet->SetCellValue("L$rowCountDataSummary", "=(I$rowCountDataSummary*M$rowCountDataSummary)+(J$rowCountDataSummary*N$rowCountDataSummary)+(K$rowCountDataSummary*O$rowCountDataSummary)");
 
-                                        $objSheet->SetCellValue("M$rowCountDataSummary", "=SUMIFS(" . '$D$' . "$farmDataFirstRow" . ':$D$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,M10)");
-                                        $objSheet->SetCellValue("N$rowCountDataSummary", "=SUMIFS(" . '$D$' . "$farmDataFirstRow" . ':$D$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,N10)");
-                                        $objSheet->SetCellValue("O$rowCountDataSummary", "=SUMIFS(" . '$D$' . "$farmDataFirstRow" . ':$D$' . "$lastRowFarmData" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',">="&$G$' . "$rowCountDataSummary" . ',$A$' . "$farmDataFirstRow" . ':$A$' . "$lastRowFarmData" . ',"<="&$H' . "$rowCountDataSummary, E$farmDataFirstRow:E$lastRowFarmData,O10)");
-    
-                                        $objSheet->SetCellValue("L$rowCountDataSummary", "=(I$rowCountDataSummary*M$rowCountDataSummary)+(J$rowCountDataSummary*N$rowCountDataSummary)+(K$rowCountDataSummary*O$rowCountDataSummary)");
-    
-                                        $objSheet->getStyle("I$rowCountDataSummary:L$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                                        $objSheet->getStyle("M$rowCountDataSummary:O$rowCountDataSummary")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
-                                    }
+                                    $objSheet->getStyle("I$rowCountDataSummary:L$rowCountDataSummary")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                                    $objSheet->getStyle("M$rowCountDataSummary:O$rowCountDataSummary")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
                                 }
                             }
 
@@ -10005,26 +11222,26 @@ class Farms extends MY_Controller
                             //     $objSheet->getStyle("K$piecesPriceCalcRow")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
                             //     $objSheet->getStyle("K$piecesPriceCalcRow")->applyFromArray($styleArray);
                             // } else {
-                                $objSheet->getStyle("G$priceFirstRow:O$priceLastRow")->applyFromArray($styleArray);
-                                $objSheet->getStyle("L$piecesPriceCalcRow")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
-                                $objSheet->getStyle("L$piecesPriceCalcRow")->applyFromArray($styleArray);
+                            $objSheet->getStyle("G$priceFirstRow:O$priceLastRow")->applyFromArray($styleArray);
+                            $objSheet->getStyle("L$piecesPriceCalcRow")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
+                            $objSheet->getStyle("L$piecesPriceCalcRow")->applyFromArray($styleArray);
                             //}
 
                             if ($getFarmDetails[0]->exchange_rate > 0) {
                                 // if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
                                 //     $objSheet->SetCellValue("K$piecesPriceCalcRow", "=SUM(K$priceFirstRow:K$priceLastRow)*D$exchangeRowVal");
                                 // } else {
-                                    $objSheet->SetCellValue("L$piecesPriceCalcRow", "=SUM(L$priceFirstRow:L$priceLastRow)*D$exchangeRowVal");
+                                $objSheet->SetCellValue("L$piecesPriceCalcRow", "=SUM(L$priceFirstRow:L$priceLastRow)*D$exchangeRowVal");
                                 //}
                             } else {
                                 // if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
                                 //     $objSheet->SetCellValue("K$piecesPriceCalcRow", "=SUM(K$priceFirstRow:K$priceLastRow)");
                                 // } else {
-                                    $objSheet->SetCellValue("L$piecesPriceCalcRow", "=SUM(L$priceFirstRow:L$priceLastRow)");
+                                $objSheet->SetCellValue("L$piecesPriceCalcRow", "=SUM(L$priceFirstRow:L$priceLastRow)");
                                 //}
                             }
 
-                            
+
 
                             $objSheet->getColumnDimension('G')->setAutoSize(false);
                             $objSheet->getColumnDimension('G')->setWidth('15');
@@ -10567,7 +11784,10 @@ class Farms extends MY_Controller
             $session = $this->session->userdata('fullname');
 
             $Return = array(
-                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
+                'result' => '',
+                'error' => '',
+                'redirect' => false,
+                'csrf_hash' => '',
                 'successmessage' => ''
             );
 
@@ -10611,13 +11831,13 @@ class Farms extends MY_Controller
                     $objSheet->SetCellValue('B5', $getFarmDetails[0]->product_name . ' - ' . $this->lang->line($getFarmDetails[0]->product_type_name));
                     $objSheet->SetCellValue('B6', $getFarmDetails[0]->purchase_date);
                     $objSheet->SetCellValue('B7', $getFarmDetails[0]->origin);
-                    
-                    if($getFarmDetails[0]->driver_name != null && $getFarmDetails[0]->driver_name != "") {
+
+                    if ($getFarmDetails[0]->driver_name != null && $getFarmDetails[0]->driver_name != "") {
                         $objSheet->SetCellValue('B8', $getFarmDetails[0]->plate_number . " / " . $getFarmDetails[0]->driver_name);
                     } else {
                         $objSheet->SetCellValue('B8', $getFarmDetails[0]->plate_number);
                     }
-                    
+
                     $objSheet->SetCellValue('D4', $this->lang->line($getFarmDetails[0]->purchase_unit));
 
                     $rowCount = 5;
@@ -11120,8 +12340,13 @@ class Farms extends MY_Controller
                                 $strFormula = str_replace(
                                     array('$l', '$w', '$t', '$vp', 'truncate', '$ew', '$et', '$el'),
                                     array(
-                                        'B' . $rowCountData, 'C' . $rowCountData, 'D' . $rowCountData,
-                                        'E' . $rowCountData, 'TRUNC', 'H' . $rowCountData, 'I' . $rowCountData,
+                                        'B' . $rowCountData,
+                                        'C' . $rowCountData,
+                                        'D' . $rowCountData,
+                                        'E' . $rowCountData,
+                                        'TRUNC',
+                                        'H' . $rowCountData,
+                                        'I' . $rowCountData,
                                         'G' . $rowCountData
                                     ),
                                     $formula->formula_context
@@ -11535,7 +12760,10 @@ class Farms extends MY_Controller
             $session = $this->session->userdata('fullname');
 
             $Return = array(
-                'result' => '', 'error' => '', 'redirect' => false, 'csrf_hash' => '',
+                'result' => '',
+                'error' => '',
+                'redirect' => false,
+                'csrf_hash' => '',
                 'successmessage' => ''
             );
 
@@ -12034,8 +13262,13 @@ class Farms extends MY_Controller
                                 $strFormula = str_replace(
                                     array('$l', '$w', '$t', '$vp', 'truncate', '$ew', '$et', '$el'),
                                     array(
-                                        'B' . $rowCountData, 'C' . $rowCountData, 'D' . $rowCountData,
-                                        'E' . $rowCountData, 'TRUNC', 'H' . $rowCountData, 'I' . $rowCountData,
+                                        'B' . $rowCountData,
+                                        'C' . $rowCountData,
+                                        'D' . $rowCountData,
+                                        'E' . $rowCountData,
+                                        'TRUNC',
+                                        'H' . $rowCountData,
+                                        'I' . $rowCountData,
                                         'G' . $rowCountData
                                     ),
                                     $formula->formula_context
@@ -12441,7 +13674,7 @@ class Farms extends MY_Controller
             exit;
         }
     }
-    
+
     public function generate_supplier_receipt($farmId, $contractId, $inventoryOrder)
     {
         try {
@@ -12483,7 +13716,7 @@ class Farms extends MY_Controller
                     $objSheet->SetCellValue('A3', $this->lang->line('inventory_order'));
                     $objSheet->SetCellValue('A4', $this->lang->line('supplier_name'));
 
-                    if($getFarmDetails[0]->exchange_rate > 0) {
+                    if ($getFarmDetails[0]->exchange_rate > 0) {
                         $objSheet->SetCellValue('A5', $this->lang->line('exchange_rate'));
                         $objSheet->SetCellValue('B5', $getFarmDetails[0]->exchange_rate);
                         $objSheet->getStyle("B5")->getNumberFormat()->setFormatCode($getFarmDetails[0]->currency_excel_format);
@@ -12789,7 +14022,7 @@ class Farms extends MY_Controller
                             $priceCalcSRow = $rowCountDataSummary + 1;
                             $piecesCalcERow = $rowCountDataSummary;
                             $priceCalcERow = $rowCountDataSummary;
-                            
+
                             foreach ($getFarmDataSummary as $farmdatasummary) {
 
                                 $rowCountDataSummary++;
@@ -12813,7 +14046,7 @@ class Farms extends MY_Controller
                                 if ($getFarmDetails[0]->unit_of_purchase == 4 || $getFarmDetails[0]->unit_of_purchase == 5) {
                                     $objSheet->SetCellValue("C$rowCountDataSummary", $totalVolumePrice);
 
-                                    if($getFarmDetails[0]->exchange_rate > 0) {
+                                    if ($getFarmDetails[0]->exchange_rate > 0) {
                                         $objSheet->SetCellValue("E$rowCountDataSummary", "=$totalValuePrice*B5");
                                     } else {
                                         $objSheet->SetCellValue("E$rowCountDataSummary", $totalValuePrice);
@@ -12823,11 +14056,11 @@ class Farms extends MY_Controller
 
                                     $objSheet->getStyle("C$rowCountDataSummary")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
                                 } else if ($getFarmDetails[0]->unit_of_purchase == 6 || $getFarmDetails[0]->unit_of_purchase == 7) {
-                                     $objSheet->SetCellValue("C$rowCountDataSummary", "=IF(" . '$D$' . "$summaryHeaderLastRow" . ">=F$rowCountDataSummary,IF(" . '$D$' . "$summaryHeaderLastRow" . "<=G$rowCountDataSummary," . '$D$' . "3,0),0)");
+                                    $objSheet->SetCellValue("C$rowCountDataSummary", "=IF(" . '$D$' . "$summaryHeaderLastRow" . ">=F$rowCountDataSummary,IF(" . '$D$' . "$summaryHeaderLastRow" . "<=G$rowCountDataSummary," . '$D$' . "3,0),0)");
                                 } else {
-                                     $objSheet->SetCellValue("C$rowCountDataSummary", $farmdatasummary->pieces_farm);
-                                     
-                                    if($getFarmDetails[0]->exchange_rate > 0) {
+                                    $objSheet->SetCellValue("C$rowCountDataSummary", $farmdatasummary->pieces_farm);
+
+                                    if ($getFarmDetails[0]->exchange_rate > 0) {
                                         if ($getFarmDetails[0]->unit_of_purchase == 3 || $getFarmDetails[0]->unit_of_purchase == 15) {
                                             $objSheet->SetCellValue("E$rowCountDataSummary", "=$totalPiecesPrice*B5");
                                         } else {

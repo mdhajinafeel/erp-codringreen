@@ -1153,3 +1153,14 @@ $lang["lubricants_report"] = "Lubricants Report";
 $lang["others_report"] = "Others Report";
 $lang["clock_start"] = "Clock Start";
 $lang["clock_end"] = "Clock End";
+
+//APP CENTER
+$lang["app_center"] = "App Center";
+$lang["app_lists"] = "App Lists";
+$lang["add_apps"] = "Add Apps";
+
+//REPORT
+$lang["loading_finca"] = "Loading";
+
+$lang["doc_dhl"] = "DHL";
+$lang["consolidatedfarmreport"] = "Consolidated Farm Report";

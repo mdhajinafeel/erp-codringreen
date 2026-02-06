@@ -1461,7 +1461,7 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->getStyle("L5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("ED7D31");
                     $objWorkSummarySheet->getStyle("M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("7B7B7B");
                     $objWorkSummarySheet->getStyle("L5:M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("548235");
-                    //$objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
+                    $objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
                     $objWorkSummarySheet->getStyle("L4:R4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("9BC2E6");
 
                     $objWorkSummarySheet->SetCellValue("D1", "=D5-E5");
@@ -1681,31 +1681,28 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->SetCellValue("M6", $this->lang->line("value_wood_farm"));
                     $objWorkSummarySheet->mergeCells("M6:M7");
 
-                    $objWorkSummarySheet->SetCellValue("N6", $this->lang->line("zona"));
+                    $objWorkSummarySheet->SetCellValue("N6", $this->lang->line("Logistics"));
                     $objWorkSummarySheet->mergeCells("N6:N7");
 
-                    $objWorkSummarySheet->SetCellValue("O6", $this->lang->line("transport"));
+                    $objWorkSummarySheet->SetCellValue("O6", $this->lang->line("Service"));
                     $objWorkSummarySheet->mergeCells("O6:O7");
 
-                    $objWorkSummarySheet->SetCellValue("P6", $this->lang->line("loading_finca"));
+                    $objWorkSummarySheet->SetCellValue("P6", $this->lang->line("total"));
                     $objWorkSummarySheet->mergeCells("P6:P7");
 
-                    $objWorkSummarySheet->SetCellValue("Q6", $this->lang->line("total"));
+                    $objWorkSummarySheet->SetCellValue("Q6", $this->lang->line("difference_farm_reception"));
                     $objWorkSummarySheet->mergeCells("Q6:Q7");
 
-                    $objWorkSummarySheet->SetCellValue("R6", $this->lang->line("difference_farm_reception"));
+                    $objWorkSummarySheet->SetCellValue("R6", $this->lang->line("value_material"));
                     $objWorkSummarySheet->mergeCells("R6:R7");
 
-                    $objWorkSummarySheet->SetCellValue("S6", $this->lang->line("value_material"));
+                    $objWorkSummarySheet->SetCellValue("S6", $this->lang->line("invoice_number"));
                     $objWorkSummarySheet->mergeCells("S6:S7");
 
-                    $objWorkSummarySheet->SetCellValue("T6", $this->lang->line("invoice_number"));
-                    $objWorkSummarySheet->mergeCells("T6:T7");
-
-                    $objWorkSummarySheet->getStyle("A6:T7")->getFont()->setBold(true);
-                    $objWorkSummarySheet->getStyle("A6:T6")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    $objWorkSummarySheet->getStyle("A6:S7")->getFont()->setBold(true);
+                    $objWorkSummarySheet->getStyle("A6:S6")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                     $objWorkSummarySheet->getStyle("D7:E7")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                    $objWorkSummarySheet->getStyle("A6:T7")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("A6:S7")->applyFromArray($styleArray);
                     $objWorkSummarySheet->getStyle("F6:Q6")->getAlignment()->setWrapText(true);
 
                     //END SUMMARY SHEET
@@ -1722,6 +1719,8 @@ class Liquidationreport extends MY_Controller
 
                         $objWorkInventorySheet = $this->excel->createSheet($sheetNo);
                         $objWorkInventorySheet->setTitle(strtoupper($sheetinventory->inventory_order));
+
+                        $getFarmDetail = $this->Financemaster_model->get_farm_detail($contractId, $supplierId, $originId, $sheetinventory->inventory_order, $lang_code[0]->language_format_code);
 
                         if ($sheetinventory->product == 2 || $sheetinventory->product == 1 || $sheetinventory->product == 4 && ($sheetinventory->product_type == 1 || $sheetinventory->product_type == 3)) {
 
@@ -1747,8 +1746,6 @@ class Liquidationreport extends MY_Controller
                             $objWorkInventorySheet->getStyle("G4")->getFont()->setBold(true);
                             $objWorkInventorySheet->getStyle("G6")->getFont()->setBold(true);
                             $objWorkInventorySheet->getStyle("J2")->getFont()->setBold(true);
-
-                            $getFarmDetail = $this->Financemaster_model->get_farm_detail($contractId, $supplierId, $originId, $sheetinventory->inventory_order, $lang_code[0]->language_format_code);
 
                             $objWorkInventorySheet->SetCellValue("B2", $getFarmDetail[0]->purchase_date);
                             $objWorkInventorySheet->getStyle("B2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("A9D08E");
@@ -2127,11 +2124,10 @@ class Liquidationreport extends MY_Controller
                             $objWorkSummarySheet->SetCellValue("M$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!R$sumCalcRow");
                             $objWorkSummarySheet->SetCellValue("N$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$logiscticRowNumber");
                             $objWorkSummarySheet->SetCellValue("O$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$serviceRowNumber");
-                            $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", $getFarmDetail[0]->loading_cost + 0);
-                            $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", "=SUM(M$summarySheetRowDataCount:P$summarySheetRowDataCount)");
-                            $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=L$summarySheetRowDataCount-M$summarySheetRowDataCount");
-                            $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", "=Q$summarySheetRowDataCount");
-                            $objWorkSummarySheet->SetCellValue("T$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
+                            $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", "=SUM(M$summarySheetRowDataCount:O$summarySheetRowDataCount)");
+                            $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", "=L$summarySheetRowDataCount-M$summarySheetRowDataCount");
+                            $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=P$summarySheetRowDataCount");
+                            $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
 
 
                             $summarySNo++;
@@ -2183,7 +2179,6 @@ class Liquidationreport extends MY_Controller
                             $objWorkInventorySheet->getStyle("J3")->getFont()->setBold(true);
                             $objWorkInventorySheet->getStyle("J6")->getFont()->setBold(true);
 
-                            
                             $objWorkInventorySheet->SetCellValue("B2", $getFarmDetail[0]->purchase_date);
                             $objWorkInventorySheet->getStyle("B2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("A9D08E");
                             $objWorkInventorySheet->SetCellValue("E2", $sheetinventory->inventory_order);
@@ -2660,11 +2655,10 @@ class Liquidationreport extends MY_Controller
                             $objWorkSummarySheet->SetCellValue("M$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!R$sumCalcRow");
                             $objWorkSummarySheet->SetCellValue("N$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$logiscticRowNumber");
                             $objWorkSummarySheet->SetCellValue("O$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$serviceRowNumber");
-                            $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", $getFarmDetail[0]->loading_cost + 0);
-                            $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", "=SUM(M$summarySheetRowDataCount:P$summarySheetRowDataCount)");
-                            $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=L$summarySheetRowDataCount-M$summarySheetRowDataCount");
-                            $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", "=Q$summarySheetRowDataCount");
-                            $objWorkSummarySheet->SetCellValue("T$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
+                            $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", "=SUM(M$summarySheetRowDataCount:O$summarySheetRowDataCount)");
+                            $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", "=L$summarySheetRowDataCount-M$summarySheetRowDataCount");
+                            $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=P$summarySheetRowDataCount");
+                            $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
 
 
                             $summarySNo++;
@@ -2706,14 +2700,14 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->getStyle("L4:R4")->getFont()->setBold(true);
                     $objWorkSummarySheet->getStyle("L4:R4")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
 
-                    $objWorkSummarySheet->getStyle("L$summarySheetFirstRowData:S$summarySheetLastRowData")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
-                    $objWorkSummarySheet->getStyle("A$summarySheetFirstRowData:T$summarySheetLastRowData")->applyFromArray($styleArray);
-                    $objWorkSummarySheet->getStyle("A$summarySheetRowDataCount:T$summarySheetLastRowData")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("L$summarySheetFirstRowData:R$summarySheetLastRowData")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+                    $objWorkSummarySheet->getStyle("A$summarySheetFirstRowData:S$summarySheetLastRowData")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("A$summarySheetRowDataCount:S$summarySheetLastRowData")->applyFromArray($styleArray);
 
                     $objWorkSummarySheet->getStyle("L5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("ED7D31");
                     $objWorkSummarySheet->getStyle("M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("7B7B7B");
                     $objWorkSummarySheet->getStyle("L5:M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("548235");
-                    //$objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
+                    $objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
                     $objWorkSummarySheet->getStyle("L4:R4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("9BC2E6");
 
                     $objWorkSummarySheet->SetCellValue("D1", "=D5-E5");
@@ -2737,8 +2731,7 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->getColumnDimension("P")->setAutoSize(false)->setWidth(18);
                     $objWorkSummarySheet->getColumnDimension("Q")->setAutoSize(false)->setWidth(18);
                     $objWorkSummarySheet->getColumnDimension("R")->setAutoSize(false)->setWidth(18);
-                    $objWorkSummarySheet->getColumnDimension("S")->setAutoSize(false)->setWidth(18);
-                    $objWorkSummarySheet->getColumnDimension("T")->setAutoSize(false)->setWidth(14);
+                    $objWorkSummarySheet->getColumnDimension("S")->setAutoSize(false)->setWidth(14);
 
                     //END INVENTORY SHEET
 
@@ -2937,31 +2930,28 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->SetCellValue("M6", $this->lang->line("value_wood_farm"));
                     $objWorkSummarySheet->mergeCells("M6:M7");
 
-                    $objWorkSummarySheet->SetCellValue("N6", $this->lang->line("zona"));
+                    $objWorkSummarySheet->SetCellValue("N6", $this->lang->line("Logistics"));
                     $objWorkSummarySheet->mergeCells("N6:N7");
 
-                    $objWorkSummarySheet->SetCellValue("O6", $this->lang->line("transport"));
+                    $objWorkSummarySheet->SetCellValue("O6", $this->lang->line("Service"));
                     $objWorkSummarySheet->mergeCells("O6:O7");
 
-                    $objWorkSummarySheet->SetCellValue("P6", $this->lang->line("loading_finca"));
+                    $objWorkSummarySheet->SetCellValue("P6", $this->lang->line("total"));
                     $objWorkSummarySheet->mergeCells("P6:P7");
 
-                    $objWorkSummarySheet->SetCellValue("Q6", $this->lang->line("total"));
+                    $objWorkSummarySheet->SetCellValue("Q6", $this->lang->line("difference_farm_reception"));
                     $objWorkSummarySheet->mergeCells("Q6:Q7");
 
-                    $objWorkSummarySheet->SetCellValue("R6", $this->lang->line("difference_farm_reception"));
+                    $objWorkSummarySheet->SetCellValue("R6", $this->lang->line("value_material"));
                     $objWorkSummarySheet->mergeCells("R6:R7");
 
-                    $objWorkSummarySheet->SetCellValue("S6", $this->lang->line("value_material"));
+                    $objWorkSummarySheet->SetCellValue("S6", $this->lang->line("invoice_number"));
                     $objWorkSummarySheet->mergeCells("S6:S7");
 
-                    $objWorkSummarySheet->SetCellValue("T6", $this->lang->line("invoice_number"));
-                    $objWorkSummarySheet->mergeCells("T6:T7");
-
-                    $objWorkSummarySheet->getStyle("A6:T7")->getFont()->setBold(true);
-                    $objWorkSummarySheet->getStyle("A6:T6")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    $objWorkSummarySheet->getStyle("A6:S7")->getFont()->setBold(true);
+                    $objWorkSummarySheet->getStyle("A6:S6")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                     $objWorkSummarySheet->getStyle("D7:E7")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                    $objWorkSummarySheet->getStyle("A6:T7")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("A6:S7")->applyFromArray($styleArray);
                     $objWorkSummarySheet->getStyle("F6:Q6")->getAlignment()->setWrapText(true);
 
                     //END SUMMARY SHEET
@@ -3380,11 +3370,10 @@ class Liquidationreport extends MY_Controller
                             $objWorkSummarySheet->SetCellValue("M$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!R$sumCalcRow");
                             $objWorkSummarySheet->SetCellValue("N$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$logiscticRowNumber");
                             $objWorkSummarySheet->SetCellValue("O$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$serviceRowNumber");
-                            $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", $getFarmDetail[0]->loading_cost + 0);
-                            $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", "=SUM(M$summarySheetRowDataCount:P$summarySheetRowDataCount)");
-                            $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=L$summarySheetRowDataCount-M$summarySheetRowDataCount");
-                            $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", "=Q$summarySheetRowDataCount");
-                            $objWorkSummarySheet->SetCellValue("T$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
+                            $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", "=SUM(M$summarySheetRowDataCount:O$summarySheetRowDataCount)");
+                            $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", "=L$summarySheetRowDataCount-M$summarySheetRowDataCount");
+                            $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=P$summarySheetRowDataCount");
+                            $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
 
 
                             $summarySNo++;
@@ -4022,11 +4011,10 @@ class Liquidationreport extends MY_Controller
                             $objWorkSummarySheet->SetCellValue("M$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!Q$sumCalcRow");
                             $objWorkSummarySheet->SetCellValue("N$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$logiscticRowNumber");
                             $objWorkSummarySheet->SetCellValue("O$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$serviceRowNumber");
-                            $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", $getFarmDetail[0]->loading_cost + 0);
-                            $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", "=SUM(M$summarySheetRowDataCount:P$summarySheetRowDataCount)");
-                            $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=L$summarySheetRowDataCount-M$summarySheetRowDataCount");
-                            $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", "=Q$summarySheetRowDataCount");
-                            $objWorkSummarySheet->SetCellValue("T$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
+                            $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", "=SUM(M$summarySheetRowDataCount:O$summarySheetRowDataCount)");
+                            $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", "=L$summarySheetRowDataCount-M$summarySheetRowDataCount");
+                            $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=P$summarySheetRowDataCount");
+                            $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
 
                             $objWorkSummarySheet->getStyle("H$summarySheetRowDataCount:K$summarySheetRowDataCount")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
 
@@ -4072,14 +4060,14 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->getStyle("L4:R4")->getFont()->setBold(true);
                     $objWorkSummarySheet->getStyle("L4:R4")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
 
-                    $objWorkSummarySheet->getStyle("L$summarySheetFirstRowData:S$summarySheetLastRowData")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
-                    $objWorkSummarySheet->getStyle("A$summarySheetFirstRowData:T$summarySheetLastRowData")->applyFromArray($styleArray);
-                    $objWorkSummarySheet->getStyle("A$summarySheetRowDataCount:T$summarySheetLastRowData")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("L$summarySheetFirstRowData:R$summarySheetLastRowData")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+                    $objWorkSummarySheet->getStyle("A$summarySheetFirstRowData:S$summarySheetLastRowData")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("A$summarySheetRowDataCount:S$summarySheetLastRowData")->applyFromArray($styleArray);
 
                     $objWorkSummarySheet->getStyle("L5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("ED7D31");
                     $objWorkSummarySheet->getStyle("M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("7B7B7B");
                     $objWorkSummarySheet->getStyle("L5:M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("548235");
-                    //$objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
+                    $objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
                     $objWorkSummarySheet->getStyle("L4:R4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("9BC2E6");
 
                     $objWorkSummarySheet->SetCellValue("D1", "=D5-E5");
@@ -4103,8 +4091,7 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->getColumnDimension("P")->setAutoSize(false)->setWidth(18);
                     $objWorkSummarySheet->getColumnDimension("Q")->setAutoSize(false)->setWidth(18);
                     $objWorkSummarySheet->getColumnDimension("R")->setAutoSize(false)->setWidth(18);
-                    $objWorkSummarySheet->getColumnDimension("S")->setAutoSize(false)->setWidth(18);
-                    $objWorkSummarySheet->getColumnDimension("T")->setAutoSize(false)->setWidth(14);
+                    $objWorkSummarySheet->getColumnDimension("S")->setAutoSize(false)->setWidth(14);
 
                     //END INVENTORY SHEET
 
@@ -4778,7 +4765,7 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->getStyle("J5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("ED7D31");
                     $objWorkSummarySheet->getStyle("K5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("7B7B7B");
                     $objWorkSummarySheet->getStyle("L5:M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("548235");
-                    //$objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
+                    $objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
                     $objWorkSummarySheet->getStyle("J4:P4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("9BC2E6");
 
                     $objWorkSummarySheet->SetCellValue("D1", "=D5-E5");
@@ -6059,11 +6046,11 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->getStyle("A$summarySheetFirstRowData:T$summarySheetLastRowData")->applyFromArray($styleArray);
                     $objWorkSummarySheet->getStyle("A$summarySheetRowDataCount:T$summarySheetLastRowData")->applyFromArray($styleArray);
 
-                    //$objWorkSummarySheet->getStyle("L5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("ED7D31");
+                    $objWorkSummarySheet->getStyle("L5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("ED7D31");
                     $objWorkSummarySheet->getStyle("M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("7B7B7B");
-                    $objWorkSummarySheet->getStyle("M5:N5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("548235");
-                    //$objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
-                    $objWorkSummarySheet->getStyle("M4:R4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("9BC2E6");
+                    $objWorkSummarySheet->getStyle("L5:M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("548235");
+                    $objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
+                    $objWorkSummarySheet->getStyle("L4:R4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("9BC2E6");
 
                     $objWorkSummarySheet->SetCellValue("D1", "=E5-F5");
                     $objWorkSummarySheet->getStyle("D1")->getNumberFormat()->setFormatCode('_(* #,##0_);_(* (#,##0);_(* "-"??_);_(@_)');
@@ -7297,7 +7284,7 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->getStyle("L5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("ED7D31");
                     $objWorkSummarySheet->getStyle("M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("7B7B7B");
                     $objWorkSummarySheet->getStyle("L5:M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("548235");
-                    //$objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
+                    $objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
                     $objWorkSummarySheet->getStyle("L4:R4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("9BC2E6");
 
                     $objWorkSummarySheet->SetCellValue("D1", "=E5-F5");
@@ -7528,32 +7515,29 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->SetCellValue("N6", $this->lang->line("value_wood_farm"));
                     $objWorkSummarySheet->mergeCells("N6:N7");
 
-                    $objWorkSummarySheet->SetCellValue("O6", $this->lang->line("zona"));
+                    $objWorkSummarySheet->SetCellValue("O6", $this->lang->line("Logistics"));
                     $objWorkSummarySheet->mergeCells("O6:O7");
 
-                    $objWorkSummarySheet->SetCellValue("P6", $this->lang->line("transport"));
+                    $objWorkSummarySheet->SetCellValue("P6", $this->lang->line("Service"));
                     $objWorkSummarySheet->mergeCells("P6:P7");
 
-                    $objWorkSummarySheet->SetCellValue("Q6", $this->lang->line("loading_finca"));
+                    $objWorkSummarySheet->SetCellValue("Q6", $this->lang->line("total"));
                     $objWorkSummarySheet->mergeCells("Q6:Q7");
 
-                    $objWorkSummarySheet->SetCellValue("R6", $this->lang->line("total"));
+                    $objWorkSummarySheet->SetCellValue("R6", $this->lang->line("difference_farm_reception"));
                     $objWorkSummarySheet->mergeCells("R6:R7");
 
-                    $objWorkSummarySheet->SetCellValue("S6", $this->lang->line("difference_farm_reception"));
+                    $objWorkSummarySheet->SetCellValue("S6", $this->lang->line("value_material"));
                     $objWorkSummarySheet->mergeCells("S6:S7");
 
-                    $objWorkSummarySheet->SetCellValue("T6", $this->lang->line("value_material"));
+                    $objWorkSummarySheet->SetCellValue("T6", $this->lang->line("invoice_number"));
                     $objWorkSummarySheet->mergeCells("T6:T7");
 
-                    $objWorkSummarySheet->SetCellValue("U6", $this->lang->line("invoice_number"));
-                    $objWorkSummarySheet->mergeCells("U6:U7");
-
-                    $objWorkSummarySheet->getStyle("A6:U7")->getFont()->setBold(true);
-                    $objWorkSummarySheet->getStyle("A6:U6")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+                    $objWorkSummarySheet->getStyle("A6:T7")->getFont()->setBold(true);
+                    $objWorkSummarySheet->getStyle("A6:T6")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
                     $objWorkSummarySheet->getStyle("E7:F7")->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER)->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-                    $objWorkSummarySheet->getStyle("A6:U7")->applyFromArray($styleArray);
-                    $objWorkSummarySheet->getStyle("G6:U6")->getAlignment()->setWrapText(true);
+                    $objWorkSummarySheet->getStyle("A6:T7")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("G6:R6")->getAlignment()->setWrapText(true);
 
                     //END SUMMARY SHEET
 
@@ -8487,11 +8471,11 @@ class Liquidationreport extends MY_Controller
                                 $objWorkSummarySheet->SetCellValue("N$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!R$sumCalcRow");
                                 $objWorkSummarySheet->SetCellValue("O$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$logiscticRowNumber");
                                 $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$serviceRowNumber");
-                                $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", $getFarmDetail[0]->loading_cost + 0);
-                                $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=SUM(N$summarySheetRowDataCount:Q$summarySheetRowDataCount)");
-                                $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", "=M$summarySheetRowDataCount-N$summarySheetRowDataCount");
-                                $objWorkSummarySheet->SetCellValue("T$summarySheetRowDataCount", "=R$summarySheetRowDataCount");
-                                $objWorkSummarySheet->SetCellValue("U$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
+                                $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", "=SUM(N$summarySheetRowDataCount:P$summarySheetRowDataCount)");
+                                $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=M$summarySheetRowDataCount-N$summarySheetRowDataCount");
+                                $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", "=Q$summarySheetRowDataCount");
+                                $objWorkSummarySheet->SetCellValue("T$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
+    
     
                                 $summarySNo++;
                                 $summarySheetRowDataCount++;
@@ -9091,30 +9075,28 @@ class Liquidationreport extends MY_Controller
 
                             $objWorkSummarySheet->SetCellValue("A$summarySheetRowDataCount", $summarySNo);
                             $objWorkSummarySheet->SetCellValue("B$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!B2");
-                            $objWorkSummarySheet->SetCellValue("C$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!B6");
-                            $objWorkSummarySheet->SetCellValue("D$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!E2");
-                            $objWorkSummarySheet->SetCellValue("E$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!A$sumCalcRow");
-                            $objWorkSummarySheet->SetCellValue("F$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!B$sumCalcRow");
-                            $objWorkSummarySheet->SetCellValue("G$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!D$sumCalcRow");
-                            $objWorkSummarySheet->SetCellValue("H$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!C$sumCalcRow");
-    
-                            $objWorkSummarySheet->SetCellValue("I$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!E$sumCalcRow");
-                            $objWorkSummarySheet->SetCellValue("J$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!F$sumCalcRow");
-                                
-    
-                            $objWorkSummarySheet->SetCellValue("K$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!G$sumCalcRow");
-                            $objWorkSummarySheet->SetCellValue("L$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!H$sumCalcRow");
-                            $objWorkSummarySheet->SetCellValue("M$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!P$sumCalcRow");
-                            $objWorkSummarySheet->SetCellValue("N$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!Q$sumCalcRow");
-                            $objWorkSummarySheet->SetCellValue("O$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$logiscticRowNumber");
-                            $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$serviceRowNumber");
-                            $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", $getFarmDetail[0]->loading_cost + 0);
-                            $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=SUM(N$summarySheetRowDataCount:Q$summarySheetRowDataCount)");
-                            $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", "=M$summarySheetRowDataCount-N$summarySheetRowDataCount");
-                            $objWorkSummarySheet->SetCellValue("T$summarySheetRowDataCount", "=R$summarySheetRowDataCount");
-                            $objWorkSummarySheet->SetCellValue("U$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
+                            $objWorkSummarySheet->SetCellValue("C$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!E2");
+                            $objWorkSummarySheet->SetCellValue("D$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!A$sumCalcRow");
+                            $objWorkSummarySheet->SetCellValue("E$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!B$sumCalcRow");
+                            $objWorkSummarySheet->SetCellValue("F$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!D$sumCalcRow");
+                            $objWorkSummarySheet->SetCellValue("G$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!C$sumCalcRow");
 
-                            $objWorkSummarySheet->getStyle("I$summarySheetRowDataCount:K$summarySheetRowDataCount")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
+                            $objWorkSummarySheet->SetCellValue("H$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!E$sumCalcRow");
+                            $objWorkSummarySheet->SetCellValue("I$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!F$sumCalcRow");
+
+
+                            $objWorkSummarySheet->SetCellValue("J$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!G$sumCalcRow");
+                            $objWorkSummarySheet->SetCellValue("K$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!H$sumCalcRow");
+                            $objWorkSummarySheet->SetCellValue("L$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!P$sumCalcRow");
+                            $objWorkSummarySheet->SetCellValue("M$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!Q$sumCalcRow");
+                            $objWorkSummarySheet->SetCellValue("N$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$logiscticRowNumber");
+                            $objWorkSummarySheet->SetCellValue("O$summarySheetRowDataCount", "='" . $getFarmDetail[0]->inventory_order . "'!$serviceRowNumber");
+                            $objWorkSummarySheet->SetCellValue("P$summarySheetRowDataCount", "=SUM(M$summarySheetRowDataCount:O$summarySheetRowDataCount)");
+                            $objWorkSummarySheet->SetCellValue("Q$summarySheetRowDataCount", "=L$summarySheetRowDataCount-M$summarySheetRowDataCount");
+                            $objWorkSummarySheet->SetCellValue("R$summarySheetRowDataCount", "=P$summarySheetRowDataCount");
+                            $objWorkSummarySheet->SetCellValue("S$summarySheetRowDataCount", $getFarmDetail[0]->invoice_number);
+
+                            $objWorkSummarySheet->getStyle("H$summarySheetRowDataCount:K$summarySheetRowDataCount")->getNumberFormat()->setFormatCode('_(* #,##0.000_);_(* (#,##0.000);_(* "-"??_);_(@_)');
 
 
                             $summarySNo++;
@@ -9142,10 +9124,9 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->SetCellValue("Q5", "=SUM(Q$summarySheetFirstRowData:Q$summarySheetLastRowData)");
                     $objWorkSummarySheet->SetCellValue("R5", "=SUM(R$summarySheetFirstRowData:R$summarySheetLastRowData)");
                     $objWorkSummarySheet->SetCellValue("S5", "=SUM(S$summarySheetFirstRowData:S$summarySheetLastRowData)");
-                    $objWorkSummarySheet->SetCellValue("T5", "=SUM(T$summarySheetFirstRowData:T$summarySheetLastRowData)");
-                    $objWorkSummarySheet->getStyle("M5:T5")->applyFromArray($styleArray);
-                    $objWorkSummarySheet->getStyle("M5:T5")->getFont()->setBold(true);
-                    $objWorkSummarySheet->getStyle("M5:T5")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+                    $objWorkSummarySheet->getStyle("M5:S5")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("M5:S5")->getFont()->setBold(true);
+                    $objWorkSummarySheet->getStyle("M5:S5")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
 
                     $objWorkSummarySheet->SetCellValue("M4", "=M5/E5");
                     $objWorkSummarySheet->SetCellValue("N4", "=N5/E5");
@@ -9154,20 +9135,19 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->SetCellValue("Q4", "=Q5/E5");
                     $objWorkSummarySheet->SetCellValue("R4", "=R5/E5");
                     $objWorkSummarySheet->SetCellValue("S4", "=S5/E5");
-                    $objWorkSummarySheet->SetCellValue("T4", "=T5/E5");
-                    $objWorkSummarySheet->getStyle("M4:T4")->applyFromArray($styleArray);
-                    $objWorkSummarySheet->getStyle("M4:T4")->getFont()->setBold(true);
-                    $objWorkSummarySheet->getStyle("M4:T4")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+                    $objWorkSummarySheet->getStyle("M4:S4")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("M4:S4")->getFont()->setBold(true);
+                    $objWorkSummarySheet->getStyle("M4:S4")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
 
-                    $objWorkSummarySheet->getStyle("M$summarySheetFirstRowData:T$summarySheetLastRowData")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
-                    $objWorkSummarySheet->getStyle("A$summarySheetFirstRowData:U$summarySheetLastRowData")->applyFromArray($styleArray);
-                    $objWorkSummarySheet->getStyle("A$summarySheetRowDataCount:U$summarySheetLastRowData")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("M$summarySheetFirstRowData:S$summarySheetLastRowData")->getNumberFormat()->setFormatCode($getCurrency[0]->currency_excel_format);
+                    $objWorkSummarySheet->getStyle("A$summarySheetFirstRowData:T$summarySheetLastRowData")->applyFromArray($styleArray);
+                    $objWorkSummarySheet->getStyle("A$summarySheetRowDataCount:T$summarySheetLastRowData")->applyFromArray($styleArray);
 
                     $objWorkSummarySheet->getStyle("L5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("ED7D31");
                     $objWorkSummarySheet->getStyle("M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("7B7B7B");
                     $objWorkSummarySheet->getStyle("L5:M5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("548235");
-                    //$objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
-                    $objWorkSummarySheet->getStyle("L4:T4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("9BC2E6");
+                    $objWorkSummarySheet->getStyle("O5")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("FFF2CC");
+                    $objWorkSummarySheet->getStyle("L4:R4")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB("9BC2E6");
 
                     $objWorkSummarySheet->SetCellValue("D1", "=E5-F5");
                     $objWorkSummarySheet->getStyle("D1")->getNumberFormat()->setFormatCode('_(* #,##0_);_(* (#,##0);_(* "-"??_);_(@_)');
@@ -9191,8 +9171,7 @@ class Liquidationreport extends MY_Controller
                     $objWorkSummarySheet->getColumnDimension("Q")->setAutoSize(false)->setWidth(18);
                     $objWorkSummarySheet->getColumnDimension("R")->setAutoSize(false)->setWidth(18);
                     $objWorkSummarySheet->getColumnDimension("S")->setAutoSize(false)->setWidth(18);
-                    $objWorkSummarySheet->getColumnDimension("T")->setAutoSize(false)->setWidth(18);
-                    $objWorkSummarySheet->getColumnDimension("U")->setAutoSize(false)->setWidth(14);
+                    $objWorkSummarySheet->getColumnDimension("T")->setAutoSize(false)->setWidth(14);
 
                     //END INVENTORY SHEET
 

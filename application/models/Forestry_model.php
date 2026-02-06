@@ -295,7 +295,7 @@ class Forestry_model extends CI_Model
     public function get_forestry_reports_farm_data($originId, $supplierId, $contractId, $fromDate, $toDate)
     {
         $strQuery = "SELECT A.farm_id, DATE_FORMAT(STR_TO_DATE(A.purchase_date, '%Y-%m-%d'), '%d/%m/%Y') AS purchase_date, A.inventory_order, gettotalpieces_farm(A.farm_id) AS pieces, 
-            gettotalvolume_farm(A.farm_id, 0, 0, 1) AS net_volume, A.wood_value, A.service_cost, A.logistic_cost, A.loading_cost, B.supplier_name, C.contract_code, C.description 
+            gettotalvolume_farm(A.farm_id, 0, 0, 1) AS gross_volume, gettotalvolume_farm(A.farm_id, 3, 5, 1) AS net_volume, A.wood_value, A.service_cost, A.logistic_cost, A.loading_cost, B.supplier_name, C.contract_code, C.description 
             FROM tbl_farm A 
             INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
             INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
@@ -578,6 +578,99 @@ class Forestry_model extends CI_Model
         if ($fromDate != '' && $toDate != '') {
             $strQuery .= " AND STR_TO_DATE(A.expense_date, '%d/%m/%Y') BETWEEN STR_TO_DATE('$fromDate', '%d/%m/%Y') AND STR_TO_DATE('$toDate', '%d/%m/%Y')";
         }
+
+        $query = $this->db->query($strQuery);
+        return $query->result();
+    }
+
+    public function check_existing_tracking_count($temptrackingId, $userId, $originId)
+    {
+        $this->db->where("temp_tracking_id", $temptrackingId);
+        $this->db->where("data_added_by", $userId);
+        $this->db->where("cost_type", 4);
+        $this->db->where("origin_id", $originId);
+        $this->db->where("is_active", 1);
+        return $this->db->count_all_results('tbl_forestry_operational_costs');
+    }
+
+    public function delete_tracking_by_temp_id($temptrackingId, $machineTrackingId, $userId, $originId)
+    {
+        $this->db->trans_start();
+
+        $this->db->where([
+            "id" => $temptrackingId,
+            "cost_type" => 4,
+            "temp_tracking_id" => $machineTrackingId,
+            "data_added_by" => $userId,
+            "origin_id" => $originId,
+            "is_active" => 1
+        ])->update("tbl_forestry_operational_costs", [
+            "is_active" => 0
+        ]);
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
+    }
+
+    public function update_machine_tracking($machineTrackingId, $temptrackingId, $userId, $originId, $data)
+    {
+        $multiClause = array(
+            'id' => $machineTrackingId,
+            'cost_type' => 4,
+            'temp_tracking_id' => $temptrackingId,
+            'data_added_by' => $userId,
+            'origin_id' => $originId,
+            'is_active' => 1
+        );
+        $this->db->where($multiClause);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        if ($this->db->update('tbl_forestry_operational_costs', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function add_tracking($data)
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_forestry_operational_costs', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
+
+    public function fetch_machine_tracking_data($originId, $userId)
+    {
+        $strQuery = "SELECT 
+                id,
+                temp_tracking_id,
+                supplier_id,
+                contract_id,
+                expense_date,
+                machine_type,
+                clock_start,
+                clock_end
+            FROM tbl_forestry_operational_costs
+            WHERE cost_type = 4 
+            AND origin_id = $originId
+            AND is_active = 1 
+            AND data_added_by = $userId
+            AND STR_TO_DATE(expense_date, '%d/%m/%Y') >= (
+                    SELECT DATE_SUB(
+                        MAX(STR_TO_DATE(expense_date, '%d/%m/%Y')),
+                        INTERVAL 20 DAY
+                    )
+                    FROM tbl_forestry_operational_costs
+                    WHERE cost_type = 4
+                    AND is_active = 1 AND origin_id = $originId AND data_added_by = $userId
+            )
+            ORDER BY STR_TO_DATE(expense_date, '%d/%m/%Y');";
 
         $query = $this->db->query($strQuery);
         return $query->result();

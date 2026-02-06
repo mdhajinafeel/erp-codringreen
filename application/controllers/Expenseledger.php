@@ -133,9 +133,14 @@ class Expenseledger extends MY_Controller
                     $amount = $credittransaction->amount;
                     $amount = $fmt->formatCurrency($amount, $currencyFormat);
 
+                    $actionText = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("edit") . '"><button type="button" class="btn icon-btn btn-xs btn-edit waves-effect waves-light" data-role="editcreditamount" data-toggle="modal" data-target=".edit-modal-data" data-transaction_id="' . $credittransaction->transaction_id . '" data-transaction_display_id="' . $credittransaction->transaction_display_id . '"><span class="fas fa-pencil"></span></button></span>';
+
+                    if($session['user_id'] == 1 || $session['user_id'] == 3 || $session['user_id'] == 6){
+                        $actionText = $actionText . '<span style="margin-left:6px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("delete") . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deletecreditamount" data-toggle="modal" data-target=".edit-modal-data" data-transaction_id="' . $credittransaction->transaction_id . '" data-transaction_display_id="' . $credittransaction->transaction_display_id . '"><span class="fas fa-trash"></span></button></span>';
+                    }
+                    
                     $creditTransaction = array(
-                        "action" => '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("edit") . '"><button type="button" class="btn icon-btn btn-xs btn-edit waves-effect waves-light" data-role="editcreditamount" data-toggle="modal" data-target=".edit-modal-data" data-transaction_id="' . $credittransaction->transaction_id . '" data-transaction_display_id="' . $credittransaction->transaction_display_id . '"><span class="fas fa-pencil"></span></button></span>
-                            <span style="margin-left:6px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("delete") . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deletecreditamount" data-toggle="modal" data-target=".edit-modal-data" data-transaction_id="' . $credittransaction->transaction_id . '" data-transaction_display_id="' . $credittransaction->transaction_display_id . '"><span class="fas fa-trash"></span></button></span>',
+                        "action" => $actionText,
                         "transactionId" => $credittransaction->transaction_id,
                         "transactionDisplayId" => $credittransaction->transaction_display_id,
                         "transactionDate" => $credittransaction->transaction_date,
@@ -153,9 +158,14 @@ class Expenseledger extends MY_Controller
                     $amount = $debittransaction->amount;
                     $amount = $fmt->formatCurrency($amount, $currencyFormat);
 
+                    $actionText = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("view") . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="viewdebittransaction" data-toggle="modal" data-target=".view-modal-data" data-transaction_id="' . $debittransaction->transaction_id . '" data-user_id = "' . $debittransaction->user_id . '" data-transaction_display_id="' . $debittransaction->transaction_display_id . '"><span class="fas fa-eye"></span></button></span>';
+
+                    if($session['user_id'] == 1 || $session['user_id'] == 3 || $session['user_id'] == 6){
+                        $actionText = $actionText . '<span style="margin-left:6px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("delete") . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deletedebittransaction" data-toggle="modal" data-target=".delete-modal-data" data-transaction_id="' . $debittransaction->transaction_id . '" data-transaction_display_id="' . $debittransaction->transaction_display_id . '"><span class="fas fa-trash"></span></button></span>';
+                    }
+              
                     $debitTransaction = array(
-                        "action" => '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("view") . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="viewdebittransaction" data-toggle="modal" data-target=".view-modal-data" data-transaction_id="' . $debittransaction->transaction_id . '" data-user_id = "' . $debittransaction->user_id . '" data-transaction_display_id="' . $debittransaction->transaction_display_id . '"><span class="fas fa-eye"></span></button></span>
-                        <span style="margin-left:6px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("delete") . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deletedebittransaction" data-toggle="modal" data-target=".delete-modal-data" data-transaction_id="' . $debittransaction->transaction_id . '" data-transaction_display_id="' . $debittransaction->transaction_display_id . '"><span class="fas fa-trash"></span></button></span>',
+                        "action" => $actionText,
                         "transactionDisplayId" => $debittransaction->transaction_display_id,
                         "transactionDate" => $debittransaction->transaction_date,
                         "amount" => $amount,
@@ -263,6 +273,49 @@ class Expenseledger extends MY_Controller
                 $creditDelete = $this->Financemaster_model->delete_credit_transaction($transactionId, $displayId, $session['user_id']);
 
                 if ($creditDelete) {
+                    $Return['result'] = $this->lang->line('data_deleted');
+                    $Return['redirect'] = false;
+                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                    $this->output($Return);
+                    exit;
+                } else {
+                    $Return['error'] = $this->lang->line('error_deleting');
+                    $Return['result'] = "";
+                    $Return['redirect'] = false;
+                    $Return['csrf_hash'] = $this->security->get_csrf_hash();
+                    $this->output($Return);
+                    exit;
+                }
+            } else if ($this->input->get('type') == "deletedebitconfirmation") {
+                $data = array(
+                    'pageheading' => $this->lang->line('confirmation'),
+                    'pagemessage' => $this->lang->line('delete_message'),
+                    'inputid' => $this->input->get('tid'),
+                    'inputid1' => $this->input->get('did'),
+                    'inputid2' => $this->input->get('oid'),
+                    'inputid3' => $this->input->get('uid'),
+                    'actionurl' => "expenseledger/dialog_expense_action",
+                    'actiontype' => "deletedebit",
+                    'xin_table' => "#xin_table_debits",
+                );
+                $this->load->view('dialogs/dialog_confirmation_expense_ledger', $data);
+            } else if ($this->input->get('type') == "deletedebit") {
+
+                $transactionId = $this->input->get('inputid');
+                $displayId = $this->input->get('inputid1');
+                $originId = $this->input->get('inputid2');
+
+                $dataTransaction = array(
+                        "updated_by" => $session['user_id'],
+                        "is_active" => 0,
+                    );
+
+                $creditDelete = $this->Financemaster_model->update_debit_details_ledger($transactionId, $displayId, $originId, $dataTransaction);
+
+                if ($creditDelete) {
+
+                    $this->Financemaster_model->update_debit_expense_details_ledger($transactionId, $displayId, $dataTransaction);
+
                     $Return['result'] = $this->lang->line('data_deleted');
                     $Return['redirect'] = false;
                     $Return['csrf_hash'] = $this->security->get_csrf_hash();

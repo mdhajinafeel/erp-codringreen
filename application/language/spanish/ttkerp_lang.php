@@ -1153,3 +1153,14 @@ $lang["lubricants_report"] = "Informe de Lubricantes";
 $lang["others_report"] = "Informe de Otros";
 $lang["clock_start"] = "Reloj Incial";
 $lang["clock_end"] = "Reloj Final";
+
+//APP CENTER
+$lang["app_center"] = "App Center";
+$lang["app_lists"] = "App Lists";
+$lang["add_apps"] = "Add Apps";
+
+//REPORT
+$lang["loading_finca"] = "Cargue";
+
+$lang["doc_dhl"] = "DHL";
+$lang["consolidatedfarmreport"] = "Informe agrícola consolidado";

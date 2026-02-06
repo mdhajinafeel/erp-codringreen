@@ -280,7 +280,7 @@ class Financemaster_model extends CI_Model
 			$query = $this->db->query("SELECT A.farm_id, DATE_FORMAT(A.purchase_date, '%d %M %Y') AS purchase_date, A.inventory_order, 
 						A.plate_number, B.supplier_name, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, 
 						A.logistic_cost, A.service_cost, A.adjustment, A.purchase_unit_id, A.exchange_rate, 
-						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length, A.driver_name     
+						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length, A.driver_name, A.loading_cost     
 						FROM tbl_farm A 
 						INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
 						INNER JOIN tbl_contract_inventory_mapping C ON C.contract_id = A.contract_id AND C.supplier_id = A.supplier_id 
@@ -292,7 +292,7 @@ class Financemaster_model extends CI_Model
 			$query = $this->db->query("SELECT A.farm_id, DATE_FORMAT(A.purchase_date, '%d %M %Y') AS purchase_date, A.inventory_order, 
 						A.plate_number, B.supplier_name, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, 
 						A.logistic_cost, A.service_cost, A.adjustment, A.purchase_unit_id, A.exchange_rate, 
-						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length, A.driver_name     
+						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length, A.driver_name, A.loading_cost     
 						FROM tbl_farm A 
 						INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
 						INNER JOIN tbl_contract_inventory_mapping C ON C.contract_id = A.contract_id AND C.supplier_id = A.supplier_id 
@@ -647,9 +647,9 @@ class Financemaster_model extends CI_Model
 					UPPER(GROUP_CONCAT(DISTINCT J1.invoice_no SEPARATOR ', ')) AS coteros_invoice, SUM(DISTINCT J.container_value) AS coteros_value, 
 					UPPER(GROUP_CONCAT(DISTINCT K1.invoice_no SEPARATOR ', ')) AS incentive_invoice, SUM(DISTINCT K.container_value) AS incentive_value,
 					UPPER(GROUP_CONCAT(DISTINCT L1.invoice_no SEPARATOR ', ')) AS other_cost_invoice, SUM(DISTINCT L.container_value) AS other_cost_value, 
-					CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
-					C.dispatch_id
-					FROM tbl_export_container_details A
+					UPPER(GROUP_CONCAT(DISTINCT M1.invoice_no SEPARATOR ', ')) AS dhl_invoice, SUM(DISTINCT M.container_value) AS dhl_value, 
+					UPPER(GROUP_CONCAT(DISTINCT N1.invoice_no SEPARATOR ', ')) AS container_loading_invoice, SUM(DISTINCT N.container_value) AS container_loading_value, 
+					CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost 					FROM tbl_export_container_details A
 					INNER JOIN tbl_export_container B ON B.container_details_id = A.id
 					INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
 					LEFT JOIN tbl_export_document_container D ON D.dispatch_id = C.dispatch_id AND D.export_type = 1 AND D.is_active = 1 
@@ -670,6 +670,10 @@ class Financemaster_model extends CI_Model
 					LEFT JOIN tbl_export_documents K1 ON K1.export_id = A.id AND K1.export_type = 7 AND K1.is_active = 1  
 					LEFT JOIN tbl_export_document_container L ON L.dispatch_id = C.dispatch_id AND L.export_type = 12 AND L.is_active = 1 
 					LEFT JOIN tbl_export_documents L1 ON L1.export_id = A.id AND L1.export_type = 12 AND L1.is_active = 1 
+					LEFT JOIN tbl_export_document_container M ON M.dispatch_id = C.dispatch_id AND M.export_type = 13 AND M.is_active = 1 
+					LEFT JOIN tbl_export_documents M1 ON M1.export_id = A.id AND M1.export_type = 13 AND M1.is_active = 1 
+					LEFT JOIN tbl_export_document_container N ON N.dispatch_id = C.dispatch_id AND N.export_type = 11 AND N.is_active = 1 
+					LEFT JOIN tbl_export_documents N1 ON N1.export_id = A.id AND N1.export_type = 11 AND N1.is_active = 1 
 					AND C.isduplicatedispatched = 0
 					WHERE A.isactive = 1 AND B.isactive = 1 
 					AND (A.shipped_date = '' OR (STR_TO_DATE(A.shipped_date, '%d/%m/%Y')
@@ -864,9 +868,10 @@ class Financemaster_model extends CI_Model
 					UPPER(GROUP_CONCAT(DISTINCT I1.invoice_no SEPARATOR ', ')) AS phyto_invoice, SUM(DISTINCT I.container_value) AS phyto_value, 
 					UPPER(GROUP_CONCAT(DISTINCT J1.invoice_no SEPARATOR ', ')) AS coteros_invoice, SUM(DISTINCT J.container_value) AS coteros_value, 
 					UPPER(GROUP_CONCAT(DISTINCT K1.invoice_no SEPARATOR ', ')) AS incentive_invoice, SUM(DISTINCT K.container_value) AS incentive_value,
-					UPPER(GROUP_CONCAT(DISTINCT L1.invoice_no SEPARATOR ', ')) AS remobilization_invoice, SUM(DISTINCT L.container_value) AS remobilization_value, 
-					CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost, 
-					C.dispatch_id 
+					UPPER(GROUP_CONCAT(DISTINCT L1.invoice_no SEPARATOR ', ')) AS other_cost_invoice, SUM(DISTINCT L.container_value) AS other_cost_value, 
+                    UPPER(GROUP_CONCAT(DISTINCT M1.invoice_no SEPARATOR ', ')) AS dhl_invoice, SUM(DISTINCT M.container_value) AS dhl_value, 
+					UPPER(GROUP_CONCAT(DISTINCT N1.invoice_no SEPARATOR ', ')) AS container_loading_invoice, SUM(DISTINCT N.container_value) AS container_loading_value, 
+					CASE WHEN A.id >= 282 THEN CASE WHEN A.product_type_id = 1 THEN (A.unit_price * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 1 AND 2.99 THEN (A.unit_price_shorts * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) BETWEEN 3 AND 5.99 THEN (A.unit_price_semi * B.total_pieces) WHEN get_average_length_by_container(B.dispatch_id) >= 6 THEN (A.unit_price_longs * B.total_pieces) END ELSE CASE WHEN A.product_type_id = 1 THEN B.material_cost ELSE get_material_cost_by_dispatch_id_export(B.dispatch_id) END END AS material_cost 
 					FROM tbl_export_container_details A
 					INNER JOIN tbl_export_container B ON B.container_details_id = A.id
 					INNER JOIN tbl_dispatch_container C ON C.dispatch_id = B.dispatch_id AND C.isactive = 1 
@@ -886,8 +891,12 @@ class Financemaster_model extends CI_Model
 					LEFT JOIN tbl_export_documents J1 ON J1.export_id = A.id AND J1.export_type = 6 AND J1.is_active = 1 
 					LEFT JOIN tbl_export_document_container K ON K.dispatch_id = C.dispatch_id AND K.export_type = 7 AND K.is_active = 1 
 					LEFT JOIN tbl_export_documents K1 ON K1.export_id = A.id AND K1.export_type = 7 AND K1.is_active = 1  
-					LEFT JOIN tbl_export_document_container L ON L.dispatch_id = C.dispatch_id AND L.export_type = 8 AND L.is_active = 1 
-					LEFT JOIN tbl_export_documents L1 ON L1.export_id = A.id AND L1.export_type = 8 AND L1.is_active = 1 
+					LEFT JOIN tbl_export_document_container L ON L.dispatch_id = C.dispatch_id AND L.export_type = 12 AND L.is_active = 1 
+					LEFT JOIN tbl_export_documents L1 ON L1.export_id = A.id AND L1.export_type = 12 AND L1.is_active = 1 
+                    LEFT JOIN tbl_export_document_container M ON M.dispatch_id = C.dispatch_id AND M.export_type = 13 AND M.is_active = 1 
+					LEFT JOIN tbl_export_documents M1 ON M1.export_id = A.id AND M1.export_type = 13 AND M1.is_active = 1 
+					LEFT JOIN tbl_export_document_container N ON N.dispatch_id = C.dispatch_id AND N.export_type = 11 AND N.is_active = 1 
+					LEFT JOIN tbl_export_documents N1 ON N1.export_id = A.id AND N1.export_type = 11 AND N1.is_active = 1 
 					AND C.isduplicatedispatched = 0
 					WHERE A.isactive = 1 AND B.isactive = 1 
 					AND A.id = $exportid AND A.origin_id = $originid GROUP BY B.dispatch_id");
@@ -1053,19 +1062,19 @@ class Financemaster_model extends CI_Model
 		return $query->result();
 	}
 
-	public function get_debited_transaction_supplier($supplierid)
+	public function get_debited_transaction_supplier($supplierid, $year)
 	{
 		$query = $this->db->query("SELECT A.id, inventory_order, B.type_name, A.amount,
 				DATE_FORMAT(STR_TO_DATE(A.expense_date, '%Y-%m-%d'), '%d/%m/%Y') as expense_date, 
 				C.contract_type, A.contract_id, A.supplier_id, A.expense_type FROM tbl_inventory_ledger A
 				INNER JOIN tbl_inventor_ledger_types B ON B.id = A.expense_type 
 				INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
-				WHERE A.supplier_id = $supplierid AND A.ledger_type = 2 AND A.is_active = 1 
+				WHERE A.supplier_id = $supplierid AND A.ledger_type = 2 AND A.is_active = 1 AND YEAR(STR_TO_DATE(A.expense_date, '%Y-%m-%d')) = $year
 				ORDER BY A.created_date DESC, A.expense_type");
 		return $query->result();
 	}
 
-	public function get_credited_transaction_supplier($supplierid)
+	public function get_credited_transaction_supplier($supplierid, $year)
 	{
 		$query = $this->db->query("SELECT A.id, A.amount, A.supplier_id, A.contract_id,
 				DATE_FORMAT(A.expense_date, '%d/%m/%Y') as expense_date, E.fullname AS fullname, 
@@ -1073,7 +1082,7 @@ class Financemaster_model extends CI_Model
 				INNER JOIN tbl_supplier_purchase_contract B ON B.contract_id = A.contract_id 
 				INNER JOIN tbl_suppliers C ON C.id = B.supplier_id 
 				LEFT JOIN tbl_user_registration E ON E.userid = A.created_by
-				where A.is_active = 1 AND A.supplier_id = $supplierid AND expense_type IN (0,1) AND ledger_type = 1 ORDER BY A.created_date DESC");
+				where A.is_active = 1 AND A.supplier_id = $supplierid AND expense_type IN (0,1) AND ledger_type = 1 AND YEAR(STR_TO_DATE(A.expense_date, '%Y-%m-%d')) = $year ORDER BY A.created_date DESC");
 		return $query->result();
 	}
 
@@ -1285,7 +1294,7 @@ class Financemaster_model extends CI_Model
 			$query = $this->db->query("SELECT A.supplier_id, A.contract_id, A.farm_id, DATE_FORMAT(A.purchase_date, '%d %M %Y') AS purchase_date, A.inventory_order, 
 						A.plate_number, B.supplier_name, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, 
 						A.logistic_cost, A.service_cost, A.adjustment, A.purchase_unit_id, A.exchange_rate, 
-						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length    
+						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length, A.loading_cost    
 						FROM tbl_farm A 
 						INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
 						INNER JOIN tbl_contract_inventory_mapping C ON C.contract_id = A.contract_id AND C.supplier_id = A.supplier_id AND C.is_active = 1 
@@ -1298,7 +1307,7 @@ class Financemaster_model extends CI_Model
 			$query = $this->db->query("SELECT A.supplier_id, A.contract_id, A.farm_id, DATE_FORMAT(A.purchase_date, '%d %M %Y') AS purchase_date, A.inventory_order, 
 						A.plate_number, B.supplier_name, A.supplier_taxes_array, A.logistics_taxes_array, A.service_taxes_array, 
 						A.logistic_cost, A.service_cost, A.adjustment, A.purchase_unit_id, A.exchange_rate, 
-						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length    
+						C.invoice_number, D.purchase_allowance, D.purchase_allowance_length, A.loading_cost    
 						FROM tbl_farm A 
 						INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
 						INNER JOIN tbl_contract_inventory_mapping C ON C.contract_id = A.contract_id AND C.supplier_id = A.supplier_id AND C.is_active = 1 
@@ -1403,7 +1412,9 @@ class Financemaster_model extends CI_Model
                         '' AS phyto_invoice, 0 AS phyto_value, 
                         '' AS coteros_invoice, 0 AS coteros_value, 
                         '' AS incentive_invoice, 0 AS incentive_value,
-                        '' AS remobilization_invoice, 0 AS remobilization_value, 
+                        '' AS other_cost_invoice, 0 AS other_cost_value, 
+                        '' AS dhl_invoice, 0 AS dhl_value, 
+						'' AS container_loading_invoice, 0 AS container_loading_value, 
 						get_material_cost_by_dispatch_id_export(C.dispatch_id) AS material_cost
                         FROM tbl_dispatch_container C 
         				WHERE C.isduplicatedispatched = 0 AND C.isactive = 1 
@@ -1747,6 +1758,30 @@ class Financemaster_model extends CI_Model
 	}
 
 	public function update_debit_expense_details($transactionId, $displayId, $data)
+	{
+		$multiClause = array('transaction_id' => $transactionId, 'transaction_display_id' => $displayId);
+		$this->db->where($multiClause);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		if ($this->db->update('tbl_expense_details', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function update_debit_details_ledger($transactionId, $displayId, $originId, $data)
+	{
+		$multiClause = array('transaction_type' => 2, 'transaction_id' => $transactionId, 'transaction_display_id' => $displayId, 'origin_id' => $originId);
+		$this->db->where($multiClause);
+		$this->db->set('updated_date', 'NOW()', FALSE);
+		if ($this->db->update('tbl_transaction', $data)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function update_debit_expense_details_ledger($transactionId, $displayId, $data)
 	{
 		$multiClause = array('transaction_id' => $transactionId, 'transaction_display_id' => $displayId);
 		$this->db->where($multiClause);
