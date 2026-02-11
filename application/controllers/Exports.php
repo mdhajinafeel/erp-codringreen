@@ -4165,31 +4165,32 @@ class Exports extends MY_Controller
                         // Extract `TaxExclusiveAmount` from the embedded XML
                         //$taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
                         $taxExclusiveAmountNode = $embeddedXpath->query("//cac:InvoiceLine/cbc:LineExtensionAmount");
+                        // $taxExclusiveAmountNode = $embeddedXpath->query("//cbc:InvoiceLine/cbc:LineExtensionAmount");
                         
-                        $invoiceLineNode = $embeddedXpath->query(
-                            "//cac:InvoiceLine[
-                                cac:Item/cbc:Description = 'ELABORACION DEX'
-                            ]"
-                        )->item(0);
+                        // $invoiceLineNode = $embeddedXpath->query(
+                        //     "//cac:InvoiceLine[
+                        //         cac:Item/cbc:Description = 'ELABORACION DEX'
+                        //     ]"
+                        // )->item(0);
 
-                        if ($invoiceLineNode) {
+                        // if ($invoiceLineNode) {
 
-                            $baseAmountNode = $embeddedXpath->query(
-                                "cbc:LineExtensionAmount",
-                                $invoiceLineNode
-                            )->item(0);
+                        //     $baseAmountNode = $embeddedXpath->query(
+                        //         "cbc:LineExtensionAmount",
+                        //         $invoiceLineNode
+                        //     )->item(0);
 
-                            $taxAmountNode = $embeddedXpath->query(
-                                "cac:TaxTotal/cbc:TaxAmount",
-                                $invoiceLineNode
-                            )->item(0);
+                        //     $taxAmountNode = $embeddedXpath->query(
+                        //         "cac:TaxTotal/cbc:TaxAmount",
+                        //         $invoiceLineNode
+                        //     )->item(0);
 
-                            $baseAmount = $baseAmountNode ? (float)$baseAmountNode->nodeValue : 0;
-                            $taxAmount  = $taxAmountNode ? (float)$taxAmountNode->nodeValue : 0;
+                        //     $baseAmount = $baseAmountNode ? (float)$baseAmountNode->nodeValue : 0;
+                        //     $taxAmount  = $taxAmountNode ? (float)$taxAmountNode->nodeValue : 0;
 
-                            // 🎯 EXACT VALUE YOU WANT
-                            $taxExclusiveAmount = $baseAmount + $taxAmount; // 41650
-                        }
+                        //     // 🎯 EXACT VALUE YOU WANT
+                        //     $taxExclusiveAmount = $baseAmount + $taxAmount; // 41650
+                        // }
                         
                         //$taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
                         $taxInclusiveAmountNode = $embeddedXpath->query("//cbc:TaxAmount");
@@ -4205,6 +4206,16 @@ class Exports extends MY_Controller
                         //     //$taxExclusiveAmount = $taxExclusiveAmountNode->item($taxExclusiveAmountNode->length - 1)->nodeValue + 0;
                         //     //$taxExclusiveAmount = $taxExclusiveAmountNode->item(1)->nodeValue + 0;
                         // }
+
+                        $taxExclusiveAmount = 0;
+
+                        $priceAmountNode = $embeddedXpath->query(
+                            "//cac:InvoiceLine/cac:Price/cbc:PriceAmount"
+                        );
+
+                        if ($priceAmountNode->length > 0) {
+                            $taxExclusiveAmount = (float)$priceAmountNode->item(4)->nodeValue;
+                        }
 
                         if ($taxInclusiveAmountNode->length > 0) {
                             if($companyIdValue == "900081359") {

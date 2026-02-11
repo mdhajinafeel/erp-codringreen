@@ -936,6 +936,8 @@ $applicable_origins = $session["applicable_origins"];
                     fd.append("measurement_system_roundlogs", measurement_system_roundlogs);
                     fd.append("mandatoryreception", $("#hdnmandatoryreceptiondetails").val());
                     fd.append("shippingline", 0);
+                    fd.append("loadingCost", 0);
+                    fd.append("unloadingCost", 0);
                     fd.append("processType", process);
                 }
                 
