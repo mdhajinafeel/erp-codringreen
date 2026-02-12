@@ -5414,6 +5414,7 @@ class Farms extends MY_Controller
                         $getFarmDetail = $this->Farm_model->get_farm_details($farm_id, $contract_id, $input_inventory_order);
                         $productTypeId = $getFarmDetail[0]->product_type_id;
                         $supplierid = $getFarmDetail[0]->supplier_id;
+                        $purchaseUnitId = $getFarmDetail[0]->unit_of_purchase;
 
                         if ($servicecost == null || $servicecost == "") {
                             $servicecost = 0;
@@ -5455,7 +5456,7 @@ class Farms extends MY_Controller
                         if ($productTypeId == 1 || $productTypeId == 3) {
                             //NEED TO BE IMPLEMENTED
                         } else if ($productTypeId == 2 || $productTypeId == 4) {
-
+                            
                             //CALCULATE WOOD VALUE & TAXES
                             $farmDataShorts = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 1);
                             $farmDataSemi = $this->Farm_model->get_farm_data_by_farm_id_and_length($farm_id, 2);
@@ -5463,83 +5464,124 @@ class Farms extends MY_Controller
 
                             $fetchContractPrice = $this->Farm_model->fetch_contract_prices_for_farm($contract_id);
                             $finalArray = [];
+                            
+                            if($purchaseUnitId == 15) {
+                                $price = $fetchContractPrice[0]->pricerange_grade3;
+                                $woodValue = $price;
+                            } else {
 
-                            foreach ($farmDataShorts as $shorts) {
-                                $circumference = $shorts->circumference;
-                                $length = $shorts->length;
-                                $netVolume = $shorts->volume;
-                                $totalVolume = $totalVolume + $netVolume;
-                                $price = 0;
-
-                                foreach ($fetchContractPrice as $range) {
-                                    if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
-                                        $price = $range->pricerange_grade3;
-                                        break;
+                                foreach ($farmDataShorts as $shorts) {
+                                    $circumference = $shorts->circumference;
+                                    $length = $shorts->length;
+                                    $netVolume = $shorts->volume;
+                                    $totalVolume = $totalVolume + $netVolume;
+                                    $pieces = $shorts->no_of_pieces;
+                                    $price = 0;
+    
+                                    foreach ($fetchContractPrice as $range) {
+                                        if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
+                                            $price = $range->pricerange_grade3;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    if($purchaseUnitId == 3) {
+                                        $finalArray[] = [
+                                            'circumference' => $circumference,
+                                            'length' => $length,
+                                            'price' => $price,
+                                            'volume' => $netVolume,
+                                            'value' => round($price * $pieces, 3)
+                                        ];
+                                    } else {
+    
+                                        $finalArray[] = [
+                                            'circumference' => $circumference,
+                                            'length' => $length,
+                                            'price' => $price,
+                                            'volume' => $netVolume,
+                                            'value' => round($price * $netVolume, 3)
+                                        ];
                                     }
                                 }
-
-                                $finalArray[] = [
-                                    'circumference' => $circumference,
-                                    'length' => $length,
-                                    'price' => $price,
-                                    'volume' => $netVolume,
-                                    'value' => round($price * $netVolume, 3)
-                                ];
-                            }
-
-                            foreach ($farmDataSemi as $semi) {
-                                $circumference = $semi->circumference;
-                                $length = $semi->length;
-                                $netVolume = $semi->volume;
-                                $totalVolume = $totalVolume + $netVolume;
-                                $price = 0;
-
-                                foreach ($fetchContractPrice as $range) {
-                                    if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
-                                        $price = $range->pricerange_grade_semi;
-                                        break;
+    
+                                foreach ($farmDataSemi as $semi) {
+                                    $circumference = $semi->circumference;
+                                    $length = $semi->length;
+                                    $netVolume = $semi->volume;
+                                    $totalVolume = $totalVolume + $netVolume;
+                                    $pieces = $semi->no_of_pieces;
+                                    $price = 0;
+    
+                                    foreach ($fetchContractPrice as $range) {
+                                        if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
+                                            $price = $range->pricerange_grade_semi;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    if($purchaseUnitId == 3) {
+                                        $finalArray[] = [
+                                            'circumference' => $circumference,
+                                            'length' => $length,
+                                            'price' => $price,
+                                            'volume' => $netVolume,
+                                            'value' => round($price * $pieces, 3)
+                                        ];
+                                    } else {
+    
+                                        $finalArray[] = [
+                                            'circumference' => $circumference,
+                                            'length' => $length,
+                                            'price' => $price,
+                                            'volume' => $netVolume,
+                                            'value' => round($price * $netVolume, 3)
+                                        ];
                                     }
                                 }
-
-                                $finalArray[] = [
-                                    'circumference' => $circumference,
-                                    'length' => $length,
-                                    'price' => $price,
-                                    'volume' => $netVolume,
-                                    'value' => round($price * $netVolume, 3)
-                                ];
-                            }
-
-                            foreach ($farmDataLongs as $longs) {
-                                $circumference = $longs->circumference;
-                                $length = $longs->length;
-                                $netVolume = $longs->volume;
-                                $totalVolume = $totalVolume + $netVolume;
-                                $price = 0;
-
-                                foreach ($fetchContractPrice as $range) {
-                                    if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
-                                        $price = $range->pricerange_grade_longs;
-                                        break;
+    
+                                foreach ($farmDataLongs as $longs) {
+                                    $circumference = $longs->circumference;
+                                    $length = $longs->length;
+                                    $netVolume = $longs->volume;
+                                    $totalVolume = $totalVolume + $netVolume;
+                                    $pieces = $longs->no_of_pieces;
+                                    $price = 0;
+    
+                                    foreach ($fetchContractPrice as $range) {
+                                        if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
+                                            $price = $range->pricerange_grade_longs;
+                                            break;
+                                        }
+                                    }
+    
+                                    if($purchaseUnitId == 3) {
+                                        $finalArray[] = [
+                                            'circumference' => $circumference,
+                                            'length' => $length,
+                                            'price' => $price,
+                                            'volume' => $netVolume,
+                                            'value' => round($price * $pieces, 3)
+                                        ];
+                                    } else {
+                                        $finalArray[] = [
+                                            'circumference' => $circumference,
+                                            'length' => $length,
+                                            'price' => $price,
+                                            'volume' => $netVolume,
+                                            'value' => round($price * $netVolume, 3)
+                                        ];
                                     }
                                 }
-
-                                $finalArray[] = [
-                                    'circumference' => $circumference,
-                                    'length' => $length,
-                                    'price' => $price,
-                                    'volume' => $netVolume,
-                                    'value' => round($price * $netVolume, 3)
-                                ];
-                            }
-
-                            foreach ($finalArray as $item) {
-                                $woodValue = $woodValue + $item['value'];
-                            }
-
-                            if ($currency_id == 1) {
-                                if ($input_conversion_rate > 0) {
-                                    $woodValue = $woodValue * $input_conversion_rate;
+                                
+                                foreach ($finalArray as $item) {
+                                    $woodValue = $woodValue + $item['value'];
+                                }
+    
+                                if ($currency_id == 1) {
+                                    if ($input_conversion_rate > 0) {
+                                        $woodValue = $woodValue * $input_conversion_rate;
+                                    }
                                 }
                             }
 
