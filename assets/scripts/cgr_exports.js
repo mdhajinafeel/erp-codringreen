@@ -110,6 +110,36 @@ $(document).ready(function () {
 			}
 		});
 	});
+
+	$(document).on('click', 'button[data-role=viewexporttracking]', function () {
+		var export_id = $(this).data("export_id");
+		var sa_number = $(this).data("sa_number");
+		var fd = new FormData();
+		fd.append("type", "viewexporttracking");
+		fd.append("eid", export_id);
+		fd.append("sn", sa_number);
+		fd.append("csrf_cgrerp", $("#hdnCsrf").val());
+		$("#loading").show();
+		$.ajax({
+			type: "POST",	
+			url: base_url + "/dialog_export_action",
+			data: fd,
+			contentType: false,
+			cache: false,
+			processData: false,
+			success: function (response) {
+				$("#loading").hide();
+				if (response.redirect == true) {
+					window.location.replace(login_url);
+				} else {
+					$("#ajax_modal_bd").html(response);
+					$("#add-modal-data-bd").modal('show');
+					//$("#port_of_discharge").select2({ dropdownCssClass: "myFont", dropdownParent: $('#ajax_modal_bd') });
+					//$("#measurement_system").select2({ dropdownCssClass: "myFont", dropdownParent: $('#ajax_modal_bd') });
+				}
+			}
+		});
+	});
 });
 
 function fetch_exports() {

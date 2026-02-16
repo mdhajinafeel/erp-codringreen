@@ -451,7 +451,7 @@ endif;
 										</a>
 										<ul class="nav collapse <?php if (
 																	$this->router->fetch_class() == "exports" || $this->router->fetch_class() == "readyforexport"
-																	|| $this->router->fetch_class() == "exportcreation"
+																	|| $this->router->fetch_class() == "exportcreation" || $this->router->fetch_class() == "exporttracking"
 																) {
 																	echo 'show';
 																} else {
@@ -477,6 +477,16 @@ endif;
 													</div>
 												</a>
 											</li>
+											<!-- <li class="nav-item">
+												<a class="nav-link <?php if ($this->router->fetch_class() == "exporttracking") {
+																		echo 'active';
+																	} else {
+																		'';
+																	} ?>" href="<?php echo site_url('exporttracking'); ?>" aria-expanded="false">
+													<div class="d-flex align-items-center"><span class="nav-link-text ps-1"><?php echo $this->lang->line('exporttracking_title'); ?></span>
+													</div>
+												</a>
+											</li> -->
 										</ul>
 
 										<a class="nav-link dropdown-indicator" href="#inventoryreports" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="events">

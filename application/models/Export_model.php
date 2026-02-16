@@ -202,18 +202,20 @@ class Export_model extends CI_Model
     {
         $strQuery = "SELECT A.id, A.sa_number, A.product_type_id, B.product_type_name, C.pol_name, 
                 CONCAT(D.pod_name, ', ', F.code) AS pod_name, A.pod, A.liner, E.shipping_line, 
-                A.total_containers, A.total_pieces, A.total_net_volume, A.total_gross_volume, G.fullname, 
+                get_distinct_containers_count_export(A.id) AS total_containers, A.total_pieces, A.total_net_volume, A.total_gross_volume, G.fullname, 
                 getapplicableorigins_byid(A.origin_id) AS origin, A.origin_id, A.measurement_system, 
                 A.vessel_name, A.shipped_date, A.bl_no, A.bl_date, A.client_pno, 
                 getdispatchids_by_exportid(A.id) AS dispatchids, 
-                A.total_net_weight, A.notify_name, A.notify_details, A.consignee_name, A.consignee_details 
+                A.total_net_weight, A.notify_name, A.notify_details, A.consignee_name, A.consignee_details, H.measurement_name, 
+                DATE_FORMAT(DATE_ADD(STR_TO_DATE(A.shipped_date, '%d/%m/%Y'),INTERVAL 42 DAY), '%d/%m/%Y') AS eta_date   
                 FROM tbl_export_container_details A 
                 INNER JOIN tbl_product_types B ON B.type_id = A.product_type_id 
                 INNER JOIN tbl_export_pol C ON C.id = A.pol 
                 INNER JOIN tbl_export_pod D ON D.id = A.pod 
                 INNER JOIN tbl_countries F ON F.id = D.country_id 
                 INNER JOIN tbl_shippingline_master E ON E.id = A.liner 
-                INNER JOIN tbl_user_registration G ON G.userid = A.createdby
+                INNER JOIN tbl_user_registration G ON G.userid = A.createdby 
+                INNER JOIN tbl_measurement_system H ON H.measurement_id = A.measurement_system 
                 WHERE A.isactive = 1 AND A.id = $exportid AND A.sa_number = '$sanumber'";
 
         $query = $this->db->query($strQuery);
@@ -263,19 +265,17 @@ class Export_model extends CI_Model
             $this->db->where($multiClause);
             $this->db->set('updateddate', 'NOW()', FALSE);
             if ($this->db->update('tbl_export_container', $updateData)) {
-                // $updateData = array(
-                //     "isexport" => 0, "exportedby" => 0,
-                // );
 
                 $updateQuery = "UPDATE tbl_dispatch_container SET isexport = 0, exportedby = 0, updateddate = NOW() 
                     WHERE dispatch_id IN ($dispatchids)";
                 $this->db->query($updateQuery);
 
-                // $multiClause = array('dispatch_id' => $dispatchids);
-                // $this->db->where_in($multiClause);
-                // $this->db->set('updateddate', 'NOW()', FALSE);
-                //if ($this->db->update('tbl_dispatch_container', $updateData)) {
                 if ($this->db->query($updateQuery)) {
+
+                    $updateTrackingQuery = "UPDATE tbl_export_tracking_details SET is_active = 0, updated_by = $userid, updated_date = NOW() 
+                        WHERE is_active = 1 AND export_id = $exportid";
+                    $this->db->query($updateTrackingQuery);
+
                     return true;
                 } else {
                     return false;
@@ -1244,5 +1244,39 @@ class Export_model extends CI_Model
         } else {
             return false;
         }
+    }
+
+    public function update_export_tracking_details($data, $exportid)
+    {
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $multiClause = array('export_id' => $exportid, "is_active" => 1);
+        $this->db->where($multiClause);
+        if ($this->db->update('tbl_export_tracking_details', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function add_export_tracking_details($data)
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_export_tracking_details', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
+
+    public function get_export_tracking_details_by_id($exportid)
+    {
+        $strQuery = "SELECT * FROM tbl_export_tracking_details A
+                WHERE A.is_active = 1 AND A.export_id = $exportid";
+
+        $query = $this->db->query($strQuery);
+        return $query->result();
     }
 }

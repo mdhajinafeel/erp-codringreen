@@ -11,29 +11,36 @@ $applicable_origins = $session["applicable_origins"];
                 <h3> <?php echo $this->lang->line('missinginventory_title'); ?> </h3>
             </div>
             <div class="col-auto ms-auto">
-            <button class="btn btn-primary btn-md btn-right-margin" title="<?php echo $this->lang->line('download_excel'); ?>" type="button" id="generate_report">
-					<span class="fas fa-download" data-fa-transform="shrink-3 down-2"></span><span class="ms-1">
-						<?php echo $this->lang->line('download_excel'); ?></span>
-					</button>
-			</div>
+                <button class="btn btn-primary btn-md btn-right-margin" title="<?php echo $this->lang->line('download_excel'); ?>" type="button" id="generate_report">
+                    <span class="fas fa-download" data-fa-transform="shrink-3 down-2"></span><span class="ms-1">
+                        <?php echo $this->lang->line('download_excel'); ?></span>
+                </button>
+            </div>
         </div>
 
     </div>
     <div class="card-body pt-0">
         <div class="row mb-5">
-            <div class="col-md-4 align-self-center">
+            <div class="col-md-3 align-self-center">
                 <label for="origin"><?php echo $this->lang->line('origin'); ?></label>
                 <select class="form-control" name="origin" id="origin" data-plugin="select_erp">
-                    <?php if (count($applicable_origins) > 1) { ?>
-                        <option value="0"><?php echo $this->lang->line('all'); ?></option>
-                        <?php foreach ($applicable_origins as $origin) { ?>
-                            <option value="<?php echo $origin->id; ?>"><?php echo $origin->origin_name; ?></option>
-                        <?php } ?>
-                    <?php } else { ?>
-                        <?php foreach ($applicable_origins as $origin) { ?>
-                            <option value="<?php echo $origin->id; ?>" selected="selected"><?php echo $origin->origin_name; ?></option>
-                        <?php } ?>
+                    <?php foreach ($applicable_origins as $origin) { ?>
+                        <option value="<?php echo $origin->id; ?>"><?php echo $origin->origin_name; ?></option>
                     <?php } ?>
+                </select>
+            </div>
+
+            <div class="col-md-3 align-self-center">
+                <label for="year"><?php echo $this->lang->line('year'); ?></label>
+                <select class="form-control" name="year" id="year" data-plugin="select_erp">
+                    <?php
+                    $sYear = date("Y");
+                    $eYear = 2023;
+
+                    for ($i = $sYear; $i >= $eYear; $i--) {
+                        echo '<option value="' . $i . '">' . $i . '</option>';
+                    }
+                    ?>
                 </select>
             </div>
         </div>

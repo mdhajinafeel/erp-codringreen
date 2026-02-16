@@ -10,7 +10,7 @@ $applicable_origins = $session["applicable_origins"];
     <div class="card-header table-responsive">
         <div class="row flex-between-end">
             <div class="col-auto align-self-center">
-                <h3> <?php echo $this->lang->line("export_title"); ?> </h3>
+                <h3> <?php echo $this->lang->line("exporttracking_title"); ?> </h3>
             </div>
         </div>
     </div>
@@ -54,7 +54,7 @@ $applicable_origins = $session["applicable_origins"];
         <table class="datatables-demo table table-striped table-bordered" id="xin_table_exports" style="width: 100% !important;">
             <thead>
                 <tr>
-                    <th width="150px"><?php echo $this->lang->line("action"); ?></th>
+                    <th width="100px"><?php echo $this->lang->line("action"); ?></th>
                     <th><?php echo $this->lang->line("sa_number"); ?></th>
                     <th><?php echo $this->lang->line("product_type"); ?></th>
                     <th><?php echo $this->lang->line("shipping_line"); ?></th>

@@ -1,7 +1,7 @@
 <?php
 
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
-ini_set('display_errors', '0');
+// error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING);
+// ini_set('display_errors', '0');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -57,12 +57,14 @@ class Exports extends MY_Controller
 
             foreach ($exportContainers as $r) {
                 if ($this->input->get("originid") == 1) {
-                    $actionExport = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("document_view") . '"><button type="button" class="btn icon-btn btn-xs btn-download waves-effect waves-light" data-role="viewexportdocuments" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-file"></span></button></span>
+                    $actionExport = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("shipping_tracking") . '"><button type="button" class="btn icon-btn btn-xs btn-primary waves-effect waves-light" data-role="viewexporttracking" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-ship"></span></button></span>
+                    <span style="margin-left:1px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("document_view") . '"><button type="button" class="btn icon-btn btn-xs btn-download waves-effect waves-light" data-role="viewexportdocuments" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-file"></span></button></span>
                     <span style="margin-left:1px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("view") . '/' . $this->lang->line("edit") . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="viewexport" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-pencil"></span></button></span>
-                    <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("delete") . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deleteexport" data-toggle="modal" data-target=".download-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-trash"></span></button></span>';
+                    <span style="margin-left:1px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("delete") . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deleteexport" data-toggle="modal" data-target=".download-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-trash"></span></button></span>';
                 } else {
-                    $actionExport = '<span style="margin-left:1px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("view") . '/' . $this->lang->line("edit") . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="viewexport" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-pencil"></span></button></span>
-                    <span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("delete") . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deleteexport" data-toggle="modal" data-target=".download-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-trash"></span></button></span>';
+                    $actionExport = '<span data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("shipping_tracking") . '"><button type="button" class="btn icon-btn btn-xs btn-primary waves-effect waves-light" data-role="viewexporttracking" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-ship"></span></button></span>
+                    <span style="margin-left:1px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("view") . '/' . $this->lang->line("edit") . '"><button type="button" class="btn icon-btn btn-xs btn-view waves-effect waves-light" data-role="viewexport" data-toggle="modal" data-target=".view-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-pencil"></span></button></span>
+                    <span style="margin-left:1px;" data-toggle="tooltip" data-placement="top" title="' . $this->lang->line("delete") . '"><button type="button" class="btn icon-btn btn-xs btn-delete waves-effect waves-light" data-role="deleteexport" data-toggle="modal" data-target=".download-modal-data" data-export_id="' . $r->id . '" data-sa_number="' . $r->sa_number . '" data-dispatch_ids =' . $r->dispatchids . '><span class="fas fa-trash"></span></button></span>';
                 }
 
                 $product_type = $this->lang->line($r->product_type_name);
@@ -74,7 +76,7 @@ class Exports extends MY_Controller
                     $r->shipping_line,
                     $r->pol_name,
                     $r->pod_name,
-                    ($r->total_containers + 0),
+                    ($r->d_total_containers + 0),
                     ($r->total_pieces + 0),
                     ($r->total_net_volume + 0),
                     $r->origin,
@@ -150,11 +152,11 @@ class Exports extends MY_Controller
                 );
 
                 $invoiceDelete = $this->Export_model->update_invoice_data($exportId, $invoiceId, $data);
-                
+
                 $dataContainerDelete = array(
                     'is_active' => 0,
                 );
-                
+
                 $invoiceDeleteContainer = $this->Export_model->update_invoice_data_container($exportId, $invoiceId, $dataContainerDelete);
 
                 $getExportDocumentsPortInvoiceLists = json_encode($this->Export_model->fetch_export_document_details($exportId, $exportType));
@@ -249,7 +251,7 @@ class Exports extends MY_Controller
 
                 //CONTAINER COSTS
                 $getExportContainerCosts = $this->Export_model->fetch_export_container_costs($exportId);
-                
+
                 //LOADING COSTS
                 //$getExportLoadingCosts = $this->Export_model->fetch_export_loading_costs($exportId); 
                 $getExportDocumentsContainerLoadingCosts = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 11);
@@ -257,7 +259,7 @@ class Exports extends MY_Controller
                 if (count($getExportDocumentsContainerLoadingCosts) > 0) {
                     $getExportDocumentsContainerLoadingCostsInvoiceLists = $this->Export_model->fetch_export_document_details($getExportDocumentsContainerLoadingCosts[0]->export_id, 11);
                 }
-                
+
                 //OTHERCOSTS
                 $getExportDocumentsOtherCosts = $this->Export_model->fetch_export_documents($getExportDetails[0]->id, 12);
                 $getExportDocumentsOtherCostsInvoiceLists = [];
@@ -305,7 +307,7 @@ class Exports extends MY_Controller
                     'exportDocumentsIncentives' => $getExportDocumentsIncentives,
                     'exportDocumentsRemobilization' => $getExportDocumentsRemobilization,
                     'exportDocumentsShipping' => $getExportDocumentsShipping,
-                    'exportContainerCosts' => $getExportContainerCosts, 
+                    'exportContainerCosts' => $getExportContainerCosts,
                     //'exportLoadingCosts' => $getExportLoadingCosts,
                     "exportDocumentsPortInvoiceLists" => json_encode($getExportDocumentsPortInvoiceLists),
                     "exportDocumentsPortInvoiceListsCount" => count($getExportDocumentsPortInvoiceLists),
@@ -335,6 +337,26 @@ class Exports extends MY_Controller
                     "measurementsystems" => $this->Master_model->fetch_measurementsystems_by_origin($getExportDetails[0]->origin_id, $getExportDetails[0]->product_type_id),
                 );
                 $this->load->view("export/dialog_view_export_documents", $data);
+            } else if ($this->input->post("type") == "viewexporttracking") {
+                $exportId = $this->input->post("eid");
+                $saNumber = $this->input->post("sn");
+
+                $getExportDetails = $this->Export_model->get_export_details_by_id($exportId, $saNumber);
+
+                $data = array(
+                    "pageheading" => $this->lang->line("shipping_tracking"),
+                    "pagetype" => "view",
+                    "exportid" => $exportId,
+                    "sanumber" => $saNumber,
+                    "export_details" => $getExportDetails,
+                    "originid" => $getExportDetails[0]->origin_id,
+                    "csrfhash" => $this->security->get_csrf_hash(),
+                    "buyers" => $this->Master_model->fetch_buyers_list($getExportDetails[0]->origin_id),
+                    "shippingports" => $this->Master_model->fetch_shipping_port_list($getExportDetails[0]->origin_id),
+                    "shippingcustoms" => $this->Master_model->fetch_shipping_customs_list($getExportDetails[0]->origin_id),
+                    "exportTrackingDetails" => $this->Export_model->get_export_tracking_details_by_id($exportId),
+                );
+                $this->load->view("export/dialog_view_export_tracking", $data);
             } else if ($this->input->post('type') == "deleteexportconfirmation") {
                 $data = array(
                     'pageheading' => $this->lang->line('confirmation'),
@@ -842,7 +864,7 @@ class Exports extends MY_Controller
                     $this->output($Return);
                     exit;
                 }
-            } 
+            }
         } else {
             $Return["pages"] = "";
             $Return["redirect"] = true;
@@ -1390,6 +1412,99 @@ class Exports extends MY_Controller
             } else {
                 redirect("/logout");
             }
+        } else if ($this->input->post("add_type") == "exporttracking") {
+            if (!empty($session)) {
+                $exportid = $this->input->post("exportid");
+                $originid = $this->input->post("originid");
+
+                $entry_date = $this->input->post("entry_date");
+                $client = $this->input->post("client");
+                $freight_type = $this->input->post("freight_type");
+                $cut_off_document = strtoupper($this->input->post("cut_off_document"));
+                $port = $this->input->post("port");
+                $actual_eta = $this->input->post("actual_eta");
+                $customs = strtoupper($this->input->post("customs"));
+                $shipping_notice = strtoupper($this->input->post("shipping_notice"));
+                $closing_shipping_document = $this->input->post("closing_shipping_document");
+                $document_management = $this->input->post("document_management");
+                $enter_port = $this->input->post("enter_port");
+                $vgm_processed = $this->input->post("vgm_processed");
+                $port_inspection = $this->input->post("port_inspection");
+                $boarding_console = $this->input->post("boarding_console");
+                $vessel_departure = $this->input->post("vessel_departure");
+                $departure_date = $this->input->post("departure_date");
+                $phyto = $this->input->post("phyto");
+                $coo = $this->input->post("coo");
+                $dex = $this->input->post("dex");
+                $fumigation = $this->input->post("fumigation");
+                $sent_by_mail = $this->input->post("sent_by_mail");
+                $approved = $this->input->post("approved");
+                $release = $this->input->post("release");
+                $patio = $this->input->post("patio");
+                $billing_port = $this->input->post("billing_port");
+                $billing_fumigation = $this->input->post("billing_fumigation");
+                $billing_customs = $this->input->post("billing_customs");
+                $billing_shipping = $this->input->post("billing_shipping");
+                $tracking_observation = $this->input->post("tracking_observation");
+
+                $dataUpdateExportTrackingDetails = array("is_active" => 0, "updated_by" => $session["user_id"]);
+                $this->Export_model->update_export_tracking_details($dataUpdateExportTrackingDetails, $exportid);
+
+                $dataExportTrackingDetails = array(
+                    "export_id" => $exportid,
+                    "origin_id" => $originid,
+                    "entry_date" => $entry_date,
+                    "client" => $client,
+                    "freight_type" => $freight_type,
+                    "cut_off_document" => $cut_off_document,
+                    "port" => $port,
+                    "actual_eta" => $actual_eta,
+                    "customs" => $customs,
+                    "shipping_notice" => $shipping_notice,
+                    "closing_shipping_document" => $closing_shipping_document,
+                    "document_management" => $document_management,
+                    "enter_port" => $enter_port,
+                    "vgm_processed" => $vgm_processed,
+                    "port_inspection" => $port_inspection,
+                    "boarding_console" => $boarding_console,
+                    "vessel_departure" => $vessel_departure,
+                    "departure_date" => $departure_date,
+                    "phyto" => $phyto,
+                    "coo" => $coo,
+                    "dex" => $dex,
+                    "fumigation" => $fumigation,
+                    "sent_by_mail" => $sent_by_mail,
+                    "approved" => $approved,
+                    "document_release" => $release,
+                    "patio" => $patio,
+                    "billing_port" => $billing_port,
+                    "billing_fumigation" => $billing_fumigation,
+                    "billing_customs" => $billing_customs,
+                    "billing_shipping" => $billing_shipping,
+                    "tracking_observation" => $tracking_observation,
+                    "created_by" => $session["user_id"],
+                    "updated_by" => $session["user_id"],
+                    "is_active" => 1,
+                );
+
+                $insertExportTrackingDetails = $this->Export_model->add_export_tracking_details($dataExportTrackingDetails);
+
+                if ($insertExportTrackingDetails > 0) {
+                    $Return["error"] = "";
+                    $Return["result"] = $this->lang->line("data_updated");
+                    $Return["csrf_hash"] = $this->security->get_csrf_hash();
+                    $this->output($Return);
+                    exit;
+                } else {
+                    $Return["error"] = $this->lang->line("error_updating");
+                    $Return["result"] = "";
+                    $Return["csrf_hash"] = $this->security->get_csrf_hash();
+                    $this->output($Return);
+                    exit;
+                }
+            } else {
+                redirect("/logout");
+            }
         } else {
             $Return["duplicateerror"] = "";
             $Return["error"] = $this->lang->line("invalid_request");
@@ -1537,12 +1652,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -1676,12 +1791,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -1815,12 +1930,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -1954,12 +2069,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -2093,12 +2208,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -2232,12 +2347,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -2371,12 +2486,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -2510,12 +2625,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -2649,12 +2764,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -2788,12 +2903,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -2927,12 +3042,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -3066,12 +3181,12 @@ class Exports extends MY_Controller
                                     if ($totalContainers > 0) {
                                         foreach ($fetchExportContainers as $container) {
                                             $containerNumber = $container->container_number;
-                                            if(strlen($containerNumber) == 11){
+                                            if (strlen($containerNumber) == 11) {
 
                                                 if ($firstValidIndex === null) {
                                                     $firstValidIndex = count($containerArray);
                                                 }
-                                            
+
                                                 $totalContainerCheck = $totalContainerCheck + $eachContainerValue;
                                                 $containerArray[] = array(
                                                     "dispatchId" => $container->dispatch_id + 0,
@@ -3116,7 +3231,7 @@ class Exports extends MY_Controller
                         $Return['csrf_hash'] = $this->security->get_csrf_hash();
                         $this->output($Return);
                     }
-                } 
+                }
             } else {
                 $Return['error'] = $this->lang->line("error_invalid_file");
                 $Return['result'] = "";
@@ -3273,7 +3388,7 @@ class Exports extends MY_Controller
                         //     $taxInclusiveAmount = 0;
                         //     $taxAmount = 0;
                         // }
-                        
+
                         if ($taxExclusiveAmountNode->length > 0) {
                             $taxExclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;
                         }
@@ -4120,7 +4235,7 @@ class Exports extends MY_Controller
             $registrationNameNode = $xpath->query('//cac:SenderParty/cac:PartyTaxScheme/cbc:RegistrationName');
             $companyIdNode = $xpath->query('//cac:SenderParty/cac:PartyTaxScheme/cbc:CompanyID');
             $supplierId = 0;
-            
+
             $companyIdValue = $companyIdNode->length > 0 ? $companyIdNode->item(0)->nodeValue : "";
 
             //CHECK AND REGISTER COMPANY ID
@@ -4166,7 +4281,7 @@ class Exports extends MY_Controller
                         //$taxExclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount");
                         $taxExclusiveAmountNode = $embeddedXpath->query("//cac:InvoiceLine/cbc:LineExtensionAmount");
                         // $taxExclusiveAmountNode = $embeddedXpath->query("//cbc:InvoiceLine/cbc:LineExtensionAmount");
-                        
+
                         // $invoiceLineNode = $embeddedXpath->query(
                         //     "//cac:InvoiceLine[
                         //         cac:Item/cbc:Description = 'ELABORACION DEX'
@@ -4191,7 +4306,7 @@ class Exports extends MY_Controller
                         //     // 🎯 EXACT VALUE YOU WANT
                         //     $taxExclusiveAmount = $baseAmount + $taxAmount; // 41650
                         // }
-                        
+
                         //$taxInclusiveAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount");
                         $taxInclusiveAmountNode = $embeddedXpath->query("//cbc:TaxAmount");
                         $allowanceTotalAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount");
@@ -4218,10 +4333,10 @@ class Exports extends MY_Controller
                         }
 
                         if ($taxInclusiveAmountNode->length > 0) {
-                            if($companyIdValue == "900081359") {
+                            if ($companyIdValue == "900081359") {
                                 $taxInclusiveAmount = 0;
                             } else {
-                                $taxInclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;//$taxInclusiveAmountNode->item(0)->nodeValue + 0;
+                                $taxInclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0; //$taxInclusiveAmountNode->item(0)->nodeValue + 0;
                             }
                         }
 
@@ -4772,7 +4887,7 @@ class Exports extends MY_Controller
             $registrationNameNode = $xpath->query('//cac:SenderParty/cac:PartyTaxScheme/cbc:RegistrationName');
             $companyIdNode = $xpath->query('//cac:SenderParty/cac:PartyTaxScheme/cbc:CompanyID');
             $supplierId = 0;
-            
+
             $companyIdValue = $companyIdNode->length > 0 ? $companyIdNode->item(0)->nodeValue : "";
 
             //CHECK AND REGISTER COMPANY ID
@@ -4823,7 +4938,7 @@ class Exports extends MY_Controller
                         $payableAmountNode = $embeddedXpath->query("//cac:LegalMonetaryTotal/cbc:PayableAmount");
 
                         if ($taxExclusiveAmountNode->length > 0) {
-                            if($companyIdValue == "900081359") {
+                            if ($companyIdValue == "900081359") {
                                 $taxExclusiveAmount = $taxExclusiveAmountNode->item($taxExclusiveAmountNode->length - 1)->nodeValue + 0;
                             } else {
                                 $taxExclusiveAmount = $taxExclusiveAmountNode->item(1)->nodeValue + 0;
@@ -4833,10 +4948,10 @@ class Exports extends MY_Controller
                         }
 
                         if ($taxInclusiveAmountNode->length > 0) {
-                            if($companyIdValue == "900081359") {
+                            if ($companyIdValue == "900081359") {
                                 $taxInclusiveAmount = 0;
                             } else {
-                                $taxInclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0;//$taxInclusiveAmountNode->item(0)->nodeValue + 0;
+                                $taxInclusiveAmount = $taxExclusiveAmountNode->item(0)->nodeValue + 0; //$taxInclusiveAmountNode->item(0)->nodeValue + 0;
                             }
                         }
 
@@ -5057,7 +5172,7 @@ class Exports extends MY_Controller
             ];
 
             return json_encode($dados, JSON_PRETTY_PRINT);
-        } 
+        }
     }
 
     //DOCUMENTS SAVING
@@ -6296,7 +6411,7 @@ class Exports extends MY_Controller
                 $this->output($Return);
                 exit;
             }
-        } 
+        }
         // else if ($this->input->post('add_type') == 11) {
 
         //     if (!empty($session)) {

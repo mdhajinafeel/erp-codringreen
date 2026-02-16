@@ -10,7 +10,7 @@ class Inventoryreports_model extends CI_Model
 	}
     
     //MISSING INVENTORY
-    public function fetch_missing_inventory_farm($originid)
+    public function fetch_missing_inventory_farm($originid, $year)
     {
         if($originid == 0) {
             $query = $this->db->query("SELECT B.supplier_name, B.supplier_code, C.product_name, D.product_type_name, inventory_order, 
@@ -26,6 +26,7 @@ class Inventoryreports_model extends CI_Model
                             WHERE A.is_active = 1 
                             AND A.inventory_order NOT IN (SELECT salvoconducto FROM tbl_reception 
                             WHERE isactive = 1 AND (isduplicatecaptured = 0 OR isduplicatecaptured IS NULL)) 
+                            AND YEAR(STR_TO_DATE(A.purchase_date, '%Y-%m-%d')) = $year
                             GROUP BY A.inventory_order ORDER BY DATE_FORMAT(A.purchase_date, '%d-%m-%Y') DESC");
         } else {
             $query = $this->db->query("SELECT B.supplier_name, B.supplier_code, C.product_name, D.product_type_name, inventory_order, 
@@ -41,13 +42,14 @@ class Inventoryreports_model extends CI_Model
                             WHERE A.is_active = 1 AND A.origin_id = $originid
                             AND A.inventory_order NOT IN (SELECT salvoconducto FROM tbl_reception 
                             WHERE isactive = 1 AND (isduplicatecaptured = 0 OR isduplicatecaptured IS NULL)) 
+                            AND YEAR(STR_TO_DATE(A.purchase_date, '%Y-%m-%d')) = $year
                             GROUP BY A.inventory_order ORDER BY DATE_FORMAT(A.purchase_date, '%d-%m-%Y') DESC");
         }
         
         return $query->result();
     }
 
-    public function fetch_missing_inventory_reception($originid)
+    public function fetch_missing_inventory_reception($originid, $year)
     {
         if($originid == 0) {
             $query = $this->db->query("SELECT S.supplier_name, S.supplier_code, S.product_name, S.product_type_name, S.salvoconducto, 
