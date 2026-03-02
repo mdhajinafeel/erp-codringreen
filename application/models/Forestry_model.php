@@ -350,8 +350,7 @@ class Forestry_model extends CI_Model
         return $query->result();
     }
 
-    public function get_forestry_operation_cost_report_data_15days($originId, $supplierId, $contractId, $fromDate, $toDate, $costType)
-    {
+    public function get_forestry_operation_cost_report_data_15days($originId, $supplierId, $contractId, $fromDate, $toDate, $costType) {
         $conditions = [];
 
         $conditions[] = "cost_type = $costType";
@@ -401,6 +400,8 @@ class Forestry_model extends CI_Model
 
             SUM(quantity) AS total_quantity,
             SUM(amount)   AS total_amount, 
+            SUM(sub_total) AS sub_total, 
+            SUM(tax_amount) AS tax_amount,
             supplier_name, 
             contract_code, 
 			description
@@ -408,7 +409,7 @@ class Forestry_model extends CI_Model
             SELECT
                 STR_TO_DATE(expense_date, '%d/%m/%Y') AS d,
                 quantity,
-                amount, B.supplier_name, C.contract_code, C.description 
+                amount, A.sub_total, A.tax_amount, B.supplier_name, C.contract_code, C.description 
             FROM tbl_forestry_operational_costs A 
             INNER JOIN tbl_suppliers B ON B.id = A.supplier_id 
             INNER JOIN tbl_supplier_purchase_contract C ON C.contract_id = A.contract_id 
