@@ -4329,7 +4329,7 @@ class Exports extends MY_Controller
                         );
 
                         if ($priceAmountNode->length > 0) {
-                            $taxExclusiveAmount = (float)$priceAmountNode->item(4)->nodeValue;
+                            $taxExclusiveAmount = (float)$priceAmountNode->item(5)->nodeValue;
                         }
 
                         if ($taxInclusiveAmountNode->length > 0) {
