@@ -2514,6 +2514,7 @@ class Exports extends MY_Controller
                                     $containerArray[$firstValidIndex]['containerValue'] = round($containerArray[$firstValidIndex]['containerValue'] + $remainingValue, 2);
                                 }
                                 $xmlResponse['containerValue'] = json_encode($containerArray);
+                                $xmlResponse['totalContainers'] = $totalContainers;
 
                                 if ($xmlResponse != null && $xmlResponse != null) {
                                     $Return['result'] = $xmlResponse;
@@ -4329,7 +4330,12 @@ class Exports extends MY_Controller
                         );
 
                         if ($priceAmountNode->length > 0) {
-                            $taxExclusiveAmount = (float)$priceAmountNode->item(5)->nodeValue;
+                            $taxExclusiveAmount = (float) $priceAmountNode->item(5)->nodeValue;
+                        }
+
+                        $taxExclusiveAmountArray = [];
+                        foreach ($priceAmountNode as $node) {
+                            array_push($taxExclusiveAmountArray, (float) $node->nodeValue);
                         }
 
                         if ($taxInclusiveAmountNode->length > 0) {
@@ -4404,6 +4410,7 @@ class Exports extends MY_Controller
                 'fileExtension' => $ext,
                 'fileUrl' => $fileurl,
                 'supplierId' => $supplierId,
+                'taxExclusiveAmountArray' => $taxExclusiveAmountArray,
             ];
 
             return json_encode($dados, JSON_PRETTY_PRINT);

@@ -1476,7 +1476,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                                 <div class="row mb-3">
                                     <div class="col-md-2">
-                                        <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?></label>
+                                        <label for="export_subtotal"><?php echo $this->lang->line("export_subtotal"); ?><i class="fa fa-info-circle text-primary ms-2"
+                                                style="cursor:pointer;" id="infoValueBeforeTaxPhyto" title="Select value before tax"></i></label>
                                         <!-- <div class="input-group">
                                             <label class="control-label" id="lblTotalAmountPhyto"></label>
                                         </div> -->
@@ -2107,8 +2108,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                     <button type="button" class="btn btn-primary col-md-2" id="btnSaveContainerCost" name="btnSaveContainerCost"><?php echo $this->lang->line('save'); ?></button>
                                 </div>
                             </div>
-                        </div> 
-                        
+                        </div>
+
                         <!-- <div class="tab-pane fade" id="nav-containerloadingcost" role="tabpanel" aria-labelledby="nav-containerloadingcost-tab">
                             <div id="divContainerLoadingCost">
 
@@ -2569,7 +2570,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="tab-pane fade" id="nav-othercost" role="tabpanel" aria-labelledby="nav-othercost-tab">
                             <div class="row mb-3">
                                 <div class="col-md-6 mb-2">
@@ -2790,6 +2791,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
     var total_error = "<?php echo $this->lang->line("total_error"); ?>";
     var data_updated = "<?php echo $this->lang->line("data_updated"); ?>";
     var text_save = "<?php echo $this->lang->line("save"); ?>";
+    var no_data_available = "<?php echo $this->lang->line("no_data_available"); ?>";
+    var export_subtotal = "<?php echo $this->lang->line("export_subtotal"); ?>";
     var text_update = "<?php echo $this->lang->line("update"); ?>";
     var totalPayableAmount = 0;
     var uploadPdfFileCustomAgency = "";
@@ -2799,6 +2802,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
     var ivaCustoms = 0;
     var retefuenteCustoms = 0;
     var payableCustoms = 0;
+    let containerValuePhytoArr = [];
+    let containerValueArr = [];
+    let totalContainers = 0;
 
     $(document).ready(function() {
 
@@ -2933,7 +2939,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#error-payable_remobilization").hide();
         $("#divXmlRemobilization").hide();
         $("#btnResetRemobilization").hide();
-        
+
         $("#error-selectdocothercost").hide();
         $("#error-invoice_no_othercost").hide();
         $("#error-supplier_name_othercost").hide();
@@ -5950,7 +5956,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 }
             }
         });
-        
+
         $("#btnSaveOthercost").click(function() {
 
             var arrUpdateContainerValue = [];
@@ -6199,7 +6205,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 }
             }
         });
-        
+
         //INVOICE LISTS
 
         //CUSTOMS
@@ -7614,7 +7620,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         });
 
         //END REMOBILIZATION 
-        
+
         //OTHER COSTS
 
         var exportDocumentsOthercostInvoiceLists = [];
@@ -8153,7 +8159,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 toastr.error(common_error);
             }
         });
-        
+
         $("#btnResetOthercost").click(function() {
             resetForm();
         });
@@ -8460,7 +8466,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         $("#divPdfRemobilization").show();
         $("#btnResetRemobilization").hide();
         $("#btnSaveRemobilization").text(text_save);
-        
+
         //OTHER COST
         $("#invoice_number_othercost").val("");
         $("#supplier_name_othercost").val(0).trigger("change");
@@ -9196,8 +9202,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     url: datatable_language
                 }
             });
-        } 
-        else if (type == 12) {
+        } else if (type == 12) {
 
             $("#xin_table_invoice_othercost").DataTable({
                 data: JSON.parse(response),
@@ -9268,7 +9273,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 }
             });
 
-        }else if (type == 13) {
+        } else if (type == 13) {
 
             $("#xin_table_invoice_dhlcost").DataTable({
                 data: JSON.parse(response),
@@ -9410,7 +9415,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 }
             });
 
-        }   
+        }
     }
 
     var loadFileCustom = function(event) {
@@ -9452,7 +9457,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         // $("#lblTotalTaxAmountCustoms").text(jsonResult.result["taxAmount"]);
                         // $("#lblAllowanceAmountCustoms").text(jsonResult.result["allowanceTotalAmount"]);
                         // $("#lblPayableAmountCustoms").text(jsonResult.result["payableAmount"]);
-                        
+
                         $("#lblTotalAmountCustoms").val(jsonResult.result["taxExclusiveAmountValue"]);
                         $("#lblTotalTaxAmountCustoms").val(jsonResult.result["taxAmountValue"]);
                         $("#lblAllowanceAmountCustoms").val(jsonResult.result["allowanceTotalAmountValue"]);
@@ -10437,6 +10442,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                     input.val(parseFloat(containerValue));
                                 }
                             });
+
+                            containerValuePhytoArr.push(jsonResult.result["taxExclusiveAmountArray"]);
+                            containerValueArr = JSON.parse(jsonResult.result["containerValue"]);
+                            totalContainers = jsonResult.result["totalContainers"];
+                            containerValuePhytoArr = containerValuePhytoArr.flat();
                         } else if (jsonResult.result["fileExtension"] == "pdf" || jsonResult.result["fileExtension"] == "PDF") {
                             $("#divXmlPhyto").hide();
                             $("#divPdfPhyto").show();
@@ -10836,7 +10846,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             $("#fileUploadDoc_Remobilization").val("");
         }
     };
-    
+
     var loadFileOthercost = function(event) {
         $("#error-selectdocothercost").hide();
         event.preventDefault();
@@ -11534,7 +11544,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     document.getElementById("formatted_date_remobilization").addEventListener("click", function() {
         document.getElementById("issued_date_remobilization").click();
     });
-    
+
     //OTHER COSTS
     document.getElementById("issued_date_othercost").addEventListener("change", function() {
         let inputDate = this.value;
@@ -11609,4 +11619,109 @@ defined('BASEPATH') or exit('No direct script access allowed');
     document.getElementById("formatted_date_containerloadingcost").addEventListener("click", function() {
         document.getElementById("issued_date_containerloadingcost").click();
     });
+
+    $(document).on('click', '#infoValueBeforeTaxPhyto', function() {
+
+        let html = '';
+
+        if (!containerValuePhytoArr.length) {
+            html = '<p class="text-danger">' + no_data_available + '</p>';
+        } else {
+
+            containerValuePhytoArr.forEach(function(val, index) {
+                html += `
+                    <div class="form-check mb-2">
+                        <input class="form-check-input phyto-tax-value"
+                            type="checkbox"
+                            value="${val}"
+                            id="phytoTaxVal_${index}">
+                        <label class="form-check-label" for="phytoTaxVal_${index}">
+                            ${parseFloat(val).toFixed(2)}
+                        </label>
+                    </div>
+                `;
+            });
+        }
+
+        $('#valueBeforeTaxListPhyto').html(html);
+        $('#modalValueBeforeTaxPhyto').modal('show');
+    });
+
+    $(document).on('change', '.phyto-tax-value', function() {
+
+        // allow only one selection
+        $('.phyto-tax-value').not(this).prop('checked', false);
+
+        if (!$(this).is(':checked')) return;
+
+        let totalValue = parseFloat($(this).val());
+        $('#lblTotalAmountPhyto').val(totalValue.toFixed(2));
+        $('#modalValueBeforeTaxPhyto').modal('hide');
+
+        let remainingValue = totalValue;
+        let validContainers = [];
+
+        // collect containers that can receive value
+        containerValueArr.forEach(function(container) {
+            if (parseFloat(container.containerValue) !== 0) {
+                validContainers.push(container);
+            }
+        });
+
+        let containerCount = validContainers.length;
+        if (containerCount === 0) return;
+
+        let eachContainerValue = parseFloat((totalValue / containerCount).toFixed(2));
+
+        validContainers.forEach(function(container, index) {
+
+            let dispatchId = container.dispatchId;
+            let valueToAssign = eachContainerValue;
+
+            // 🔥 FIRST container absorbs rounding difference
+            if (index === 0) {
+                valueToAssign = parseFloat(
+                    (remainingValue - (eachContainerValue * (containerCount - 1))).toFixed(2)
+                );
+            }
+
+            let input = $("input[name='phyto_container_value[" + dispatchId + "]']");
+            if (input.length) {
+                input.val(valueToAssign);
+            }
+        });
+
+        // zero containers stay zero
+        containerValueArr.forEach(function(container) {
+            if (parseFloat(container.containerValue) === 0) {
+                let input = $("input[name='phyto_container_value[" + container.dispatchId + "]']");
+                if (input.length) {
+                    input.val(0);
+                }
+            }
+        });
+    });
 </script>
+
+<div class="modal fade" id="modalValueBeforeTaxPhyto" tabindex="-1">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 style="color:white;" class="modal-title"><?php echo $this->lang->line("export_subtotal"); ?></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" id="valueBeforeTaxListPhyto">
+                <!-- values injected by JS -->
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
