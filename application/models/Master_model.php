@@ -1516,6 +1516,7 @@ class Master_model extends CI_Model
 		$query = $this->db->query("SELECT id, port_name FROM tbl_master_shipping_ports WHERE is_active = 1 AND origin_id = $originid");
 		return $query->result();
 	}
+	
 	public function fetch_shipping_customs_list($originid)
 	{
 		$query = $this->db->query("SELECT id, customs_name FROM tbl_master_shipping_customs WHERE is_active = 1 AND origin_id = $originid");

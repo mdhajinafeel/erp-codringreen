@@ -57,7 +57,7 @@ class Login_model extends CI_Model
 		$encrypt_iv = '3963673579222347';
 		$encryption_key = "TjWnZr4u7x!A%D*G-KaPdSgVkXp2s5v8";
 		$encryptedPassword = openssl_encrypt($data['password'], $cipher_algo, $encryption_key, $option, $encrypt_iv);
-
+		
 		if ($query->num_rows() > 0) {
 			$rw_password = $query->result();
 			if ($encryptedPassword == $rw_password[0]->password) {
@@ -157,7 +157,7 @@ class Login_model extends CI_Model
 			return false;
 		}
 	}
-
+	
 	public function update_app_login($data, $username, $roleid)
     {
         $multiClause = array('username' => $username, 'roleid' => $roleid, 'isactive' => 1);

@@ -93,3 +93,13 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 define("JWT_SECRET", "C0dR!nGreeN@dm1n#123#JwT");
 define("BASIC_AUTH_UNAME", "codringreenadmin");
 define("BASIC_AUTH_PWD", "CodRinGreeN@dm1n#123");
+
+/*
+|
+| TERRA ERP AUTHORIZATION
+|
+*/
+
+define("JWT_SECRET_TERRA", "CgRTeRR@eRpDigit@l@dm1n#123#JwT");
+define("BASIC_AUTH_UNAME_TERRA", "codrindigitalterraerp");
+define("BASIC_AUTH_PWD_TERRA", "CgRTeRR@eRpDigit@l@dm1n#123");
