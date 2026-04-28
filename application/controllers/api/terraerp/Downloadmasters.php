@@ -137,10 +137,20 @@ class Downloadmasters extends MY_Controller
 
                 // MEASUREMENT SYSTEMS
                 $dataMeasurementSystems = $this->Terramaster_model->get_measurement_systems_by_origin($originid);
+                $dataFormulas = $this->Terramaster_model->get_formulas_grouped();
+
+                // Convert formulas to map [measurement_system_id => formulas]
+                $formulaMap = [];
+
+                foreach ($dataFormulas as $f) {
+                    $formulaMap[$f->measurement_system_id] = json_decode($f->formulas);
+                }
 
                 foreach ($dataMeasurementSystems as &$ms) {
                     $ms->id = (int)$ms->id;
                     $ms->productTypeId = (int)$ms->productTypeId;
+
+                    $ms->formulas = isset($formulaMap[$ms->id]) ? $formulaMap[$ms->id] : [];
                 }
 
                 $return_arr_measurement_systems = $dataMeasurementSystems;
@@ -214,6 +224,9 @@ class Downloadmasters extends MY_Controller
                 }
 
                 $return_arr_length_classification = $dataLengthClassification;
+
+                // FORMULA
+                $dataFormula = $this->Terramaster_model->get_formula_by_origin($originid);
             }
 
             return $this->output([

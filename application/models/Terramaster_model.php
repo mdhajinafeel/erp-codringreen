@@ -215,4 +215,37 @@ class Terramaster_model extends CI_Model
             ->get()
             ->result();
     }
+
+    // MEASUREMENT FORMULA
+    public function get_formulas_grouped()
+    {
+        return $this->db->query("SELECT 
+            A.measurement_system_id,
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'formulaMasterId', A.id,
+                    'formula', A.formula,
+                    'roundPrecision', A.round_precision,
+                    'roundingType', A.rounding_type,
+                    'context', A.context,
+                    'variables', (
+                        SELECT JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'formulaMasterId', V.formula_master_id,
+                                'varName', V.var_name,
+                                'displayName', V.display_name,
+                                'unit', V.unit,
+                                'sortOrder', V.sort_order
+                            )
+                        )
+                        FROM tbl_formula_variable V
+                        WHERE V.formula_master_id = A.id
+                    )
+                )
+            ) AS formulas
+
+        FROM tbl_formula_master A
+        WHERE A.is_active = 1
+        GROUP BY A.measurement_system_id")->result();
+    }
 }
