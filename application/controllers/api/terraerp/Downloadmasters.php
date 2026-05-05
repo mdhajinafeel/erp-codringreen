@@ -83,8 +83,7 @@ class Downloadmasters extends MY_Controller
             $return_arr_dispatch_containers = [];
             $return_arr_products = [];
             $return_arr_product_types = [];
-            $return_arr_girth_classification = [];
-            $return_arr_length_classification = [];
+            $return_arr_container_categories = [];
 
             if (!in_array('9', $roles) && !in_array('7', $roles)) {
                 return $this->output([
@@ -209,24 +208,15 @@ class Downloadmasters extends MY_Controller
 
                 $return_arr_product_types = $dataProductTypes;
 
-                // GIRTH CLASSIFICATION
-                $dataGirthClassification = $this->Terramaster_model->get_girth_classification_by_origin($originid);
-                foreach ($dataGirthClassification as &$gc) {
-                    $gc->id = (int)$gc->id;
+                // CONTAINER CATEGORIES
+                $dataContainerCategories = $this->Terramaster_model->get_container_categories();
+
+                foreach ($dataContainerCategories as &$cc) {
+                    $cc->id = (int)$cc->id;
+                    $cc->productTypeId = (int)$cc->productTypeId;
                 }
 
-                $return_arr_girth_classification = $dataGirthClassification;
-
-                // LENGTH CLASSIFICATION
-                $dataLengthClassification = $this->Terramaster_model->get_length_classification_by_origin($originid);
-                foreach ($dataLengthClassification as &$lc) {
-                    $lc->id = (int)$lc->id;
-                }
-
-                $return_arr_length_classification = $dataLengthClassification;
-
-                // FORMULA
-                $dataFormula = $this->Terramaster_model->get_formula_by_origin($originid);
+                $return_arr_container_categories = $dataContainerCategories;
             }
 
             return $this->output([
@@ -244,8 +234,7 @@ class Downloadmasters extends MY_Controller
                     "dispatchContainers" => $return_arr_dispatch_containers,
                     "products" => $return_arr_products,
                     "productTypes" => $return_arr_product_types,
-                    "girthClassification" => $return_arr_girth_classification,
-                    "lengthClassification" => $return_arr_length_classification
+                    "containerCategories" => $return_arr_container_categories,
                 ]
             ]);
         } catch (Exception $e) {

@@ -192,30 +192,6 @@ class Terramaster_model extends CI_Model
             ->result();
     }
 
-    // GIRTH CLASSIFICATION
-    public function get_girth_classification_by_origin($originid)
-    {
-        return $this->db
-            ->select("id, girth_classification as girthClassification")
-            ->from("tbl_master_girth_classification")
-            ->where("origin_id", $originid)
-            ->where("is_active", 1)
-            ->get()
-            ->result();
-    }
-
-    // LENGTH CLASSIFICATION
-    public function get_length_classification_by_origin($originid)
-    {
-        return $this->db
-            ->select("id, length_classification as lengthClassification")
-            ->from("tbl_master_length_classification")
-            ->where("origin_id", $originid)
-            ->where("is_active", 1)
-            ->get()
-            ->result();
-    }
-
     // MEASUREMENT FORMULA
     public function get_formulas_grouped()
     {
@@ -247,5 +223,16 @@ class Terramaster_model extends CI_Model
         FROM tbl_formula_master A
         WHERE A.is_active = 1
         GROUP BY A.measurement_system_id")->result();
+    }
+
+    // CONTAINER CATEGORIES
+    public function get_container_categories()
+    {
+        return $this->db
+            ->select("id as id, category, product_type_id as productTypeId")
+            ->from("tbl_container_categories")
+            ->where("is_active", 1)
+            ->get()
+            ->result();
     }
 }
