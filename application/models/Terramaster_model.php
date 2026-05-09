@@ -10,7 +10,7 @@ class Terramaster_model extends CI_Model
     }
 
     // SUPPLIERS & PRODUCTS
-    public function get_suppliers_full_data($originid)
+    public function get_suppliers_full_data(int $originid)
     {
         $sql = "SELECT 
             S.id AS supplierId,
@@ -60,8 +60,20 @@ class Terramaster_model extends CI_Model
         return $this->db->query($sql, [$originid])->result();
     }
 
+    public function get_supplier_code_by_id(int $supplierid)
+    {
+        $row = $this->db
+            ->select("supplier_code as supplierCode")
+            ->from("tbl_suppliers")
+            ->where("id", $supplierid)
+            ->get()
+            ->row();
+        
+        return $row->supplierCode ?? '';
+    }
+
     // WAREHOUSES
-    public function get_warehouses_by_origin($originid)
+    public function get_warehouses_by_origin(int $originid)
     {
         return $this->db
             ->select("whid as id, warehouse_name as warehouseName")
@@ -73,7 +85,7 @@ class Terramaster_model extends CI_Model
     }
 
     // PURCHASE CONTRACT
-    public function fetch_purchase_contract_origin($originid)
+    public function fetch_purchase_contract_origin(int $originid)
     {
         return $this->db
             ->select("
@@ -100,7 +112,7 @@ class Terramaster_model extends CI_Model
     }
 
     // MEASUREMENT SYSTEMS
-    public function get_measurement_systems_by_origin($originid)
+    public function get_measurement_systems_by_origin(int $originid)
     {
         return $this->db
             ->select("measurement_id as id, measurement_name as measurementName, product_type_id as productTypeId")
@@ -112,7 +124,7 @@ class Terramaster_model extends CI_Model
     }
 
     // FARM INVENTORY ORDERS
-    public function get_farm_inventory_orders_by_origin($originid)
+    public function get_farm_inventory_orders_by_origin(int $originid)
     {
         return $this->db
             ->select("inventory_order as inventoryOrder, supplier_id as supplierId")
@@ -125,7 +137,7 @@ class Terramaster_model extends CI_Model
     }
 
     // RECEPTION INVENTORY ORDERS
-    public function get_reception_inventory_orders_by_origin($originid, $year)
+    public function get_reception_inventory_orders_by_origin(int $originid, int $year)
     {
         return $this->db
             ->select("salvoconducto as inventoryOrder, supplier_id as supplierId")
@@ -141,7 +153,7 @@ class Terramaster_model extends CI_Model
     }
 
     // SHIPPING LINES
-    public function get_shipping_lines_by_origin($originid)
+    public function get_shipping_lines_by_origin(int $originid)
     {
         return $this->db
             ->select("id, shipping_line as shippingLine")
@@ -153,7 +165,7 @@ class Terramaster_model extends CI_Model
     }
 
     // DISPATCH CONTAINERS
-    public function get_dispatch_containers_by_origin($originid, $year)
+    public function get_dispatch_containers_by_origin(int $originid, int $year)
     {
         return $this->db
             ->select("container_number as containerNumber, shipping_line as shippingLineId")
@@ -169,7 +181,7 @@ class Terramaster_model extends CI_Model
     }
 
     // PRODUCTS
-    public function get_products_by_origin($originid)
+    public function get_products_by_origin(int $originid)
     {
         return $this->db
             ->select("product_id as productId, product_name as productName")
@@ -181,7 +193,7 @@ class Terramaster_model extends CI_Model
     }
 
     // PRODUCT TYPES
-    public function get_product_types_by_origin()
+    public function get_product_types_by_origin(int $originid)
     {
         return $this->db
             ->select("type_id as typeId, product_type_name as productTypeName")

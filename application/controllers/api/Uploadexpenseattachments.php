@@ -29,6 +29,7 @@ class Uploadexpenseattachments extends MY_Controller
         }
 
         $headers = apache_request_headers();
+        $requestBearerToken = '';
         foreach ($headers as $header => $value) {
             if ($header == "Authorization") {
                 list($a, $b) = explode(" ", $value);

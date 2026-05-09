@@ -1,0 +1,561 @@
+<?php
+defined("BASEPATH") or exit("No direct script access allowed");
+
+class Sync extends MY_Controller
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model("Terralogin_model");
+        $this->load->model("Terramaster_model");
+        $this->load->model("Terrasync_model");
+        $this->load->library("jwttoken");
+        $this->load->helper('url');
+    }
+
+
+    private function output($data = array(), $code = 200)
+    {
+        http_response_code($code);
+        header("Access-Control-Allow-Origin: *");
+        header("Content-Type: application/json; charset=UTF-8");
+        echo json_encode($data);
+        exit;
+    }
+
+    // =====================
+    // IMAGE UPLOAD
+    // =====================
+    public function uploadcontainerphotos()
+    {
+        try {
+            // =========================
+            // REQUEST METHOD CHECK
+            // =========================
+
+            if ($this->input->method(TRUE) !== 'POST') {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Invalid request method'
+                ], 405);
+            }
+
+            // =========================
+            // AUTHORIZATION
+            // =========================
+            $headers = apache_request_headers();
+            $requestBearerToken = '';
+            foreach ($headers as $header => $value) {
+                if ($header == "Authorization") {
+                    list($a, $b) = explode(" ", $value);
+                    $requestBearerToken = $b;
+                }
+            }
+
+            if (empty($requestBearerToken)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Authorization token missing'
+                ], 401);
+            }
+
+            $token = JWT::decode($requestBearerToken, JWT_SECRET);
+            $userid   = $token->userid ?? 0;
+            $originid = $token->originid ?? 0;
+
+            // =========================
+            // USER VALIDATION
+            // =========================
+
+            if (!$this->Terralogin_model->check_user_exists_terra_app($userid, $originid)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Unauthorized user'
+                ], 401);
+            }
+
+            // =========================
+            // REQUIRED PARAMS
+            // =========================
+
+            $tempContainerImageId = $this->input->post('tempContainerImageId');
+            $tempDispatchId = $this->input->post('tempDispatchId');
+
+            if (empty($tempContainerImageId) || empty($tempDispatchId)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Required parameters missing'
+                ], 400);
+            }
+
+            // =========================
+            // FILE CHECK
+            // =========================
+
+            if (!isset($_FILES['image'])) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Image file missing'
+                ], 400);
+            }
+
+            // =========================
+            // CREATE DIRECTORY
+            // =========================
+
+            $uploadPath = FCPATH . 'uploads/containerimages/' . $tempDispatchId . '/';
+
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+
+            // =========================
+            // FILE EXTENSION
+            // =========================
+            $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+
+            // =========================
+            // CUSTOM FILE NAME
+            // =========================
+
+            $customFileName = 'container_' . $tempContainerImageId . '_' . rand(1000000, 9999999) . '.' . $ext;
+
+            // =========================
+            // UPLOAD CONFIG
+            // =========================
+
+            $config = [
+                'upload_path' => $uploadPath,
+                'allowed_types' => 'jpg|jpeg|png|webp',
+                'file_name' => $customFileName,
+                'overwrite' => false,
+                'max_size' => 10240 // 10MB
+            ];
+
+            $this->load->library('upload', $config);
+
+            // =========================
+            // UPLOAD FILE
+            // =========================
+
+            if (!$this->upload->do_upload('image')) {
+                return $this->output([
+                    'status' => false,
+                    'message' => $this->upload->display_errors('', '')
+                ], 400);
+            }
+
+            // =========================
+            // FILE DATA
+            // =========================
+
+            $fileData = $this->upload->data();
+
+            $imageUrl = base_url('uploads/containerimages/' . $tempDispatchId . '/' . $fileData['file_name']);
+
+            // =========================
+            // SUCCESS RESPONSE
+            // =========================
+            return $this->output([
+                'status' => true,
+                'message' => 'Image uploaded successfully',
+                'tempContainerImageId' => $tempContainerImageId,
+                'tempDispatchId' => $tempDispatchId,
+                'url' => $imageUrl
+            ]);
+        } catch (Exception $e) {
+            return $this->output([
+                "status" => false,
+                "message" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // =====================
+    // SYNC DATA
+    // =====================
+    public function syncdata()
+    {
+        try {
+
+            // =========================
+            // REQUEST METHOD CHECK
+            // =========================
+
+            if ($this->input->method(TRUE) !== 'POST') {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Invalid request method'
+                ], 405);
+            }
+
+            // =========================
+            // AUTHORIZATION
+            // =========================
+            $headers = apache_request_headers();
+            $requestBearerToken = '';
+            foreach ($headers as $header => $value) {
+                if ($header == "Authorization") {
+                    list($a, $b) = explode(" ", $value);
+                    $requestBearerToken = $b;
+                }
+            }
+
+            if (empty($requestBearerToken)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Authorization token missing'
+                ], 401);
+            }
+
+            $token = JWT::decode($requestBearerToken, JWT_SECRET);
+            $userid   = $token->userid ?? 0;
+            $originid = $token->originid ?? 0;
+
+            // =========================
+            // USER VALIDATION
+            // =========================
+
+            if (!$this->Terralogin_model->check_user_exists_terra_app($userid, $originid)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Unauthorized user'
+                ], 401);
+            }
+
+            // =========================
+            // INPUT
+            // =========================
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!$input) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Invalid JSON payload'
+                ], 400);
+            }
+
+            // =========================
+            // SAFE DEFAULTS
+            // =========================
+            $input['receptionDetails'] = $input['receptionDetails'] ?? [];
+            $input['receptionData'] = $input['receptionData'] ?? [];
+            $input['dispatchDetails'] = $input['dispatchDetails'] ?? [];
+            $input['containerData'] = $input['containerData'] ?? [];
+
+            // =========================
+            // RESPONSE
+            // =========================
+            $response = [
+                'status' => true,
+                'receptionMappings' => [],
+                'receptionDataMappings' => [],
+                'dispatchMappings' => [],
+                'containerDataMappings' => []
+            ];
+
+            // =========================
+            // START TRANSACTION
+            // =========================
+            $this->db->trans_begin();
+
+            // =================
+            // RECEPTION DETAILS
+            // =================
+            foreach ($input['receptionDetails'] as $receptiondetail) {
+
+                // =====================
+                // FLAGS
+                // =====================
+                $isDeleted = filter_var($receptiondetail['isDeleted'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+                // =====================
+                // TOTAL GROSS VOLUME
+                // =====================
+                if ($receptiondetail['supplierProductTypeId'] == 1 || $receptiondetail['supplierProductTypeId'] == 3) {
+                    $totalGrossVolume = $receptiondetail['totalVolumePie'] ?? 0;
+                } else {
+                    $totalGrossVolume = $receptiondetail['totalGrossVolume'] ?? 0;
+                }
+
+                // =====================
+                // COMMON DATA
+                // =====================
+                $receptionDetailData = [
+                    "measurementsystem_id" => $receptiondetail['measurementSystem'],
+                    "warehouse_id" => $receptiondetail['warehouse'],
+                    "supplier_id" => $receptiondetail['supplierId'],
+                    "supplier_code" => $this->Terramaster_model->get_supplier_code_by_id($receptiondetail['supplierId']),
+                    "supplier_product_id" => $receptiondetail['supplierProductId'],
+                    "supplier_product_typeid" => $receptiondetail['supplierProductTypeId'],
+                    "received_date" => $receptiondetail['receptionDate'],
+                    "salvoconducto" => $receptiondetail['ica'],
+                    "updatedby" => $userid,
+                    "isactive" => $isDeleted ? 0 : 1,
+                    "isclosed" => $receptiondetail['isClosed'],
+                    "closedby" => $receptiondetail['closedBy'],
+                    "closeddate" => $receptiondetail['closedDate'],
+                    "origin_id" => $originid,
+                    "total_gross_volume" => $totalGrossVolume,
+                    "total_volume" => $receptiondetail['totalNetVolume'] ?? 0,
+                    "total_pieces" => $receptiondetail['totalPieces'] ?? 0,
+                    "captured_from_app" => 1,
+                    "is_create_farm" => $receptiondetail['isFarmEnabled'],
+                    "contract_id" => $receptiondetail['purchaseContract'],
+                    "truck_plate_number" => $receptiondetail['truckNumber'],
+                ];
+
+                // =====================
+                // CHECK EXISTS
+                // =====================
+                $receptionExists = $this->Terrasync_model->reception_exists($receptiondetail['tempReceptionId']);
+
+                // =====================
+                // INSERT
+                // =====================
+                if (!$receptionExists) {
+                    $receptionDetailData['createdby'] = $userid;
+                    $receptionDetailData['captured_timestamp'] = $receptiondetail['createdAt'];
+                    $receptionDetailData['isduplicatecaptured'] = 0;
+                    $receptionDetailData['is_contract_added'] = 0;
+                    $receptionDetailData['is_special_uploaded'] = 0;
+                    $receptionDetailData['logistic_cost'] = 0;
+                    $receptionDetailData['logistic_pay_to'] = 0;
+                    $receptionDetailData['metric_ton'] = 0;
+                    $receptionDetailData['circ_allowance'] = 0;
+                    $receptionDetailData['length_allowance'] = 0;
+                    $receptionDetailData['rounding_factor'] = 0;
+                    $receptionDetailData['temp_reception_id'] = $receptiondetail['tempReceptionId'];
+
+                    $receptionId = $this->Terrasync_model->add_reception($receptionDetailData);
+                } else {
+
+                    // =================
+                    // UPDATE
+                    // =================
+
+                    $receptionId = $receptionExists->reception_id ?? 0;
+
+                    if ($receptionId > 0) {
+                        $this->Terrasync_model->update_reception($receptionId, $receptiondetail['tempReceptionId'], $receptionDetailData);
+                    }
+                }
+
+                // =====================
+                // RESPONSE MAPPING
+                // =====================
+                $response['receptionMappings'][] = [
+                    'tempReceptionId' => $receptiondetail['tempReceptionId'],
+                    'receptionId' => (int) $receptionId
+                ];
+            }
+
+            // =========================
+            // RECEPTION DATA
+            // =========================
+            foreach ($input['receptionData'] as $receptiondata) {
+
+                $isDeleted = filter_var($receptiondata['isDeleted'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+                // =================
+                // FETCH EXIST RECEPTION DATA
+                // =================
+                $reception = $this->Terrasync_model->reception_exists($receptiondata['tempReceptionId']);
+                $receptionId = $reception->reception_id ?? 0;
+                $salvoconducto = $reception->salvoconducto ?? '';
+                $supplierProductTypeId = $reception->supplier_product_typeid ?? 0;
+
+                $lengthExport = 0;
+                $widthExport = 0;
+                $thicknessExport = 0;
+                $grossVolume = 0;
+                $netVolume = 0;
+                $face = 0;
+                $grade = 0;
+
+                if ($supplierProductTypeId == 1 || $supplierProductTypeId == 3) {
+                    $lengthExport = $this->truncate_decimal((float) $receptiondata['length'] * 0.3048, 2);
+                    $widthExport = $this->truncate_decimal((float) $receptiondata['width'] * 2.54, 0);
+                    $thicknessExport = $this->truncate_decimal((float) $receptiondata['thickness'] * 2.54, 0);
+                    $grossVolume = $this->truncate_decimal((float) $receptiondata['volumePie'] / 424, 3);
+                    $netVolume = $this->truncate_decimal((float) $lengthExport * (float) $widthExport * (float) $thicknessExport / 10000, 3) * (float) $receptiondata['pieces'];
+                    $face = (float) $receptiondata['width'] * (float) $receptiondata['thickness'];
+
+                    if (($widthExport < 15) || ($thicknessExport < 15)) {
+                        $grade = 1;
+                    } elseif (($widthExport > 19.9) || ($thicknessExport > 19.9)) {
+                        $grade = 3;
+                    } else {
+                        $grade = 2;
+                    }
+                } else {
+                    $grossVolume = $receptiondata['grossVolume'];
+                    $netVolume = $receptiondata['netVolume'];
+                }
+
+                $receptionData = [
+                    "reception_id" => $receptionId,
+                    "salvoconducto" => $salvoconducto,
+                    "scanned_code" => $receptiondata['pieces'],
+                    "length_bought" => $receptiondata['length'],
+                    "width_bought" => $receptiondata['width'],
+                    "thickness_bought" => $receptiondata['thickness'],
+                    "circumference_bought" => $receptiondata['circumference'],
+                    "volumepie_bought" => $receptiondata['volumePie'],
+                    "length_export" => $lengthExport,
+                    "width_export" => $widthExport,
+                    "thickness_export" => $thicknessExport,
+                    "cbm_bought" => $grossVolume,
+                    "cbm_export" => $netVolume,
+                    "grade" => $grade,
+                    "face" => $face,
+                    "isdispatch" => 0,
+                    "scanned_timestamp" => $receptiondata['createdAt'],
+                    "isduplicatescanned" => 0,
+                    "dispatch_date" => '',
+                    "container_number" => '',
+                    "is_special" => 0,
+                    "remaining_stock_count" => $receptiondata['pieces'],
+                    "temp_reception_id" => $receptiondata['tempReceptionId'],
+                    "temp_reception_data_id" => $receptiondata['tempReceptionDataId'],
+                    "reception_container_mapping_id" => $receptiondata['containerReceptionMappingId'],
+                    "isactive" => $isDeleted ? 0 : 1,
+                    "updatedby" => $userid
+                ];
+
+                $receptionDataExists = $this->Terrasync_model->reception_data_exists($receptiondata['tempReceptionDataId'], $receptiondata['tempReceptionId']);
+
+                if (!$receptionDataExists) {
+                    $receptionData['createdby'] =  $userid;
+                    $receptionDataId = $this->Terrasync_model->add_reception_data($receptionData);
+                } else {
+                    $receptionDataId = $receptionDataExists->reception_data_id ?? 0;
+                    $this->Terrasync_model->update_reception_data(
+                        $receptionDataId,
+                        $receptiondata['tempReceptionDataId'],
+                        $receptiondata['containerReceptionMappingId'],
+                        $receptionData
+                    );
+                }
+
+                $response['receptionDataMappings'][] = [
+                    'tempReceptionDataId' => $receptiondata['tempReceptionDataId'],
+                    'receptionDataId' => (int) $receptionDataId,
+                    'receptionContainerMappingId' => $receptiondata['containerReceptionMappingId']
+                ];
+            }
+
+            // =====================================================
+            // TRANSACTION STATUS
+            // =====================================================
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception('Database transaction failed');
+            }
+
+            // =========================
+            // COMMIT
+            // =========================
+            $this->db->trans_commit();
+
+            // =====================================
+            // SUCCESS LOG
+            // =====================================
+            $this->write_sync_log('SUCCESS', 'SYNC SUCCESS', 'Sync completed successfully', [
+                'user_id' => $userid,
+                'origin_id' => $originid,
+                'request' => $input,
+                'response' => $response
+            ]);
+
+            return $this->output($response);
+        } catch (Throwable $e) {
+
+            // =========================
+            // ROLLBACK
+            // =========================
+            $this->db->trans_rollback();
+
+            // =========================
+            // ERROR DATA
+            // =========================
+            $errorData = [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' =>  $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ];
+
+            // =====================================
+            // CUSTOM ERROR LOG
+            // =====================================
+            $this->write_sync_log('ERROR', 'SYNC FAILED', $e->getMessage(), [
+                'error' => $errorData,
+                'request' => json_decode(file_get_contents('php://input'), true)
+            ]);
+
+            return $this->output([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // =====================================================
+    // CUSTOM SYNC LOGGER
+    // =====================================================
+    private function write_sync_log($type = 'INFO', $title = '', $message = '', $payload = null)
+    {
+        try {
+
+            // =====================================
+            // LOG DIRECTORY
+            // =====================================
+            $logDir = APPPATH . 'logs/sync/';
+            if (!is_dir($logDir)) {
+                mkdir($logDir, 0777, true);
+            }
+
+            // =====================================
+            // FILE NAME
+            // =====================================
+            $fileName = strtolower($type) . '_' . date('Y_m_d_H_i_s') . '_' . uniqid() . '.txt';
+            $filePath = $logDir . $fileName;
+
+            // =====================================
+            // CONTENT
+            // =====================================
+            $content = '';
+            $content .= "====================================================\n";
+            $content .= "TYPE : " . strtoupper($type) . "\n";
+            $content .= "DATE : " . date('Y-m-d H:i:s') . "\n";
+            $content .= "TITLE : " . $title . "\n";
+            $content .= "MESSAGE : \n" . $message . "\n";
+
+            // =====================================
+            // PAYLOAD
+            // =====================================
+            if ($payload !== null) {
+                $content .= "\nPAYLOAD : \n";
+                $content .= json_encode($payload, JSON_PRETTY_PRINT);
+                $content .= "\n";
+            }
+
+            $content .= "\n====================================================\n\n";
+
+            // =====================================
+            // WRITE FILE
+            // =====================================
+            file_put_contents($filePath, $content, FILE_APPEND);
+        } catch (Throwable $e) {
+            log_message('error', $e->getMessage());
+        }
+    }
+
+    // =====================================================
+    // TRUNCATE DECIMAL
+    // =====================================================
+    private function truncate_decimal(float $number, int $digits = 2): float
+    {
+        $factor = pow(10, $digits);
+        return floor($number * $factor) / $factor;
+    }
+}

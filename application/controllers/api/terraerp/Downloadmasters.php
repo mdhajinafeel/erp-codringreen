@@ -62,8 +62,7 @@ class Downloadmasters extends MY_Controller
             }
 
             // 🔹 Validate user
-            $checkUserExists = $this->Terralogin_model
-                ->check_user_exists_terra_app($userid, $originid);
+            $checkUserExists = $this->Terralogin_model->check_user_exists_terra_app($userid, $originid);
 
             if (!$checkUserExists) {
                 return $this->unauthorized();
