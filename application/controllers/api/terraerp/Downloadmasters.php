@@ -12,60 +12,63 @@ class Downloadmasters extends MY_Controller
         $this->load->helper('url');
     }
 
-    public function output($Return = array())
+    private function output($data = array(), $code = 200)
     {
+        http_response_code($code);
         header("Access-Control-Allow-Origin: *");
         header("Content-Type: application/json; charset=UTF-8");
-        exit(json_encode($Return));
+        echo json_encode($data);
+        exit;
     }
+
 
     public function index()
     {
         try {
-            if ($this->input->method(TRUE) != "GET") {
+            
+            // =========================
+            // REQUEST METHOD CHECK
+            // =========================
+            if ($this->input->method(TRUE) !== 'GET') {
                 return $this->output([
-                    "status" => false,
-                    "message" => "Invalid Request Method"
-                ]);
+                    'status' => false,
+                    'message' => 'Invalid request method'
+                ], 405);
             }
 
-            // 🔹 Get Authorization Header
-            $headers = getallheaders();
-
-            $authHeader = null;
-
-            if (isset($headers['Authorization'])) {
-                $authHeader = $headers['Authorization'];
-            } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-                $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+            // =========================
+            // AUTHORIZATION
+            // =========================
+            $headers = apache_request_headers();
+            $requestBearerToken = '';
+            foreach ($headers as $header => $value) {
+                if ($header == "Authorization") {
+                    list($a, $b) = explode(" ", $value);
+                    $requestBearerToken = $b;
+                }
             }
 
-            if (!$authHeader) {
-                return $this->unauthorized();
+            if (empty($requestBearerToken)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Authorization token missing'
+                ], 401);
             }
 
-            $parts = explode(" ", $authHeader);
-            if (count($parts) !== 2 || strtolower($parts[0]) !== 'bearer') {
-                return $this->unauthorized();
-            }
+            $token = JWT::decode($requestBearerToken, JWT_SECRET);
+             $userid   = $token->userid ?? 0;
+            $originid = $token->originid ?? 0;
+            $roleid   = $token->roleid ?? 0;
 
-            $tokenStr = $parts[1];
+            // =========================
+            // USER VALIDATION
+            // =========================
 
-            $token = JWT::decode($tokenStr, JWT_SECRET, ['HS256']);
-
-            $userid   = $token->userid;
-            $originid = $token->originid;
-            $roleid   = $token->roleid;
-
-            if ($userid <= 0) {
-                return $this->unauthorized();
-            }
-
-            // 🔹 Validate user
-            $checkUserExists = $this->Terralogin_model->check_user_exists_terra_app($userid, $originid);
-
-            if (!$checkUserExists) {
-                return $this->unauthorized();
+            if (!$this->Terralogin_model->check_user_exists_terra_app($userid, $originid)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Unauthorized user'
+                ], 401);
             }
 
             // 🔹 Fast role check (optimized)
@@ -76,10 +79,7 @@ class Downloadmasters extends MY_Controller
             $return_arr_warehouses = [];
             $return_arr_contracts = [];
             $return_arr_measurement_systems = [];
-            $return_arr_farm_inventory_orders = [];
-            $return_arr_reception_inventory_orders = [];
             $return_arr_shipping_lines = [];
-            $return_arr_dispatch_containers = [];
             $return_arr_products = [];
             $return_arr_product_types = [];
             $return_arr_container_categories = [];
@@ -88,7 +88,7 @@ class Downloadmasters extends MY_Controller
                 return $this->output([
                     "status" => false,
                     "message" => "Access denied (role)"
-                ]);
+                ], 403);
             }
 
             // 🚀 OPTIMIZED DATA FETCH (ONLY 3 QUERIES)
@@ -147,29 +147,10 @@ class Downloadmasters extends MY_Controller
                 foreach ($dataMeasurementSystems as &$ms) {
                     $ms->id = (int)$ms->id;
                     $ms->productTypeId = (int)$ms->productTypeId;
-
                     $ms->formulas = isset($formulaMap[$ms->id]) ? $formulaMap[$ms->id] : [];
                 }
 
                 $return_arr_measurement_systems = $dataMeasurementSystems;
-
-                // FARM INVENTORY ORDERS
-                $dataFarmInventoryOrders = $this->Terramaster_model->get_farm_inventory_orders_by_origin($originid);
-
-                foreach ($dataFarmInventoryOrders as &$io) {
-                    $io->supplierId = (int)$io->supplierId;
-                }
-
-                $return_arr_farm_inventory_orders = $dataFarmInventoryOrders;
-
-                // RECEPTION INVENTORY ORDERS
-                $dataReceptionInventoryOrders = $this->Terramaster_model->get_reception_inventory_orders_by_origin($originid, 2025);
-
-                foreach ($dataReceptionInventoryOrders as &$io) {
-                    $io->supplierId = (int)$io->supplierId;
-                }
-
-                $return_arr_reception_inventory_orders = $dataReceptionInventoryOrders;
 
                 // SHIPPING LINES
                 $dataShippingLines = $this->Terramaster_model->get_shipping_lines_by_origin($originid);
@@ -179,15 +160,6 @@ class Downloadmasters extends MY_Controller
                 }
 
                 $return_arr_shipping_lines = $dataShippingLines;
-
-                // DISPATCH CONTAINERS
-                $dataDispatchContainers = $this->Terramaster_model->get_dispatch_containers_by_origin($originid, 2025);
-
-                foreach ($dataDispatchContainers as &$dc) {
-                    $dc->shippingLineId = (int)$dc->shippingLineId;
-                }
-
-                $return_arr_dispatch_containers = $dataDispatchContainers;
 
                 // PRODUCTS
                 $dataProducts = $this->Terramaster_model->get_products_by_origin($originid);
@@ -228,9 +200,6 @@ class Downloadmasters extends MY_Controller
                     "purchaseContracts" => $return_arr_contracts,
                     "measurementSystems" => $return_arr_measurement_systems, 
                     "shippingLines" => $return_arr_shipping_lines,
-                    "farmInventoryOrders" => $return_arr_farm_inventory_orders, 
-                    "receptionInventoryOrders" => $return_arr_reception_inventory_orders, 
-                    "dispatchContainers" => $return_arr_dispatch_containers,
                     "products" => $return_arr_products,
                     "productTypes" => $return_arr_product_types,
                     "containerCategories" => $return_arr_container_categories,

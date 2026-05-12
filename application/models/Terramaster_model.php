@@ -123,35 +123,6 @@ class Terramaster_model extends CI_Model
             ->result();
     }
 
-    // FARM INVENTORY ORDERS
-    public function get_farm_inventory_orders_by_origin(int $originid)
-    {
-        return $this->db
-            ->select("inventory_order as inventoryOrder, supplier_id as supplierId")
-            ->from("tbl_farm")
-            ->where("is_active", 1)
-            ->where("origin_id", $originid)
-            ->where("purchase_date >=", '2025-01-01') // ✅ start of year
-            ->get()
-            ->result();
-    }
-
-    // RECEPTION INVENTORY ORDERS
-    public function get_reception_inventory_orders_by_origin(int $originid, int $year)
-    {
-        return $this->db
-            ->select("salvoconducto as inventoryOrder, supplier_id as supplierId")
-            ->from("tbl_reception")
-            ->where("isactive", 1)
-            ->where("origin_id", $originid)
-
-            // 🔥 FAST: extract year directly
-            ->where("RIGHT(received_date, 4) >=", $year)
-
-            ->get()
-            ->result();
-    }
-
     // SHIPPING LINES
     public function get_shipping_lines_by_origin(int $originid)
     {
@@ -160,22 +131,6 @@ class Terramaster_model extends CI_Model
             ->from("tbl_shippingline_master")
             ->where("isactive", 1)
             ->where("origin_id", $originid)
-            ->get()
-            ->result();
-    }
-
-    // DISPATCH CONTAINERS
-    public function get_dispatch_containers_by_origin(int $originid, int $year)
-    {
-        return $this->db
-            ->select("container_number as containerNumber, shipping_line as shippingLineId")
-            ->from("tbl_dispatch_container")
-            ->where("isactive", 1)
-            ->where("origin_id", $originid)
-
-            // 🔥 FAST: extract year directly
-            ->where("RIGHT(dispatch_date, 4) >=", $year)
-
             ->get()
             ->result();
     }

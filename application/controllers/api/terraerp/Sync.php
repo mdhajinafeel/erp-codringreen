@@ -439,8 +439,236 @@ class Sync extends MY_Controller
 
                 $response['receptionDataMappings'][] = [
                     'tempReceptionDataId' => $receptiondata['tempReceptionDataId'],
+                    'tempReceptionId' => $receptiondata['tempReceptionId'],
                     'receptionDataId' => (int) $receptionDataId,
+                    'receptionId' => (int) $receptionId,
                     'receptionContainerMappingId' => $receptiondata['containerReceptionMappingId']
+                ];
+            }
+
+            // =================
+            // CONTAINER DETAILS
+            // =================
+            foreach ($input['dispatchDetails'] as $dispatchdetail) {
+
+                // =====================
+                // FLAGS
+                // =====================
+                $isDeleted = filter_var($dispatchdetail['isDeleted'] ?? false, FILTER_VALIDATE_BOOLEAN);
+                $isClosed = filter_var($dispatchdetail['isClosed'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+                // =====================
+                // COMMON DATA
+                // =====================
+
+                if($isClosed) {
+                    $date = $dispatchdetail['closedDate'];
+                    $objDate = DateTime::createFromFormat('d/m/Y', $date);
+                    if ($objDate !== false) {
+                        $timestamp = $objDate->getTimestamp();
+                    } else {
+                        $timestamp = null;
+                    }
+                } else {
+                    $timestamp = null;
+                }
+
+
+                $dispatchDetailData = [
+                    "container_number" => $dispatchdetail['containerNumber'],
+                    "warehouse_id" => $dispatchdetail['warehouseId'],
+                    "shipping_line" => $dispatchdetail['shippingLineId'],
+                    "product_id" => $dispatchdetail['productId'],
+                    "product_type_id" => $dispatchdetail['productTypeId'],
+                    "dispatch_date" => $dispatchdetail['dispatchDate'],
+                    "updatedby" => $userid,
+                    "isactive" => $isDeleted ? 0 : 1,
+                    "isclosed" => $dispatchdetail['isClosed'],
+                    "closedby" => $dispatchdetail['closedBy'],
+                    "closeddate" => $timestamp,
+                    "isexport" => 0,
+                    "origin_id" => $originid,
+                    "total_gross_volume" => $dispatchdetail['totalGrossVolume'] ?? 0,
+                    "total_volume" => $dispatchdetail['totalNetVolume'] ?? 0,
+                    "total_pieces" => $dispatchdetail['totalPieces'] ?? 0,
+                    "app_category" => $dispatchdetail['categoryId'] ?? '',
+                    "captured_from_app" => 1,
+                    "metric_ton" => 0,
+                    "short_ton" => 0,
+                    "net_lbs" => 0,
+                    "diameter_text" => '',
+                    "length_text" => '',
+                    "unit_price" => 0,
+                    "total_value" => 0,
+                    "measurement_system_id" => 0,
+                    "circ_allowance" => 0,
+                    "length_allowance" => 0,
+                    "rounding_factor" => 0,
+                    "is_saw_mill_loading" => 0,
+                ];
+
+                // =====================
+                // CHECK EXISTS
+                // =====================
+                $dispatchExists = $this->Terrasync_model->dispatch_exists($dispatchdetail['tempDispatchId']);
+
+                // =====================
+                // INSERT
+                // =====================
+                if (!$dispatchExists) {
+                    $dispatchDetailData['createdby'] = $userid;
+                    $dispatchDetailData['temp_dispatch_id'] = $dispatchdetail['tempDispatchId'];
+
+                    $dispatchId = $this->Terrasync_model->add_dispatch($dispatchDetailData);
+                } else {
+
+                    // =================
+                    // UPDATE
+                    // =================
+
+                    $dispatchId = $dispatchExists->dispatch_id ?? 0;
+
+                    if ($dispatchId > 0) {
+                        $this->Terrasync_model->update_dispatch($dispatchId, $dispatchdetail['tempDispatchId'], $dispatchDetailData);
+                    }
+                }
+
+                // =====================
+                // RESPONSE MAPPING
+                // =====================
+                $response['dispatchMappings'][] = [
+                    'tempDispatchId' => $dispatchdetail['tempDispatchId'],
+                    'dispatchId' => (int) $dispatchId
+                ];
+            }
+
+            // =========================
+            // DISPATCH DATA
+            // =========================
+            foreach ($input['containerData'] as $containerdata) {
+
+                $isDeleted = filter_var(
+                    $containerdata['isDeleted'] ?? false,
+                    FILTER_VALIDATE_BOOLEAN
+                );
+
+                // =========================
+                // FETCH DISPATCH
+                // =========================
+                $dispatch = $this->Terrasync_model->dispatch_exists($containerdata['tempDispatchId']);
+
+                $dispatchId = $dispatch->dispatch_id ?? 0;
+
+                if ($dispatchId <= 0) {
+                    throw new Exception('Dispatch header not found');
+                }
+
+                // =========================
+                // FETCH RECEPTION DATA
+                // =========================
+                $receptionDataExists = $this->Terrasync_model->reception_data_exists($containerdata['tempReceptionDataId'], $containerdata['tempReceptionId']);
+                $receptionDataId = $receptionDataExists->reception_data_id ?? 0;
+
+                if ($receptionDataId <= 0) {
+                    throw new Exception('Reception data not found');
+                }
+
+                // =========================
+                // CONTAINER DATA
+                // =========================
+                $containerData = [
+                    "dispatch_id" => $dispatchId,
+                    "reception_data_id" => $receptionDataId,
+                    "reception_id" => $receptionDataExists->reception_id ?? 0,
+                    "cbm_bought" => $containerdata['grossVolume'],
+                    "cbm_export" => $containerdata['netVolume'],
+                    "scanned_timestamp" => $containerdata['createdAt'],
+                    "isduplicatescanned" => 0,
+                    "is_special" => 0,
+                    "dispatch_pieces" => $containerdata['pieces'],
+                    "temp_dispatch_id" => $containerdata['tempDispatchId'],
+                    "temp_reception_id" => $containerdata['tempReceptionId'],
+                    "temp_reception_data_id" => $containerdata['tempReceptionDataId'],
+                    "container_reception_mapping_id" => $containerdata['containerReceptionMappingId'],
+                    "isactive" => $isDeleted ? 0 : 1,
+                    "updatedby" => $userid
+                ];
+
+                // =========================
+                // CHECK EXISTING DISPATCH DATA
+                // =========================
+                $containerDataExists = $this->Terrasync_model->dispatch_data_exists($containerdata['tempDispatchId'], $containerdata['tempReceptionDataId'],
+                        $containerdata['tempReceptionId']);
+
+                // =====================================================
+                // INSERT
+                // =====================================================
+                if (!$containerDataExists) {
+                    $containerData['createdby'] = $userid;
+                    $dispatchDataId = $this->Terrasync_model->add_dispatch_data($containerData);
+                }
+
+                // =====================================================
+                // UPDATE
+                // =====================================================
+                else {
+
+                    $dispatchDataId = $containerDataExists->dispatch_data_id ?? 0;
+
+                    $this->Terrasync_model->update_dispatch_data(
+                        $dispatchDataId,
+                        $containerdata['tempDispatchId'],
+                        $containerdata['tempReceptionDataId'],
+                        $containerdata['tempReceptionId'],
+                        $containerData
+                    );
+                }
+
+                // =====================================================
+                // RECALCULATE REMAINING STOCK
+                // =====================================================
+                $this->Terrasync_model->recalculate_remaining_stock($containerdata['tempReceptionId'], $containerdata['tempReceptionDataId']);
+
+                // =====================================================
+                // FETCH UPDATED STOCK
+                // =====================================================
+                $updatedReceptionData = $this->Terrasync_model->reception_data_exists($containerdata['tempReceptionDataId'], $containerdata['tempReceptionId']);
+                $remainingStock = (float) ($updatedReceptionData->remaining_stock_count ?? 0);
+
+                // =====================================================
+                // PARTIAL/FULL DISPATCH STATUS
+                // =====================================================
+                $isDispatch = ($remainingStock <= 0) ? 1 : 0;
+
+                // =====================================================
+                // UPDATE RECEPTION DATA STATUS
+                // =====================================================
+                $updateReceptionData = [
+                    'isdispatch' => $isDispatch,
+                    'dispatch_date' => $dispatch->dispatch_date ?? '',
+                    'container_number' => $dispatch->container_number ?? '',
+                    'updatedby' => $userid
+                ];
+
+                $this->Terrasync_model->update_reception_data_stock(
+                    $containerdata['tempReceptionDataId'],
+                    $containerdata['tempReceptionId'],
+                    $receptionDataId,
+                    $updateReceptionData
+                );
+
+                // =====================================================
+                // RESPONSE MAPPING
+                // =====================================================
+                $response['containerDataMappings'][] = [
+                    'tempReceptionDataId' => $containerdata['tempReceptionDataId'],
+                    'tempDispatchId' => $containerdata['tempDispatchId'],
+                    'dispatchDataId' => (int) $dispatchDataId,
+                    'containerReceptionMappingId' => $containerdata['containerReceptionMappingId'],
+                    'receptionDataId' => (int) $receptionDataId,
+                    'receptionId' => (int) $receptionDataExists->reception_id, 
+                    'dispatchId' => (int) $dispatchId, 
+                    'tempReceptionId' => $containerdata['tempReceptionId']
                 ];
             }
 

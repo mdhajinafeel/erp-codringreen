@@ -53,7 +53,8 @@ class Terrasync_model extends CI_Model
     // =========================
     // RECEPTION DATA
     // =========================
-    public function reception_data_exists(string $tempReceptionDataId, string $tempReceptionId) {
+    public function reception_data_exists(string $tempReceptionDataId, string $tempReceptionId)
+    {
         return $this->db
             ->where('temp_reception_data_id', $tempReceptionDataId)
             ->where('temp_reception_id', $tempReceptionId)
@@ -87,6 +88,131 @@ class Terrasync_model extends CI_Model
         );
         $this->db->where($multiClause);
         $this->db->set('updateddate', 'NOW()', FALSE);
+        if ($this->db->update('tbl_reception_data', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // =========================
+    // DISPATCH
+    // =========================
+    public function dispatch_exists(string $tempDispatchId)
+    {
+        return $this->db
+            ->where('temp_dispatch_id', $tempDispatchId)
+            ->where('isactive', 1)
+            ->get('tbl_dispatch_container')
+            ->row();
+    }
+
+    public function add_dispatch(array $data): int
+    {
+        $this->db->set('createddate', 'NOW()', FALSE);
+        $this->db->set('updateddate', 'NOW()', FALSE);
+        $this->db->insert('tbl_dispatch_container', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
+
+    public function update_dispatch(int $dispatchId, string $tempDispatchId, array $data): bool
+    {
+        $multiClause = array(
+            'dispatch_id' => $dispatchId,
+            'temp_dispatch_id' => $tempDispatchId,
+            'isactive' => 1
+        );
+        $this->db->where($multiClause);
+        $this->db->set('updateddate', 'NOW()', FALSE);
+        if ($this->db->update('tbl_dispatch_container', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // =========================
+    // CONTAINER DATA
+    // =========================
+    public function dispatch_data_exists(string $tempDispatchId, string $tempReceptionDataId, string $tempReceptionId)
+    {
+        return $this->db
+            ->where('temp_dispatch_id', $tempDispatchId)
+            ->where('temp_reception_data_id', $tempReceptionDataId)
+            ->where('temp_reception_id', $tempReceptionId)
+            ->where('isactive', 1)
+            ->get('tbl_dispatch_data')
+            ->row();
+    }
+
+    public function add_dispatch_data(array $data): int
+    {
+        $this->db->set('createddate', 'NOW()', FALSE);
+        $this->db->set('updateddate', 'NOW()', FALSE);
+        $this->db->insert('tbl_dispatch_data', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
+
+    public function update_dispatch_data(int $dispatchDataId, string $tempDispatchId, string $tempReceptionDataId, string $tempReceptionId, array $data): bool
+    {
+        $multiClause = array(
+            'dispatch_data_id' => $dispatchDataId,
+            'temp_dispatch_id' => $tempDispatchId,
+            'temp_reception_data_id' => $tempReceptionDataId,
+            'temp_reception_id' => $tempReceptionId,
+            'isactive' => 1
+        );
+        $this->db->where($multiClause);
+        $this->db->set('updateddate', 'NOW()', FALSE);
+        if ($this->db->update('tbl_dispatch_data', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function recalculate_remaining_stock(string $tempReceptionId, string $tempReceptionDataId)
+    {
+        $sql = "
+        UPDATE tbl_reception_data rd
+        SET remaining_stock_count =
+        (
+            rd.scanned_code -
+            IFNULL(
+                (
+                    SELECT SUM(dd.dispatch_pieces)
+                    FROM tbl_dispatch_data dd
+                    WHERE dd.temp_reception_id =
+                        rd.temp_reception_id
+                    AND dd.temp_reception_data_id =
+                        rd.temp_reception_data_id
+                    AND dd.isactive = 1
+                ),
+                0
+            )
+        )
+        WHERE rd.temp_reception_id = ?
+        AND rd.temp_reception_data_id = ?";
+
+        return $this->db->query($sql, [$tempReceptionId, $tempReceptionDataId]);
+    }
+
+    public function update_reception_data_stock(string $tempReceptionDataId, string $tempReceptionId, string $receptionDataId, array $data)
+    {
+        $this->db->where('reception_data_id', $receptionDataId);
+        $this->db->where('temp_reception_data_id', $tempReceptionDataId);
+        $this->db->where('temp_reception_id', $tempReceptionId);
+
         if ($this->db->update('tbl_reception_data', $data)) {
             return true;
         } else {
