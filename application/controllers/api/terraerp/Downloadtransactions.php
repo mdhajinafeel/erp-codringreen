@@ -85,6 +85,7 @@
                 $return_arr_reception_inventory_orders = [];
                 $return_arr_dispatch_containers = [];
                 $return_arr_reception_details = [];
+                $return_arr_dispatch_details = [];
 
                 $serverTime = time();
                 $lastSync = (int)$this->input->get("lastSync");
@@ -121,9 +122,54 @@
 
                     $return_arr_dispatch_containers = $dataDispatchContainers;
 
+                    // ======================
                     // RECEPTION DETAILS
-                    $dataReceptionDetails = $this->Terratransactions_model->get_reception_details($originid, 2025);
+                    // ======================
+                    $dataReceptionDetails = $this->Terratransactions_model->get_reception_details($originid);
+
+                    // ======================
+                    // GET RECEPTION IDS
+                    // ======================
+                    $receptionIds = [];
+
+                    foreach ($dataReceptionDetails as $rd) {
+                        $receptionIds[] = (int)$rd->receptionId;
+                    }
+
+                    // ======================
+                    // GET ALL RECEPTION DATA
+                    // ======================
+                    $allReceptionData = $this->Terratransactions_model->get_reception_data_by_ids($receptionIds);
+
+                    // ======================
+                    // GROUP RECEPTION DATA
+                    // ======================
+                    $groupedReceptionData = [];
+
+                    foreach ($allReceptionData as $data) {
+
+                        $data->receptionDataId = (int)$data->receptionDataId;
+                        $data->receptionId = (int)$data->receptionId;
+                        $data->circumference = (float)$data->circumference;
+                        $data->length = (float)$data->length;
+                        $data->thickness = (float)$data->thickness;
+                        $data->width = (float)$data->width;
+                        $data->pieces = (int)$data->pieces;
+                        $data->grossVolume = (float)$data->grossVolume;
+                        $data->netVolume = (float)$data->netVolume;
+                        $data->volumePie = (float)$data->volumePie;
+                        $data->createdAt = (int)$data->createdAt;
+                        $data->updatedAt = (int)$data->updatedAt;
+
+                        // GROUP BY RECEPTION ID
+                        $groupedReceptionData[$data->receptionId][] = $data;
+                    }
+
+                    // ======================
+                    // FORMAT RECEPTION DETAILS
+                    // ======================
                     foreach ($dataReceptionDetails as &$rd) {
+
                         $rd->receptionId = (int)$rd->receptionId;
                         $rd->warehouseId = (int)$rd->warehouseId;
                         $rd->supplierId = (int)$rd->supplierId;
@@ -131,15 +177,94 @@
                         $rd->supplierProductTypeId = (int)$rd->supplierProductTypeId;
                         $rd->measurementSystemId = (int)$rd->measurementSystemId;
                         $rd->isClosed = (bool)$rd->isClosed;
+                        $rd->closedDate = $rd->closedDate ? strtotime($rd->closedDate) * 1000 : null;
                         $rd->closedBy = (int)$rd->closedBy;
                         $rd->totalGrossVolume = (float)$rd->totalGrossVolume;
                         $rd->totalNetVolume = (float)$rd->totalNetVolume;
                         $rd->totalPieces = (int)$rd->totalPieces;
                         $rd->isCreateFarm = (bool)$rd->isCreateFarm;
                         $rd->contractId = (int)$rd->contractId;
+                        $rd->productId = (int)$rd->productId;
+                        $rd->productTypeId = (int)$rd->productTypeId;
+                        $rd->capturedTimestamp = (int)$rd->capturedTimestamp;
+                        $rd->updatedAt = (int)$rd->updateAt;
+
+                        // ======================
+                        // ATTACH RECEPTION DATA
+                        // ======================
+                        $rd->receptionData = $groupedReceptionData[$rd->receptionId] ?? [];
                     }
 
                     $return_arr_reception_details = $dataReceptionDetails;
+
+                    // ======================
+                    // DISPATCH DETAILS
+                    // ======================
+                    $dataDispatchDetails = $this->Terratransactions_model->get_dispatch_details($originid);
+
+                    // ======================
+                    // GET DISPATCH IDS
+                    // ======================
+                    $dispatchIds = [];
+
+                    foreach ($dataDispatchDetails as $dd) {
+                        $dispatchIds[] = (int)$dd->dispatchId;
+                    }
+
+                    // ======================
+                    // GET ALL RECEPTION DATA
+                    // ======================
+                    $allDispatchData = $this->Terratransactions_model->get_dispatch_data_by_ids($dispatchIds);
+
+                    // ======================
+                    // GROUP DISPATCH DATA
+                    // ======================
+                    $groupedDispatchData = [];
+
+                    foreach ($allDispatchData as $dispatchdata) {
+
+                        $dispatchdata->dispatchDataId = (int)$dispatchdata->dispatchDataId;
+                        $dispatchdata->dispatchId = (int)$dispatchdata->dispatchId;
+                        $dispatchdata->receptionDataId = (int)$dispatchdata->receptionDataId;
+                        $dispatchdata->receptionId = (int)$dispatchdata->receptionId;
+                        $dispatchdata->grossVolume = (float)$dispatchdata->grossVolume;
+                        $dispatchdata->netVolume = (float)$dispatchdata->netVolume;
+                        $dispatchdata->pieces = (int)$dispatchdata->pieces;
+                        $dispatchdata->createdAt = (int)$dispatchdata->createdAt;
+                        $dispatchdata->updatedAt = (int)$dispatchdata->updatedAt;
+
+                        // GROUP BY DISPATCH ID
+                        $groupedDispatchData[$dispatchdata->dispatchId][] = $dispatchdata;
+                    }
+
+
+                    // ======================
+                    // FORMAT DISPATCH DETAILS
+                    // ======================
+                    foreach ($dataDispatchDetails as &$dd) {
+
+                        $dd->dispatchId = (int)$dd->dispatchId;
+                        $dd->warehouseId = (int)$dd->warehouseId;
+                        $dd->shippingLineId = (int)$dd->shippingLineId;
+                        $dd->productId = (int)$dd->productId;
+                        $dd->productTypeId = (int)$dd->productTypeId;
+                        $dd->createdAt = (int)$dd->createdAt;
+                        $dd->updatedAt = (int)$dd->updatedAt;
+                        $dd->isClosed = (bool)$dd->isClosed;
+                        $dd->closedDate = $dd->closedDate ? strtotime($dd->closedDate) * 1000 : null;
+                        $dd->closedBy = (int)$dd->closedBy;
+                        $dd->totalGrossVolume = (float)$dd->totalGrossVolume;
+                        $dd->totalNetVolume = (float)$dd->totalNetVolume;
+                        $dd->totalPieces = (int)$dd->totalPieces;
+                        $dd->categoryId = (int)$dd->categoryId;
+
+                        // ======================
+                        // ATTACH DISPATCH DATA
+                        // ======================
+                        $dd->dispatchData = $groupedDispatchData[$dd->dispatchId] ?? [];
+                    }
+
+                    $return_arr_dispatch_details = $dataDispatchDetails;
                 }
 
                 return $this->output([
@@ -151,6 +276,7 @@
                         "receptionInventoryOrders" => $return_arr_reception_inventory_orders,
                         "dispatchContainers" => $return_arr_dispatch_containers,
                         "receptionDetails" => $return_arr_reception_details,
+                        "dispatchDetails" => $return_arr_dispatch_details,
                     ]
                 ]);
             } catch (Exception $e) {

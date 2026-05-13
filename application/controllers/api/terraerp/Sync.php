@@ -293,7 +293,7 @@ class Sync extends MY_Controller
                     "isactive" => $isDeleted ? 0 : 1,
                     "isclosed" => $receptiondetail['isClosed'],
                     "closedby" => $receptiondetail['closedBy'],
-                    "closeddate" => $receptiondetail['closedDate'],
+                    "closeddate" => !empty($receptiondetail['closedDate']) ? date('Y-m-d H:i:s', $receptiondetail['closedDate'] / 1000) : null,
                     "origin_id" => $originid,
                     "total_gross_volume" => $totalGrossVolume,
                     "total_volume" => $receptiondetail['totalNetVolume'] ?? 0,
@@ -302,6 +302,7 @@ class Sync extends MY_Controller
                     "is_create_farm" => $receptiondetail['isFarmEnabled'],
                     "contract_id" => $receptiondetail['purchaseContract'],
                     "truck_plate_number" => $receptiondetail['truckNumber'],
+                    "container_reception_mapping_id" => $receptiondetail['containerReceptionMappingId'] ?? null,
                 ];
 
                 // =====================
@@ -460,20 +461,6 @@ class Sync extends MY_Controller
                 // =====================
                 // COMMON DATA
                 // =====================
-
-                if($isClosed) {
-                    $date = $dispatchdetail['closedDate'];
-                    $objDate = DateTime::createFromFormat('d/m/Y', $date);
-                    if ($objDate !== false) {
-                        $timestamp = $objDate->getTimestamp();
-                    } else {
-                        $timestamp = null;
-                    }
-                } else {
-                    $timestamp = null;
-                }
-
-
                 $dispatchDetailData = [
                     "container_number" => $dispatchdetail['containerNumber'],
                     "warehouse_id" => $dispatchdetail['warehouseId'],
@@ -485,7 +472,7 @@ class Sync extends MY_Controller
                     "isactive" => $isDeleted ? 0 : 1,
                     "isclosed" => $dispatchdetail['isClosed'],
                     "closedby" => $dispatchdetail['closedBy'],
-                    "closeddate" => $timestamp,
+                    "closeddate" => !empty($dispatchdetail['closedDate']) ? date('Y-m-d H:i:s', $dispatchdetail['closedDate'] / 1000) : null,
                     "isexport" => 0,
                     "origin_id" => $originid,
                     "total_gross_volume" => $dispatchdetail['totalGrossVolume'] ?? 0,
@@ -518,6 +505,7 @@ class Sync extends MY_Controller
                 if (!$dispatchExists) {
                     $dispatchDetailData['createdby'] = $userid;
                     $dispatchDetailData['temp_dispatch_id'] = $dispatchdetail['tempDispatchId'];
+                    $dispatchDetailData['dispatched_timestamp'] = $dispatchdetail['createdAt'];
 
                     $dispatchId = $this->Terrasync_model->add_dispatch($dispatchDetailData);
                 } else {
