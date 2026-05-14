@@ -229,6 +229,7 @@
                         $dispatchdata->receptionId = (int)$dispatchdata->receptionId;
                         $dispatchdata->grossVolume = (float)$dispatchdata->grossVolume;
                         $dispatchdata->netVolume = (float)$dispatchdata->netVolume;
+                        $dispatchdata->volumePie = (float)$dispatchdata->volumePie;
                         $dispatchdata->pieces = (int)$dispatchdata->pieces;
                         $dispatchdata->createdAt = (int)$dispatchdata->createdAt;
                         $dispatchdata->updatedAt = (int)$dispatchdata->updatedAt;
@@ -261,7 +262,7 @@
                         // ======================
                         // ATTACH DISPATCH DATA
                         // ======================
-                        $dd->dispatchData = $groupedDispatchData[$dd->dispatchId] ?? [];
+                        $dd->containerData = $groupedDispatchData[$dd->dispatchId] ?? [];
                     }
 
                     $return_arr_dispatch_details = $dataDispatchDetails;

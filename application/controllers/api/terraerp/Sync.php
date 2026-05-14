@@ -318,7 +318,7 @@ class Sync extends MY_Controller
                     $receptionDetailData['captured_timestamp'] = $receptiondetail['createdAt'];
                     $receptionDetailData['isduplicatecaptured'] = 0;
                     $receptionDetailData['is_contract_added'] = 0;
-                    $receptionDetailData['is_special_uploaded'] = 0;
+                    $receptionDetailData['is_special_uploaded'] = 1;
                     $receptionDetailData['logistic_cost'] = 0;
                     $receptionDetailData['logistic_pay_to'] = 0;
                     $receptionDetailData['metric_ton'] = 0;
@@ -414,7 +414,7 @@ class Sync extends MY_Controller
                     "isduplicatescanned" => 0,
                     "dispatch_date" => '',
                     "container_number" => '',
-                    "is_special" => 0,
+                    "is_special" => 1,
                     "remaining_stock_count" => $receptiondata['pieces'],
                     "temp_reception_id" => $receptiondata['tempReceptionId'],
                     "temp_reception_data_id" => $receptiondata['tempReceptionDataId'],
@@ -570,10 +570,12 @@ class Sync extends MY_Controller
                     "reception_id" => $receptionDataExists->reception_id ?? 0,
                     "cbm_bought" => $containerdata['grossVolume'],
                     "cbm_export" => $containerdata['netVolume'],
+                    "volume_pie" => $containerdata['volumePie'] ?? 0,
                     "scanned_timestamp" => $containerdata['createdAt'],
                     "isduplicatescanned" => 0,
-                    "is_special" => 0,
+                    "is_special" => 1,
                     "dispatch_pieces" => $containerdata['pieces'],
+                    "temp_dispatch_data_id" => $containerdata['tempDispatchDataId'],
                     "temp_dispatch_id" => $containerdata['tempDispatchId'],
                     "temp_reception_id" => $containerdata['tempReceptionId'],
                     "temp_reception_data_id" => $containerdata['tempReceptionDataId'],
@@ -649,6 +651,7 @@ class Sync extends MY_Controller
                 // RESPONSE MAPPING
                 // =====================================================
                 $response['containerDataMappings'][] = [
+                    'tempDispatchDataId' => $containerdata['tempDispatchDataId'],
                     'tempReceptionDataId' => $containerdata['tempReceptionDataId'],
                     'tempDispatchId' => $containerdata['tempDispatchId'],
                     'dispatchDataId' => (int) $dispatchDataId,

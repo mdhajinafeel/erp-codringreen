@@ -119,9 +119,9 @@ class Terratransactions_model extends CI_Model
         }
 
         return $this->db
-            ->select("dispatch_data_id AS dispatchDataId, temp_dispatch_id AS tempDispatchId, container_reception_mapping_id AS containerReceptionMappingId, 
+            ->select("dispatch_data_id AS dispatchDataId, temp_dispatch_data_id AS tempDispatchDataId, temp_dispatch_id AS tempDispatchId, container_reception_mapping_id AS containerReceptionMappingId, 
             temp_reception_id AS tempReceptionId, temp_reception_data_id AS tempReceptionDataId, dispatch_id AS dispatchId, reception_data_id AS receptionDataId, 
-            reception_id AS receptionId, cbm_bought AS grossVolume, cbm_export AS netVolume, dispatch_pieces AS pieces, 
+            reception_id AS receptionId, cbm_bought AS grossVolume, cbm_export AS netVolume, volume_pie AS volumePie, dispatch_pieces AS pieces, 
             scanned_timestamp AS createdAt, ROUND(UNIX_TIMESTAMP(updateddate) * 1000) AS updatedAt")
             ->from('tbl_dispatch_data')
             ->where_in('dispatch_id', $dispatchIds)

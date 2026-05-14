@@ -171,6 +171,7 @@ class Terramaster_model extends CI_Model
                     'roundPrecision', A.round_precision,
                     'roundingType', A.rounding_type,
                     'context', A.context,
+                    'sortOrder', A.sort_order,
                     'variables', (
                         SELECT JSON_ARRAYAGG(
                             JSON_OBJECT(
