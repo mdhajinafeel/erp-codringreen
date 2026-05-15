@@ -29,6 +29,7 @@ class Auth extends MY_Controller
 			$password = $requestdata["password"];
 			$originId = (int) $requestdata["originId"];
 
+			$requestBasicAuth = '';
 			$headers = apache_request_headers();
 			foreach ($headers as $header => $value) {
 				if ($header == "Authorization") {

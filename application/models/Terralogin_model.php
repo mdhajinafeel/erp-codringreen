@@ -9,7 +9,7 @@ class Terralogin_model extends CI_Model
         $this->load->database();
     }
 
-    public function login_app_terraerp($data)
+    public function login_app_terraerp(array $data)
     {
         $originId = $data['originId'];
         $sql = "SELECT password FROM tbl_login A 
@@ -40,7 +40,7 @@ class Terralogin_model extends CI_Model
         }
     }
 
-    public function read_user_information_terra_app($username, $originId)
+    public function read_user_information_terra_app(string $username, int $originId)
     {
         $sql = "SELECT B.userid, B.fullname, B.profilephoto, 
 				A.roleid, E.timezone_abbreviation AS timezone, F.language_name, B.contactno, B.emailid, B.address, 
@@ -64,7 +64,7 @@ class Terralogin_model extends CI_Model
         }
     }
 
-    public function delete_login_details($userid)
+    public function delete_login_details(int $userid)
     {
         return $this->db
             ->where("user_id", $userid)
@@ -74,7 +74,7 @@ class Terralogin_model extends CI_Model
             ]);
     }
 
-    public function add_login_details($data)
+    public function add_login_details(array $data)
     {
         $this->db->set('created_date', 'NOW()', FALSE);
         $this->db->set('updated_date', 'NOW()', FALSE);
@@ -87,7 +87,7 @@ class Terralogin_model extends CI_Model
         }
     }
 
-    public function check_user_exists_terra_app($userId, $originId)
+    public function check_user_exists_terra_app(int $userId, int $originId)
     {
         $query = $this->db->query("SELECT COUNT(A.userid) AS cnt FROM tbl_user_registration A 
 			WHERE A.isactive = 1 AND A.userid = $userId 
@@ -101,7 +101,7 @@ class Terralogin_model extends CI_Model
         }
     }
 
-    public function get_by_refresh_token($token)
+    public function get_by_refresh_token(string $token)
     {
         return $this->db
             ->where("refresh_token", $token)
@@ -112,7 +112,7 @@ class Terralogin_model extends CI_Model
             ->row();
     }
 
-    public function update_refresh_token($id, $token)
+    public function update_refresh_token(int $id, string $token)
     {
         return $this->db
             ->where("id", $id)
@@ -122,12 +122,27 @@ class Terralogin_model extends CI_Model
             ]);
     }
 
-    public function logout_by_token($token)
+    public function logout_by_token(string $token)
     {
         return $this->db
             ->where("refresh_token", $token)
             ->update("tbl_login_details", [
                 "is_logged_in" => 0
             ]);
+    }
+
+    public function get_latest_active_fcm_token(int $userId)
+    {
+        return $this->db
+            ->select('fcm_token')
+            ->from('tbl_login_details')
+            ->where('user_id', $userId)
+            ->where('is_logged_in', 1)
+            ->where('is_active', 1)
+            ->where('fcm_token !=', '')
+            ->order_by('updated_date', 'DESC')
+            ->limit(1)
+            ->get()
+            ->row();
     }
 }

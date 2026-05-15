@@ -237,6 +237,7 @@ class Sync extends MY_Controller
             // =========================
             // SAFE DEFAULTS
             // =========================
+            $input['deviceId'] = $input['deviceId'] ?? '';
             $input['receptionDetails'] = $input['receptionDetails'] ?? [];
             $input['receptionData'] = $input['receptionData'] ?? [];
             $input['dispatchDetails'] = $input['dispatchDetails'] ?? [];
@@ -587,8 +588,11 @@ class Sync extends MY_Controller
                 // =========================
                 // CHECK EXISTING DISPATCH DATA
                 // =========================
-                $containerDataExists = $this->Terrasync_model->dispatch_data_exists($containerdata['tempDispatchId'], $containerdata['tempReceptionDataId'],
-                        $containerdata['tempReceptionId']);
+                $containerDataExists = $this->Terrasync_model->dispatch_data_exists(
+                    $containerdata['tempDispatchId'],
+                    $containerdata['tempReceptionDataId'],
+                    $containerdata['tempReceptionId']
+                );
 
                 // =====================================================
                 // INSERT
@@ -657,8 +661,8 @@ class Sync extends MY_Controller
                     'dispatchDataId' => (int) $dispatchDataId,
                     'containerReceptionMappingId' => $containerdata['containerReceptionMappingId'],
                     'receptionDataId' => (int) $receptionDataId,
-                    'receptionId' => (int) $receptionDataExists->reception_id, 
-                    'dispatchId' => (int) $dispatchId, 
+                    'receptionId' => (int) $receptionDataExists->reception_id,
+                    'dispatchId' => (int) $dispatchId,
                     'tempReceptionId' => $containerdata['tempReceptionId']
                 ];
             }
@@ -674,6 +678,11 @@ class Sync extends MY_Controller
             // COMMIT
             // =========================
             $this->db->trans_commit();
+
+            // =========================
+            // SEND PUSH NOTIFICATION
+            // =========================
+            $this->send_sync_notification($userid, 'sync_completed', 'data_sync_successfully', 'SUCCESS');
 
             // =====================================
             // SUCCESS LOG
@@ -702,6 +711,11 @@ class Sync extends MY_Controller
                 'file' =>  $e->getFile(),
                 'trace' => $e->getTraceAsString()
             ];
+
+            // =========================
+            // FAILURE PUSH NOTIFICATION
+            // =========================
+            $this->send_sync_notification($userid ?? 0, 'sync_failed', $e->getMessage(), "FAILED");
 
             // =====================================
             // CUSTOM ERROR LOG
@@ -747,7 +761,7 @@ class Sync extends MY_Controller
             $content .= "TYPE : " . strtoupper($type) . "\n";
             $content .= "DATE : " . date('Y-m-d H:i:s') . "\n";
             $content .= "TITLE : " . $title . "\n";
-            $content .= "MESSAGE : \n" . $message . "\n";
+            $content .= "MESSAGE : " . $message . "\n";
 
             // =====================================
             // PAYLOAD
@@ -776,5 +790,33 @@ class Sync extends MY_Controller
     {
         $factor = pow(10, $digits);
         return floor($number * $factor) / $factor;
+    }
+
+    // =====================================================
+    // FCM NOTIFICATION
+    // =====================================================
+    private function send_sync_notification(int $userId, string $title, string $message, string $status = 'SUCCESS')
+    {
+
+        // =====================================
+        // GET TOKEN
+        // =====================================
+        $tokenData = $this->Terralogin_model->get_latest_active_fcm_token($userId);
+
+        if (!$tokenData) {
+            return;
+        }
+
+        $token = $tokenData->fcm_token ?? '';
+
+        if (empty($token)) {
+            return;
+        }
+
+        // =====================================
+        // SEND FCM
+        // =====================================
+        $this->load->helper('fcm');
+        send_fcm_notification_v1([$token], $title, $message, 'sync_notification', $status);
     }
 }

@@ -12,7 +12,8 @@
 	},
 	"require": {
 		"php": ">=5.3.7",
-		"phpoffice/phpspreadsheet": "^1.23"
+		"phpoffice/phpspreadsheet": "^1.23",
+		"google/auth": "*"
 	},
 	"suggest": {
 		"paragonie/random_compat": "Provides better randomness in PHP 5.x"
@@ -30,8 +31,7 @@
 		]
 	},
 	"require-dev": {
-		"mikey179/vfsstream": "1.6.*",
-		"phpunit/phpunit": "4.* || 5.* || 9.*"
+		"mikey179/vfsstream": "1.6.*"
 	},
 	"config": {
 
