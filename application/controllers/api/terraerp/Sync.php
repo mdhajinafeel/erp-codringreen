@@ -259,6 +259,11 @@ class Sync extends MY_Controller
             // =========================
             $this->db->trans_begin();
 
+            // =========================
+            // FARM ENABLED TEMP IDS
+            // =========================
+            $farmReceptionTempIds = [];
+
             // =================
             // RECEPTION DETAILS
             // =================
@@ -340,6 +345,16 @@ class Sync extends MY_Controller
                     if ($receptionId > 0) {
                         $this->Terrasync_model->update_reception($receptionId, $receptiondetail['tempReceptionId'], $receptionDetailData);
                     }
+                }
+
+                // =====================
+                // STORE FARM ENABLED IDS
+                // =====================
+                if (!empty($receptiondetail['isFarmEnabled'])) {
+                    $farmReceptionTempIds[] = [
+                        'tempReceptionId' => $receptiondetail['tempReceptionId'],
+                        'receptionId' => $receptionId
+                    ];
                 }
 
                 // =====================
@@ -446,6 +461,20 @@ class Sync extends MY_Controller
                     'receptionId' => (int) $receptionId,
                     'receptionContainerMappingId' => $receptiondata['containerReceptionMappingId']
                 ];
+            }
+
+            // =====================================================
+            // CREATE FARM DETAILS
+            // =====================================================
+            foreach ($farmReceptionTempIds as $farmReception) {
+                $tempReceptionId = $farmReception['tempReceptionId'];
+                $receptionId = $farmReception['receptionId'];
+
+                // =========================================
+                // GET ALL RECEPTION DATA FOR THIS RECEPTION
+                // =========================================
+                $farmExists = $this->Terrasync_model->farm_exists($receptionId);
+                
             }
 
             // =================
@@ -817,6 +846,6 @@ class Sync extends MY_Controller
         // SEND FCM
         // =====================================
         $this->load->helper('fcm');
-        send_fcm_notification_v1([$token], $title, $message, 'sync_notification', $status);
+        send_fcm_notification_v1([$token], $title, $message, 'SYNC', $status);
     }
 }

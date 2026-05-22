@@ -95,6 +95,14 @@ class Terrasync_model extends CI_Model
         }
     }
 
+    public function get_reception_data_by_temp_reception_id(string $tempReceptionId)
+    {
+        return $this->db
+            ->where('temp_reception_id', $tempReceptionId)
+            ->get('tbl_reception_data')
+            ->result();
+    }
+
     // =========================
     // DISPATCH
     // =========================
@@ -214,6 +222,46 @@ class Terrasync_model extends CI_Model
         $this->db->where('temp_reception_id', $tempReceptionId);
 
         if ($this->db->update('tbl_reception_data', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // =========================
+    // FARM DETAILS
+    // =========================
+    public function farm_exists(string $tempFarmId)
+    {
+        return $this->db
+            ->where('temp_farm_id', $tempFarmId)
+            ->get('tbl_farm')
+            ->row();
+    }
+
+    public function add_farm(array $data): int
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_farm', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
+
+    public function update_farm(int $farmId, string $tempFarmId, array $data): bool
+    {
+        $multiClause = array(
+            'farm_id' => $farmId,
+            'temp_farm_id' => $tempFarmId,
+            'is_active' => 1
+        );
+        $this->db->where($multiClause);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        if ($this->db->update('tbl_farm', $data)) {
             return true;
         } else {
             return false;
