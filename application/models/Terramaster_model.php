@@ -203,4 +203,42 @@ class Terramaster_model extends CI_Model
             ->get()
             ->result();
     }
+
+    // CONTRACT DETAILS
+    public function get_contract_details(int $contractId, int $supplierId, int $originId)
+    {
+        return $this->db
+            ->select("contract_id as contractId, supplier_id as supplierId, product as productId, product_type as productTypeId, unit_of_purchase as purchaseUnitId, 
+                purchase_allowance as purchaseAllowance, purchase_allowance_length as purchaseAllowanceLength, currency as currencyId")
+            ->from("tbl_supplier_purchase_contract")
+            ->where("contract_id", $contractId)
+            ->where("supplier_id", $supplierId)
+            ->where("origin_id", $originId)
+            ->where("is_active", 1)
+            ->get()
+            ->row();
+    }
+
+    public function fetch_contract_prices_for_farm(int $contractid) {
+        $query = $this->db->query("SELECT minrange_grade1, maxrange_grade2, pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs 
+                FROM tbl_supplier_contract_price A
+                WHERE A.is_active = 1 AND A.supplier_id = $contractid");
+        return $query->result();
+    }
+
+    public function fetch_exchange_rate_by_date(string $purchase_date)
+    {
+        $query = $this->db->query("SELECT value FROM tbl_exchange_rate WHERE exchange_date <= '$purchase_date' AND is_active = 1 ORDER BY exchange_date DESC LIMIT 1");
+        return $query->result();
+    }
+
+    public function get_supplier_taxes(int $supplierId)
+	{
+		$query = $this->db->query("SELECT A.tax_id, A.tax_value, B.tax_name, B.number_format, B.arithmetic_type 
+					FROM tbl_supplier_taxes A 
+					INNER JOIN tbl_origin_supplier_taxes B ON B.id = A.tax_id 
+					WHERE A.is_active = 1 AND A.supplier_id = $supplierId AND B.is_enabled_supplier = 1
+					ORDER BY A.tax_id");
+		return $query->result();
+	}
 }

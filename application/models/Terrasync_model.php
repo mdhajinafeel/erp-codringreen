@@ -267,4 +267,64 @@ class Terrasync_model extends CI_Model
             return false;
         }
     }
+
+    // =========================
+    // FARM DATA
+    // =========================
+    public function farm_data_exists(int $farmId, string $tempReceptionDataId)
+    {
+        return $this->db
+            ->where('farm_id', $farmId)
+            ->where('temp_farm_data_id', $tempReceptionDataId)
+            ->get('tbl_farm_data')
+            ->row();
+    }
+
+    public function add_farm_data(array $data): int
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_farm_data', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
+
+    public function update_farm_data(int $farmDataId, string $tempFarmDataId, array $data): bool
+    {
+        $multiClause = array(
+            'farm_data_id' => $farmDataId,
+            'temp_farm_data_id' => $tempFarmDataId,
+            'is_active' => 1
+        );
+        $this->db->where($multiClause);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        if ($this->db->update('tbl_farm_data', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function get_farm_data_by_farm_id_and_length(int $farmId, int $length)
+    {
+        if ($length == 1) {
+            $query = $this->db->query("SELECT A.farm_data_id, A.farm_id, A.no_of_pieces, A.circumference, A.length, A.gross_volume, 
+                A.volume, A.captured_timestamp FROM tbl_farm_data A 
+                WHERE A.is_active = 1 AND A.farm_id = $farmId AND A.length < 330");
+        } else if ($length == 2) {
+            $query = $this->db->query("SELECT A.farm_data_id, A.farm_id, A.no_of_pieces, A.circumference, A.length, A.gross_volume, 
+                A.volume, A.captured_timestamp FROM tbl_farm_data A 
+                WHERE A.is_active = 1 AND A.farm_id = $farmId AND (A.length >= 330 && A.length < 600)");
+        } else {
+            $query = $this->db->query("SELECT A.farm_data_id, A.farm_id, A.no_of_pieces, A.circumference, A.length, A.gross_volume, 
+                A.volume, A.captured_timestamp FROM tbl_farm_data A 
+                WHERE A.is_active = 1 AND A.farm_id = $farmId AND A.length >= 600");
+        }
+
+        return $query->result();
+    }
 }
