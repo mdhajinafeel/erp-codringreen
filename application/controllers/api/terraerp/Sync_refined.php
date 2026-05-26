@@ -3,6 +3,9 @@ defined("BASEPATH") or exit("No direct script access allowed");
 
 class Sync extends MY_Controller
 {
+    private const PRODUCT_TYPE_LOG = 1;
+    private const PRODUCT_TYPE_TIMBER = 3;
+
     public function __construct()
     {
         parent::__construct();
@@ -43,12 +46,15 @@ class Sync extends MY_Controller
             // =========================
             // AUTHORIZATION
             // =========================
-            $headers = apache_request_headers();
+            $headers = $this->input->request_headers();
             $requestBearerToken = '';
             foreach ($headers as $header => $value) {
-                if ($header == "Authorization") {
-                    list($a, $b) = explode(" ", $value);
-                    $requestBearerToken = $b;
+                if (strtolower($header) == 'authorization') {
+                    $parts = explode(' ', $value);
+
+                    if (count($parts) == 2) {
+                        $requestBearerToken = $parts[1];
+                    }
                 }
             }
 
@@ -113,12 +119,40 @@ class Sync extends MY_Controller
             // FILE EXTENSION
             // =========================
             $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $ext = strtolower($ext);
+            if (empty($ext)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Invalid file extension'
+                ], 400);
+            }
 
             // =========================
             // CUSTOM FILE NAME
             // =========================
 
-            $customFileName = 'container_' . $tempContainerImageId . '_' . rand(1000000, 9999999) . '.' . $ext;
+            $customFileName = 'container_' . $tempContainerImageId . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+
+            // =========================
+            // FILE MIME TYPE
+            // =========================
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $_FILES['image']['tmp_name']);
+
+            $allowedMime = [
+                'image/jpeg',
+                'image/png',
+                'image/webp'
+            ];
+
+            if (!in_array($mime, $allowedMime)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Invalid image type'
+                ], 400);
+            }
+
+            finfo_close($finfo);
 
             // =========================
             // UPLOAD CONFIG
@@ -176,6 +210,9 @@ class Sync extends MY_Controller
     // =====================
     public function syncdata()
     {
+        $startTime = microtime(true);
+        $requestId = bin2hex(random_bytes(16));
+
         try {
 
             // =========================
@@ -192,12 +229,15 @@ class Sync extends MY_Controller
             // =========================
             // AUTHORIZATION
             // =========================
-            $headers = apache_request_headers();
+            $headers = $this->input->request_headers();
             $requestBearerToken = '';
             foreach ($headers as $header => $value) {
-                if ($header == "Authorization") {
-                    list($a, $b) = explode(" ", $value);
-                    $requestBearerToken = $b;
+                if (strtolower($header) == 'authorization') {
+                    $parts = explode(' ', $value);
+
+                    if (count($parts) == 2) {
+                        $requestBearerToken = $parts[1];
+                    }
                 }
             }
 
@@ -226,11 +266,13 @@ class Sync extends MY_Controller
             // =========================
             // INPUT
             // =========================
-            $input = json_decode(file_get_contents('php://input'), true);
-            if (!$input) {
+            $rawInput = file_get_contents('php://input');
+            $input = json_decode($rawInput, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
                 return $this->output([
                     'status' => false,
-                    'message' => 'Invalid JSON payload'
+                    'message' => json_last_error_msg()
                 ], 400);
             }
 
@@ -251,6 +293,7 @@ class Sync extends MY_Controller
             // =========================
             // START TRANSACTION
             // =========================
+            $this->db->query("SET innodb_lock_wait_timeout = 50");
             $this->db->trans_begin();
 
             // =================
@@ -289,6 +332,7 @@ class Sync extends MY_Controller
             // COMMIT
             // =========================
             $this->db->trans_commit();
+            $executionTime = microtime(true) - $startTime;
 
             // =========================
             // SEND PUSH NOTIFICATION
@@ -298,12 +342,30 @@ class Sync extends MY_Controller
             // =====================================
             // SUCCESS LOG
             // =====================================
-            $this->write_sync_log('SUCCESS', 'SYNC SUCCESS', 'Sync completed successfully', [
-                'user_id' => $userid,
-                'origin_id' => $originid,
-                'request' => $input,
-                'response' => $response
-            ]);
+            $this->write_sync_log(
+                'SUCCESS',
+                'SYNC SUCCESS',
+                'Sync completed successfully',
+                [
+                    'request_id' => $requestId,
+                    'user_id' => $userid,
+                    'origin_id' => $originid,
+                    'execution_time' => $executionTime,
+                    'payload_size' => strlen($rawInput),
+                    'request_summary' => [
+                        'receptionDetails' => count($input['receptionDetails']),
+                        'receptionData' => count($input['receptionData']),
+                        'dispatchDetails' => count($input['dispatchDetails']),
+                        'containerData' => count($input['containerData'])
+                    ],
+                    'response' => [
+                        'receptionMappings' => count($response['receptionMappings']),
+                        'receptionDataMappings' => count($response['receptionDataMappings']),
+                        'dispatchMappings' => count($response['dispatchMappings']),
+                        'containerDataMappings' => count($response['containerDataMappings'])
+                    ]
+                ]
+            );
 
             return $this->output($response);
         } catch (Throwable $e) {
@@ -333,7 +395,13 @@ class Sync extends MY_Controller
             // =====================================
             $this->write_sync_log('ERROR', 'SYNC FAILED', $e->getMessage(), [
                 'error' => $errorData,
-                'request' => json_decode(file_get_contents('php://input'), true)
+                'request_id' => $requestId ?? '',
+                'request_summary' => [
+                    'receptionDetails' => count($input['receptionDetails'] ?? []),
+                    'receptionData' => count($input['receptionData'] ?? []),
+                    'dispatchDetails' => count($input['dispatchDetails'] ?? []),
+                    'containerData' => count($input['containerData'] ?? [])
+                ]
             ]);
 
             return $this->output([
@@ -456,7 +524,34 @@ class Sync extends MY_Controller
         // =========================
         $farmReceptionTempIds = [];
 
+        // =========================
+        // TEMP RECEPTION IDS
+        // =========================
+        $tempReceptionIds = array_column($input['receptionDetails'], 'tempReceptionId');
+        $existingReceptions = $this->Terrasync_model->get_receptions_by_temp_ids($tempReceptionIds);
+        $receptionMap = [];
+        foreach ($existingReceptions as $item) {
+            $receptionMap[$item->temp_reception_id] = $item;
+        }
+
+        $supplierIds = array_unique(
+            array_column(
+                $input['receptionDetails'],
+                'supplierId'
+            )
+        );
+
+        $supplierCodes = $this->Terramaster_model->get_supplier_codes($supplierIds);
+        $supplierCodeMap = [];
+
+        foreach ($supplierCodes as $item) {
+            $supplierCodeMap[$item->supplier_id] = $item->supplier_code;
+        }
+
         foreach ($input['receptionDetails'] as $receptiondetail) {
+
+            $tempReceptionId = $receptiondetail['tempReceptionId'];
+            $receptionExists = $receptionMap[$tempReceptionId] ?? null;
 
             // =====================
             // FLAGS
@@ -466,7 +561,8 @@ class Sync extends MY_Controller
             // =====================
             // TOTAL GROSS VOLUME
             // =====================
-            if ($receptiondetail['supplierProductTypeId'] == 1 || $receptiondetail['supplierProductTypeId'] == 3) {
+            $productType = $receptiondetail['supplierProductTypeId'];
+            if ($productType == self::PRODUCT_TYPE_LOG || $productType == self::PRODUCT_TYPE_TIMBER) {
                 $totalGrossVolume = $receptiondetail['totalVolumePie'] ?? 0;
             } else {
                 $totalGrossVolume = $receptiondetail['totalGrossVolume'] ?? 0;
@@ -479,7 +575,7 @@ class Sync extends MY_Controller
                 "measurementsystem_id" => $receptiondetail['measurementSystem'],
                 "warehouse_id" => $receptiondetail['warehouse'],
                 "supplier_id" => $receptiondetail['supplierId'],
-                "supplier_code" => $this->Terramaster_model->get_supplier_code_by_id($receptiondetail['supplierId']),
+                "supplier_code" => $supplierCodeMap[$receptiondetail['supplierId']] ?? null,
                 "supplier_product_id" => $receptiondetail['supplierProductId'],
                 "supplier_product_typeid" => $receptiondetail['supplierProductTypeId'],
                 "received_date" => $receptiondetail['receptionDate'],
@@ -502,11 +598,6 @@ class Sync extends MY_Controller
             ];
 
             // =====================
-            // CHECK EXISTS
-            // =====================
-            $receptionExists = $this->Terrasync_model->reception_exists($receptiondetail['tempReceptionId']);
-
-            // =====================
             // INSERT
             // =====================
             if (!$receptionExists) {
@@ -524,6 +615,11 @@ class Sync extends MY_Controller
                 $receptionDetailData['temp_reception_id'] = $receptiondetail['tempReceptionId'];
 
                 $receptionId = $this->Terrasync_model->add_reception($receptionDetailData);
+
+                $receptionMap[$tempReceptionId] = (object) [
+                    'reception_id' => $receptionId,
+                    'temp_reception_id' => $tempReceptionId
+                ];
             } else {
 
                 // =================
@@ -564,6 +660,27 @@ class Sync extends MY_Controller
     // =====================================================
     private function process_reception_data(array $input, int $userid, array &$response)
     {
+        $tempReceptionIds = array_unique(array_column($input['receptionData'], 'tempReceptionId'));
+        $existingReceptions = $this->Terrasync_model->get_receptions_by_temp_ids($tempReceptionIds);
+        $receptionMap = [];
+        foreach ($existingReceptions as $item) {
+            $receptionMap[$item->temp_reception_id] = $item;
+        }
+
+        $tempReceptionDataIds = array_unique(
+            array_column(
+                $input['receptionData'],
+                'tempReceptionDataId'
+            )
+        );
+
+        $existingReceptionData = $this->Terrasync_model->get_reception_data_by_temp_ids($tempReceptionDataIds);
+        $receptionDataMap = [];
+        foreach ($existingReceptionData as $item) {
+            $key = $item->temp_reception_id . '_' . $item->temp_reception_data_id;
+            $receptionDataMap[$key] = $item;
+        }
+
         foreach ($input['receptionData'] as $receptiondata) {
 
             $isDeleted = filter_var($receptiondata['isDeleted'] ?? false, FILTER_VALIDATE_BOOLEAN);
@@ -571,7 +688,7 @@ class Sync extends MY_Controller
             // =================
             // FETCH EXIST RECEPTION DATA
             // =================
-            $reception = $this->Terrasync_model->reception_exists($receptiondata['tempReceptionId']);
+            $reception = $receptionMap[$receptiondata['tempReceptionId']] ?? null;
             $receptionId = $reception->reception_id ?? 0;
             $salvoconducto = $reception->salvoconducto ?? '';
             $supplierProductTypeId = $reception->supplier_product_typeid ?? 0;
@@ -584,7 +701,7 @@ class Sync extends MY_Controller
             $face = 0;
             $grade = 0;
 
-            if ($supplierProductTypeId == 1 || $supplierProductTypeId == 3) {
+            if ($supplierProductTypeId == self::PRODUCT_TYPE_LOG || $supplierProductTypeId == self::PRODUCT_TYPE_TIMBER) {
                 $lengthExport = $this->truncate_decimal((float) $receptiondata['length'] * 0.3048, 2);
                 $widthExport = $this->truncate_decimal((float) $receptiondata['width'] * 2.54, 0);
                 $thicknessExport = $this->truncate_decimal((float) $receptiondata['thickness'] * 2.54, 0);
@@ -634,11 +751,19 @@ class Sync extends MY_Controller
                 "updatedby" => $userid
             ];
 
-            $receptionDataExists = $this->Terrasync_model->reception_data_exists($receptiondata['tempReceptionDataId'], $receptiondata['tempReceptionId']);
+            $key = $receptiondata['tempReceptionId'] . '_' . $receptiondata['tempReceptionDataId'];
+            $receptionDataExists = $receptionDataMap[$key] ?? null;
 
             if (!$receptionDataExists) {
                 $receptionData['createdby'] =  $userid;
                 $receptionDataId = $this->Terrasync_model->add_reception_data($receptionData);
+
+                $receptionDataMap[$key] = (object) [
+                    'reception_data_id' => $receptionDataId,
+                    'temp_reception_id' => $receptiondata['tempReceptionId'],
+                    'temp_reception_data_id' => $receptiondata['tempReceptionDataId'],
+                    'reception_id' => $receptionId
+                ];
             } else {
                 $receptionDataId = $receptionDataExists->reception_data_id ?? 0;
                 $this->Terrasync_model->update_reception_data(
@@ -664,6 +789,82 @@ class Sync extends MY_Controller
     // =====================================================
     private function process_farm_data(array $farmReceptionTempIds, int $userid, int $originid)
     {
+        $tempFarmIds = array_column(
+            $farmReceptionTempIds,
+            'tempReceptionId'
+        );
+
+        $existingFarms = $this->Terrasync_model->get_farms_by_temp_ids($tempFarmIds);
+        $farmMap = [];
+
+        foreach ($existingFarms as $item) {
+            $farmMap[$item->temp_farm_id] = $item;
+        }
+
+        $tempReceptionIds = array_column(
+            $farmReceptionTempIds,
+            'tempReceptionId'
+        );
+
+        $existingReceptions = $this->Terrasync_model->get_receptions_by_temp_ids($tempReceptionIds);
+        $receptionMap = [];
+        foreach ($existingReceptions as $item) {
+            $receptionMap[$item->temp_reception_id] = $item;
+        }
+
+        $existingFarmData =
+            $this->Terrasync_model->get_farm_data_by_farm_ids(
+                array_column(
+                    $existingFarms,
+                    'farm_id'
+                )
+            );
+
+        $farmDataMap = [];
+        foreach ($existingFarmData as $item) {
+            $key = $item->farm_id . '_' . $item->temp_farm_data_id;
+            $farmDataMap[$key] = $item;
+        }
+
+        $allReceptionDatas = $this->Terrasync_model->get_reception_data_by_temp_reception_ids($tempReceptionIds);
+        $receptionDataGrouped = [];
+
+        foreach ($allReceptionDatas as $item) {
+            $receptionDataGrouped[$item->temp_reception_id][] = $item;
+        }
+
+        $contractIds = [];
+        $supplierIds = [];
+
+        foreach ($existingReceptions as $item) {
+            $contractIds[] = $item->contract_id;
+            $supplierIds[] = $item->supplier_id;
+        }
+
+        $contractIds = array_unique($contractIds);
+        $supplierIds = array_unique($supplierIds);
+
+        $contractDetailsList = $this->Terramaster_model->get_contract_details_bulk($contractIds, $supplierIds, $originid);
+
+        $contractMap = [];
+
+        foreach ($contractDetailsList as $item) {
+            $key = $item->contract_id . '_' . $item->supplier_id;
+            $contractMap[$key] = $item;
+        }
+
+        $contractPrices = $this->Terramaster_model->fetch_contract_prices_bulk($contractIds);
+        $contractPriceMap = [];
+        foreach ($contractPrices as $item) {
+            $contractPriceMap[$item->supplier_id][] = $item;
+        }
+
+        $supplierTaxes = $this->Terramaster_model->get_supplier_taxes_bulk($supplierIds);
+        $supplierTaxMap = [];
+        foreach ($supplierTaxes as $item) {
+            $supplierTaxMap[$item->supplier_id][] = $item;
+        }
+
         foreach ($farmReceptionTempIds as $farmReception) {
             $tempReceptionId = $farmReception['tempReceptionId'];
             $receptionId = $farmReception['receptionId'];
@@ -671,7 +872,7 @@ class Sync extends MY_Controller
             // =========================================
             // FETCH RECEPTION
             // =========================================
-            $reception = $this->Terrasync_model->reception_exists($tempReceptionId);
+            $reception = $receptionMap[$tempReceptionId] ?? null;
 
             if (!$reception) {
                 continue;
@@ -680,12 +881,13 @@ class Sync extends MY_Controller
             // =========================================
             // CHECK FARM EXISTS
             // =========================================
-            $farmExists = $this->Terrasync_model->farm_exists($tempReceptionId);
+            $farmExists = $farmMap[$tempReceptionId] ?? null;
 
             // =========================================
             // FETCH CONTRACT DETAILS
             // =========================================
-            $contractDetails = $this->Terramaster_model->get_contract_details($reception->contract_id, $reception->supplier_id, $originid);
+            $contractKey = $reception->contract_id . '_' . $reception->supplier_id;
+            $contractDetails =  $contractMap[$contractKey] ?? null;
 
             $farmSupplierId = $reception->supplier_id ?? 0;
             $farmContractId = $contractDetails->contractId ?? 0;
@@ -744,6 +946,11 @@ class Sync extends MY_Controller
 
                 $farmData['created_by'] = $userid;
                 $farmId = $this->Terrasync_model->add_farm($farmData);
+
+                $farmMap[$tempReceptionId] = (object) [
+                    'farm_id' => $farmId,
+                    'temp_farm_id' => $tempReceptionId
+                ];
             } else {
 
                 $farmId = $farmExists->farm_id ?? 0;
@@ -753,7 +960,7 @@ class Sync extends MY_Controller
             // =========================================
             // FETCH RECEPTION DATA
             // =========================================
-            $receptionDatas = $this->Terrasync_model->get_reception_data_by_temp_reception_id($tempReceptionId);
+            $receptionDatas = $receptionDataGrouped[$tempReceptionId] ?? [];
 
             // =========================================
             // LOOP RECEPTION DATA
@@ -763,7 +970,8 @@ class Sync extends MY_Controller
                 // =====================================
                 // CHECK FARM DETAIL EXISTS
                 // =====================================
-                $farmDetailExists = $this->Terrasync_model->farm_data_exists($farmId, $receptionData->temp_reception_data_id);
+                $farmKey = $farmId . '_' . $receptionData->temp_reception_data_id;
+                $farmDetailExists =  $farmDataMap[$farmKey] ?? null;
 
                 // =====================================
                 // FARM DETAIL DATA
@@ -796,7 +1004,12 @@ class Sync extends MY_Controller
                 // =====================================
                 if (!$farmDetailExists) {
                     $farmDetailData['created_by'] = $userid;
-                    $this->Terrasync_model->add_farm_data($farmDetailData);
+                    $farmId = $this->Terrasync_model->add_farm_data($farmDetailData);
+
+                    $farmDataMap[$farmKey] = (object) [
+                        'farm_id' => $farmId,
+                        'temp_farm_data_id' => $receptionData->temp_reception_data_id
+                    ];
                 } else {
                     $this->Terrasync_model->update_farm_data($farmDetailExists->farm_data_id, $farmDetailExists->temp_farm_data_id, $farmDetailData);
                 }
@@ -832,7 +1045,7 @@ class Sync extends MY_Controller
                 $finalArray = [];
                 $totalVolume = 0;
 
-                if ($farmProductTypeId == 1 || $farmProductTypeId == 3) {
+                if ($farmProductTypeId == self::PRODUCT_TYPE_LOG || $farmProductTypeId == self::PRODUCT_TYPE_TIMBER) {
                 } else {
 
                     //CALCULATE WOOD VALUE & TAXES
@@ -840,135 +1053,40 @@ class Sync extends MY_Controller
                     $farmDataSemi = $this->Terrasync_model->get_farm_data_by_farm_id_and_length($farmId, 2);
                     $farmDataLongs = $this->Terrasync_model->get_farm_data_by_farm_id_and_length($farmId, 3);
 
-                    $fetchContractPrice = $this->Terramaster_model->fetch_contract_prices_for_farm($farmContractId);
+                    $fetchContractPrice = $contractPriceMap[$farmContractId] ?? [];
                     $exchangeRate = $this->Terramaster_model->fetch_exchange_rate_by_date($farmPurchaseDate);
 
                     if ($farmPurchaseUnitId == 15) {
-                        $price = $fetchContractPrice[0]->pricerange_grade3;
+                        $price = $fetchContractPrice[0]->pricerange_grade3 ?? 0;
                         $woodValue = $price;
                     } else {
 
-                        foreach ($farmDataShorts as $shorts) {
-                            $circumference = $shorts->circumference;
-                            $length = $shorts->length;
-                            $netVolume = $shorts->volume;
-                            $totalVolume = $totalVolume + $netVolume;
-                            $pieces = $shorts->no_of_pieces;
-                            $price = 0;
+                        $shortResults = $this->process_price_ranges($farmDataShorts, $fetchContractPrice, 'pricerange_grade3', $farmPurchaseUnitId);
+                        $semiResults = $this->process_price_ranges($farmDataSemi, $fetchContractPrice, 'pricerange_grade_semi', $farmPurchaseUnitId);
+                        $longResults =  $this->process_price_ranges($farmDataLongs, $fetchContractPrice, 'pricerange_grade_longs', $farmPurchaseUnitId);
 
-                            foreach ($fetchContractPrice as $range) {
-                                if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
-                                    $price = $range->pricerange_grade3;
-                                    break;
-                                }
-                            }
+                        $finalArray = array_merge($shortResults,  $semiResults, $longResults);
 
-                            if ($farmPurchaseUnitId == 3) {
-                                $finalArray[] = [
-                                    'circumference' => $circumference,
-                                    'length' => $length,
-                                    'price' => $price,
-                                    'volume' => $netVolume,
-                                    'value' => round($price * $pieces, 3)
-                                ];
-                            } else {
-
-                                $finalArray[] = [
-                                    'circumference' => $circumference,
-                                    'length' => $length,
-                                    'price' => $price,
-                                    'volume' => $netVolume,
-                                    'value' => round($price * $netVolume, 3)
-                                ];
-                            }
-                        }
-
-                        foreach ($farmDataSemi as $semi) {
-                            $circumference = $semi->circumference;
-                            $length = $semi->length;
-                            $netVolume = $semi->volume;
-                            $totalVolume = $totalVolume + $netVolume;
-                            $pieces = $semi->no_of_pieces;
-                            $price = 0;
-
-                            foreach ($fetchContractPrice as $range) {
-                                if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
-                                    $price = $range->pricerange_grade_semi;
-                                    break;
-                                }
-                            }
-
-                            if ($farmPurchaseUnitId == 3) {
-                                $finalArray[] = [
-                                    'circumference' => $circumference,
-                                    'length' => $length,
-                                    'price' => $price,
-                                    'volume' => $netVolume,
-                                    'value' => round($price * $pieces, 3)
-                                ];
-                            } else {
-
-                                $finalArray[] = [
-                                    'circumference' => $circumference,
-                                    'length' => $length,
-                                    'price' => $price,
-                                    'volume' => $netVolume,
-                                    'value' => round($price * $netVolume, 3)
-                                ];
-                            }
-                        }
-
-                        foreach ($farmDataLongs as $longs) {
-                            $circumference = $longs->circumference;
-                            $length = $longs->length;
-                            $netVolume = $longs->volume;
-                            $totalVolume = $totalVolume + $netVolume;
-                            $pieces = $longs->no_of_pieces;
-                            $price = 0;
-
-                            foreach ($fetchContractPrice as $range) {
-                                if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
-                                    $price = $range->pricerange_grade_longs;
-                                    break;
-                                }
-                            }
-
-                            if ($farmPurchaseUnitId == 3) {
-                                $finalArray[] = [
-                                    'circumference' => $circumference,
-                                    'length' => $length,
-                                    'price' => $price,
-                                    'volume' => $netVolume,
-                                    'value' => round($price * $pieces, 3)
-                                ];
-                            } else {
-                                $finalArray[] = [
-                                    'circumference' => $circumference,
-                                    'length' => $length,
-                                    'price' => $price,
-                                    'volume' => $netVolume,
-                                    'value' => round($price * $netVolume, 3)
-                                ];
-                            }
-                        }
+                        $woodValue = 0;
 
                         foreach ($finalArray as $item) {
-                            $woodValue = $woodValue + $item['value'];
+                            $woodValue += $item['value'];
                         }
                     }
                 }
 
                 if ($woodValue > 0) {
                     if ($farmCurrencyId == 1) {
-                        if ($exchangeRate[0]->value > 0 && $woodValue > 0) {
-                            $woodValue = $woodValue * $exchangeRate[0]->value;
+                        $exchangeValue = $exchangeRate[0]->value ?? 0;
+                        if ($exchangeValue > 0 && $woodValue > 0) {
+                            $woodValue = $woodValue * $exchangeValue;
                         }
                     }
 
                     // =====================================
                     // WOOD VALUE WITH TAXES
                     // =====================================
-                    $getSupplierTaxes = $this->Terramaster_model->get_supplier_taxes($farmSupplierId);
+                    $getSupplierTaxes = $supplierTaxMap[$farmSupplierId] ?? [];
                     $supplierTaxesValue = 0;
                     if (count($getSupplierTaxes) > 0) {
                         $supplierTaxesValue = 0;
@@ -1071,6 +1189,19 @@ class Sync extends MY_Controller
     // =====================================================
     private function process_dispatch_details(array $input, int $userid, int $originid, array &$response)
     {
+        $tempDispatchIds = array_unique(
+            array_column(
+                $input['dispatchDetails'],
+                'tempDispatchId'
+            )
+        );
+
+        $existingDispatches = $this->Terrasync_model->get_dispatches_by_temp_ids($tempDispatchIds);
+        $dispatchMap = [];
+        foreach ($existingDispatches as $item) {
+            $dispatchMap[$item->temp_dispatch_id] = $item;
+        }
+
         foreach ($input['dispatchDetails'] as $dispatchdetail) {
 
             // =====================
@@ -1118,7 +1249,7 @@ class Sync extends MY_Controller
             // =====================
             // CHECK EXISTS
             // =====================
-            $dispatchExists = $this->Terrasync_model->dispatch_exists($dispatchdetail['tempDispatchId']);
+            $dispatchExists = $dispatchMap[$dispatchdetail['tempDispatchId']] ?? null;
 
             // =====================
             // INSERT
@@ -1129,6 +1260,11 @@ class Sync extends MY_Controller
                 $dispatchDetailData['dispatched_timestamp'] = $dispatchdetail['createdAt'];
 
                 $dispatchId = $this->Terrasync_model->add_dispatch($dispatchDetailData);
+
+                $dispatchMap[$dispatchdetail['tempDispatchId']] = (object) [
+                    'dispatch_id' => $dispatchId,
+                    'temp_dispatch_id' => $dispatchdetail['tempDispatchId']
+                ];
             } else {
 
                 // =================
@@ -1157,6 +1293,43 @@ class Sync extends MY_Controller
     // =====================================================
     private function process_container_data(array $input, int $userid, array &$response)
     {
+        $tempDispatchIds = array_unique(
+            array_column(
+                $input['containerData'],
+                'tempDispatchId'
+            )
+        );
+
+        $existingDispatches = $this->Terrasync_model->get_dispatches_by_temp_ids($tempDispatchIds);
+        $dispatchMap = [];
+        foreach ($existingDispatches as $item) {
+            $dispatchMap[$item->temp_dispatch_id] = $item;
+        }
+
+        $tempReceptionDataIds = array_unique(
+            array_column(
+                $input['containerData'],
+                'tempReceptionDataId'
+            )
+        );
+
+        $existingReceptionData = $this->Terrasync_model->get_reception_data_by_temp_ids($tempReceptionDataIds);
+        $receptionDataMap = [];
+
+        foreach ($existingReceptionData as $item) {
+            $key = $item->temp_reception_id . '_' . $item->temp_reception_data_id;
+            $receptionDataMap[$key] = $item;
+        }
+
+        $existingDispatchData = $this->Terrasync_model->get_dispatch_data_by_temp_ids($tempDispatchIds);
+        $dispatchDataMap = [];
+        foreach ($existingDispatchData as $item) {
+            $key = $item->temp_dispatch_id . '_' . $item->temp_reception_id . '_' . $item->temp_reception_data_id;
+            $dispatchDataMap[$key] = $item;
+        }
+
+        $recalculateStocks = [];
+
         foreach ($input['containerData'] as $containerdata) {
 
             $isDeleted = filter_var(
@@ -1167,7 +1340,7 @@ class Sync extends MY_Controller
             // =========================
             // FETCH DISPATCH
             // =========================
-            $dispatch = $this->Terrasync_model->dispatch_exists($containerdata['tempDispatchId']);
+            $dispatch = $dispatchMap[$containerdata['tempDispatchId']] ?? null;
 
             $dispatchId = $dispatch->dispatch_id ?? 0;
 
@@ -1178,7 +1351,8 @@ class Sync extends MY_Controller
             // =========================
             // FETCH RECEPTION DATA
             // =========================
-            $receptionDataExists = $this->Terrasync_model->reception_data_exists($containerdata['tempReceptionDataId'], $containerdata['tempReceptionId']);
+            $key =  $containerdata['tempReceptionId'] . '_' . $containerdata['tempReceptionDataId'];
+            $receptionDataExists = $receptionDataMap[$key] ?? null;
             $receptionDataId = $receptionDataExists->reception_data_id ?? 0;
 
             if ($receptionDataId <= 0) {
@@ -1211,11 +1385,8 @@ class Sync extends MY_Controller
             // =========================
             // CHECK EXISTING DISPATCH DATA
             // =========================
-            $containerDataExists = $this->Terrasync_model->dispatch_data_exists(
-                $containerdata['tempDispatchId'],
-                $containerdata['tempReceptionDataId'],
-                $containerdata['tempReceptionId']
-            );
+            $dispatchKey = $containerdata['tempDispatchId'] . '_'  . $containerdata['tempReceptionId'] . '_' . $containerdata['tempReceptionDataId'];
+            $containerDataExists = $dispatchDataMap[$dispatchKey] ?? null;
 
             // =====================================================
             // INSERT
@@ -1223,6 +1394,13 @@ class Sync extends MY_Controller
             if (!$containerDataExists) {
                 $containerData['createdby'] = $userid;
                 $dispatchDataId = $this->Terrasync_model->add_dispatch_data($containerData);
+
+                $dispatchDataMap[$dispatchKey] = (object) [
+                    'dispatch_data_id' => $dispatchDataId,
+                    'temp_dispatch_id' => $containerdata['tempDispatchId'],
+                    'temp_reception_id' => $containerdata['tempReceptionId'],
+                    'temp_reception_data_id' => $containerdata['tempReceptionDataId']
+                ];
             }
 
             // =====================================================
@@ -1244,13 +1422,7 @@ class Sync extends MY_Controller
             // =====================================================
             // RECALCULATE REMAINING STOCK
             // =====================================================
-            $this->Terrasync_model->recalculate_remaining_stock($containerdata['tempReceptionId'], $containerdata['tempReceptionDataId']);
-
-            // =====================================================
-            // FETCH UPDATED STOCK
-            // =====================================================
-            $updatedReceptionData = $this->Terrasync_model->reception_data_exists($containerdata['tempReceptionDataId'], $containerdata['tempReceptionId']);
-            $remainingStock = (float) ($updatedReceptionData->remaining_stock_count ?? 0);
+            $remainingStock = (float) $this->Terrasync_model->recalculate_remaining_stock($containerdata['tempReceptionId'], $containerdata['tempReceptionDataId']);
 
             // =====================================================
             // PARTIAL/FULL DISPATCH STATUS
@@ -1289,5 +1461,32 @@ class Sync extends MY_Controller
                 'tempReceptionId' => $containerdata['tempReceptionId']
             ];
         }
+    }
+
+    // =====================================================
+    // PROCESS PRICE RANGES
+    // =====================================================
+    private function process_price_ranges(array $items, array $contractPrices, string $priceColumn, int $purchaseUnitId)
+    {
+        $results = [];
+        $price = 0;
+        foreach ($items as $item) {
+            foreach ($contractPrices as $range) {
+
+                if ($item->circumference >= $range->minrange_grade1 && $item->circumference <= $range->maxrange_grade2) {
+                    $price = $range->$priceColumn;
+                    break;
+                }
+            }
+
+            $value = ($purchaseUnitId == 3) ? round($price * $item->no_of_pieces, 3) : round($price * $item->volume, 3);
+
+            $results[] = [
+                'price' => $price,
+                'value' => $value
+            ];
+        }
+
+        return $results;
     }
 }

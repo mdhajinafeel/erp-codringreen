@@ -148,7 +148,7 @@ class Terramaster_model extends CI_Model
     }
 
     // PRODUCT TYPES
-    public function get_product_types_by_origin()
+    public function get_product_types_by_origin(int $originid)
     {
         return $this->db
             ->select("type_id as typeId, product_type_name as productTypeName")
@@ -251,7 +251,6 @@ class Terramaster_model extends CI_Model
         }
 
         return $this->db
-            ->select("minrange_grade1, maxrange_grade2, pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs ")
             ->where_in('supplier_id', $contractIds)
             ->where('is_active', 1)
             ->get('tbl_supplier_contract_price')

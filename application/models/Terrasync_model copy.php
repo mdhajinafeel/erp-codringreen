@@ -130,25 +130,11 @@ class Terrasync_model extends CI_Model
             ->result();
     }
 
-    public function get_reception_data_by_id(int $receptionDataId)
-    {
+    public function get_reception_data_by_id(int $receptionDataId) {
         return $this->db
             ->where('reception_data_id', $receptionDataId)
             ->get('tbl_reception_data')
             ->row();
-    }
-
-    public function get_reception_data_by_temp_reception_ids(
-        array $tempReceptionIds
-    ) {
-        if (empty($tempReceptionIds)) {
-            return [];
-        }
-
-        return $this->db
-            ->where_in('temp_reception_id', $tempReceptionIds)
-            ->get('tbl_reception_data')
-            ->result();
     }
 
     // =========================
@@ -264,35 +250,27 @@ class Terrasync_model extends CI_Model
     public function recalculate_remaining_stock(string $tempReceptionId, string $tempReceptionDataId)
     {
         $sql = "
-            UPDATE tbl_reception_data rd
-            SET remaining_stock_count =
-            (
-                rd.scanned_code -
-                IFNULL(
-                    (
-                        SELECT SUM(dd.dispatch_pieces)
-                        FROM tbl_dispatch_data dd
-                        WHERE dd.temp_reception_id =
-                            rd.temp_reception_id
-                        AND dd.temp_reception_data_id =
-                            rd.temp_reception_data_id
-                        AND dd.isactive = 1
-                    ),
-                    0
-                )
+        UPDATE tbl_reception_data rd
+        SET remaining_stock_count =
+        (
+            rd.scanned_code -
+            IFNULL(
+                (
+                    SELECT SUM(dd.dispatch_pieces)
+                    FROM tbl_dispatch_data dd
+                    WHERE dd.temp_reception_id =
+                        rd.temp_reception_id
+                    AND dd.temp_reception_data_id =
+                        rd.temp_reception_data_id
+                    AND dd.isactive = 1
+                ),
+                0
             )
-            WHERE rd.temp_reception_id = ?
-            AND rd.temp_reception_data_id = ?";
+        )
+        WHERE rd.temp_reception_id = ?
+        AND rd.temp_reception_data_id = ?";
 
-        $this->db->query($sql, [$tempReceptionId, $tempReceptionDataId]);
-
-        return $this->db
-            ->select('remaining_stock_count')
-            ->where('temp_reception_id', $tempReceptionId)
-            ->where('temp_reception_data_id', $tempReceptionDataId)
-            ->get('tbl_reception_data')
-            ->row()
-            ->remaining_stock_count ?? 0;
+        return $this->db->query($sql, [$tempReceptionId, $tempReceptionDataId]);
     }
 
     public function update_reception_data_stock(string $tempReceptionDataId, string $tempReceptionId, string $receptionDataId, array $data)
@@ -300,7 +278,6 @@ class Terrasync_model extends CI_Model
         $this->db->where('reception_data_id', $receptionDataId);
         $this->db->where('temp_reception_data_id', $tempReceptionDataId);
         $this->db->where('temp_reception_id', $tempReceptionId);
-        $this->db->set('updateddate', 'NOW()', FALSE);
 
         if ($this->db->update('tbl_reception_data', $data)) {
             return true;
@@ -349,18 +326,6 @@ class Terrasync_model extends CI_Model
         }
     }
 
-    public function get_farms_by_temp_ids(array $tempIds)
-    {
-        if (empty($tempIds)) {
-            return [];
-        }
-
-        return $this->db
-            ->where_in('temp_farm_id', $tempIds)
-            ->get('tbl_farm')
-            ->result();
-    }
-
     // =========================
     // FARM DATA
     // =========================
@@ -407,30 +372,18 @@ class Terrasync_model extends CI_Model
         if ($length == 1) {
             $query = $this->db->query("SELECT A.farm_data_id, A.farm_id, A.no_of_pieces, A.circumference, A.length, A.gross_volume, 
                 A.volume, A.captured_timestamp FROM tbl_farm_data A 
-                WHERE A.is_active = 1 AND A.farm_id = ? AND A.length < 330", [$farmId]);
+                WHERE A.is_active = 1 AND A.farm_id = $farmId AND A.length < 330");
         } else if ($length == 2) {
             $query = $this->db->query("SELECT A.farm_data_id, A.farm_id, A.no_of_pieces, A.circumference, A.length, A.gross_volume, 
                 A.volume, A.captured_timestamp FROM tbl_farm_data A 
-                WHERE A.is_active = 1 AND A.farm_id = ? AND (A.length >= 330 && A.length < 600)", [$farmId]);
+                WHERE A.is_active = 1 AND A.farm_id = $farmId AND (A.length >= 330 && A.length < 600)");
         } else {
             $query = $this->db->query("SELECT A.farm_data_id, A.farm_id, A.no_of_pieces, A.circumference, A.length, A.gross_volume, 
                 A.volume, A.captured_timestamp FROM tbl_farm_data A 
-                WHERE A.is_active = 1 AND A.farm_id = ? AND A.length >= 600", [$farmId]);
+                WHERE A.is_active = 1 AND A.farm_id = $farmId AND A.length >= 600");
         }
 
         return $query->result();
-    }
-
-    public function get_farm_data_by_farm_ids(array $farmIds)
-    {
-        if (empty($farmIds)) {
-            return [];
-        }
-
-        return $this->db
-            ->where_in('farm_id', $farmIds)
-            ->get('tbl_farm_data')
-            ->result();
     }
 
     // =========================

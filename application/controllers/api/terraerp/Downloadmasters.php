@@ -25,7 +25,7 @@ class Downloadmasters extends MY_Controller
     public function index()
     {
         try {
-            
+
             // =========================
             // REQUEST METHOD CHECK
             // =========================
@@ -56,7 +56,7 @@ class Downloadmasters extends MY_Controller
             }
 
             $token = JWT::decode($requestBearerToken, JWT_SECRET);
-             $userid   = $token->userid ?? 0;
+            $userid   = $token->userid ?? 0;
             $originid = $token->originid ?? 0;
             $roleid   = $token->roleid ?? 0;
 
@@ -198,7 +198,7 @@ class Downloadmasters extends MY_Controller
                     "suppliers" => $return_arr_suppliers,
                     "warehouses" => $return_arr_warehouses,
                     "purchaseContracts" => $return_arr_contracts,
-                    "measurementSystems" => $return_arr_measurement_systems, 
+                    "measurementSystems" => $return_arr_measurement_systems,
                     "shippingLines" => $return_arr_shipping_lines,
                     "products" => $return_arr_products,
                     "productTypes" => $return_arr_product_types,
