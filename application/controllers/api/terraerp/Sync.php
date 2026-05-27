@@ -735,6 +735,7 @@ class Sync extends MY_Controller
                 'temp_farm_id' => $tempReceptionId,
                 'circ_allowance' => $contractDetails->purchaseAllowance ?? 0,
                 'length_allowance' => $contractDetails->lengthAllowance ?? 0,
+                'is_from_reception' => 1,
             ];
 
             // =========================================
