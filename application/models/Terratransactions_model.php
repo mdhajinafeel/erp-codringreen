@@ -13,7 +13,7 @@ class Terratransactions_model extends CI_Model
     public function get_farm_inventory_orders_by_origin(int $originid)
     {
         return $this->db
-            ->select("inventory_order as inventoryOrder, supplier_id as supplierId")
+            ->select("inventory_order as inventoryOrder, supplier_id as supplierId, is_from_reception as isFromReception")
             ->from("tbl_farm")
             ->where("is_active", 1)
             ->where("origin_id", $originid)

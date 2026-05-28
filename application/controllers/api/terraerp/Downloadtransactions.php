@@ -100,6 +100,7 @@
 
                     foreach ($dataFarmInventoryOrders as &$io) {
                         $io->supplierId = (int)$io->supplierId;
+                        $io->isFromReception = (bool)$io->isFromReception;
                     }
 
                     $return_arr_farm_inventory_orders = $dataFarmInventoryOrders;
