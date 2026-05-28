@@ -433,6 +433,15 @@ class Terrasync_model extends CI_Model
             ->result();
     }
 
+    public function get_farm_data_by_farm_id_sqaure_blocks(int $farmId)
+    {
+        $query = $this->db->query("SELECT A.farm_data_id, A.farm_id, A.no_of_pieces, A.length, A.width, A.thickness, A.length_export, A.width_export, 
+                A.thickness_export, A.gross_volume, A.volume, A.face, A.volume_pie, A.captured_timestamp FROM tbl_farm_data A 
+                WHERE A.is_active = 1 AND A.farm_id = ?", [$farmId]);
+
+        return $query->result();
+    }
+
     // =========================
     // FARM CONTRACT MAPPING
     // =========================

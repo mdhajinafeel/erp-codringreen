@@ -834,6 +834,58 @@ class Sync extends MY_Controller
                 $totalVolume = 0;
 
                 if ($farmProductTypeId == 1 || $farmProductTypeId == 3) {
+
+                    //CALCULATE WOOD VALUE & TAXES
+                    $farmDataSquare = $this->Terrasync_model->get_farm_data_by_farm_id_sqaure_blocks($farmId);
+
+                    $fetchContractPrice = $this->Terramaster_model->fetch_contract_prices_for_farm($farmContractId);
+                    $exchangeRate = $this->Terramaster_model->fetch_exchange_rate_by_date($farmPurchaseDate);
+
+                    foreach ($farmDataSquare as $square) {
+                        $width = $square->width;
+                        $thickness = $square->thickness;
+                        $length = $square->length;
+                        $face = $square->face;
+                        $volumePie = $square->volume_pie;
+                        $netVolume = $square->volume;
+                        $pieces = $shorts->no_of_pieces;
+                        $price = 0;
+
+                        foreach ($fetchContractPrice as $range) {
+                            if ($face >= $range->minrange_grade1 && $face <= $range->maxrange_grade2) {
+                                $price = $range->pricerange_grade3;
+                                break;
+                            }
+                        }
+
+                        if ($farmPurchaseUnitId == 1) {
+                            $finalArray[] = [
+                                'width' => $width,
+                                'thickness' => $thickness,
+                                'length' => $length,
+                                'face' => $face,
+                                'volume_pie' => $volumePie,
+                                'price' => $price,
+                                'volume' => $netVolume,
+                                'value' => round($price * $volumePie, 3)
+                            ];
+                        } else {
+                            $finalArray[] = [
+                                'width' => $width,
+                                'thickness' => $thickness,
+                                'length' => $length,
+                                'face' => $face,
+                                'volume_pie' => $volumePie,
+                                'price' => $price,
+                                'volume' => $netVolume,
+                                'value' => round($price * $netVolume, 3)
+                            ];
+                        }
+                    }
+
+                    foreach ($finalArray as $item) {
+                        $woodValue = $woodValue + $item['value'];
+                    }
                 } else {
 
                     //CALCULATE WOOD VALUE & TAXES
