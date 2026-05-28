@@ -278,6 +278,21 @@ class Sync extends MY_Controller
             // =========================
             $this->process_container_data($input, $userid, $response);
 
+            // =================
+            // FARM DETAILS
+            // =================
+            $farmTempIds = $this->process_farm_details($input, $userid, $originid, $response);
+
+            // =========================
+            // FARM CAPTURED DATA
+            // =========================
+            $this->process_farm_captured_data($input, $userid, $response);
+
+            // =====================================================
+            // FARM PRICE CALCULATION
+            // =====================================================
+            $this->process_farm_price_calculation($farmTempIds, $userid, $originid);
+
             // =====================================================
             // TRANSACTION STATUS
             // =====================================================
@@ -441,7 +456,9 @@ class Sync extends MY_Controller
             'receptionMappings' => [],
             'receptionDataMappings' => [],
             'dispatchMappings' => [],
-            'containerDataMappings' => []
+            'containerDataMappings' => [],
+            'farmMappings' => [],
+            'farmDataMappings' => [],
         ];
     }
 
@@ -464,15 +481,6 @@ class Sync extends MY_Controller
             $isDeleted = filter_var($receptiondetail['isDeleted'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
             // =====================
-            // TOTAL GROSS VOLUME
-            // =====================
-            if ($receptiondetail['supplierProductTypeId'] == 1 || $receptiondetail['supplierProductTypeId'] == 3) {
-                $totalGrossVolume = $receptiondetail['totalVolumePie'] ?? 0;
-            } else {
-                $totalGrossVolume = $receptiondetail['totalGrossVolume'] ?? 0;
-            }
-
-            // =====================
             // COMMON DATA
             // =====================
             $receptionDetailData = [
@@ -490,9 +498,10 @@ class Sync extends MY_Controller
                 "closedby" => $receptiondetail['closedBy'],
                 "closeddate" => !empty($receptiondetail['closedDate']) ? date('Y-m-d H:i:s', $receptiondetail['closedDate'] / 1000) : null,
                 "origin_id" => $originid,
-                "total_gross_volume" => $totalGrossVolume,
+                "total_gross_volume" => $receptiondetail['totalGrossVolume'] ?? 0,
                 "total_volume" => $receptiondetail['totalNetVolume'] ?? 0,
                 "total_pieces" => $receptiondetail['totalPieces'] ?? 0,
+                "total_volume_pie" => $receptiondetail['totalVolumePie'] ?? 0,
                 "captured_from_app" => 1,
                 "is_create_farm" => $receptiondetail['isFarmEnabled'],
                 "contract_id" => $receptiondetail['purchaseContract'],
@@ -1341,6 +1350,435 @@ class Sync extends MY_Controller
                 'dispatchId' => (int) $dispatchId,
                 'tempReceptionId' => $containerdata['tempReceptionId']
             ];
+        }
+    }
+
+    // =====================================================
+    // PROCESS FARM DETAILS
+    // =====================================================
+    private function process_farm_details(array $input, int $userid, int $originid, array &$response)
+    {
+
+        // =========================
+        // FARM ENABLED TEMP IDS
+        // =========================
+        $farmTempIds = [];
+
+        foreach ($input['farmDetails'] as $farmdetail) {
+
+            // =====================
+            // FLAGS
+            // =====================
+            $isDeleted = filter_var($farmdetail['isDeleted'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+            // =========================================
+            // FETCH CONTRACT DETAILS
+            // =========================================
+            $contractDetails = $this->Terramaster_model->get_contract_details($farmdetail['purchaseContract'], $farmdetail['supplierId'], $originid);
+
+            // =====================
+            // COMMON DATA
+            // =====================
+            $farmDetailData = [
+                "supplier_id" => $farmdetail['supplierId'],
+                "contract_id" => $farmdetail['purchaseContract'],
+                "product_id" => $farmdetail['productId'],
+                "product_type_id" => $farmdetail['productTypeId'],
+                "purchase_unit_id" => $contractDetails->purchaseUnitId ?? 0,
+                "purchase_date" => $farmdetail['purchaseDate'],
+                "inventory_order" => $farmdetail['ica'],
+                "plate_number" => $farmdetail['truckNumber'],
+                "driver_name" => $farmdetail['truckDriverName'],
+                "total_volume" => $farmdetail['totalNetVolume'] ?? 0,
+                'total_value' => 0,
+                'wood_value' => 0,
+                "updated_by" => $userid,
+                "is_active" => $isDeleted ? 0 : 1,
+                "origin_id" => $originid,
+                'circ_allowance' => $contractDetails->purchaseAllowance ?? 0,
+                'length_allowance' => $contractDetails->lengthAllowance ?? 0,
+                "total_gross_volume" => $farmdetail['totalGrossVolume'] ?? 0,
+                "total_pieces" => $farmdetail['totalPieces'] ?? 0,
+                "total_volume_pie" => $farmdetail['totalVolumePie'] ?? 0,
+                "is_closed" => $farmdetail['isClosed'],
+                "closed_by" => $farmdetail['closedBy'],
+                "closed_date" => !empty($farmdetail['closedDate']) ? date('Y-m-d H:i:s', $farmdetail['closedDate'] / 1000) : null,
+                "temp_farm_id" => $farmdetail['tempFarmId'] ?? null,
+                "is_from_reception" => 0,
+            ];
+
+            // =====================
+            // CHECK EXISTS
+            // =====================
+            $farmExists = $this->Terrasync_model->farm_exists($farmdetail['tempFarmId']);
+
+            // =====================
+            // INSERT
+            // =====================
+            if (!$farmExists) {
+                $farmDetailData['created_by'] = $userid;
+                $farmDetailData['captured_timestamp'] = $farmdetail['createdAt'];
+
+                $farmId = $this->Terrasync_model->add_farm($farmDetailData);
+            } else {
+
+                // =================
+                // UPDATE
+                // =================
+
+                $farmId = $farmExists->farm_id ?? 0;
+
+                if ($farmId > 0) {
+                    $this->Terrasync_model->update_farm($farmId, $farmdetail['tempFarmId'], $farmDetailData);
+                }
+            }
+
+            // =====================
+            // STORE FARM ENABLED IDS
+            // =====================
+            $farmTempIds[] = [
+                'tempFarmId' => $farmdetail['tempFarmId'],
+                'farmId' => $farmId
+            ];
+
+            // =====================
+            // RESPONSE MAPPING
+            // =====================
+            $response['farmMappings'][] = [
+                'tempFarmId' => $farmdetail['tempFarmId'],
+                'farmId' => (int) $farmId
+            ];
+        }
+
+        return $farmTempIds;
+    }
+
+    // =====================================================
+    // PROCESS FARM CAPTURED DATA
+    // =====================================================
+    private function process_farm_captured_data(array $input, int $userid, array &$response)
+    {
+        foreach ($input['farmData'] as $farmdata) {
+
+            $isDeleted = filter_var($farmdata['isDeleted'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+            // =================
+            // FETCH EXIST FARM DATA
+            // =================
+            $farm = $this->Terrasync_model->farm_exists($farmdata['tempFarmId']);
+            $farmId = $farm->farm_id ?? 0;
+            $productTypeId = $farm->product_typeid ?? 0;
+
+            $lengthExport = 0;
+            $widthExport = 0;
+            $thicknessExport = 0;
+            $grossVolume = 0;
+            $netVolume = 0;
+            $face = 0;
+            $grade = 0;
+
+            if ($productTypeId == 1 || $productTypeId == 3) {
+                $lengthExport = $this->truncate_decimal((float) $farmdata['length'] * 0.3048, 2);
+                $widthExport = $this->truncate_decimal((float) $farmdata['width'] * 2.54, 0);
+                $thicknessExport = $this->truncate_decimal((float) $farmdata['thickness'] * 2.54, 0);
+                $grossVolume = $this->truncate_decimal((float) $farmdata['grossVolume'] / 424, 3);
+                $netVolume = $this->truncate_decimal((float) $lengthExport * (float) $widthExport * (float) $thicknessExport / 10000, 3) * (float) $farmdata['pieces'];
+                $face = (float) $farmdata['width'] * (float) $farmdata['thickness'];
+
+                if (($widthExport < 15) || ($thicknessExport < 15)) {
+                    $grade = 1;
+                } elseif (($widthExport > 19.9) || ($thicknessExport > 19.9)) {
+                    $grade = 3;
+                } else {
+                    $grade = 2;
+                }
+            } else {
+                $grossVolume = $farmdata['grossVolume'];
+                $netVolume = $farmdata['netVolume'];
+            }
+
+            $farmData = [
+                "farm_id" => $farmId,
+                "scanned_code" => "",
+                "no_of_pieces" => $farmdata['pieces'],
+                "circumference" => $farmdata['circumference'],
+                "length" => $farmdata['length'],
+                "width" => $farmdata['width'],
+                "thickness" => $farmdata['thickness'],
+                "gross_volume" => $grossVolume,
+                "volume" => $netVolume,
+                "volume_pie" => $farmdata['volumePie'] ?? 0,
+                "grade_id" => $grade,
+                "face" => $face,
+                "length_export" => $lengthExport,
+                "width_export" => $widthExport,
+                "thickness_export" => $thicknessExport,
+                "volume_bought" => $grossVolume,
+                "updated_by" => $userid,
+                "is_active" => $isDeleted ? 0 : 1,
+                "captured_timestamp" => $farmdata['createdAt'],
+                "temp_farm_data_id" => $farmdata['tempFarmDataId'] ?? null,
+            ];
+
+            $farmDataExists = $this->Terrasync_model->farm_data_exists($farmId, $farmdata['tempFarmDataId']);
+
+            if (!$farmDataExists) {
+                $farmData['created_by'] =  $userid;
+                $farmDataId = $this->Terrasync_model->add_farm_data($farmData);
+            } else {
+                $farmDataId = $farmDataExists->farm_data_id ?? 0;
+                $this->Terrasync_model->update_farm_data($farmDataId, $farmdata['tempFarmId'], $farmData);
+            }
+
+            $response['farmDataMappings'][] = [
+                'tempFarmDataId' => $farmdata['tempFarmDataId'],
+                'tempFarmId' => $farmdata['tempFarmId'],
+                'farmDataId' => (int) $farmDataId,
+                'farmId' => (int) $farmId,
+            ];
+        }
+    }
+
+    // =====================================================
+    // PROCESS FARM PRICE CALCULATION
+    // =====================================================
+    private function process_farm_price_calculation(array $farmTempIds, int $userid, int $originid)
+    {
+        foreach ($farmTempIds as $farmTemp) {
+
+            $tempFarmId = $farmTemp['tempFarmId'];
+            $farmId = $farmTemp['farmId'];
+
+            // =========================================
+            // FETCH FARM
+            // =========================================
+            $farm = $this->Terrasync_model->farm_exists($tempFarmId);
+
+            if (!$farm || $farmId <= 0) {
+                continue;
+            }
+
+            // =========================================
+            // FARM DATA
+            // =========================================
+            $farmSupplierId = $farm->supplier_id ?? 0;
+            $farmContractId = $farm->contract_id ?? 0;
+            $farmProductTypeId = $farm->product_type_id ?? 0;
+            $farmPurchaseUnitId = $farm->purchase_unit_id ?? 0;
+            $farmInventoryOrder = $farm->inventory_order ?? '';
+            $farmPurchaseDate = $farm->purchase_date ?? '';
+
+            // =========================================
+            // FETCH CONTRACT DETAILS
+            // =========================================
+            $contractDetails = $this->Terramaster_model->get_contract_details($farm->contract_id ?? 0, $farm->supplier_id ?? 0, $originid);
+            $farmCurrencyId = $contractDetails->currencyId ?? 0;
+
+            // =========================================
+            // CONTRACT MAPPING
+            // =========================================
+            $updateContractMappingData = [
+                'is_active' => 0,
+                'updated_by' => $userid
+            ];
+
+            $this->Terrasync_model->delete_contract_inventory_mapping($farmContractId, $farmSupplierId, $farmInventoryOrder, $updateContractMappingData);
+
+            $dataContractMapping = [
+                "contract_id" => $farmContractId,
+                "supplier_id" => $farmSupplierId,
+                "inventory_order" => $farmInventoryOrder,
+                "total_volume" => $farm->total_volume ?? 0,
+                "invoice_number" => "",
+                "created_by" => $userid,
+                "updated_by" => $userid,
+                "is_active" => 1,
+            ];
+
+            $this->Terrasync_model->add_contract_inventory_mapping($dataContractMapping);
+
+            // =========================================
+            // CALCULATIONS
+            // =========================================
+            $woodValue = 0;
+            $finalArray = [];
+            $totalVolume = 0;
+
+            $fetchContractPrice = $this->Terramaster_model->fetch_contract_prices_for_farm($farmContractId);
+            $exchangeRate = $this->Terramaster_model->fetch_exchange_rate_by_date($farmPurchaseDate);
+
+            // =====================================================
+            // WOOD VALUE CALCULATION
+            // =====================================================
+            if ($farmProductTypeId == 1 || $farmProductTypeId == 3) {
+                $farmDataSquare = $this->Terrasync_model->get_farm_data_by_farm_id_sqaure_blocks($farmId);
+                foreach ($farmDataSquare as $square) {
+                    $face = $square->face;
+                    $volumePie = $square->volume_pie;
+                    $netVolume = $square->volume;
+
+                    $price = 0;
+
+                    foreach ($fetchContractPrice as $range) {
+                        if ($face >= $range->minrange_grade1 && $face <= $range->maxrange_grade2) {
+                            $price = $range->pricerange_grade3;
+                            break;
+                        }
+                    }
+
+                    $value = ($farmPurchaseUnitId == 1) ? round($price * $volumePie, 3) : round($price * $netVolume, 3);
+
+                    $woodValue += $value;
+                }
+            } else {
+                if ($farmPurchaseUnitId == 15) {
+                    $woodValue = $fetchContractPrice[0]->pricerange_grade3 ?? 0;
+                } else {
+
+                    $farmDataShorts = $this->Terrasync_model->get_farm_data_by_farm_id_and_length($farmId, 1);
+                    $farmDataSemi   = $this->Terrasync_model->get_farm_data_by_farm_id_and_length($farmId, 2);
+                    $farmDataLongs  = $this->Terrasync_model->get_farm_data_by_farm_id_and_length($farmId, 3);
+
+                    $allFarmData = [
+                        ['data' => $farmDataShorts, 'field' => 'pricerange_grade3'],
+                        ['data' => $farmDataSemi, 'field' => 'pricerange_grade_semi'],
+                        ['data' => $farmDataLongs, 'field' => 'pricerange_grade_longs'],
+                    ];
+
+                    foreach ($allFarmData as $group) {
+                        foreach ($group['data'] as $item) {
+                            $circumference = $item->circumference;
+                            $netVolume = $item->volume;
+                            $pieces = $item->no_of_pieces;
+                            $price = 0;
+                            foreach ($fetchContractPrice as $range) {
+                                if ($circumference >= $range->minrange_grade1 && $circumference <= $range->maxrange_grade2) {
+                                    $price = $range->{$group['field']};
+                                    break;
+                                }
+                            }
+                            $value = ($farmPurchaseUnitId == 3) ? round($price * $pieces, 3) : round($price * $netVolume, 3);
+                            $woodValue += $value;
+                        }
+                    }
+                }
+            }
+
+            // =========================================
+            // EXCHANGE RATE
+            // =========================================
+            if ($woodValue > 0 && $farmCurrencyId == 1) {
+                if (!empty($exchangeRate) && ($exchangeRate[0]->value ?? 0) > 0) {
+                    $woodValue *= $exchangeRate[0]->value;
+                }
+            }
+
+            // =========================================
+            // SUPPLIER TAXES
+            // =========================================
+            $supplierTaxesArr = [];
+            $supplierTaxesAdjustArr = [];
+            $supplierTaxesValue = 0;
+
+            $getSupplierTaxes = $this->Terramaster_model->get_supplier_taxes($farmSupplierId);
+
+            foreach ($getSupplierTaxes as $suppliertax) {
+
+                $taxId = $suppliertax->tax_id;
+                $taxValue = $suppliertax->tax_value;
+                $taxFormat = $suppliertax->number_format;
+                $taxType = $suppliertax->arithmetic_type;
+
+                if ($taxType == 2) {
+                    $taxValue *= -1;
+                }
+
+                $calcValue = ($taxFormat == 2) ? $woodValue * ($taxValue / 100) : $woodValue * $taxValue;
+
+                $supplierTaxesAdjustArr[] = [
+                    "taxId" => $taxId,
+                    "taxValue" => $calcValue,
+                    "taxVal" => abs($taxValue)
+                ];
+
+                $supplierTaxesArr[] = $taxId;
+                $supplierTaxesValue += $calcValue;
+            }
+
+            $woodValueWithSupplierTaxes = $woodValue + $supplierTaxesValue;
+
+            // =========================================
+            // UPDATE FARM
+            // =========================================
+            $this->Terrasync_model->update_farm(
+                $farmId,
+                $tempFarmId,
+                [
+                    'wood_value' => $woodValue,
+                    'total_value' => $woodValue,
+                    'wood_value_withtaxes' => $woodValueWithSupplierTaxes,
+                    'supplier_taxes' => implode(', ', $supplierTaxesArr),
+                    'supplier_taxes_array' => json_encode($supplierTaxesAdjustArr),
+                    'updated_by' => $userid
+                ]
+            );
+
+            // =========================================
+            // INVENTORY SUPPLIER PRICE
+            // =========================================
+            $updateInventorySupplierPriceData = [
+                "updated_by" => $userid,
+                "is_active" => 0,
+            ];
+
+            $this->Terrasync_model->delete_inventory_supplier_price(
+                $farmInventoryOrder,
+                $farmContractId,
+                $farmSupplierId,
+                $updateInventorySupplierPriceData
+            );
+
+            $this->Terrasync_model->add_inventory_supplier_price(
+                $farmContractId,
+                $farmSupplierId,
+                $farmInventoryOrder,
+                $userid
+            );
+
+            // =========================================
+            // INVENTORY LEDGER
+            // =========================================
+            $updateInventoryLedgerData = [
+                "amount" => 0,
+                "updated_by" => $userid,
+                "is_active" => 0,
+            ];
+
+            $this->Terrasync_model->delete_inventory_ledger(
+                $farmInventoryOrder,
+                $farmContractId,
+                $updateInventoryLedgerData
+            );
+
+            if ($woodValueWithSupplierTaxes != 0) {
+
+                $dataInventoryLedger = [
+                    "contract_id" => $farmContractId,
+                    "supplier_id" => $farmSupplierId,
+                    "inventory_order" => $farmInventoryOrder,
+                    "ledger_type" => 2,
+                    "pm_ledger_type" => 0,
+                    "expense_type" => 1,
+                    "amount" => $woodValueWithSupplierTaxes,
+                    "expense_date" => $farmPurchaseDate,
+                    "created_by" => $userid,
+                    "updated_by" => $userid,
+                    "is_active" => 1,
+                    "is_advance_app" => 0,
+                ];
+
+                $this->Terrasync_model->add_inventory_ledger($dataInventoryLedger);
+            }
         }
     }
 }
