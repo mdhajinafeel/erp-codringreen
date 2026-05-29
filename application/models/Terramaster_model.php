@@ -236,11 +236,11 @@ class Terramaster_model extends CI_Model
             ->result();
     }
 
-    public function fetch_contract_prices_for_farm(int $contractid)
+    public function fetch_contract_prices_for_farm(int $contractId)
     {
         $query = $this->db->query("SELECT minrange_grade1, maxrange_grade2, pricerange_grade3, pricerange_grade_semi, pricerange_grade_longs 
                 FROM tbl_supplier_contract_price A
-                WHERE A.is_active = 1 AND A.supplier_id = $contractid");
+                WHERE A.is_active = 1 AND A.supplier_id = $contractId");
         return $query->result();
     }
 
@@ -258,12 +258,14 @@ class Terramaster_model extends CI_Model
             ->result();
     }
 
-    public function fetch_exchange_rate_by_date(string $purchase_date)
+    // EXCHANGE RATE
+    public function fetch_exchange_rate_by_date(string $purchaseDate)
     {
-        $query = $this->db->query("SELECT value FROM tbl_exchange_rate WHERE exchange_date <= '$purchase_date' AND is_active = 1 ORDER BY exchange_date DESC LIMIT 1");
+        $query = $this->db->query("SELECT value FROM tbl_exchange_rate WHERE exchange_date <= '$purchaseDate' AND is_active = 1 ORDER BY exchange_date DESC LIMIT 1");
         return $query->result();
     }
 
+    // SUPPLIER TAXES
     public function get_supplier_taxes(int $supplierId)
     {
         $query = $this->db->query("SELECT A.tax_id, A.tax_value, B.tax_name, B.number_format, B.arithmetic_type 
@@ -272,5 +274,27 @@ class Terramaster_model extends CI_Model
 					WHERE A.is_active = 1 AND A.supplier_id = $supplierId AND B.is_enabled_supplier = 1
 					ORDER BY A.tax_id");
         return $query->result();
+    }
+
+    //FINANCE
+    public function all_account_heads(int $originId)
+	{
+		$strQuery = "SELECT A.id as accountHeadId, A.name_in_app as accountHeadName, A.icon_svg as icon, A.color_code_primary as colorCodePrimary, A.color_code_secondary as colorCodeSecondary, 
+            A.is_forestry as isForestry, A.forestry_cost_type as forestryCostType 
+            FROM tbl_accounting_heads A 
+            WHERE A.origin_id = $originId AND A.is_active = 1 ORDER BY A.id";
+
+		$query = $this->db->query($strQuery);
+		return $query->result();
+	}
+
+    public function all_beneficiaries(int $originId)
+    {
+        $query = "SELECT DISTINCT beneficiary_name AS beneficiaryName, document_number AS beneficiaryIdentification
+                FROM tbl_expense_details A 
+                INNER JOIN tbl_transaction B ON B.transaction_id = A.transaction_id 
+                WHERE B.origin_id = $originId";
+        $result = $this->db->query($query);
+        return $result->result();
     }
 }

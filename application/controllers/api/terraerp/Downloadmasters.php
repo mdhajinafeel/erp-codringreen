@@ -83,8 +83,10 @@ class Downloadmasters extends MY_Controller
             $return_arr_products = [];
             $return_arr_product_types = [];
             $return_arr_container_categories = [];
+            $return_arr_account_heads = [];
+            $return_arr_beneficiaries = [];
 
-            if (!in_array('9', $roles) && !in_array('7', $roles)) {
+            if (!in_array('6', $roles) && !in_array('7', $roles) && !in_array('9', $roles)) {
                 return $this->output([
                     "status" => false,
                     "message" => "Access denied (role)"
@@ -190,6 +192,24 @@ class Downloadmasters extends MY_Controller
                 $return_arr_container_categories = $dataContainerCategories;
             }
 
+            if (in_array('6', $roles)) {
+
+                // ACCOUNT HEADS
+                $dataAccountHeads = $this->Terramaster_model->all_account_heads($originid);
+
+                foreach ($dataAccountHeads as &$c) {
+                    $c->accountHeadId = (int)$c->accountHeadId;
+                    $c->forestryCostType = (int)$c->forestryCostType;
+                    $c->isForestry = (bool)$c->isForestry;
+                }
+
+                $return_arr_account_heads = $dataAccountHeads;
+
+                // BENEFICIARIES
+                $dataBeneficiaries = $this->Terramaster_model->all_beneficiaries($originid);
+                $return_arr_beneficiaries = $dataBeneficiaries;
+            }
+
             return $this->output([
                 "status" => true,
                 "message" => "",
@@ -203,6 +223,8 @@ class Downloadmasters extends MY_Controller
                     "products" => $return_arr_products,
                     "productTypes" => $return_arr_product_types,
                     "containerCategories" => $return_arr_container_categories,
+                    "accountHeads" => $return_arr_account_heads,
+                    "beneficiaries" => $return_arr_beneficiaries
                 ]
             ]);
         } catch (Exception $e) {

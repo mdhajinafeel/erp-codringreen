@@ -487,7 +487,7 @@ $config['csrf_exclude_uris'] = array("purchasecontracts/load_price_template", "f
 | by the output class.  Do not 'echo' any values with compression enabled.
 |
 */
-$config['compress_output'] = FALSE;
+$config['compress_output'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------

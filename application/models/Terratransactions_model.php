@@ -129,4 +129,31 @@ class Terratransactions_model extends CI_Model
             ->get()
             ->result();
     }
+
+    // CREDIT TRANSACTION DATA
+    public function fetch_credit_transactions(int $originId, int $userId)
+    {
+        $query = "SELECT transaction_id AS creditTransactionId, transaction_display_id AS transactionDisplayId, amount, 
+            transaction_date AS transactionDate, expense_timestamp AS transactionTimestamp, concept_general AS conceptGeneral, 
+            ROUND(UNIX_TIMESTAMP(dc.updateddate) * 1000) AS updatedAt
+            FROM tbl_transaction 
+            WHERE is_active = 1 AND origin_id = $originId AND user_id = $userId AND transaction_type = 1";
+        $result = $this->db->query($query);
+        return $result->result();
+    }
+
+    // DEBIT TRANSACTION DATA
+    public function fetch_debit_transactions(int $originId, int $userId)
+    {
+        $query = "SELECT A.temp_transaction_id AS tempTransactionId, A.credit_transaction_id AS creditTransactionId, A.transaction_id AS transactionId, 
+            A.transaction_display_id AS transactionDisplayId, A.amount AS amount, A.expense_timestamp AS expenseTimestamp, B.expense_date AS expenseDate, 
+            B.account_head AS accountHeadId, 
+            B.beneficiary_name AS beneficiaryName, B.document_number AS documentNumber, B.expense_uploaded_image AS expenseUploadedImage, 
+            A.is_forestry AS isForestry, A.forestry_cost_type AS forestryCostType
+            FROM tbl_transaction A 
+            INNER JOIN tbl_expense_details B ON B.transaction_id = A.transaction_id AND B.transaction_display_id = A.transaction_display_id 
+            WHERE A.is_active = 1 AND origin_id = $originId AND user_id = $userId AND transaction_type = 2";
+        $result = $this->db->query($query);
+        return $result->result();
+    }
 }

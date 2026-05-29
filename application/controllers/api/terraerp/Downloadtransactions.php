@@ -73,7 +73,7 @@
                 // 🔹 Fast role check (optimized)
                 $roles = explode(',', $roleid);
 
-                if (!in_array('9', $roles) && !in_array('7', $roles)) {
+                if (!in_array('6', $roles) && !in_array('7', $roles) && !in_array('9', $roles)) {
                     return $this->output([
                         "status" => false,
                         "message" => "Access denied (role)"
@@ -86,14 +86,14 @@
                 $return_arr_dispatch_containers = [];
                 $return_arr_reception_details = [];
                 $return_arr_dispatch_details = [];
+                $return_arr_credit_transactions = [];
+                $return_arr_debit_transactions = [];
 
                 $serverTime = time();
                 $lastSync = (int)$this->input->get("lastSync");
 
                 // 🚀 OPTIMIZED DATA FETCH
                 if (in_array('9', $roles) || in_array('7', $roles)) {
-
-
 
                     // FARM INVENTORY ORDERS
                     $dataFarmInventoryOrders = $this->Terratransactions_model->get_farm_inventory_orders_by_origin($originid);
@@ -188,7 +188,7 @@
                         $rd->productId = (int)$rd->productId;
                         $rd->productTypeId = (int)$rd->productTypeId;
                         $rd->capturedTimestamp = (int)$rd->capturedTimestamp;
-                        $rd->updatedAt = (int)$rd->updateAt;
+                        $rd->updatedAt = (int)$rd->updatedAt;
 
                         // ======================
                         // ATTACH RECEPTION DATA
@@ -239,7 +239,6 @@
                         $groupedDispatchData[$dispatchdata->dispatchId][] = $dispatchdata;
                     }
 
-
                     // ======================
                     // FORMAT DISPATCH DETAILS
                     // ======================
@@ -269,6 +268,34 @@
                     $return_arr_dispatch_details = $dataDispatchDetails;
                 }
 
+                if(in_array('6', $roles)) {
+
+                    // CREDIT TRANSACTIONS
+                    $dataCreditTransactions = $this->Terratransactions_model->fetch_credit_transactions($originid, $userid);
+
+                    foreach ($dataCreditTransactions as &$c) {
+                        $c->transactionId = (int)$c->transactionId;
+                        $c->amount = (float)$c->amount;
+                        $c->transactionTimestamp = (int)$c->transactionTimestamp;
+                        $c->updatedAt = (int)$c->updatedAt;
+                    }
+
+                    $return_arr_credit_transactions = $dataCreditTransactions;
+
+                    // DEBIT TRANSACTIONS
+                    $dataDebitTransactions = $this->Terratransactions_model->fetch_debit_transactions($originid, $userid);
+
+                    foreach ($dataDebitTransactions as &$d) {
+                        $d->transactionId = (int)$d->transactionId;
+                        $d->amount = (float)$d->amount;
+                        $d->expenseTimestamp = (int)$d->expenseTimestamp;
+                        $d->creditTransactionId = (int)$d->creditTransactionId;
+                        $d->accountHeadId = (int)$d->accountHeadId;
+                    }
+
+                    $return_arr_debit_transactions = $dataDebitTransactions;
+                }
+
                 return $this->output([
                     "status" => true,
                     "message" => "",
@@ -279,6 +306,8 @@
                         "dispatchContainers" => $return_arr_dispatch_containers,
                         "receptionDetails" => $return_arr_reception_details,
                         "dispatchDetails" => $return_arr_dispatch_details,
+                        "creditTransactions" => $return_arr_credit_transactions,
+                        "debitTransactions" => $return_arr_debit_transactions,
                     ]
                 ]);
             } catch (Exception $e) {
