@@ -172,6 +172,152 @@ class Sync extends MY_Controller
     }
 
     // =====================
+    // INVOICE UPLOAD
+    // =====================
+    public function uploadexpenseinvoices()
+    {
+        try {
+            // =========================
+            // REQUEST METHOD CHECK
+            // =========================
+
+            if ($this->input->method(TRUE) !== 'POST') {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Invalid request method'
+                ], 405);
+            }
+
+            // =========================
+            // AUTHORIZATION
+            // =========================
+            $headers = apache_request_headers();
+            $requestBearerToken = '';
+            foreach ($headers as $header => $value) {
+                if ($header == "Authorization") {
+                    list($a, $b) = explode(" ", $value);
+                    $requestBearerToken = $b;
+                }
+            }
+
+            if (empty($requestBearerToken)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Authorization token missing'
+                ], 401);
+            }
+
+            $token = JWT::decode($requestBearerToken, JWT_SECRET);
+            $userid   = $token->userid ?? 0;
+            $originid = $token->originid ?? 0;
+
+            // =========================
+            // USER VALIDATION
+            // =========================
+
+            if (!$this->Terralogin_model->check_user_exists_terra_app($userid, $originid)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Unauthorized user'
+                ], 401);
+            }
+
+            // =========================
+            // REQUIRED PARAMS
+            // =========================
+
+            $tempTransactionId = $this->input->post('tempTransactionId');
+
+            if (empty($tempTransactionId)) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Required parameters missing'
+                ], 400);
+            }
+
+            // =========================
+            // FILE CHECK
+            // =========================
+
+            if (!isset($_FILES['image'])) {
+                return $this->output([
+                    'status' => false,
+                    'message' => 'Invoice file missing'
+                ], 400);
+            }
+
+            // =========================
+            // CREATE DIRECTORY
+            // =========================
+
+            $uploadPath = FCPATH . 'uploads/expenseinvoices/';
+
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+
+            // =========================
+            // FILE EXTENSION
+            // =========================
+            $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+
+            // =========================
+            // CUSTOM FILE NAME
+            // =========================
+
+            $customFileName = 'expinv_' . $tempTransactionId . '_' . rand(1000, 9999) . '.' . $ext;
+
+            // =========================
+            // UPLOAD CONFIG
+            // =========================
+
+            $config = [
+                'upload_path' => $uploadPath,
+                'allowed_types' => '*',
+                'file_name' => $customFileName,
+                'overwrite' => false,
+                'max_size' => 20480 // 20MB
+            ];
+
+            $this->load->library('upload', $config);
+
+            // =========================
+            // UPLOAD FILE
+            // =========================
+
+            if (!$this->upload->do_upload('image')) {
+                return $this->output([
+                    'status' => false,
+                    'message' => $this->upload->display_errors('', '')
+                ], 400);
+            }
+
+            // =========================
+            // FILE DATA
+            // =========================
+
+            $fileData = $this->upload->data();
+
+            $imageUrl = base_url('uploads/expenseinvoices/' . $fileData['file_name']);
+
+            // =========================
+            // SUCCESS RESPONSE
+            // =========================
+            return $this->output([
+                'status' => true,
+                'message' => 'Invoice uploaded successfully',
+                'tempTransactionId' => $tempTransactionId,
+                'url' => $imageUrl
+            ]);
+        } catch (Exception $e) {
+            return $this->output([
+                "status" => false,
+                "message" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // =====================
     // SYNC DATA
     // =====================
     public function syncdata()
@@ -292,6 +438,11 @@ class Sync extends MY_Controller
             // FARM PRICE CALCULATION
             // =====================================================
             $this->process_farm_price_calculation($farmTempIds, $userid, $originid);
+
+            // =================
+            // EXPENSE DETAILS
+            // =================
+            $this->process_expense_details($input, $userid, $originid, $response);
 
             // =====================================================
             // TRANSACTION STATUS
@@ -459,6 +610,7 @@ class Sync extends MY_Controller
             'containerDataMappings' => [],
             'farmMappings' => [],
             'farmDataMappings' => [],
+            'expenseDataMappings' => [],
         ];
     }
 
@@ -1779,6 +1931,120 @@ class Sync extends MY_Controller
 
                 $this->Terrasync_model->add_inventory_ledger($dataInventoryLedger);
             }
+        }
+    }
+
+    // =====================================================
+    // PROCESS EXPENSE DETAILS
+    // =====================================================
+    private function process_expense_details(array $input, int $userid, int $originid, array &$response)
+    {
+        foreach ($input['expenseData'] as $expensedata) {
+
+            // =====================
+            // FLAGS
+            // =====================
+            $isDeleted = filter_var($expensedata['isDeleted'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            $isForestry = filter_var($expensedata['isForestry'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+            // =====================
+            // COMMON DATA
+            // =====================
+
+            $transactionDisplayId = $this->Terrasync_model->transactionCodeSequence();
+
+            $transactionDetailData = [
+                "credit_transaction_id" => $expensedata['creditTransactionId'],
+                "transaction_display_id" => $transactionDisplayId,
+                "user_id" => $userid,
+                "transaction_type" => 2,
+                "amount" => $expensedata['amount'],
+                "transaction_date" => $expensedata['expenseDate'],
+                "temp_expense_id" => $expensedata['tempTransactionId'] ?? null,
+                "concept_general" => "",
+                "updated_by" => $userid,
+                "is_active" => $isDeleted ? 0 : 1,
+                "origin_id" => $originid,
+                "is_forestry" => $isForestry ? 1 : 0,
+                "forestry_cost_type" => $expensedata['forestryCostType'] ?? 0,
+            ];
+
+            // =====================
+            // CHECK EXISTS
+            // =====================
+            $transactionExists = $this->Terrasync_model->transaction_exists($expensedata['tempTransactionId']);
+
+            // =====================
+            // INSERT
+            // =====================
+
+            $transactionId = 0;
+            if (!$transactionExists) {
+                $transactionDetailData['created_by'] = $userid;
+                $transactionDetailData['temp_transaction_id'] = $expensedata['tempTransactionId'];
+                $transactionDetailData['expense_timestamp'] = $expensedata['capturedTimeStamp'];
+
+                $transactionId = $this->Terrasync_model->add_transaction($transactionDetailData);
+            } else {
+
+                // =================
+                // UPDATE
+                // =================
+
+                $transactionId = $transactionExists->transaction_id ?? 0;
+
+                if ($transactionId > 0) {
+                    $this->Terrasync_model->update_transaction($transactionId, $expensedata['tempTransactionId'], $transactionDetailData);
+                }
+            }
+
+            if ($transactionId > 0) {
+                // =====================
+                // EXPENSE COMMON DATA
+                // =====================
+                $expenseDetailData = [
+                    "transaction_id" => $transactionId,
+                    "transaction_display_id" => $transactionDisplayId,
+                    "expense_type" => 1,
+                    "account_head" => $expensedata['accountHeadId'],
+                    "beneficiary_name" => $expensedata['beneficiaryName'],
+                    "document_number" => $expensedata['beneficiaryIdentification'],
+                    "expense_date" => $expensedata['expenseDate'],
+                    "expense_uploaded_image" => $expensedata['attachFileUrl'] ?? null,
+                    "updated_by" => $userid,
+                    "is_active" => $isDeleted ? 0 : 1,
+                ];
+
+                // =====================
+                // EXPENSE CHECK EXISTS
+                // =====================
+                $expenseDetailsExists = $this->Terrasync_model->expense_details_exists($transactionId);
+
+                if (!$expenseDetailsExists) {
+                    $expenseDetailData['created_by'] = $userid;
+
+                    $expenseDetailId = $this->Terrasync_model->add_expense_details($expenseDetailData);
+                } else {
+
+                    // =================
+                    // UPDATE
+                    // =================
+
+                    $expenseDetailId = $expenseDetailsExists->expense_details_id ?? 0;
+
+                    if ($expenseDetailId > 0) {
+                        $this->Terrasync_model->update_expense_details($expenseDetailId, $expenseDetailData);
+                    }
+                }
+            }
+
+            // =====================
+            // RESPONSE MAPPING
+            // =====================
+            $response['expenseDataMappings'][] = [
+                'tempTransactionId' => $expensedata['tempTransactionId'],
+                'transactionId' => (int) $transactionId
+            ];
         }
     }
 }

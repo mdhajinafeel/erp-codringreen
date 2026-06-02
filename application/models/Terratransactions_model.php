@@ -135,7 +135,7 @@ class Terratransactions_model extends CI_Model
     {
         $query = "SELECT transaction_id AS creditTransactionId, transaction_display_id AS transactionDisplayId, amount, 
             transaction_date AS transactionDate, expense_timestamp AS transactionTimestamp, concept_general AS conceptGeneral, 
-            ROUND(UNIX_TIMESTAMP(dc.updateddate) * 1000) AS updatedAt
+            ROUND(UNIX_TIMESTAMP(updated_date) * 1000) AS updatedAt
             FROM tbl_transaction 
             WHERE is_active = 1 AND origin_id = $originId AND user_id = $userId AND transaction_type = 1";
         $result = $this->db->query($query);
@@ -149,7 +149,8 @@ class Terratransactions_model extends CI_Model
             A.transaction_display_id AS transactionDisplayId, A.amount AS amount, A.expense_timestamp AS expenseTimestamp, B.expense_date AS expenseDate, 
             B.account_head AS accountHeadId, 
             B.beneficiary_name AS beneficiaryName, B.document_number AS documentNumber, B.expense_uploaded_image AS expenseUploadedImage, 
-            A.is_forestry AS isForestry, A.forestry_cost_type AS forestryCostType
+            A.is_forestry AS isForestry, A.forestry_cost_type AS forestryCostType, 
+            ROUND(UNIX_TIMESTAMP(A.updated_date) * 1000) AS updatedAt
             FROM tbl_transaction A 
             INNER JOIN tbl_expense_details B ON B.transaction_id = A.transaction_id AND B.transaction_display_id = A.transaction_display_id 
             WHERE A.is_active = 1 AND origin_id = $originId AND user_id = $userId AND transaction_type = 2";

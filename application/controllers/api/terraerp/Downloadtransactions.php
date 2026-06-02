@@ -291,6 +291,9 @@
                         $d->expenseTimestamp = (int)$d->expenseTimestamp;
                         $d->creditTransactionId = (int)$d->creditTransactionId;
                         $d->accountHeadId = (int)$d->accountHeadId;
+                        $d->isForestry = (bool)$d->isForestry;
+                        $d->forestryCostType = (int)$d->forestryCostType;
+                        $d->updatedAt = (int)$d->updatedAt;
                     }
 
                     $return_arr_debit_transactions = $dataDebitTransactions;

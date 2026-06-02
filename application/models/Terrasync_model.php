@@ -545,4 +545,97 @@ class Terrasync_model extends CI_Model
             return false;
         }
     }
+
+    // =========================
+    // TRANSACTION
+    // =========================
+    public function transaction_exists(string $tempTransactionId)
+    {
+        return $this->db
+            ->where('temp_transaction_id', $tempTransactionId)
+            ->where('is_active', 1)
+            ->get('tbl_transaction')
+            ->row();
+    }
+
+    public function add_transaction(array $data): int
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_transaction', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
+
+    public function update_transaction(int $transactionId, string $tempTransactionId, array $data): bool
+    {
+        $multiClause = array(
+            'transaction_id' => $transactionId,
+            'temp_transaction_id' => $tempTransactionId,
+            'is_active' => 1
+        );
+        $this->db->where($multiClause);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        if ($this->db->update('tbl_transaction', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function transactionCodeSequence()
+    {
+        $count = $this->transaction_record_count(2);
+        $next = $count + 1;
+
+        // Always return an 8-digit padded code
+        return "D" . str_pad($next, 8, '0', STR_PAD_LEFT);
+    }
+
+    private function transaction_record_count(int $transactionType)
+    {
+        $this->db->where("transaction_type", $transactionType);
+        $this->db->from("tbl_transaction");
+        return $this->db->count_all_results();
+    }
+
+    // =========================
+    // EXPENSE DETAILS
+    // =========================
+    public function expense_details_exists(int $transactionId)
+    {
+        return $this->db
+            ->where('transaction_id', $transactionId)
+            ->where('is_active', 1)
+            ->get('tbl_expense_details')
+            ->row();
+    }
+
+    public function add_expense_details(array $data): int
+    {
+        $this->db->set('created_date', 'NOW()', FALSE);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        $this->db->insert('tbl_expense_details', $data);
+        if ($this->db->affected_rows() > 0) {
+            $insert_id = $this->db->insert_id();
+            return $insert_id;
+        } else {
+            return 0;
+        }
+    }
+
+    public function update_expense_details(int $expenseDetailsId, array $data): bool
+    {
+        $this->db->where('expense_details_id', $expenseDetailsId);
+        $this->db->set('updated_date', 'NOW()', FALSE);
+        if ($this->db->update('tbl_expense_details', $data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
